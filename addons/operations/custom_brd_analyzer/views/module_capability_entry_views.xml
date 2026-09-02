@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_capability_entry_list" model="ir.ui.view">
+            <field name="name">custom.module.capability.entry.list</field>
+            <field name="model">custom.module.capability.entry</field>
+            <field name="arch" type="xml">
+                <list decoration-success="maturity == 'production'" decoration-warning="maturity == 'partial' or knowledge_status == 'drift'" decoration-muted="maturity == 'scaffold'" decoration-danger="knowledge_status == 'drift'">
+                    <field name="module_name"/>
+                    <field name="category"/>
+                    <field name="maturity"/>
+                    <field name="version"/>
+                    <field name="capability_tag_ids" widget="many2many_tags"/>
+                    <field name="knowledge_status" widget="badge" decoration-success="knowledge_status == 'reviewed'" decoration-info="knowledge_status == 'draft'" decoration-danger="knowledge_status == 'drift'" decoration-muted="knowledge_status == 'missing'"/>
+                    <field name="last_scanned"/>
+                    <button name="action_rescan" type="object" string="Rescan All" class="btn-link" icon="fa-refresh"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_capability_entry_form" model="ir.ui.view">
+            <field name="name">custom.module.capability.entry.form</field>
+            <field name="model">custom.module.capability.entry</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_rescan" type="object" string="Rescan Catalog" class="btn-primary"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="module_name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="category"/>
+                                <field name="maturity"/>
+                                <field name="version"/>
+                                <field name="last_scanned"/>
+                            </group>
+                            <group>
+                                <field name="module_path"/>
+                                <field name="capability_tag_ids" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Summary">
+                                <field name="summary" nolabel="1"/>
+                            </page>
+                            <page string="README">
+                                <field name="readme_excerpt" nolabel="1"/>
+                            </page>
+                            <page string="Knowledge">
+                                <group>
+                                    <field name="knowledge_status"/>
+                                </group>
+                                <field name="knowledge_md" nolabel="1"/>
+                            </page>
+                            <page string="Models &amp; Routes">
+                                <group>
+                                    <field name="models_own" widget="json"/>
+                                    <field name="models_inherit" widget="json"/>
+                                    <field name="routes" widget="json"/>
+                                    <field name="depends" widget="json"/>
+                                    <field name="wizards" widget="json"/>
+                                </group>
+                            </page>
+                            <page string="Fields &amp; Methods">
+                                <group>
+                                    <field name="fields_summary" widget="json"/>
+                                    <field name="methods" widget="json"/>
+                                </group>
+                            </page>
+                            <page string="UI &amp; Security">
+                                <group>
+                                    <field name="views_count"/>
+                                    <field name="reports_count"/>
+                                    <field name="security_groups" widget="json"/>
+                                </group>
+                            </page>
+                            <page string="Notes">
+                                <field name="notes"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_capability_entry_search" model="ir.ui.view">
+            <field name="name">custom.module.capability.entry.search</field>
+            <field name="model">custom.module.capability.entry</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="module_name"/>
+                    <field name="capability_tag_ids"/>
+                    <filter name="filter_core" string="Core" domain="[('category','=','core')]"/>
+                    <filter name="filter_control_plane" string="Control Plane" domain="[('category','=','control_plane')]"/>
+                    <filter name="filter_compliance" string="Compliance" domain="[('category','=','compliance')]"/>
+                    <filter name="filter_ee_gap" string="EE-Gap" domain="[('category','=','ee_gap')]"/>
+                    <filter name="filter_operations" string="Operations" domain="[('category','=','operations')]"/>
+                    <filter name="filter_vertical" string="Vertical" domain="[('category','=','vertical')]"/>
+                    <separator/>
+                    <filter name="filter_production" string="Production" domain="[('maturity','=','production')]"/>
+                    <filter name="filter_partial" string="Partial" domain="[('maturity','=','partial')]"/>
+                    <filter name="filter_scaffold" string="Scaffold" domain="[('maturity','=','scaffold')]"/>
+                    <separator/>
+                    <filter name="filter_knowledge_missing" string="Knowledge Missing" domain="[('knowledge_status','=','missing')]"/>
+                    <filter name="filter_knowledge_draft" string="Knowledge Draft" domain="[('knowledge_status','=','draft')]"/>
+                    <filter name="filter_knowledge_reviewed" string="Knowledge Reviewed" domain="[('knowledge_status','=','reviewed')]"/>
+                    <filter name="filter_knowledge_drift" string="Knowledge Drift" domain="[('knowledge_status','=','drift')]"/>
+
+                        <filter name="group_category" string="Category" context="{'group_by':'category'}"/>
+                        <filter name="group_maturity" string="Maturity" context="{'group_by':'maturity'}"/>
+
+                </search>
+            </field>
+        </record>
+
+        <record id="action_capability_entry" model="ir.actions.act_window">
+            <field name="name">Capability Catalog</field>
+            <field name="res_model">custom.module.capability.entry</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_capability_entry_search"/>
+        </record>
+
+    </data>
+</odoo>

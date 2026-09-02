@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- License: LGPL-3 -->
+<odoo>
+    <template id="hht_shell_layout" name="HHT PWA Shell">
+        <html lang="en">
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport"
+                      content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+                <meta name="theme-color" content="#1f2937"/>
+                <title>Hub HHT</title>
+                <!-- crossorigin=use-credentials: the manifest fetch is
+                     uncredentialed by default, so without it the session
+                     cookie is dropped, Odoo cannot resolve the database and
+                     the request 404s. -->
+                <link rel="manifest" href="/hht/manifest.webmanifest"
+                      crossorigin="use-credentials"/>
+                <link rel="icon" sizes="192x192"
+                      href="/custom_hht_bridge/static/src/pwa/icon-192.png"/>
+                <script type="text/javascript">
+                    var odoo = <t t-out="json.dumps({
+                        'csrf_token': request.csrf_token(None),
+                        '__session_info__': session_info,
+                        'debug': debug,
+                    })"/>;
+                </script>
+                <!-- Boot diagnostics. Deliberately ES5-only (no arrow
+                     functions, const/let, or template literals) so it still
+                     runs on an old Android WebView that cannot even parse the
+                     modern bundle. Registered before the bundle so window.onerror
+                     catches the bundle's own parse/runtime errors, turning a
+                     blank screen into a readable message on a device that has
+                     no DevTools. -->
+                <script type="text/javascript">
+                    (function () {
+                        var errors = [];
+                        function render() {
+                            var el = document.getElementById('hht-app');
+                            if (!el) { return; }
+                            el.innerHTML = '';
+                            var box = document.createElement('div');
+                            box.setAttribute('style', 'padding:14px;font-family:monospace;font-size:12px;color:#e5e7eb;background:#111827;min-height:100vh');
+                            var h = document.createElement('div');
+                            h.setAttribute('style', 'color:#ef4444;font-weight:bold;font-size:14px;margin-bottom:10px');
+                            h.textContent = 'HHT shell failed to start';
+                            box.appendChild(h);
+                            var e = document.createElement('div');
+                            e.setAttribute('style', 'margin-bottom:10px;white-space:pre-wrap;word-break:break-all');
+                            e.textContent = errors.join('\n\n');
+                            box.appendChild(e);
+                            var ua = document.createElement('div');
+                            ua.setAttribute('style', 'color:#9ca3af;white-space:pre-wrap;word-break:break-all');
+                            ua.textContent = 'UA: ' + navigator.userAgent;
+                            box.appendChild(ua);
+                            el.appendChild(box);
+                        }
+                        var reportTimer = null;
+                        function report() {
+                            try {
+                                var xhr = new XMLHttpRequest();
+                                xhr.open('POST', '/hht/boot-report', true);
+                                xhr.setRequestHeader('Content-Type', 'application/json');
+                                xhr.send(JSON.stringify({
+                                    errors: errors,
+                                    ua: navigator.userAgent,
+                                    url: window.location.href
+                                }));
+                            } catch (e) {
+                                // Reporting must never mask the failure it reports.
+                            }
+                        }
+                        function scheduleReport() {
+                            // Batch: a parse error often fires several handlers.
+                            if (reportTimer) { return; }
+                            reportTimer = setTimeout(report, 1500);
+                        }
+                        window.onerror = function (msg, src, line) {
+                            errors.push(String(msg) + '\n  at ' + String(src) + ':' + String(line));
+                            render();
+                            scheduleReport();
+                            return false;
+                        };
+                        window.addEventListener('load', function () {
+                            setTimeout(function () {
+                                if (document.querySelector('#hht-app .hht-shell')) { return; }
+                                if (errors.length === 0) {
+                                    errors.push('The app did not mount within 12s and reported no error.');
+                                }
+                                render();
+                                scheduleReport();
+                            }, 12000);
+                        });
+                    })();
+                </script>
+                <t t-call-assets="custom_hht_bridge.pwa_assets" t-css="true" t-js="false"/>
+                <t t-call-assets="custom_hht_bridge.pwa_assets" t-css="false" t-js="true"/>
+                <script type="text/javascript">
+                    if ('serviceWorker' in navigator) {
+                        window.addEventListener('load', function () {
+                            navigator.serviceWorker.register('/hht/sw.js', { scope: '/hht/' })
+                                .catch(function (e) { console.warn('SW register failed', e); });
+                        });
+                    }
+                </script>
+            </head>
+            <body>
+                <div id="hht-app"/>
+            </body>
+        </html>
+    </template>
+</odoo>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_provider_topup_wizard_form" model="ir.ui.view">
+        <field name="name">custom.ppob.provider.topup.wizard.form</field>
+        <field name="model">custom.ppob.provider.topup.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Topup Provider Bucket (DP 100% + Pelunasan)">
+                <sheet>
+                    <group>
+                        <group string="Provider">
+                            <field name="provider_id" readonly="1"/>
+                            <field name="mode" readonly="1"/>
+                            <field name="bucket_id"/>
+                            <field name="timing" readonly="1"/>
+                            <field name="coretax_method" readonly="1"/>
+                            <field name="reason"/>
+                        </group>
+                        <group string="Amounts">
+                            <field name="gross_amount"/>
+                            <field name="discount_amount"/>
+                            <field name="paid_amount" readonly="1"/>
+                            <field name="dpp_amount" readonly="1"/>
+                            <field name="tax_amount" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="request_uid" readonly="1"/>
+                        <field name="bank_account_id"/>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        <strong>Flow:</strong> Wizard creates a DP 100% vendor bill (full gross with PPN Masukan) and a Pelunasan vendor bill (Rp 0). Bucket is credited at the timing configured on the provider.
+                        Pay the DP bill via Register Payment to settle A/P with the bank.
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_apply" type="object" string="Create DP &amp; Pelunasan Bills" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ppob_provider_topup_wizard" model="ir.actions.act_window">
+        <field name="name">Topup Bucket (DP 100%)</field>
+        <field name="res_model">custom.ppob.provider.topup.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

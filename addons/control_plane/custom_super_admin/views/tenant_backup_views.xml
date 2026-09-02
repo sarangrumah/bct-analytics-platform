@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_tenant_backup_list" model="ir.ui.view">
+        <field name="name">tenant.backup.list</field>
+        <field name="model">tenant.backup</field>
+        <field name="arch" type="xml">
+            <list string="Backups"
+                  decoration-success="outcome == 'success'"
+                  decoration-danger="outcome == 'failure'"
+                  decoration-info="outcome == 'pending'"
+                  create="false" edit="false">
+                <field name="started_at"/>
+                <field name="tenant_slug"/>
+                <field name="kind"/>
+                <field name="size_human"/>
+                <field name="checksum_sha256" optional="hide"/>
+                <field name="s3_key" optional="show"/>
+                <field name="outcome" widget="badge"/>
+                <field name="expires_at"/>
+                <button name="action_restore_to_staging"
+                        type="object"
+                        icon="fa-undo"
+                        title="Restore to staging"
+                        invisible="outcome != 'success'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_tenant_backup_form" model="ir.ui.view">
+        <field name="name">tenant.backup.form</field>
+        <field name="model">tenant.backup</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false">
+                <header>
+                    <button name="action_restore_to_staging"
+                            string="Restore to Staging"
+                            type="object"
+                            class="btn-primary"
+                            invisible="outcome != 'success'"/>
+                </header>
+                <sheet>
+                    <h1>
+                        <field name="tenant_slug"/>
+                        <span> / </span>
+                        <field name="kind"/>
+                    </h1>
+                    <group>
+                        <group>
+                            <field name="started_at"/>
+                            <field name="finished_at"/>
+                            <field name="outcome" widget="badge"/>
+                            <field name="size_human"/>
+                        </group>
+                        <group>
+                            <field name="s3_key"/>
+                            <field name="checksum_sha256"/>
+                            <field name="expires_at"/>
+                        </group>
+                    </group>
+                    <field name="error" invisible="not error" readonly="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_tenant_backup" model="ir.actions.act_window">
+        <field name="name">Backups</field>
+        <field name="res_model">tenant.backup</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

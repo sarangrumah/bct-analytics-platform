@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_onboarding_journey_form" model="ir.ui.view">
+        <field name="name">onboarding.journey.form</field>
+        <field name="model">onboarding.journey</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_launch_brd_upload" type="object"
+                            string="Upload BRD" class="btn-primary"
+                            invisible="stage in ('closed','rejected')"/>
+                    <button name="action_launch_go_no_go" type="object"
+                            string="Go / No-Go" class="btn-primary"
+                            invisible="stage not in ('recommendations_ready','go_no_go')"/>
+                    <button name="action_launch_provision" type="object"
+                            string="Provision Tenant" class="btn-primary"
+                            invisible="stage not in ('go_no_go','provisioning_requested')"/>
+                    <field name="stage" widget="statusbar"
+                           statusbar_visible="intake,brd_uploaded,brd_analyzed,recommendations_ready,go_no_go,provisioning_in_progress,tenant_live,handover,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_open_brds" icon="fa-file-text-o">
+                            <field name="brd_document_ids" widget="statinfo" string="BRDs"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_recommendations" icon="fa-lightbulb-o">
+                            <field name="brd_recommendation_ids" widget="statinfo" string="Recommendations"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_project" icon="fa-tasks"
+                                invisible="not project_id">
+                            <span class="o_stat_text">Project</span>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_tasks" icon="fa-list-ul"
+                                invisible="not project_id">
+                            <span class="o_stat_text">Tasks</span>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_tenant" icon="fa-database"
+                                invisible="not tenant_registry_id">
+                            <span class="o_stat_text">Tenant</span>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_open_vps" icon="fa-server"
+                                invisible="not tenant_vps_id">
+                            <span class="o_stat_text">VPS</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Customer name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="owner_id"/>
+                            <field name="ba_id"/>
+                            <field name="target_go_live"/>
+                            <field name="mandays_estimate"/>
+                            <field name="progress_pct" widget="progressbar"/>
+                        </group>
+                        <group>
+                            <field name="tenant_registry_id"/>
+                            <field name="tenant_vps_id"/>
+                            <field name="tenant_environment_id"/>
+                            <field name="project_id" readonly="1"/>
+                            <field name="project_orphaned" readonly="1"/>
+                            <field name="approval_request_id" readonly="1"/>
+                            <field name="sync_version" readonly="1"/>
+                            <field name="public_status_token" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Info">
+                            <field name="company_profile_json" widget="text"/>
+                        </page>
+                        <page string="BRDs">
+                            <field name="brd_document_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="state"/>
+                                    <field name="overall_fit_pct"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Stage Transitions">
+                            <field name="transition_ids" readonly="1">
+                                <list>
+                                    <field name="transitioned_at"/>
+                                    <field name="from_stage"/>
+                                    <field name="to_stage"/>
+                                    <field name="user_id"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_onboarding_journey_list" model="ir.ui.view">
+        <field name="name">onboarding.journey.list</field>
+        <field name="model">onboarding.journey</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="stage"/>
+                <field name="owner_id"/>
+                <field name="ba_id"/>
+                <field name="target_go_live"/>
+                <field name="mandays_estimate"/>
+                <field name="progress_pct" widget="progressbar"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_onboarding_journey_kanban" model="ir.ui.view">
+        <field name="name">onboarding.journey.kanban</field>
+        <field name="model">onboarding.journey</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="owner_id"/>
+                <field name="target_go_live"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="o_kanban_record_top">
+                            <strong><field name="name"/></strong>
+                        </div>
+                        <div><field name="partner_id"/></div>
+                        <div>Owner: <field name="owner_id"/></div>
+                        <div>Go-Live: <field name="target_go_live"/></div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_onboarding_journey" model="ir.actions.act_window">
+        <field name="name">Onboarding Pipeline</field>
+        <field name="res_model">onboarding.journey</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+
+</odoo>

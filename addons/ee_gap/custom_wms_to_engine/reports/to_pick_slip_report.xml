@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_to_pick_slip" model="ir.actions.report">
+        <field name="name">Transfer Order Pick Slip</field>
+        <field name="model">custom.transfer.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_wms_to_engine.report_to_pick_slip</field>
+        <field name="report_file">custom_wms_to_engine.report_to_pick_slip</field>
+        <field name="binding_model_id" ref="model_custom_transfer_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_to_pick_slip">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Transfer Order <span t-field="o.name"/></h2>
+                        <p>
+                            <img t-att-src="'/report/barcode/Code128/' + (o.name or '')" alt="Barcode" style="height:50px;"/>
+                        </p>
+                        <table class="table table-sm">
+                            <tr><th>Product</th><td><span t-field="o.product_id"/></td></tr>
+                            <tr><th>Lot</th><td><span t-field="o.lot_id"/></td></tr>
+                            <tr><th>Source</th><td><span t-field="o.source_location_id"/></td></tr>
+                            <tr><th>Target</th><td><span t-field="o.target_location_id"/></td></tr>
+                            <tr><th>Planned Qty</th><td><span t-field="o.planned_qty"/></td></tr>
+                            <tr><th>Priority</th><td><span t-field="o.rule_id.priority"/></td></tr>
+                        </table>
+                        <p style="margin-top:30px;">
+                            Picker signature: ____________________________
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

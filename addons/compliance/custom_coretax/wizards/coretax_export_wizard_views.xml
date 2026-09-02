@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_coretax_export_wizard_form" model="ir.ui.view">
+        <field name="name">custom.coretax.export.wizard.form</field>
+        <field name="model">custom.coretax.export.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Coretax XML Export">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="config_id"/>
+                            <field name="document_type"/>
+                        </group>
+                        <group>
+                            <field name="period_year_from"/>
+                            <field name="period_month_from"/>
+                            <field name="period_year_to"/>
+                            <field name="period_month_to"/>
+                        </group>
+                    </group>
+                    <group invisible="not xml_filename">
+                        <field name="record_count" readonly="1"/>
+                        <field name="xml_filename" readonly="1"/>
+                        <field name="xml_file" filename="xml_filename" readonly="1"/>
+                        <field name="validation_warning" readonly="1"
+                               invisible="not validation_warning"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate_xml" type="object"
+                            string="Generate XML" class="btn-primary"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_coretax_export_wizard" model="ir.actions.act_window">
+        <field name="name">Export XML</field>
+        <field name="res_model">custom.coretax.export.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

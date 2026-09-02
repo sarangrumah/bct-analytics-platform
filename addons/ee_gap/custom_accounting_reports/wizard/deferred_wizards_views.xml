@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pph_reconciliation_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.pph.reconciliation.wizard.form</field>
+        <field name="model">custom.report.pph.reconciliation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Rekonsiliasi PPh Terutang vs Disetor">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group><field name="company_ids" widget="many2many_tags"/></group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print" type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Lihat Transaksi" name="action_view_source" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_pph_reconciliation_wizard" model="ir.actions.act_window">
+        <field name="name">Rekonsiliasi PPh (Terutang vs Disetor)</field>
+        <field name="res_model">custom.report.pph.reconciliation.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_pph25_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.pph25.wizard.form</field>
+        <field name="model">custom.report.pph25.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Monitoring Angsuran PPh 25">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group><field name="company_ids" widget="many2many_tags"/></group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print" type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Lihat Transaksi" name="action_view_source" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_pph25_wizard" model="ir.actions.act_window">
+        <field name="name">Monitoring Angsuran PPh 25</field>
+        <field name="res_model">custom.report.pph25.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_tax_audit_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.tax.audit.wizard.form</field>
+        <field name="model">custom.report.tax.audit.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Jejak Audit Pajak (PDP Audit Log)">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group><field name="company_ids" widget="many2many_tags"/></group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print" type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Lihat Transaksi" name="action_view_source" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_tax_audit_wizard" model="ir.actions.act_window">
+        <field name="name">Jejak Audit Pajak</field>
+        <field name="res_model">custom.report.tax.audit.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

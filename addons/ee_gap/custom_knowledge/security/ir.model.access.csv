@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_knowledge_tag_user,knowledge.tag user,model_knowledge_tag,custom_knowledge.group_user,1,1,1,0
+access_knowledge_tag_manager,knowledge.tag manager,model_knowledge_tag,custom_knowledge.group_manager,1,1,1,1
+access_knowledge_article_user,knowledge.article user,model_knowledge_article,custom_knowledge.group_user,1,1,1,0
+access_knowledge_article_manager,knowledge.article manager,model_knowledge_article,custom_knowledge.group_manager,1,1,1,1
+access_knowledge_article_template_user,knowledge.article.template user,model_knowledge_article_template,custom_knowledge.group_user,1,0,0,0
+access_knowledge_article_template_manager,knowledge.article.template manager,model_knowledge_article_template,custom_knowledge.group_manager,1,1,1,1
+access_knowledge_article_version_user,knowledge.article.version user,model_knowledge_article_version,custom_knowledge.group_user,1,0,0,0
+access_knowledge_article_version_manager,knowledge.article.version manager,model_knowledge_article_version,custom_knowledge.group_manager,1,1,1,1

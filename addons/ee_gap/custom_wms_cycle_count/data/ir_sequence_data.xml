@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Without this record ``next_by_code`` returns None and every session
+         falls back to the literal "CC/NEW" in create(), so all sessions end up
+         sharing one name — which makes the session barcode on the stock-take
+         sheet unscannable and the reports impossible to group. -->
+    <record id="seq_cycle_count_session" model="ir.sequence">
+        <field name="name">Cycle Count Session</field>
+        <field name="code">custom.cycle.count.session</field>
+        <field name="prefix">CC/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+        <field name="implementation">standard</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bast_document_form_loan" model="ir.ui.view">
+        <field name="name">custom.bast.document.form.loan</field>
+        <field name="model">custom.bast.document</field>
+        <field name="inherit_id" ref="custom_bast.view_bast_document_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_ids']/list/field[@name='note']" position="before">
+                <field name="is_loan" widget="boolean_toggle" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

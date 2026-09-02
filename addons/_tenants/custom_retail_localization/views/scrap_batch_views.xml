@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_scrap_batch_form" model="ir.ui.view">
+        <field name="name">custom.scrap.batch.form</field>
+        <field name="model">custom.scrap.batch</field>
+        <field name="arch" type="xml">
+            <form string="Scrap Batch">
+                <header>
+                    <button name="action_validate" type="object" string="Validate"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state != 'draft'"/>
+                    <button name="action_draft" type="object" string="Set to Draft"
+                            invisible="state != 'cancel'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_scraps" type="object"
+                                class="oe_stat_button" icon="fa-recycle"
+                                invisible="scrap_count == 0">
+                            <field name="scrap_count" widget="statinfo" string="Scraps"/>
+                        </button>
+                        <button name="action_view_move" type="object"
+                                class="oe_stat_button" icon="fa-book"
+                                invisible="not move_id">
+                            <span class="o_stat_text">Journal Entry</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="warehouse_id"
+                                   readonly="state != 'draft'"/>
+                            <field name="date" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="location_id" readonly="state != 'draft'"/>
+                            <field name="scrap_location_id" readonly="state != 'draft'"/>
+                            <field name="origin" readonly="state != 'draft'"/>
+                            <field name="reason_tag_ids" widget="many2many_tags"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Products" name="products">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="lot_id"
+                                           column_invisible="parent.state == 'done'"/>
+                                    <field name="scrap_qty"/>
+                                    <field name="product_uom_id"/>
+                                    <field name="value" optional="show"/>
+                                    <field name="scrap_id" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="amount_total"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_scrap_batch_list" model="ir.ui.view">
+        <field name="name">custom.scrap.batch.list</field>
+        <field name="model">custom.scrap.batch</field>
+        <field name="arch" type="xml">
+            <list string="Scrap Batches">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="warehouse_id"/>
+                <field name="amount_total"/>
+                <field name="move_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-muted="state == 'cancel'"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_scrap_batch_search" model="ir.ui.view">
+        <field name="name">custom.scrap.batch.search</field>
+        <field name="model">custom.scrap.batch</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="warehouse_id"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="done" string="Done" domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter name="group_warehouse" string="Warehouse"
+                        context="{'group_by': 'warehouse_id'}"/>
+                <filter name="group_state" string="Status"
+                        context="{'group_by': 'state'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_scrap_batch" model="ir.actions.act_window">
+        <field name="name">Scrap Batches</field>
+        <field name="res_model">custom.scrap.batch</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a scrap batch</p>
+            <p>Scrap several products at once and post one consolidated valuation journal.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_custom_scrap_batch"
+              name="Scrap Batches"
+              parent="stock.menu_stock_warehouse_mgmt"
+              action="action_custom_scrap_batch"
+              sequence="95"/>
+</odoo>

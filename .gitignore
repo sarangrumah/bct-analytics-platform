@@ -1,10 +1,109 @@
+# ===========================================================================
+# ANCHORING RULE - read this before adding a pattern.
+#
+# A pattern with no leading slash matches at EVERY depth. `data/` does not mean
+# "the data directory at the repo root", it means "any directory called data,
+# anywhere". That silently excluded three install-critical files:
+#
+#   addons/custom_pdp_core/data/pdp.field.classification.csv   (724-row contract 01 map)
+#   addons/custom_pdp_masking/data/pdp_masking_rule_data.xml
+#   addons/custom_ppob/data/ir_sequence_data.xml
+#
+# All three are declared in their manifests, so a fresh clone could not install
+# those modules - while every local check passed, because the files existed in
+# the working tree. `git status` shows nothing. Tests pass. It only surfaces on
+# a clean clone.
+#
+# So: if a pattern names a directory that exists at the ROOT and is runtime
+# state, ANCHOR IT with a leading slash. Leave a pattern unanchored only when
+# the name is an artefact everywhere it appears (node_modules, __pycache__,
+# .ruff_cache).
+#
+# Escape hatch, if a needed file is ever caught anyway:
+#   git add -f <path>          # tracks it despite the pattern
+#   git check-ignore -v --no-index <path>   # shows which line matched
+# `git add -f` fixes one file; it does NOT fix the pattern, so the next file at
+# that path is dropped again. Fix the pattern.
+#
+# `make verify` fails if an ignored file appears under a source root.
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# Secrets. `.env` holds generated dev credentials; `.env.example` (tracked)
+# holds only the literal string `changeme`.
+# ---------------------------------------------------------------------------
 .env
-.env.bak-*
-data/
+.env.*
+!.env.example
+*.bak-*
+.age-key.txt
+*.agekey
+
+# Private key material, at any depth - deliberately unanchored, and deliberately
+# fail-safe: a file called *.key or *.pem is presumed private.
+*.pem
+*.key
+# ...but PUBLIC keys and certificates must ship. The login-gateway publishes a
+# JWKS and its verifiers need the public half (contract 02), so these come back.
+!**/*.pub
+!**/*.pub.pem
+!**/*public*.pem
+!**/*.crt
+!**/*.pub.key
+
+# Unanchored on purpose: a directory called `secrets` should be ignored wherever
+# it appears. Nothing that must ship belongs in one. Use `git add -f` for a
+# README describing the layout.
+secrets/
+
+# ---------------------------------------------------------------------------
+# Runtime state - bind-mounted or generated at the repo ROOT. Never tracked.
+# ANCHORED: `data/`, `backups/` and `logs/` unanchored swallowed addon seed
+# data, dbt seeds and any nested logs/ a service ships.
+# ---------------------------------------------------------------------------
+/data/
+/backups/
+/logs/
 *.log
-node_modules/
+
+# Machine-local Postgres override, loaded by `include_if_exists` at the end of
+# postgres/postgresql.conf.
+/postgres/conf.d/local.conf
+
+# ---------------------------------------------------------------------------
+# Language / tooling artefacts.
+# Unanchored where the directory name is an artefact at any depth; anchored
+# where a source tree could legitimately use the name.
+# ---------------------------------------------------------------------------
 __pycache__/
-*.pyc
+*.py[cod]
+.venv/
+venv/
+node_modules/
+.next/
+dist/
+# ANCHORED: a dbt project can legitimately have models/.../build/.
+/build/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+coverage/
+.coverage
+
+# dbt (Data Warehouse agent) - already path-anchored.
 analytics/dbt/target/
 analytics/dbt/logs/
-.age-key.txt
+analytics/dbt/dbt_packages/
+
+# ---------------------------------------------------------------------------
+# Editors / OS
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*~

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--
+        Default config-parameters for the AI bridge.
+        These mirror the defaults declared on res.config.settings; setting them
+        explicitly here ensures the values exist before the Settings UI is opened.
+    -->
+    <record id="ir_config_custom_ai_enabled" model="ir.config_parameter">
+        <field name="key">custom_ai.enabled</field>
+        <field name="value">True</field>
+    </record>
+
+    <record id="ir_config_custom_ai_quality" model="ir.config_parameter">
+        <field name="key">custom_ai.quality</field>
+        <field name="value">fast</field>
+    </record>
+
+    <record id="ir_config_custom_ai_provider_override" model="ir.config_parameter">
+        <field name="key">custom_ai.provider_override</field>
+        <field name="value"></field>
+    </record>
+</odoo>

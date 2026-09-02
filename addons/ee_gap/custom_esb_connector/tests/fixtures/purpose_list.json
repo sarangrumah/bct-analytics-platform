@@ -1,0 +1,19 @@
+{
+  "path": "https://stg7.esb.co.id/core-stg/purpose",
+  "timestamp": "2026-07-21 09:00:02",
+  "status": "ok",
+  "code": "EC03100000",
+  "message": "OK",
+  "result": {
+    "page": 1,
+    "limit": 100,
+    "count": 2,
+    "data": [
+      {"purposeID": 9, "purposeName": "Stock Loss - Opname", "purposeAccount": "5-6100", "purposeAppliedTo": "Item Journal", "flagActive": 1},
+      {"purposeID": 10, "purposeName": "Stock Gain - Opname", "purposeAccount": "4-9100", "purposeAppliedTo": "Item Journal", "flagActive": 1}
+    ],
+    "prev": "",
+    "next": ""
+  },
+  "errors": null
+}

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_transfer_report_list" model="ir.ui.view">
+        <field name="name">custom.wms.transfer.report.list</field>
+        <field name="model">custom.wms.transfer.report</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <header>
+                    <button name="action_export_xlsx" type="object" string="Export XLSX (with barcode)"
+                            class="btn-primary"/>
+                </header>
+                <field name="date"/>
+                <field name="reference"/>
+                <field name="transfer_kind"/>
+                <field name="picking_type_id" optional="hide"/>
+                <field name="partner_id" optional="show"/>
+                <field name="location_id"/>
+                <field name="location_dest_id"/>
+                <field name="default_code" optional="show"/>
+                <field name="product_id"/>
+                <field name="categ_id" optional="hide"/>
+                <field name="demand_qty" sum="Total Demand"/>
+                <field name="done_qty" sum="Total Done"/>
+                <field name="state"/>
+                <field name="origin" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_transfer_report_pivot" model="ir.ui.view">
+        <field name="name">custom.wms.transfer.report.pivot</field>
+        <field name="model">custom.wms.transfer.report</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="transfer_kind" type="row"/>
+                <field name="date" interval="month" type="col"/>
+                <field name="demand_qty" type="measure"/>
+                <field name="done_qty" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_transfer_report_search" model="ir.ui.view">
+        <field name="name">custom.wms.transfer.report.search</field>
+        <field name="model">custom.wms.transfer.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="reference"/>
+                <field name="product_id"/>
+                <field name="default_code"/>
+                <field name="partner_id"/>
+                <field name="location_id"/>
+                <field name="location_dest_id"/>
+                <filter name="filter_done" string="Done" domain="[('state', '=', 'done')]"/>
+                <filter name="filter_internal" string="Internal" domain="[('transfer_kind', '=', 'internal')]"/>
+                <filter name="filter_incoming" string="Receipts" domain="[('transfer_kind', '=', 'incoming')]"/>
+                <filter name="filter_outgoing" string="Deliveries" domain="[('transfer_kind', '=', 'outgoing')]"/>
+                <filter name="filter_date" date="date"/>
+                <group>
+                    <filter name="group_kind" string="Kind" context="{'group_by': 'transfer_kind'}"/>
+                    <filter name="group_picking_type" string="Operation Type" context="{'group_by': 'picking_type_id'}"/>
+                    <filter name="group_source" string="From" context="{'group_by': 'location_id'}"/>
+                    <filter name="group_dest" string="To" context="{'group_by': 'location_dest_id'}"/>
+                    <filter name="group_product" string="Product (SKU)" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_transfer_report" model="ir.actions.act_window">
+        <field name="name">Transfer Report</field>
+        <field name="res_model">custom.wms.transfer.report</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="view_transfer_report_search"/>
+        <field name="context">{'search_default_filter_done': 1, 'search_default_group_kind': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">No transfers yet</p>
+            <p>All picking moves — receipts, deliveries and internal transfers
+               (including WMS Transfer Orders) — with demand vs done quantity.</p>
+        </field>
+    </record>
+
+</odoo>

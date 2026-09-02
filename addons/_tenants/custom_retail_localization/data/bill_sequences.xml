@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Trade / Non-Trade vendor-bill numbering (feedback Finance-AP #8 /
+      Accounting #16). Two independent sequences with a MONTHLY reset, mirroring
+      the PO sequences (see data/po_sequences.xml). EBR-prefixed with the stream
+      marker so Trade and Non-Trade bills never share a running counter even
+      though both post to the store's shared purchase journal:
+
+        Trade     -> BILL/T/EBR/YYYY/MM/00001
+        Non-Trade -> BILL/NT/EBR/YYYY/MM/00001
+
+      account.move._compute_name draws these (bypassing the sequence.mixin) for
+      vendor bills that carry an l10n_purchase_type; see models/account_move.py.
+      noupdate so the running counters survive upgrades.
+    -->
+    <data noupdate="1">
+        <record id="seq_account_move_bill_trade" model="ir.sequence">
+            <field name="name">the apparel brand Vendor Bill (Trade)</field>
+            <field name="code">account.move.retail.bill.trade</field>
+            <field name="prefix">BILL/T/EBR/%(year)s/%(month)s/</field>
+            <field name="padding">5</field>
+            <field name="use_date_range" eval="True"/>
+            <field name="implementation">no_gap</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_account_move_bill_nontrade" model="ir.sequence">
+            <field name="name">the apparel brand Vendor Bill (Non-Trade)</field>
+            <field name="code">account.move.retail.bill.nontrade</field>
+            <field name="prefix">BILL/NT/EBR/%(year)s/%(month)s/</field>
+            <field name="padding">5</field>
+            <field name="use_date_range" eval="True"/>
+            <field name="implementation">no_gap</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_ai_recommend_wizard_form" model="ir.ui.view">
+        <field name="name">custom.ai.recommend.wizard.form</field>
+        <field name="model">custom.ai.recommend.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Ask AI">
+                <group>
+                    <field name="model_name"/>
+                    <field name="res_id"/>
+                    <field name="locale"/>
+                </group>
+                <notebook>
+                    <page string="Result" name="result">
+                        <group>
+                            <field name="priority"/>
+                            <field name="tags"/>
+                        </group>
+                        <field name="summary" readonly="1"/>
+                        <field name="next_actions_text" readonly="1"/>
+                        <field name="raw_text" readonly="1"/>
+                    </page>
+                </notebook>
+                <footer>
+                    <button name="action_ask" string="Ask AI" type="object" class="btn-primary"/>
+                    <button special="cancel" string="Close" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

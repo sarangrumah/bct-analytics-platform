@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_provider_list" model="ir.ui.view">
+        <field name="name">custom.ppob.provider.list</field>
+        <field name="model">custom.ppob.provider</field>
+        <field name="arch" type="xml">
+            <list string="Providers">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="settlement_mode"/>
+                <field name="bucket_mode"/>
+                <field name="bucket_total_balance" sum="Total"/>
+                <field name="failover_priority"/>
+                <field name="adapter_class"/>
+                <field name="status" widget="badge" decoration-success="status=='active'" decoration-warning="status=='maintenance'" decoration-danger="status=='disabled'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ppob_provider_form" model="ir.ui.view">
+        <field name="name">custom.ppob.provider.form</field>
+        <field name="model">custom.ppob.provider</field>
+        <field name="arch" type="xml">
+            <form string="Provider">
+                <header>
+                    <button name="action_ensure_buckets" type="object"
+                            string="Ensure Buckets" class="btn-secondary"
+                            invisible="settlement_mode != 'prepaid_deposit'"/>
+                    <button name="%(action_ppob_provider_topup_wizard)d" type="action"
+                            string="Topup Bucket" class="btn-primary"
+                            invisible="settlement_mode != 'prepaid_deposit'"
+                            context="{'default_provider_id': id}"/>
+                    <button name="action_test_connection" type="object"
+                            string="Test Connection" class="btn-secondary"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Telkomsel"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="partner_id"/>
+                            <field name="settlement_mode"/>
+                            <field name="failover_priority"/>
+                            <field name="bucket_mode"
+                                   invisible="settlement_mode != 'prepaid_deposit'"/>
+                        </group>
+                        <group>
+                            <field name="journal_id"/>
+                            <field name="bucket_inventory_account_id"
+                                   invisible="settlement_mode != 'prepaid_deposit'"/>
+                            <field name="input_vat_account_id"
+                                   invisible="settlement_mode != 'prepaid_deposit'"/>
+                            <field name="tax_rate_topup"
+                                   invisible="settlement_mode != 'prepaid_deposit'"/>
+                            <field name="ap_account_id" invisible="settlement_mode != 'postpaid'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Connection" name="connection">
+                            <group>
+                                <group>
+                                    <field name="adapter_class"/>
+                                    <field name="adapter_config_id"/>
+                                    <field name="endpoint_url"/>
+                                    <field name="credential_ref"
+                                           placeholder="e.g. custom_ppob.provider.tsel.secret"/>
+                                    <field name="mock_outcome" invisible="adapter_class != 'ppob_mock'"/>
+                                </group>
+                                <group string="Reaper">
+                                    <field name="stale_threshold_minutes"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="SKU Map" name="sku_map">
+                            <field name="sku_map_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="provider_sku"/>
+                                    <field name="buy_price"/>
+                                    <field name="priority"/>
+                                    <field name="active"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="DP 100% Topup Config" name="dp_topup">
+                            <group>
+                                <group string="DP / Pelunasan">
+                                    <field name="topup_dp_timing"/>
+                                    <field name="vendor_advance_account_id"
+                                           required="topup_dp_timing == 'pelunasan_post'"
+                                           invisible="topup_dp_timing != 'pelunasan_post'"/>
+                                    <field name="dp_purchase_tax_id"/>
+                                </group>
+                                <group string="Coretax (PMK 131/2024 default)">
+                                    <field name="coretax_method"/>
+                                    <field name="dpp_factor"/>
+                                    <field name="ppn_rate"/>
+                                </group>
+                            </group>
+                            <group string="Discount handling">
+                                <field name="discount_handling"/>
+                                <field name="discount_income_account_id"
+                                       invisible="discount_handling != 'income'"/>
+                            </group>
+                            <div class="alert alert-info" role="alert">
+                                <p><strong>Coretax formula:</strong>
+                                    <em invisible="coretax_method != 'dpp_nilai_lain'">
+                                        DPP nilai lain — DPP = gross / (1 + dpp_factor × ppn_rate); PPN = gross − DPP.
+                                    </em>
+                                    <em invisible="coretax_method != 'gross_minus_ppn'">
+                                        Gross − PPN — PPN = gross × dpp_factor × ppn_rate; deposit value = gross − PPN.
+                                    </em>
+                                </p>
+                                <p><strong>Timing:</strong>
+                                    <em invisible="topup_dp_timing != 'dp_post'">
+                                        Bucket subledger naik saat DP bill posted. Pelunasan murni reverse.
+                                    </em>
+                                    <em invisible="topup_dp_timing != 'pelunasan_post'">
+                                        DP bill mendebet Vendor Advance. Bucket naik saat Pelunasan posted.
+                                    </em>
+                                </p>
+                            </div>
+                        </page>
+                        <page string="Buckets" name="buckets"
+                              invisible="settlement_mode != 'prepaid_deposit'">
+                            <div class="alert alert-info" role="alert">
+                                <strong>Bucket Mode:</strong>
+                                <em invisible="bucket_mode != 'fixed_denom'">
+                                    Fixed Denom — satu bucket per produk denom.
+                                    Klik <b>Ensure Buckets</b> untuk auto-generate
+                                    dari SKU Map (semua produk dengan denom &gt; 0),
+                                    atau tambah manual di bawah.
+                                </em>
+                                <em invisible="bucket_mode != 'bulky'">
+                                    Bulky — satu bucket besar untuk semua produk
+                                    provider ini. Klik <b>Ensure Buckets</b> untuk
+                                    auto-create satu bucket bulky.
+                                </em>
+                            </div>
+                            <field name="bucket_ids"
+                                   context="{
+                                       'default_provider_id': id,
+                                       'default_mode': bucket_mode,
+                                       'default_account_id': bucket_inventory_account_id,
+                                       'default_journal_id': journal_id,
+                                   }">
+                                <list>
+                                    <field name="mode"/>
+                                    <field name="product_id" optional="show"/>
+                                    <field name="denom_value" optional="show"/>
+                                    <field name="balance" sum="Total"/>
+                                    <field name="low_water_mark"/>
+                                    <field name="account_id" optional="hide"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state=='active'"
+                                           decoration-muted="state=='archived'"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ppob_provider" model="ir.actions.act_window">
+        <field name="name">Providers</field>
+        <field name="res_model">custom.ppob.provider</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

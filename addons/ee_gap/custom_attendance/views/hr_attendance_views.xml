@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_attendance_form_inherit" model="ir.ui.view">
+        <field name="name">hr.attendance.form.custom.attendance</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Geofence &amp; Overtime">
+                    <group string="Geofence">
+                        <field name="x_geofence_id"/>
+                        <field name="x_geofence_validated"/>
+                    </group>
+                    <group string="Coordinates">
+                        <field name="x_check_in_lat"/>
+                        <field name="x_check_in_lng"/>
+                        <field name="x_check_out_lat"/>
+                        <field name="x_check_out_lng"/>
+                    </group>
+                    <group string="Overtime / Payroll">
+                        <field name="x_overtime_hours"/>
+                        <field name="x_payroll_work_entry_id" readonly="1"/>
+                        <field name="x_payroll_synced" readonly="1"/>
+                    </group>
+                    <group string="Kiosk">
+                        <field name="x_kiosk_session" readonly="1"/>
+                    </group>
+                </group>
+                <group string="Approval Workflow">
+                    <group>
+                        <field name="x_approval_required"/>
+                        <field name="x_approval_state"/>
+                        <field name="x_approval_by" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="x_approval_note"/>
+                    </group>
+                </group>
+                <group string="Face Recognition">
+                    <group>
+                        <field name="x_face_recognition_data" widget="image"/>
+                    </group>
+                    <group>
+                        <field name="x_face_recognition_confidence" readonly="1"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_request_approval" type="object"
+                            string="Request Approval" class="btn-primary"
+                            invisible="x_approval_state not in ('draft','rejected')"/>
+                    <button name="action_approve" type="object"
+                            string="Approve" class="btn-success"
+                            invisible="x_approval_state != 'pending'"/>
+                    <button name="action_reject" type="object"
+                            string="Reject" class="btn-danger"
+                            invisible="x_approval_state != 'pending'"/>
+                    <button name="action_create_overtime_work_entry" type="object"
+                            string="Push OT to Payroll"
+                            invisible="x_overtime_hours &lt;= 0"/>
+                    <button name="action_verify_face" type="object"
+                            string="Verify Face"
+                            invisible="not x_face_recognition_data"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_hr_attendance_search_inherit" model="ir.ui.view">
+        <field name="name">hr.attendance.search.custom.attendance</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter string="Needs Approval" name="needs_approval"
+                        domain="[('x_approval_required','=',True),('x_approval_state','in',['draft','pending'])]"/>
+                <filter string="Pending Approval" name="pending_approval"
+                        domain="[('x_approval_state','=','pending')]"/>
+                <filter string="Has Overtime" name="has_overtime"
+                        domain="[('x_overtime_hours','&gt;',0)]"/>
+                <filter string="Geofence Validated" name="geofence_ok"
+                        domain="[('x_geofence_validated','=',True)]"/>
+                <filter string="Payroll Synced" name="payroll_synced"
+                        domain="[('x_payroll_synced','=',True)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

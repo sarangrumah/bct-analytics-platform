@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============ Form ============ -->
+    <record id="view_bupot_unifikasi_form" model="ir.ui.view">
+        <field name="name">custom.bupot.unifikasi.form</field>
+        <field name="model">custom.bupot.unifikasi</field>
+        <field name="arch" type="xml">
+            <form string="Bukti Potong Unifikasi">
+                <header>
+                    <button string="Generate XML"
+                            name="action_generate_xml" type="object"
+                            class="oe_highlight"
+                            invisible="state in ('accepted',)"/>
+                    <button string="Mark Submitted"
+                            name="action_mark_submitted" type="object"
+                            invisible="state not in ('draft','generated')"/>
+                    <button string="Upload DJP Numbers"
+                            name="action_open_number_upload" type="object"
+                            invisible="state != 'submitted'"/>
+                    <button string="Mark Accepted"
+                            name="action_mark_accepted" type="object"
+                            invisible="state != 'submitted'"/>
+                    <button string="Mark Rejected"
+                            name="action_mark_rejected" type="object"
+                            invisible="state in ('draft','accepted','rejected')"/>
+                    <button string="Reset to Draft"
+                            name="action_reset_draft" type="object"
+                            invisible="state == 'draft'"
+                            groups="custom_coretax_bupot.group_bupot_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,generated,submitted,accepted"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_generate_xml" type="object"
+                                class="oe_stat_button" icon="fa-file-code-o">
+                            <field name="line_count" widget="statinfo" string="Lines"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="month"/>
+                            <field name="year"/>
+                        </group>
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="total_withheld" widget="monetary"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="internal_ref" readonly="1"/>
+                                    <field name="bupot_number"/>
+                                    <field name="pph_type"/>
+                                    <field name="cuttee_npwp"/>
+                                    <field name="cuttee_nitku"/>
+                                    <field name="cuttee_name"/>
+                                    <field name="doc_ref"/>
+                                    <field name="transaction_date"/>
+                                    <field name="gross_amount" sum="Total Bruto"/>
+                                    <field name="dpp_amount"/>
+                                    <field name="rate"/>
+                                    <field name="withheld_amount" sum="Total PPh"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Rejection Note" invisible="state != 'rejected'">
+                            <field name="rejection_note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============ List ============ -->
+    <record id="view_bupot_unifikasi_list" model="ir.ui.view">
+        <field name="name">custom.bupot.unifikasi.list</field>
+        <field name="model">custom.bupot.unifikasi</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="year"/>
+                <field name="month"/>
+                <field name="line_count"/>
+                <field name="total_withheld"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" decoration-success="state=='accepted'" decoration-danger="state=='rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============ Search ============ -->
+    <record id="view_bupot_unifikasi_search" model="ir.ui.view">
+        <field name="name">custom.bupot.unifikasi.search</field>
+        <field name="model">custom.bupot.unifikasi</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="year"/>
+                <filter name="state_draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="state_submitted" string="Submitted" domain="[('state','=','submitted')]"/>
+                <filter name="state_accepted" string="Accepted" domain="[('state','=','accepted')]"/>
+
+                    <filter name="g_year" string="Year" context="{'group_by': 'year'}"/>
+                    <filter name="g_state" string="State" context="{'group_by': 'state'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bupot_unifikasi" model="ir.actions.act_window">
+        <field name="name">Bupot Unifikasi</field>
+        <field name="res_model">custom.bupot.unifikasi</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_studio_view_editor" model="ir.actions.client">
+        <field name="name">Visual View Editor</field>
+        <field name="tag">custom_studio_lite.studio_view_editor</field>
+    </record>
+</odoo>

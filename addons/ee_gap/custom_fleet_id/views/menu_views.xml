@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Submenu under standard Fleet root -->
+    <menuitem id="menu_fleet_id_stnk_alert"
+              name="STNK/KIR Expiring"
+              parent="fleet.menu_root"
+              action="action_fleet_vehicle_stnk_alert"
+              sequence="50"
+              groups="custom_fleet_id.group_user"/>
+
+    <menuitem id="menu_fleet_id_service_due"
+              name="Service Due"
+              parent="fleet.menu_root"
+              action="action_fleet_vehicle_service_due"
+              sequence="51"
+              groups="custom_fleet_id.group_user"/>
+
+    <menuitem id="menu_fleet_id_bbm_logs"
+              name="BBM Logs"
+              parent="fleet.menu_root"
+              action="action_custom_fleet_bbm_log"
+              sequence="55"
+              groups="custom_fleet_id.group_user"/>
+
+    <menuitem id="menu_fleet_id_driver_assignments"
+              name="Driver Assignments"
+              parent="fleet.menu_root"
+              action="action_custom_fleet_driver_assignment"
+              sequence="56"
+              groups="custom_fleet_id.group_user"/>
+</odoo>

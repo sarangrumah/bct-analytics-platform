@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Trade / Non-Trade purchase-order numbering (feature #9).
+
+      Two independent sequences with a MONTHLY reset. Native ir.sequence date
+      ranges are yearly, so purchase_order.create ensures a monthly
+      ir.sequence.date_range for the effective date before drawing the number
+      (see PurchaseOrder._retail_next_po_number). use_date_range must be on for
+      the counter to consult those ranges.
+
+        Trade     -> PO/T/EBR/YYYY/MM/00001
+        Non-Trade -> PO/NT/EBR/YYYY/MM/00001
+
+      noupdate so the running counters survive upgrades.
+    -->
+    <data noupdate="1">
+        <record id="seq_purchase_order_trade" model="ir.sequence">
+            <field name="name">the apparel brand Purchase Order (Trade)</field>
+            <field name="code">purchase.order.retail.trade</field>
+            <field name="prefix">PO/T/EBR/%(year)s/%(month)s/</field>
+            <field name="padding">5</field>
+            <field name="use_date_range" eval="True"/>
+            <field name="implementation">no_gap</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_purchase_order_nontrade" model="ir.sequence">
+            <field name="name">the apparel brand Purchase Order (Non-Trade)</field>
+            <field name="code">purchase.order.retail.nontrade</field>
+            <field name="prefix">PO/NT/EBR/%(year)s/%(month)s/</field>
+            <field name="padding">5</field>
+            <field name="use_date_range" eval="True"/>
+            <field name="implementation">no_gap</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

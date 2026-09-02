@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_wms_integration_root"
+              name="WMS Integration"
+              parent="stock.menu_stock_warehouse_mgmt"
+              sequence="70"
+              groups="stock.group_stock_user"/>
+
+    <menuitem id="menu_wms_integration_events"
+              name="Outbound Events"
+              parent="menu_wms_integration_root"
+              action="action_wms_integration_event"
+              sequence="10"/>
+
+    <menuitem id="menu_wms_integration_mappings"
+              name="Code Mappings"
+              parent="menu_wms_integration_root"
+              action="action_wms_integration_mapping"
+              sequence="20"/>
+
+    <menuitem id="menu_wms_integration_adapters"
+              name="Host Adapters"
+              parent="menu_wms_integration_root"
+              action="action_wms_adapter_config"
+              sequence="30"
+              groups="group_wms_integration_manager"/>
+</odoo>

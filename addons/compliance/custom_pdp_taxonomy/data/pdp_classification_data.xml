@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--
+        Default PDP classification taxonomy.
+        Aligned with UU 27/2022 (Indonesian Personal Data Protection Act):
+          - Art. 4(1) General personal data
+          - Art. 4(2) Specific personal data (health, biometrics, genetic,
+            criminal record, child data, financial, etc.)
+        Plus practical IT categories used by downstream compliance modules.
+    -->
+
+    <record id="pdp_class_public" model="pdp.classification">
+        <field name="code">public</field>
+        <field name="name">Public</field>
+        <field name="description">Information cleared for public disclosure. No restrictions.</field>
+        <field name="sequence">10</field>
+        <field name="requires_consent" eval="False"/>
+        <field name="requires_masking" eval="False"/>
+        <field name="default_retention_days">0</field>
+        <field name="color">10</field>
+    </record>
+
+    <record id="pdp_class_internal" model="pdp.classification">
+        <field name="code">internal</field>
+        <field name="name">Internal</field>
+        <field name="description">Business-internal data. Restricted to staff but not regulated personal data.</field>
+        <field name="sequence">20</field>
+        <field name="requires_consent" eval="False"/>
+        <field name="requires_masking" eval="False"/>
+        <field name="default_retention_days">0</field>
+        <field name="color">4</field>
+    </record>
+
+    <record id="pdp_class_pii" model="pdp.classification">
+        <field name="code">pii</field>
+        <field name="name">PII (General Personal Data)</field>
+        <field name="description">General personal data per UU PDP Art. 4(1): name, address, phone, email, identifier numbers.</field>
+        <field name="sequence">30</field>
+        <field name="requires_consent" eval="True"/>
+        <field name="requires_masking" eval="False"/>
+        <field name="default_retention_days">1825</field>
+        <field name="color">2</field>
+    </record>
+
+    <record id="pdp_class_financial" model="pdp.classification">
+        <field name="code">financial</field>
+        <field name="name">Financial</field>
+        <field name="description">Financial data (bank account, NPWP, salary, transactions). Specific personal data per UU PDP Art. 4(2)(f).</field>
+        <field name="sequence">40</field>
+        <field name="requires_consent" eval="True"/>
+        <field name="requires_masking" eval="True"/>
+        <field name="default_retention_days">3650</field>
+        <field name="color">3</field>
+    </record>
+
+    <record id="pdp_class_sensitive" model="pdp.classification">
+        <field name="code">sensitive</field>
+        <field name="name">Sensitive (Specific Personal Data)</field>
+        <field name="description">Specific personal data per UU PDP Art. 4(2): health, biometrics, genetics, religion, political views, sexual orientation, criminal record.</field>
+        <field name="sequence">50</field>
+        <field name="requires_consent" eval="True"/>
+        <field name="requires_masking" eval="True"/>
+        <field name="default_retention_days">1825</field>
+        <field name="color">1</field>
+    </record>
+
+    <record id="pdp_class_child" model="pdp.classification">
+        <field name="code">child</field>
+        <field name="name">Child Data</field>
+        <field name="description">Personal data of children (under 18). Requires guardian consent per UU PDP Art. 25.</field>
+        <field name="sequence">60</field>
+        <field name="requires_consent" eval="True"/>
+        <field name="requires_masking" eval="True"/>
+        <field name="default_retention_days">1825</field>
+        <field name="color">8</field>
+    </record>
+
+    <record id="pdp_class_anonymized" model="pdp.classification">
+        <field name="code">anonymized</field>
+        <field name="name">Anonymized</field>
+        <field name="description">Irreversibly anonymized data. Outside UU PDP scope.</field>
+        <field name="sequence">90</field>
+        <field name="requires_consent" eval="False"/>
+        <field name="requires_masking" eval="False"/>
+        <field name="default_retention_days">0</field>
+        <field name="color">5</field>
+    </record>
+
+</odoo>

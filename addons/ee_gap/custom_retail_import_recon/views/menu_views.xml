@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Two entry points to the same action, because two different people need it:
+         the operator who just ran an import, and the accountant closing the month.
+         Odoo shows a menu only if the user can read the model, so the accounting
+         entry is what makes this visible to finance without giving them the rest
+         of the Retail Import menu. -->
+
+    <menuitem id="menu_retail_recon_under_retail"
+              name="X-Store Reconciliation"
+              parent="custom_retail_import.menu_retail_import_root"
+              action="action_retail_import_recon"
+              sequence="16"/>
+
+    <menuitem id="menu_retail_recon_under_accounting"
+              name="X-Store vs Odoo Reconciliation"
+              parent="custom_accounting_reports.menu_custom_reports_root"
+              action="action_retail_import_recon"
+              sequence="95"/>
+
+</odoo>

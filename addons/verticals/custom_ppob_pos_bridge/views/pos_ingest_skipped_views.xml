@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_pos_ingest_skipped_list" model="ir.ui.view">
+        <field name="name">custom.ppob.pos.ingest.skipped.list</field>
+        <field name="model">custom.ppob.pos.ingest.skipped</field>
+        <field name="arch" type="xml">
+            <list string="POS Skipped Events" decoration-muted="replayed">
+                <field name="create_date"/>
+                <field name="feed"/>
+                <field name="external_ref"/>
+                <field name="pos_trx_ref"/>
+                <field name="mitra_ref"/>
+                <field name="product_code"/>
+                <field name="skip_reason"/>
+                <field name="error_detail"/>
+                <field name="replayed"/>
+                <button name="action_replay" type="object" string="Replay" icon="fa-repeat"
+                        invisible="replayed"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pos_ingest_skipped_form" model="ir.ui.view">
+        <field name="name">custom.ppob.pos.ingest.skipped.form</field>
+        <field name="model">custom.ppob.pos.ingest.skipped</field>
+        <field name="arch" type="xml">
+            <form string="POS Skipped Event">
+                <header>
+                    <button name="action_replay" type="object" string="Replay"
+                            class="btn-primary" invisible="replayed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="feed"/>
+                            <field name="external_ref"/>
+                            <field name="pos_trx_ref"/>
+                            <field name="skip_reason"/>
+                            <field name="error_detail"/>
+                        </group>
+                        <group>
+                            <field name="mitra_ref"/>
+                            <field name="product_code"/>
+                            <field name="replayed"/>
+                            <field name="replayed_at"/>
+                            <field name="pos_txn_id"/>
+                        </group>
+                    </group>
+                    <field name="raw_payload"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pos_ingest_skipped" model="ir.actions.act_window">
+        <field name="name">POS Skipped Events</field>
+        <field name="res_model">custom.ppob.pos.ingest.skipped</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

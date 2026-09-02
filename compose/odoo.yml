@@ -1,0 +1,308 @@
+# ===========================================================================
+# odoo19-bct — base stack: postgres, redis, odoo.
+#
+# This file defines the services and NOTHING environment-specific: no host port
+# bindings, no bind mounts. Those live in compose/odoo.dev.yml so that the
+# base file is the same artefact everywhere.
+#
+#   dev:  docker compose -f compose/odoo.yml -f compose/odoo.dev.yml ...
+#         (or just `docker compose ...` — COMPOSE_FILE in .env sets both)
+#
+# SCOPING. This host runs other live stacks (odoo19-platform-*,
+# odoo19-analytics-*, smart-warga-*). Every compose invocation must be scoped
+# to this project. `name:` below plus COMPOSE_PROJECT_NAME in .env do that, and
+# the Makefile passes -p explicitly on top. Never run a bare `docker compose
+# down`, `docker system prune` or `docker volume prune` in this repository.
+#
+# IMAGE PINNING. Images are pinned by digest, inline, not via variables. A
+# digest is a security control, not a tunable: making it overridable from .env
+# would let an unreviewed image into the stack. Digests come from
+# docs/agents/PLAN.md.
+# ===========================================================================
+name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}
+
+# --- Anchors ---------------------------------------------------------------
+
+x-restart-policy: &restart-policy
+  restart: unless-stopped
+
+x-default-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+# Applied to every service. cap_drop ALL is the default posture; a service adds
+# back only what it provably needs, with the reason stated at the add_cap site.
+x-hardening: &hardening
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+services:
+
+  # =========================================================================
+  # Postgres 16 — Odoo OLTP primary.
+  #
+  # Configured for logical decoding FROM FIRST BOOT (postgres/postgresql.conf).
+  # That is the point: Phase 3 CDC must never require restarting a live Odoo's
+  # database. See docs/adr/0001-analytics-warehouse.md.
+  # =========================================================================
+  postgres:
+    image: postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-postgres
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    # The postgres entrypoint starts as root to chown $PGDATA and then drops to
+    # uid 70 via su-exec. That needs exactly these five and nothing else.
+    cap_add:
+      - CHOWN          # chown $PGDATA on first boot
+      - DAC_OVERRIDE   # read the root-owned mounted postgresql.conf as postgres
+      - FOWNER         # chmod 0700 $PGDATA
+      - SETGID         # su-exec: drop group
+      - SETUID         # su-exec: drop user
+    stop_grace_period: 1m
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-odoo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required - run `make dev-bootstrap`}
+      PGDATA: /var/lib/postgresql/data
+      # libpq defaults the database name to the *role* name, so a bare
+      # `psql -U odoo` inside this container would try to open a database
+      # called "odoo" and fail. PGDATABASE makes every ad-hoc psql land on the
+      # maintenance database instead. An explicit -d still overrides it.
+      PGDATABASE: ${POSTGRES_DB:-postgres}
+      # Checksums cannot be enabled after initdb without a full dump/restore,
+      # so they are enabled at the only moment they can be: first boot.
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+      # Consumed by postgres/init/00-init.sh, which injects them into psql.
+      WAREHOUSE_READER_USER: ${WAREHOUSE_READER_USER:-warehouse_reader}
+      WAREHOUSE_READER_PASSWORD: ${WAREHOUSE_READER_PASSWORD:?WAREHOUSE_READER_PASSWORD is required - run `make dev-bootstrap`}
+      POSTGRES_EXPORTER_USER: ${POSTGRES_EXPORTER_USER:-metrics_exporter}
+      POSTGRES_EXPORTER_PASSWORD: ${POSTGRES_EXPORTER_PASSWORD:?POSTGRES_EXPORTER_PASSWORD is required - run `make dev-bootstrap`}
+      TZ: ${TZ:-UTC}
+    command:
+      - postgres
+      - -c
+      - config_file=/etc/postgresql/postgresql.conf
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      # Only files directly in this directory are executed by the entrypoint;
+      # init/sql/ is a subdirectory and is therefore skipped, which is what
+      # lets 00-init.sh apply it with psql -v.
+      - ../postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # -h 127.0.0.1 forces a real TCP handshake. Without it pg_isready uses the
+      # unix socket, which comes up during initdb and would report healthy
+      # while the network listener is still closed.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - bct
+
+  # =========================================================================
+  # Redis 7 — Odoo session store / cache side-channel.
+  # =========================================================================
+  redis:
+    image: redis:7-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-redis
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    # Runs as uid 999 directly, so no su-exec and no capability is needed at
+    # all. The entrypoint's chown pass is skipped because the named volume
+    # already carries the image's ownership for /data.
+    user: "999:1000"
+    stop_grace_period: 30s
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required - run `make dev-bootstrap`}
+      TZ: ${TZ:-UTC}
+    # No redis.conf file: this repository has no redis/** owned path, and a
+    # rendered config would need a second template mechanism for one setting.
+    # The password reaches argv, which is acceptable here because the container
+    # is single-tenant and unprivileged; it is NOT acceptable for Odoo, where
+    # the config-file path is used instead.
+    command:
+      - redis-server
+      - --requirepass
+      - ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - everysec
+      - --save
+      - ""
+      - --maxmemory
+      - ${REDIS_MAXMEMORY:-128mb}
+      - --maxmemory-policy
+      - allkeys-lru
+      # Renamed rather than removed so an accidental FLUSHALL errors loudly.
+      # rename-command takes TWO arguments; passing "FLUSHALL NEWNAME" as one
+      # string is a fatal config error at startup ("Bad directive or wrong
+      # number of arguments").
+      - --rename-command
+      - FLUSHALL
+      - BCT_FLUSHALL_DISABLED
+      - --rename-command
+      - FLUSHDB
+      - BCT_FLUSHDB_DISABLED
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      # Authenticates, so it fails if requirepass is misconfigured — a plain
+      # `redis-cli ping` would answer NOAUTH and still look alive to a TCP test.
+      test: ["CMD-SHELL", "redis-cli --no-auth-warning -a \"$${REDIS_PASSWORD}\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+    networks:
+      - bct
+
+  # =========================================================================
+  # Odoo 19 CE.
+  # =========================================================================
+  odoo:
+    build:
+      context: ../odoo
+      dockerfile: Dockerfile
+    image: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-odoo:local
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-odoo
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    # Non-root, inherited from the image (uid 100). No capability is added:
+    # Odoo binds 8069/8072, both above 1024, so NET_BIND_SERVICE is not needed.
+    stop_grace_period: 1m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      # Read by odoo/render-config.py to produce $ODOO_RC at start.
+      ODOO_DB_HOST: ${ODOO_DB_HOST:-postgres}
+      ODOO_DB_PORT: ${ODOO_DB_PORT:-5432}
+      ODOO_DB_USER: ${ODOO_DB_USER:-odoo}
+      ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD:?ODOO_DB_PASSWORD is required - run `make dev-bootstrap`}
+      ODOO_DB_MAXCONN: ${ODOO_DB_MAXCONN:-32}
+      ODOO_DB_NAME: ${ODOO_DB_NAME:-bct}
+      ODOO_DB_NAMES: ${ODOO_DB_NAMES:-bct}
+      ODOO_DBFILTER: ${ODOO_DBFILTER:-^bct$$}
+      ODOO_ADMIN_PASSWD: ${ODOO_ADMIN_PASSWD:?ODOO_ADMIN_PASSWD is required - run `make dev-bootstrap`}
+      ODOO_LIST_DB: ${ODOO_LIST_DB:-False}
+      ODOO_PROXY_MODE: ${ODOO_PROXY_MODE:-True}
+      ODOO_HTTP_PORT: ${ODOO_HTTP_PORT:-8069}
+      ODOO_LONGPOLLING_PORT: ${ODOO_LONGPOLLING_PORT:-8072}
+      ODOO_WORKERS: ${ODOO_WORKERS:-2}
+      ODOO_MAX_CRON_THREADS: ${ODOO_MAX_CRON_THREADS:-1}
+      ODOO_LIMIT_MEMORY_SOFT: ${ODOO_LIMIT_MEMORY_SOFT:-1073741824}
+      ODOO_LIMIT_MEMORY_HARD: ${ODOO_LIMIT_MEMORY_HARD:-1342177280}
+      ODOO_LIMIT_REQUEST: ${ODOO_LIMIT_REQUEST:-8192}
+      ODOO_LIMIT_TIME_CPU: ${ODOO_LIMIT_TIME_CPU:-120}
+      ODOO_LIMIT_TIME_REAL: ${ODOO_LIMIT_TIME_REAL:-240}
+      ODOO_LIMIT_TIME_REAL_CRON: ${ODOO_LIMIT_TIME_REAL_CRON:-300}
+      ODOO_LOG_LEVEL: ${ODOO_LOG_LEVEL:-info}
+      # Fernet master key for custom_core's encrypted ir.config_parameter helper.
+      # NOT optional once the addon suite is installed: custom_storefront_api
+      # encrypts PII on res.partner through it, so without this key `create` on
+      # res.partner raises and no partner can be written at all.
+      # The two HMAC secrets the imported addons sign with, and the URLs they
+      # sign toward. custom_ai_bridge reads AI_GATEWAY_URL and
+      # custom.security._gateway_secret(); custom_super_admin reads
+      # ORCHESTRATOR_URL and _orchestrator_secret(). Both raise rather than
+      # send an unsigned request, so an unset value here is a loud failure in
+      # the UI rather than a silent one on the wire.
+      GATEWAY_SHARED_SECRET: ${GATEWAY_SHARED_SECRET:?GATEWAY_SHARED_SECRET is required - run `make dev-bootstrap`}
+      AI_GATEWAY_URL: ${AI_GATEWAY_URL:-http://ai-gateway:8080}
+      ORCHESTRATOR_SHARED_SECRET: ${ORCHESTRATOR_SHARED_SECRET:?ORCHESTRATOR_SHARED_SECRET is required - run `make dev-bootstrap`}
+      ORCHESTRATOR_URL: ${ORCHESTRATOR_URL:-http://tenant-orchestrator:8080}
+      CORETAX_SERTEL_MASTER_KEY: ${CORETAX_SERTEL_MASTER_KEY:?CORETAX_SERTEL_MASTER_KEY is required - run `make dev-bootstrap`}
+      ODOO_WITHOUT_DEMO: ${ODOO_WITHOUT_DEMO:-True}
+      # queue_job channel capacities. Read by the job runner at start
+      # (jobrunner/runner.py reads ODOO_QUEUE_JOB_CHANNELS before the config
+      # file), because queue.job.channel has no `capacity` field in this
+      # version. root.athera_provision is held at 1 so two tenant provisionings
+      # cannot run at once -- each holds a registry open on a half-built
+      # database for minutes.
+      ODOO_QUEUE_JOB_CHANNELS: ${ODOO_QUEUE_JOB_CHANNELS:-root:2,root.athera_provision:1}
+      ODOO_EMAIL_FROM: ${ODOO_EMAIL_FROM:-noreply@localhost}
+      ODOO_SMTP_SERVER: ${ODOO_SMTP_SERVER:-localhost}
+      ODOO_SMTP_PORT: ${ODOO_SMTP_PORT:-25}
+      TZ: ${TZ:-UTC}
+    volumes:
+      # Filestore (ir.attachment binaries) + sessions. Backed up together with
+      # the database by scripts/tenant-backup.sh — a database dump alone is an
+      # incomplete backup and restores to broken attachments.
+      - odoodata:/var/lib/odoo
+      # ------------------------------------------------------------------
+      # THE ADDONS MOUNT POINT.
+      #
+      # In the BASE file, not the dev overlay. It lived in the overlay until
+      # 2026-09-01, which meant the 155-module suite imported by ADR 0002 ran
+      # in development only — recorded as a blocker in that ADR and in the
+      # CHANGELOG's "Known gaps". A stack that cannot load its own addons is
+      # not the same artefact in production, so the mount belongs here.
+      #
+      # Read-only on purpose: Odoo must never write into a source tree. An
+      # `-i module` install writes to the database, not to addons/.
+      # `make dev-bootstrap` creates the directory if it does not exist.
+      # ------------------------------------------------------------------
+      - ../addons:/mnt/extra-addons:ro
+    tmpfs:
+      # Odoo writes report spool files and wkhtmltopdf temporaries here. On
+      # tmpfs they never touch the volume and vanish with the container.
+      - /tmp:rw,noexec,nosuid,size=256m
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl -fsS -o /dev/null "http://127.0.0.1:${ODOO_HTTP_PORT:-8069}/web/health?db_server_status=1"
+      interval: 15s
+      timeout: 10s
+      retries: 6
+      start_period: 90s
+    networks:
+      bct:
+        aliases:
+          # ONE ALIAS PER SERVED DATABASE, and this is load-bearing rather than
+          # cosmetic. dbfilter is ^%d$, which means Odoo picks the database
+          # from the FIRST LABEL of the Host header — and that applies to
+          # JSON-RPC exactly as it applies to the browser. An in-network client
+          # calling http://odoo:8069 resolves %d to "odoo", matches no
+          # database, and gets "No database is selected"; measured, as a
+          # login-gateway returning upstream_unavailable on a correct password.
+          #
+          # An alias fixes it without touching any client's code: the URL a
+          # caller already uses IS the Host header it sends. login-gateway and
+          # the CDC loader address the tenant by hostname and Docker's embedded
+          # DNS resolves it here.
+          #
+          # PROVISIONING A CLIENT ADDS AN ALIAS HERE. That is deliberate — the
+          # same reviewed-edit posture ODOO_DBFILTER used to carry, moved to
+          # the place that now decides reachability.
+          - ${ODOO_DB_NAME:-bct}.${ATHERA_DOMAIN:-athera.localhost}
+          - ${ATHERA_ADMIN_DB:-athera_admin}.${ATHERA_DOMAIN:-athera.localhost}
+          - acme.${ATHERA_DOMAIN:-athera.localhost}
+
+# --- Networks --------------------------------------------------------------
+# One explicit network. Named `bct` inside the file; the actual docker network
+# is `${COMPOSE_PROJECT_NAME}_bct`, which is the name sibling overlays must
+# join as external. Restated in docs/agents/contracts/04-platform.md.
+networks:
+  bct:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_bct
+    driver: bridge
+
+# --- Volumes ---------------------------------------------------------------
+# Named, not bind-mounted, so `docker compose -p odoo19-bct down` (without -v)
+# is always safe and the data survives a rebuild.
+volumes:
+  pgdata:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_pgdata
+  redisdata:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_redisdata
+  odoodata:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_odoodata

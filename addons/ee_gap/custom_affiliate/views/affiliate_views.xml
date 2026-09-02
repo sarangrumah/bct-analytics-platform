@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============ Affiliate ============ -->
+    <record id="view_affiliate_list" model="ir.ui.view">
+        <field name="name">custom.affiliate.list</field>
+        <field name="model">custom.affiliate</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="affiliate_code"/>
+                <field name="partner_id"/>
+                <field name="commission_rate"/>
+                <field name="click_count"/>
+                <field name="conversion_count"/>
+                <field name="total_commission"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-muted="state == 'suspended'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_affiliate_form" model="ir.ui.view">
+        <field name="name">custom.affiliate.form</field>
+        <field name="model">custom.affiliate</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_activate" type="object" string="Activate"
+                            class="btn-primary" invisible="state == 'active'"/>
+                    <button name="action_suspend" type="object" string="Suspend"
+                            invisible="state != 'active'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="affiliate_code" placeholder="auto"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="commission_rate"/>
+                        </group>
+                        <group>
+                            <field name="payout_method"/>
+                            <field name="payout_details"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Performance">
+                        <field name="click_count"/>
+                        <field name="conversion_count"/>
+                        <field name="total_commission"/>
+                    </group>
+                    <notebook>
+                        <page string="Links">
+                            <field name="link_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="target_url"/>
+                                    <field name="short_code"/>
+                                    <field name="utm_campaign"/>
+                                    <field name="click_count"/>
+                                    <field name="full_url" widget="url"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_affiliate" model="ir.actions.act_window">
+        <field name="name">Affiliates</field>
+        <field name="res_model">custom.affiliate</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ============ Conversions ============ -->
+    <record id="view_affiliate_conversion_list" model="ir.ui.view">
+        <field name="name">custom.affiliate.conversion.list</field>
+        <field name="model">custom.affiliate.conversion</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="affiliate_id"/>
+                <field name="order_reference"/>
+                <field name="partner_id"/>
+                <field name="order_value"/>
+                <field name="commission_rate"/>
+                <field name="commission_amount"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'pending'"
+                       decoration-success="state in ('approved','paid')"
+                       decoration-danger="state == 'reversed'"/>
+                <button name="action_approve" type="object" string="Approve"
+                        icon="fa-check" invisible="state != 'pending'"/>
+                <button name="action_reverse" type="object" string="Reverse"
+                        icon="fa-undo" invisible="state not in ('pending','approved')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_affiliate_conversion" model="ir.actions.act_window">
+        <field name="name">Conversions</field>
+        <field name="res_model">custom.affiliate.conversion</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ============ Clicks ============ -->
+    <record id="view_affiliate_click_list" model="ir.ui.view">
+        <field name="name">custom.affiliate.click.list</field>
+        <field name="model">custom.affiliate.click</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="create_date"/>
+                <field name="affiliate_id"/>
+                <field name="link_id"/>
+                <field name="landing_url"/>
+                <field name="referrer"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_affiliate_click" model="ir.actions.act_window">
+        <field name="name">Clicks</field>
+        <field name="res_model">custom.affiliate.click</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- ============ Payouts ============ -->
+    <record id="view_affiliate_payout_form" model="ir.ui.view">
+        <field name="name">custom.affiliate.payout.form</field>
+        <field name="model">custom.affiliate.payout</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_collect_approved" type="object"
+                            string="Collect Approved" class="btn-secondary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_mark_paid" type="object" string="Mark Paid"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="affiliate_id"/>
+                            <field name="method"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="paid_date"/>
+                            <field name="amount_total"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="conversion_ids">
+                        <list>
+                            <field name="order_reference"/>
+                            <field name="order_value"/>
+                            <field name="commission_amount"/>
+                            <field name="state"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_affiliate_payout" model="ir.actions.act_window">
+        <field name="name">Payouts</field>
+        <field name="res_model">custom.affiliate.payout</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ============ Menus ============ -->
+    <menuitem id="menu_affiliate_root" name="Affiliate" sequence="95"/>
+    <menuitem id="menu_affiliate" name="Affiliates" parent="menu_affiliate_root"
+              action="action_affiliate" sequence="10"/>
+    <menuitem id="menu_affiliate_conversion" name="Conversions" parent="menu_affiliate_root"
+              action="action_affiliate_conversion" sequence="20"/>
+    <menuitem id="menu_affiliate_payout" name="Payouts" parent="menu_affiliate_root"
+              action="action_affiliate_payout" sequence="30"/>
+    <menuitem id="menu_affiliate_click" name="Clicks" parent="menu_affiliate_root"
+              action="action_affiliate_click" sequence="40"/>
+
+</odoo>

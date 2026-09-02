@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Stock report (/odoo/stock-report) — show ALL articles including variants.
+
+      The native action ``stock.action_product_stock_view`` filters
+      ``[('is_storable', '=', True)]``. the apparel brand entire article master is imported as
+      ``type='consu', is_storable=False`` (real-time valued but not inventory-
+      tracked), so the native page shows only a handful of storable products and
+      appears not to match the master. Broaden the domain to every *goods* article
+      (``type='consu'`` — storable + non-storable), which is the full article
+      master as product.product variants. Services stay excluded.
+    -->
+    <record id="stock.action_product_stock_view" model="ir.actions.act_window">
+        <field name="domain">[('type', '=', 'consu')]</field>
+    </record>
+</odoo>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_tenant_replicate_wizard_form" model="ir.ui.view">
+        <field name="name">tenant.replicate.wizard.form</field>
+        <field name="model">tenant.replicate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Replicate Tenant">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Replicate a tenant's data from one environment into another
+                        (e.g. prod &#8594; staging) by restoring its latest backup.
+                    </div>
+                    <group>
+                        <group string="Source">
+                            <field name="source_tenant_id"/>
+                            <field name="source_env_type"/>
+                            <field name="latest_backup_only"/>
+                            <field name="backup_id"
+                                   invisible="latest_backup_only"
+                                   required="not latest_backup_only"/>
+                        </group>
+                        <group string="Target">
+                            <field name="target_tenant_id"/>
+                            <field name="target_env_type"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Why are you replicating?"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_replicate"
+                            string="Replicate"
+                            type="object"
+                            class="btn-primary"
+                            confirm="Replicate source backup into target environment? This will overwrite the target DB."/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_tenant_replicate_wizard" model="ir.actions.act_window">
+        <field name="name">Replicate Tenant</field>
+        <field name="res_model">tenant.replicate.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

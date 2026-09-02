@@ -1,0 +1,32 @@
+{
+  "path": "https://stg7.esb.co.id/api-fnb-backend/web/corev1/master/product",
+  "timestamp": "2026-07-21 09:00:04",
+  "code": "EC03100000",
+  "status": "ok",
+  "result": {
+    "page": 1, "limit": 100, "count": 2,
+    "data": [
+      {
+        "productID": 1088, "productCode": "AYM-001", "productName": "Ayam Utuh",
+        "categoryID": 3, "categoryName": "Bahan Baku", "subCategoryID": 7, "subCategoryName": "Protein",
+        "purchasable": true, "saleable": false, "statusActive": "Yes",
+        "productDetails": [
+          {"productDetailID": 2112, "unit": "GR", "conversionFactor": 1, "basePrice": 45, "sku": "AYM-001-GR",
+           "defaultUnit": {"stockUnit": true, "purchaseUnit": false, "baseUnit": true, "transferUnit": true, "salesUnit": false}},
+          {"productDetailID": 2113, "unit": "KG", "conversionFactor": 1000, "basePrice": 45000, "sku": "AYM-001-KG",
+           "defaultUnit": {"stockUnit": false, "purchaseUnit": true, "baseUnit": false, "transferUnit": false, "salesUnit": false}}
+        ]
+      },
+      {
+        "productID": 1090, "productCode": "BRS-001", "productName": "Beras Premium",
+        "categoryID": 3, "categoryName": "Bahan Baku", "subCategoryID": 8, "subCategoryName": "Karbohidrat",
+        "purchasable": true, "saleable": false, "statusActive": "Yes",
+        "productDetails": [
+          {"productDetailID": 2058, "unit": "KG", "conversionFactor": 1, "basePrice": 14000, "sku": "BRS-001-KG",
+           "defaultUnit": {"stockUnit": true, "purchaseUnit": true, "baseUnit": true, "transferUnit": true, "salesUnit": false}}
+        ]
+      }
+    ]
+  },
+  "next": "", "prev": ""
+}

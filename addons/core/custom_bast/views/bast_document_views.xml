@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bast_document_list" model="ir.ui.view">
+        <field name="name">custom.bast.document.list</field>
+        <field name="model">custom.bast.document</field>
+        <field name="arch" type="xml">
+            <list string="BAST Documents">
+                <field name="name"/>
+                <field name="kind"/>
+                <field name="date_handover"/>
+                <field name="party_from_id"/>
+                <field name="party_to_id"/>
+                <field name="reference"/>
+                <field name="state" decoration-success="state == 'completed'" decoration-info="state == 'signed_one_side'" decoration-muted="state == 'voided'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bast_document_form" model="ir.ui.view">
+        <field name="name">custom.bast.document.form</field>
+        <field name="model">custom.bast.document</field>
+        <field name="arch" type="xml">
+            <form string="BAST">
+                <header>
+                    <button name="action_open_sign_wizard" type="object" string="Sign" class="btn-primary" invisible="state in ('completed','voided')"/>
+                    <button name="action_void" type="object" string="Void" invisible="state == 'voided'" groups="custom_bast.group_bast_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,signed_one_side,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_reference" type="object" class="oe_stat_button" icon="fa-external-link" invisible="not reference">
+                            <span>Source</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="kind"/>
+                            <field name="date_handover"/>
+                            <field name="reference"/>
+                            <field name="location_id"/>
+                            <field name="location_text"/>
+                        </group>
+                        <group>
+                            <field name="party_from_id"/>
+                            <field name="party_to_id"/>
+                            <field name="witness_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="item_description"/>
+                                    <field name="product_id"/>
+                                    <field name="qty"/>
+                                    <field name="uom_id"/>
+                                    <field name="lot_id"/>
+                                    <field name="condition"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Signatures">
+                            <group>
+                                <group string="From">
+                                    <field name="party_from_signature" widget="image"/>
+                                    <field name="party_from_signed_at"/>
+                                    <field name="party_from_signed_by"/>
+                                </group>
+                                <group string="To">
+                                    <field name="party_to_signature" widget="image"/>
+                                    <field name="party_to_signed_at"/>
+                                    <field name="party_to_signed_by"/>
+                                </group>
+                            </group>
+                            <group string="GPS">
+                                <field name="gps_latitude"/>
+                                <field name="gps_longitude"/>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bast_document_kanban" model="ir.ui.view">
+        <field name="name">custom.bast.document.kanban</field>
+        <field name="model">custom.bast.document</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name"/>
+                <field name="kind"/>
+                <field name="party_from_id"/>
+                <field name="party_to_id"/>
+                <field name="date_handover"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="o_kanban_record_top">
+                            <strong><field name="name"/></strong>
+                            <span class="float-end"><field name="kind"/></span>
+                        </div>
+                        <div>
+                            <field name="party_from_id"/> -&gt; <field name="party_to_id"/>
+                        </div>
+                        <div><field name="date_handover"/></div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_bast_document_search" model="ir.ui.view">
+        <field name="name">custom.bast.document.search</field>
+        <field name="model">custom.bast.document</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="party_from_id"/>
+                <field name="party_to_id"/>
+                <field name="reference"/>
+                <filter name="filter_draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="filter_one_side" string="One Side" domain="[('state','=','signed_one_side')]"/>
+                <filter name="filter_completed" string="Completed" domain="[('state','=','completed')]"/>
+                <filter name="filter_voided" string="Voided" domain="[('state','=','voided')]"/>
+                <separator/>
+                <filter name="filter_pickup" string="Pickup" domain="[('kind','=','pickup')]"/>
+                <filter name="filter_return" string="Return" domain="[('kind','=','return')]"/>
+                <filter name="filter_delivery" string="Delivery" domain="[('kind','=','delivery')]"/>
+
+                    <filter name="group_state" string="State" context="{'group_by':'state'}"/>
+                    <filter name="group_kind" string="Kind" context="{'group_by':'kind'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bast_document" model="ir.actions.act_window">
+        <field name="name">BAST Documents</field>
+        <field name="res_model">custom.bast.document</field>
+        <field name="view_mode">list,kanban,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- noupdate=1: a warehouse that has tuned the threshold must not have it
+         reset back to 90 by the next module upgrade. -->
+    <data noupdate="1">
+        <record id="param_auto_apply_threshold" model="ir.config_parameter">
+            <field name="key">custom_wms_putaway.auto_apply_threshold</field>
+            <field name="value">90</field>
+        </record>
+    </data>
+</odoo>

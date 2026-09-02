@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend the applicant form with PDP + Source fields + dedup + offer + actions. -->
+    <record id="view_hr_applicant_form_recruitment_id" model="ir.ui.view">
+        <field name="name">hr.applicant.form.recruitment.id</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header position="inside">
+                    <button name="action_schedule_interview"
+                            type="object"
+                            string="Schedule Interview"
+                            class="btn-primary"
+                            groups="custom_recruitment_id.group_user"/>
+                    <button name="action_print_offer_letter"
+                            type="object"
+                            string="Print Offer Letter"
+                            groups="custom_recruitment_id.group_user"/>
+                </header>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="Job Board &amp; PDP" name="recruitment_id_pdp">
+                    <group>
+                        <field name="x_job_board_source"/>
+                        <field name="x_external_id"/>
+                        <field name="x_dedup_hash" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="x_pdp_consent_given"/>
+                        <field name="x_pdp_retention_until"/>
+                        <field name="x_is_duplicate" readonly="1"/>
+                        <field name="x_duplicate_of" readonly="1"
+                               invisible="not x_is_duplicate"/>
+                    </group>
+                </group>
+                <group string="Offer Letter" name="recruitment_id_offer">
+                    <group>
+                        <field name="x_offer_salary"/>
+                        <field name="x_offer_currency_id" groups="base.group_multi_currency"/>
+                        <field name="x_offer_pph21_estimated" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="x_offer_probation_months"/>
+                        <field name="x_offer_start_date"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- PDP-Expiring Applicants action (filters expired retention horizon). -->
+    <record id="action_hr_applicant_pdp_expiring" model="ir.actions.act_window">
+        <field name="name">PDP-Expiring Applicants</field>
+        <field name="res_model">hr.applicant</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('x_pdp_retention_until', '!=', False), ('x_pdp_retention_until', '&lt;=', context_today().strftime('%Y-%m-%d'))]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No applicants past their PDP retention horizon.</p>
+        </field>
+    </record>
+
+    <!-- Duplicates action. -->
+    <record id="action_hr_applicant_duplicates" model="ir.actions.act_window">
+        <field name="name">Duplicate Applicants</field>
+        <field name="res_model">hr.applicant</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('x_is_duplicate', '=', True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No duplicate applicants detected.</p>
+        </field>
+    </record>
+</odoo>

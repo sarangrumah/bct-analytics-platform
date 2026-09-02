@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fsm_skill_list" model="ir.ui.view">
+        <field name="name">fsm.skill.list</field>
+        <field name="model">fsm.skill</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_fsm_skill" model="ir.actions.act_window">
+        <field name="name">Skills</field>
+        <field name="res_model">fsm.skill</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

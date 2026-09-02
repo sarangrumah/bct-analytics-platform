@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_provider_form_oracle_bridge" model="ir.ui.view">
+        <field name="name">custom.ppob.provider.form.oracle.bridge</field>
+        <field name="model">custom.ppob.provider</field>
+        <field name="inherit_id" ref="custom_ppob_provider.view_ppob_provider_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='adapter_class']" position="before">
+                <field name="bridge_mode"/>
+            </xpath>
+            <xpath expr="//field[@name='adapter_class']" position="after">
+                <field name="oracle_sp_name" invisible="bridge_mode != 'oracle_bridge'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ppob_provider_list_oracle_bridge" model="ir.ui.view">
+        <field name="name">custom.ppob.provider.list.oracle.bridge</field>
+        <field name="model">custom.ppob.provider</field>
+        <field name="inherit_id" ref="custom_ppob_provider.view_ppob_provider_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='adapter_class']" position="after">
+                <field name="bridge_mode" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_ppob_provider_sku_map_list_oracle" model="ir.ui.view">
+        <field name="name">custom.ppob.provider.sku.map.list.oracle</field>
+        <field name="model">custom.ppob.provider.sku.map</field>
+        <field name="inherit_id" ref="custom_ppob_provider.view_ppob_provider_sku_map_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='provider_sku']" position="after">
+                <field name="oracle_kode_voucher" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

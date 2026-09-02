@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- Own privilege: groups that share one are rendered as a single
+             pick-one dropdown on the user form, so sharing it across modules
+             makes saving a user silently drop every other module's group. -->
+        <record id="res_groups_privilege_ppob" model="res.groups.privilege">
+            <field name="name">PPOB</field>
+            <field name="sequence">140</field>
+            <field name="category_id" ref="custom_core.module_category_custom_platform"/>
+        </record>
+
+
+        <!--
+            PPOB access groups. They own the PPOB privilege above, which sits
+            in the Custom Platform category so they still appear together with
+            the other custom groups on the user form. Internal hierarchy:
+            User (read-only) < Operations < Manager; API is a service tier.
+        -->
+        <record id="group_ppob_user" model="res.groups">
+            <field name="name">PPOB / User</field>
+            <field name="privilege_id" ref="res_groups_privilege_ppob"/>
+            <field name="comment">Read-only access to PPOB transactions, wallets, deposits.</field>
+        </record>
+
+        <record id="group_ppob_ops" model="res.groups">
+            <field name="name">PPOB / Operations</field>
+            <field name="privilege_id" ref="res_groups_privilege_ppob"/>
+            <field name="implied_ids" eval="[(4, ref('custom_ppob_core.group_ppob_user'))]"/>
+            <field name="comment">Can manage wallets, top-ups, and dispatch PPOB transactions.</field>
+        </record>
+
+        <record id="group_ppob_manager" model="res.groups">
+            <field name="name">PPOB / Manager</field>
+            <field name="privilege_id" ref="res_groups_privilege_ppob"/>
+            <field name="implied_ids" eval="[
+                (4, ref('custom_ppob_core.group_ppob_ops')),
+                (4, ref('account.group_account_manager')),
+            ]"/>
+            <field name="comment">Full access: configure providers, pricing tiers, COA, commission rules.</field>
+        </record>
+
+        <record id="group_ppob_api" model="res.groups">
+            <field name="name">PPOB / API Integration</field>
+            <field name="privilege_id" ref="res_groups_privilege_ppob"/>
+            <field name="implied_ids" eval="[(4, ref('custom_ppob_core.group_ppob_ops'))]"/>
+            <field name="comment">Service account for external adapters / VA H2H callbacks.</field>
+        </record>
+
+    </data>
+</odoo>

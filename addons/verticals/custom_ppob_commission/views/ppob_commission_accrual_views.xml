@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_commission_accrual_list" model="ir.ui.view">
+        <field name="name">custom.ppob.commission.accrual.list</field>
+        <field name="model">custom.ppob.commission.accrual</field>
+        <field name="arch" type="xml">
+            <list string="Commission Accruals" create="false">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="scope"/>
+                <field name="partner_id"/>
+                <field name="transaction_id"/>
+                <field name="rule_id"/>
+                <field name="amount" sum="Total"/>
+                <field name="state" widget="badge"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ppob_commission_accrual_search" model="ir.ui.view">
+        <field name="name">custom.ppob.commission.accrual.search</field>
+        <field name="model">custom.ppob.commission.accrual</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="transaction_id"/>
+                <field name="rule_id"/>
+                <filter name="f_accrued" string="Accrued" domain="[('state','=','accrued')]"/>
+                <filter name="f_invoiced" string="Invoiced" domain="[('state','=','invoiced')]"/>
+                <filter name="f_settled" string="Settled" domain="[('state','=','settled')]"/>
+                <group>
+                    <filter name="g_scope" string="Scope" context="{'group_by': 'scope'}"/>
+                    <filter name="g_partner" string="Partner" context="{'group_by': 'partner_id'}"/>
+                    <filter name="g_state" string="State" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_ppob_commission_accrual_pivot" model="ir.ui.view">
+        <field name="name">custom.ppob.commission.accrual.pivot</field>
+        <field name="model">custom.ppob.commission.accrual</field>
+        <field name="arch" type="xml">
+            <pivot string="Commission Accruals">
+                <field name="partner_id" type="row"/>
+                <field name="date" interval="month" type="row"/>
+                <field name="state" type="col"/>
+                <field name="amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_ppob_commission_accrual_graph" model="ir.ui.view">
+        <field name="name">custom.ppob.commission.accrual.graph</field>
+        <field name="model">custom.ppob.commission.accrual</field>
+        <field name="arch" type="xml">
+            <graph string="Commission Accruals" type="bar">
+                <field name="date" interval="day"/>
+                <field name="amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_ppob_commission_accrual" model="ir.actions.act_window">
+        <field name="name">Commission Accruals</field>
+        <field name="res_model">custom.ppob.commission.accrual</field>
+        <field name="view_mode">list,form,pivot,graph</field>
+    </record>
+
+</odoo>

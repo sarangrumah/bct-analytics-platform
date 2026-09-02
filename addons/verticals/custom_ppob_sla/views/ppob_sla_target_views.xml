@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_sla_target_list" model="ir.ui.view">
+        <field name="name">custom.ppob.sla.target.list</field>
+        <field name="model">custom.ppob.sla.target</field>
+        <field name="arch" type="xml">
+            <list decoration-warning="calibration_source == 'default_baseline'">
+                <field name="name"/>
+                <field name="provider_id" optional="show"/>
+                <field name="class_id" optional="show"/>
+                <field name="daily_txn_target"/>
+                <field name="peak_tps_target"/>
+                <field name="p95_latency_ms_target"/>
+                <field name="success_rate_target_pct"/>
+                <field name="calibration_source"
+                       widget="badge"
+                       decoration-warning="calibration_source == 'default_baseline'"
+                       decoration-info="calibration_source == 'oracle_historical'"
+                       decoration-success="calibration_source == 'measured'"/>
+                <field name="calibrated_at" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ppob_sla_target_form" model="ir.ui.view">
+        <field name="name">custom.ppob.sla.target.form</field>
+        <field name="model">custom.ppob.sla.target</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_mark_calibrated"
+                            type="object"
+                            string="Mark Calibrated"
+                            class="oe_highlight"
+                            invisible="calibration_source == 'default_baseline'"/>
+                    <field name="calibration_source" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="calibration_source != 'default_baseline'">
+                        These numbers are a <b>derivation from an assumed volume</b>,
+                        not a measurement. Import the Oracle MSG016T history into
+                        Throughput Samples, re-derive the assumptions below from it,
+                        then promote the Calibration Source.
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Scope">
+                            <field name="provider_id"
+                                   placeholder="Any provider"
+                                   options="{'no_create': True}"/>
+                            <field name="class_id"
+                                   placeholder="Any product class"
+                                   options="{'no_create': True}"/>
+                            <field name="active" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Reliability Targets">
+                            <field name="p95_latency_ms_target"/>
+                            <field name="success_rate_target_pct"/>
+                            <field name="timeout_s_target"/>
+                            <field name="max_in_flight"/>
+                        </group>
+                    </group>
+                    <group string="Volume Assumptions">
+                        <group>
+                            <field name="daily_txn_target"/>
+                            <field name="active_hours"/>
+                            <field name="peak_factor"/>
+                        </group>
+                        <group>
+                            <field name="peak_tps_target"/>
+                            <div class="text-muted" colspan="2">
+                                Peak TPS is derived as
+                                <i>daily / (active_hours &#215; 3600) &#215; peak_factor</i>,
+                                but you may type a value to pin it. Both assumptions
+                                are editable on purpose &#8212; they are the part of
+                                this row most likely to be wrong.
+                            </div>
+                        </group>
+                    </group>
+                    <group string="Calibration">
+                        <field name="calibrated_at"/>
+                        <field name="calibration_note"
+                               placeholder="Where did these numbers come from? Which Oracle date range, whose sign-off?"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ppob_sla_target" model="ir.actions.act_window">
+        <field name="name">SLA Targets</field>
+        <field name="res_model">custom.ppob.sla.target</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define a throughput / latency target</p>
+            <p>
+                Targets are scoped by provider &#215; product class. Leave either
+                empty to match anything &#8212; the most specific row wins.
+            </p>
+        </field>
+    </record>
+
+</odoo>

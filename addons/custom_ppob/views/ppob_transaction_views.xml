@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_transaction_list" model="ir.ui.view">
+        <field name="name">ppob.transaction.list</field>
+        <field name="model">ppob.transaction</field>
+        <field name="arch" type="xml">
+            <list string="PPOB Transactions">
+                <field name="name"/>
+                <field name="requested_at"/>
+                <field name="biller_id"/>
+                <field name="customer_ref"/>
+                <field name="partner_id" optional="show"/>
+                <field name="operating_unit_id" optional="show"/>
+                <field name="amount" sum="Bill Amount"/>
+                <field name="admin_fee" sum="Admin Fee" optional="show"/>
+                <field name="commission" sum="Commission" optional="show"/>
+                <field name="total_amount" sum="Total" optional="hide"/>
+                <field name="sla_seconds" optional="show"/>
+                <field name="sla_breached" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'success'"
+                       decoration-danger="state in ('failed', 'reversed')"
+                       decoration-info="state == 'pending'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ppob_transaction_form" model="ir.ui.view">
+        <field name="name">ppob.transaction.form</field>
+        <field name="model">ppob.transaction</field>
+        <field name="arch" type="xml">
+            <form string="PPOB Transaction">
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_succeed" type="object" string="Mark Settled"
+                            class="btn-primary" invisible="state != 'pending'"/>
+                    <button name="action_fail" type="object" string="Mark Failed"
+                            invisible="state != 'pending'"/>
+                    <button name="action_reverse" type="object" string="Reverse"
+                            invisible="state != 'success'"
+                            groups="custom_ppob.group_ppob_manager"
+                            confirm="Reversing a settled transaction is final. Continue?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,pending,success"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Bill">
+                            <field name="biller_id"/>
+                            <field name="product_id"/>
+                            <field name="customer_ref"/>
+                            <field name="customer_name"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group string="Money">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="amount"/>
+                            <field name="admin_fee"/>
+                            <field name="commission"/>
+                            <field name="total_amount"/>
+                        </group>
+                        <group string="Routing">
+                            <field name="operating_unit_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Timing">
+                            <field name="requested_at"/>
+                            <field name="settled_at"/>
+                            <field name="sla_seconds"/>
+                            <field name="sla_breached"/>
+                            <field name="biller_reference"/>
+                        </group>
+                    </group>
+                    <group string="Failure reason" invisible="state not in ('failed', 'reversed')">
+                        <field name="failure_reason" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ppob_transaction_search" model="ir.ui.view">
+        <field name="name">ppob.transaction.search</field>
+        <field name="model">ppob.transaction</field>
+        <field name="arch" type="xml">
+            <search string="PPOB Transactions">
+                <field name="name"/>
+                <field name="customer_ref"/>
+                <field name="biller_id"/>
+                <field name="partner_id"/>
+                <field name="operating_unit_id"/>
+                <filter name="filter_pending" string="Pending"
+                        domain="[('state', '=', 'pending')]"/>
+                <filter name="filter_success" string="Settled"
+                        domain="[('state', '=', 'success')]"/>
+                <filter name="filter_failed" string="Failed"
+                        domain="[('state', 'in', ('failed', 'reversed'))]"/>
+                <separator/>
+                <filter name="filter_sla_breached" string="SLA breached"
+                        domain="[('sla_breached', '=', True)]"/>
+                <separator/>
+                <filter name="filter_today" string="Today"
+                        domain="[('requested_at', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <group>
+                    <filter name="group_by_state" string="Status" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_biller" string="Biller" domain="[]"
+                            context="{'group_by': 'biller_id'}"/>
+                    <filter name="group_by_ou" string="Operating Unit" domain="[]"
+                            context="{'group_by': 'operating_unit_id'}"/>
+                    <filter name="group_by_month" string="Request Month" domain="[]"
+                            context="{'group_by': 'requested_at:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ppob_transaction" model="ir.actions.act_window">
+        <field name="name">PPOB Transactions</field>
+        <field name="res_model">ppob.transaction</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record a PPOB transaction</p>
+            <p>A bill payment or top-up forwarded to a biller.</p>
+        </field>
+    </record>
+
+</odoo>

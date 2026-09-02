@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Each xpath anchors on a field that occurs exactly ONCE in the parent view arch of this Odoo
+      19 build (verified against ir_ui_view.arch_db before shipping). Anchoring on company_id, for
+      example, would be ambiguous: it appears 7 times in account.view_move_form.
+    -->
+
+    <record id="view_order_form_operating_unit" model="ir.ui.view">
+        <field name="name">sale.order.form.operating.unit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <field name="team_id" position="after">
+                <field name="operating_unit_id"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_move_form_operating_unit" model="ir.ui.view">
+        <field name="name">account.move.form.operating.unit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <field name="invoice_user_id" position="after">
+                <field name="operating_unit_id"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_picking_form_operating_unit" model="ir.ui.view">
+        <field name="name">stock.picking.form.operating.unit</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="operating_unit_id"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_pos_pos_form_operating_unit" model="ir.ui.view">
+        <field name="name">pos.order.form.operating.unit</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+            <field name="session_id" position="after">
+                <field name="operating_unit_id"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

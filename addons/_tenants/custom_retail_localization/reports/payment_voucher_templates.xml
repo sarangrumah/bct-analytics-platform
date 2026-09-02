@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Detailed Payment Voucher / Payment Receipt on account.payment.
+
+      Layout follows the tenant's attached format: company + title, a two-column
+      meta header (voucher no / source bank), the payment's own journal entry
+      rendered as a COA / DEBIT / CREDIT table (with the reconciled AP document
+      and vendor invoice ref per line), amount-in-words (Terbilang), the
+      recipient (vendor) bank block and a four-column signature strip.
+
+      wkhtmltopdf-safe: inline styles + <table> layout only; money via the
+      NBSP-free `lv_money` macro (Odoo's monetary widget emits U+00A0 which the
+      PDF engine renders as a stray "Â").
+    -->
+
+    <!-- ============ Money (NBSP-free, fixed Indonesian format) ============ -->
+    <!-- Requires in scope: amount (float), currency (res.currency). Decimal
+         count follows the currency (IDR -> 0), but the separators are ALWAYS
+         Indonesian ('.' thousands, ',' decimal) regardless of the user locale.
+         Never use a literal '%' in a QWeb expression. -->
+    <template id="lv_money">
+        <t t-set="_dp" t-value="int(currency.decimal_places)"/>
+        <t t-set="_raw" t-value="'{:,.{dp}f}'.format(abs(amount or 0.0), dp=_dp)"/>
+        <t t-set="_raw" t-value="_raw.replace(',', '\x00').replace('.', ',').replace('\x00', '.')"/>
+        <t t-set="_sign" t-value="'-' if (amount or 0.0) &lt; 0 else ''"/>
+        <span style="white-space: nowrap;"><t t-out="_sign"/><t t-out="_raw"/></span>
+    </template>
+
+    <!-- ============ Long Indonesian date / period ============ -->
+    <!-- Caller sets `d` (a date/datetime). lv_id_date -> "3 Juli 2026";
+         lv_id_period -> "Juli 2026" (month + year). Built from a month map
+         because babel/format_date is not exposed in this QWeb sandbox and the
+         id_ID locale is usually inactive. -->
+    <template id="lv_id_date">
+        <t t-set="_bulan" t-value="['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']"/>
+        <t t-if="d"><t t-out="d.day"/> <t t-out="_bulan[d.month]"/> <t t-out="d.year"/></t>
+    </template>
+    <template id="lv_id_period">
+        <t t-set="_bulan" t-value="['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']"/>
+        <t t-if="d"><t t-out="_bulan[d.month]"/> <t t-out="d.year"/></t>
+    </template>
+
+    <!-- ============ Shared body: Payment Voucher & Payment Receipt ============ -->
+    <template id="report_payment_document">
+        <t t-set="is_inbound" t-value="o.payment_type == 'inbound'"/>
+        <t t-set="rows" t-value="o._edo_voucher_rows()"/>
+        <t t-set="rbank" t-value="o._edo_recipient_bank()"/>
+        <t t-set="ccur" t-value="o.currency_id"/>
+        <t t-set="total_debit" t-value="sum([r['debit'] for r in rows])"/>
+        <t t-set="total_credit" t-value="sum([r['credit'] for r in rows])"/>
+
+        <div class="page" style="font-size: 11px;">
+            <!-- Company + title -->
+            <div style="margin-bottom: 12px;">
+                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 45px; max-width: 200px;" alt="Logo"/>
+                <div style="font-weight: bold; font-size: 14px; margin-top: 4px;" t-out="o.company_id.name"/>
+                <div style="font-weight: bold; font-size: 13px; letter-spacing: 1px;" t-out="doc_title"/>
+            </div>
+
+            <!-- Meta: two columns -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
+                <tr>
+                    <td style="width: 13%; padding: 2px 4px; vertical-align: top;">Voucher Number</td>
+                    <td style="width: 37%; padding: 2px 4px; vertical-align: top;">: <t t-out="o.name or 'Draft'"/></td>
+                    <td style="width: 13%; padding: 2px 4px; vertical-align: top;">Bank Name</td>
+                    <td style="width: 37%; padding: 2px 4px; vertical-align: top;">: <t t-out="o.journal_id.bank_account_id.bank_id.name or o.journal_id.name or ''"/></td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px 4px; vertical-align: top;">Payment Date</td>
+                    <td style="padding: 2px 4px; vertical-align: top;">: <t t-call="custom_retail_localization.lv_id_date"><t t-set="d" t-value="o.date"/></t></td>
+                    <td style="padding: 2px 4px; vertical-align: top;">Account No.</td>
+                    <td style="padding: 2px 4px; vertical-align: top;">: <t t-out="o._edo_source_bank_account()"/></td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px 4px;"/>
+                    <td style="padding: 2px 4px;"/>
+                    <td style="padding: 2px 4px; vertical-align: top;">Method Payment</td>
+                    <td style="padding: 2px 4px; vertical-align: top;">: <t t-out="o.payment_method_line_id.name or ''"/><t t-if="o.journal_id"> (<t t-out="o.journal_id.name"/>)</t></td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px 4px;"/>
+                    <td style="padding: 2px 4px;"/>
+                    <td style="padding: 2px 4px; vertical-align: top;">Doc. Reference</td>
+                    <td style="padding: 2px 4px; vertical-align: top;">: <t t-out="o.payment_reference or ''"/></td>
+                </tr>
+            </table>
+
+            <!-- COA table -->
+            <table style="width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 8px;">
+                <thead>
+                    <tr style="background-color: #f3f3f3;">
+                        <th style="width: 3%; border: 1px solid #000; padding: 3px; text-align: center;">Seq</th>
+                        <th style="width: 12%; border: 1px solid #000; padding: 3px; text-align: left;">COA Description</th>
+                        <th style="width: 16%; border: 1px solid #000; padding: 3px; text-align: left;">DESC Invoice</th>
+                        <th style="width: 11%; border: 1px solid #000; padding: 3px; text-align: left;">NOMOR DOC AP</th>
+                        <th style="width: 11%; border: 1px solid #000; padding: 3px; text-align: left;">REF Invoice Vendor</th>
+                        <th style="width: 11%; border: 1px solid #000; padding: 3px; text-align: left;">Vendor</th>
+                        <th style="width: 4%; border: 1px solid #000; padding: 3px; text-align: center;">Cur.</th>
+                        <th style="width: 9%; border: 1px solid #000; padding: 3px; text-align: right;">Original Amount</th>
+                        <th style="width: 5%; border: 1px solid #000; padding: 3px; text-align: right;">Exch Rate</th>
+                        <th style="width: 9%; border: 1px solid #000; padding: 3px; text-align: right;">DEBIT</th>
+                        <th style="width: 9%; border: 1px solid #000; padding: 3px; text-align: right;">CREDIT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="rows" t-as="r">
+                        <td style="border: 1px solid #000; padding: 3px; text-align: center;" t-out="r_index + 1"/>
+                        <td style="border: 1px solid #000; padding: 3px;" t-out="r['coa']"/>
+                        <td style="border: 1px solid #000; padding: 3px; white-space: pre-line;" t-out="r['desc']"/>
+                        <td style="border: 1px solid #000; padding: 3px;" t-out="r['doc_ap']"/>
+                        <td style="border: 1px solid #000; padding: 3px;" t-out="r['ref_vendor']"/>
+                        <td style="border: 1px solid #000; padding: 3px;" t-out="r['vendor']"/>
+                        <td style="border: 1px solid #000; padding: 3px; text-align: center;" t-out="r['currency']"/>
+                        <td style="border: 1px solid #000; padding: 3px; text-align: right;"><t t-call="custom_retail_localization.lv_money"><t t-set="amount" t-value="r['orig_amount']"/><t t-set="currency" t-value="ccur"/></t></td>
+                        <td style="border: 1px solid #000; padding: 3px; text-align: right;" t-out="'{:.2f}'.format(r['rate'])"/>
+                        <td style="border: 1px solid #000; padding: 3px; text-align: right;"><t t-call="custom_retail_localization.lv_money"><t t-set="amount" t-value="r['debit']"/><t t-set="currency" t-value="ccur"/></t></td>
+                        <td style="border: 1px solid #000; padding: 3px; text-align: right;"><t t-call="custom_retail_localization.lv_money"><t t-set="amount" t-value="r['credit']"/><t t-set="currency" t-value="ccur"/></t></td>
+                    </tr>
+                    <tr style="font-weight: bold; background-color: #f3f3f3;">
+                        <td colspan="9" style="border: 1px solid #000; padding: 3px; text-align: right;">Total</td>
+                        <td style="border: 1px solid #000; padding: 3px; text-align: right;"><t t-call="custom_retail_localization.lv_money"><t t-set="amount" t-value="total_debit"/><t t-set="currency" t-value="ccur"/></t></td>
+                        <td style="border: 1px solid #000; padding: 3px; text-align: right;"><t t-call="custom_retail_localization.lv_money"><t t-set="amount" t-value="total_credit"/><t t-set="currency" t-value="ccur"/></t></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Terbilang -->
+            <div style="margin-bottom: 12px;">
+                <span style="font-weight: bold;">Terbilang :</span>
+                <span style="font-style: italic;" t-out="o._edo_amount_in_words()"/>
+            </div>
+
+            <!-- Remarks + recipient bank -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+                <tr>
+                    <td style="width: 13%; padding: 1px 4px; vertical-align: top;">Remarks</td>
+                    <td style="padding: 1px 4px;">: <t t-out="o.memo or ''"/></td>
+                </tr>
+                <tr>
+                    <td style="padding: 1px 4px;">Bank Name</td>
+                    <td style="padding: 1px 4px;">: <t t-out="rbank['bank_name']"/></td>
+                </tr>
+                <tr>
+                    <td style="padding: 1px 4px;">Bank Account</td>
+                    <td style="padding: 1px 4px;">: <t t-out="rbank['acc_number']"/></td>
+                </tr>
+                <tr>
+                    <td style="padding: 1px 4px;" t-out="'Account Name' if not is_inbound else 'From Account'"/>
+                    <td style="padding: 1px 4px;">: <t t-out="rbank['acc_holder']"/></td>
+                </tr>
+                <tr>
+                    <td style="padding: 1px 4px;">Branch Name</td>
+                    <td style="padding: 1px 4px;">: <t t-out="rbank['branch']"/></td>
+                </tr>
+                <tr>
+                    <td style="padding: 1px 4px;">Swift Code</td>
+                    <td style="padding: 1px 4px;">: <t t-out="rbank['swift']"/></td>
+                </tr>
+            </table>
+
+            <!-- Signatures -->
+            <table style="width: 100%; border-collapse: collapse; text-align: center;">
+                <tr>
+                    <td style="width: 25%; padding: 4px;">Prepared by</td>
+                    <td style="width: 25%; padding: 4px;">Checked by</td>
+                    <td style="width: 25%; padding: 4px;">Approved by</td>
+                    <td style="width: 25%; padding: 4px;" t-out="'Paid by' if is_inbound else 'Received by'"/>
+                </tr>
+                <tr style="height: 55px;"><td/><td/><td/><td/></tr>
+                <tr>
+                    <td style="padding: 4px 4px 0; border-top: 1px solid #000;" t-out="o.create_uid.name or ''"/>
+                    <td style="padding: 4px 4px 0; border-top: 1px solid #000;">(________________)</td>
+                    <td style="padding: 4px 4px 0; border-top: 1px solid #000;">(________________)</td>
+                    <td style="padding: 4px 4px 0; border-top: 1px solid #000;">(________________)</td>
+                </tr>
+                <!-- the apparel brand has no approval engine: leave the approver names blank
+                     with fillable signature lines instead of designations. -->
+                <tr style="font-size: 9px; color: #555;">
+                    <td style="padding: 0 4px 4px;"/>
+                    <td style="padding: 0 4px 4px;"/>
+                    <td style="padding: 0 4px 4px;"/>
+                    <td style="padding: 0 4px 4px;"/>
+                </tr>
+            </table>
+        </div>
+    </template>
+
+    <!-- Payment Voucher: vendor / outbound payments.
+         Self-contained wrapper: no web.html_container → no external asset (report.url)
+         callback that stalls wkhtmltopdf. <main> required by _prepare_html. -->
+    <template id="report_payment_voucher">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <style>
+                    @page { margin: 15mm; }
+                    * { box-sizing: border-box; }
+                    body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; margin: 0; padding: 0; }
+                </style>
+            </head>
+            <body>
+                <main>
+                    <t t-foreach="docs" t-as="o">
+                        <div t-if="not o_first" style="page-break-before: always;"></div>
+                        <t t-set="doc_title">PAYMENT VOUCHER</t>
+                        <t t-call="custom_retail_localization.report_payment_document"/>
+                    </t>
+                </main>
+            </body>
+        </html>
+    </template>
+</odoo>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- The single wildcard baseline: no provider, no class, so it matches
+             everything until narrower rows are added. It exists so the system is
+             configured on day one rather than after the first incident.
+
+             Every number here is DERIVED FROM AN ASSUMPTION, not observed:
+               50,000 txn/day   = the upper bound of the 10k-50k indicative
+                                  range in the v2 brief. Designing to the lower
+                                  bound would mean breaching on day one.
+               14 active hours  = traffic skews to waking/retail hours.
+               peak factor 3.0  = busiest second vs mean across that window.
+             giving peak_tps_target = 50000 / (14 * 3600) * 3 = ~2.98 TPS
+
+             calibration_source stays 'default_baseline' precisely so this row
+             cannot be mistaken for evidence. Replace all three assumptions with
+             values measured from the Oracle MSG016T history (import them as
+             source=oracle samples first), then promote the source and run
+             action_mark_calibrated.
+
+             noupdate="1": once ops tunes these, a module upgrade must not stomp
+             them. -->
+        <record id="sla_target_baseline" model="custom.ppob.sla.target">
+            <field name="daily_txn_target">50000</field>
+            <field name="active_hours">14.0</field>
+            <field name="peak_factor">3.0</field>
+            <field name="p95_latency_ms_target">3000</field>
+            <field name="timeout_s_target">15</field>
+            <field name="max_in_flight">0</field>
+            <field name="success_rate_target_pct">99.0</field>
+            <field name="calibration_source">default_baseline</field>
+            <field name="calibration_note">Seeded at install from the v2 realignment brief's indicative 10k-50k txn/day. NOT measured. Recalibrate from Oracle MSG016T history before go-live.</field>
+        </record>
+
+    </data>
+</odoo>

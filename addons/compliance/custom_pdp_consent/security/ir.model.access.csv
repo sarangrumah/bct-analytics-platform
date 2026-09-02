@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pdp_consent_purpose_user,pdp.consent.purpose user,model_pdp_consent_purpose,custom_core.group_custom_user,1,0,0,0
+access_pdp_consent_purpose_mgr,pdp.consent.purpose mgr,model_pdp_consent_purpose,group_consent_manager,1,1,1,1
+access_pdp_consent_user,pdp.consent user,model_pdp_consent,custom_core.group_custom_user,1,0,0,0
+access_pdp_consent_mgr,pdp.consent mgr,model_pdp_consent,group_consent_manager,1,1,1,1
+access_pdp_consent_portal,pdp.consent portal,model_pdp_consent,base.group_portal,1,1,0,0

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_wallet_list" model="ir.ui.view">
+        <field name="name">custom.ppob.wallet.list</field>
+        <field name="model">custom.ppob.wallet</field>
+        <field name="arch" type="xml">
+            <list string="Wallets">
+                <field name="partner_id"/>
+                <field name="class_id"/>
+                <field name="balance" sum="Total Balance"/>
+                <field name="credit_limit"/>
+                <field name="state" widget="badge" decoration-success="state == 'active'" decoration-warning="state == 'frozen'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ppob_wallet_form" model="ir.ui.view">
+        <field name="name">custom.ppob.wallet.form</field>
+        <field name="model">custom.ppob.wallet</field>
+        <field name="arch" type="xml">
+            <form string="Wallet">
+                <header>
+                    <button name="%(action_ppob_wallet_adjust_wizard)d" type="action"
+                            string="Adjust / Topup" class="btn-primary"
+                            context="{'default_wallet_id': id}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="active,frozen"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="partner_id"/>
+                        <h1><field name="partner_id" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="class_id"/>
+                            <field name="currency_id"/>
+                            <field name="company_id"/>
+                        </group>
+                        <group>
+                            <field name="balance" widget="monetary"/>
+                            <field name="credit_limit"/>
+                            <field name="account_id"/>
+                            <field name="journal_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Moves">
+                            <field name="move_ids" readonly="1">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="name"/>
+                                    <field name="type"/>
+                                    <field name="amount_signed" sum="Sum"/>
+                                    <field name="balance_after"/>
+                                    <field name="ref"/>
+                                    <field name="move_id"/>
+                                    <field name="state"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ppob_wallet_search" model="ir.ui.view">
+        <field name="name">custom.ppob.wallet.search</field>
+        <field name="model">custom.ppob.wallet</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="class_id"/>
+                <filter name="filter_active" string="Active" domain="[('state','=','active')]"/>
+                <filter name="filter_frozen" string="Frozen" domain="[('state','=','frozen')]"/>
+                <group>
+                    <filter name="group_class" string="Class" context="{'group_by': 'class_id'}"/>
+                    <filter name="group_partner" string="Mitra" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ppob_wallet" model="ir.actions.act_window">
+        <field name="name">Wallets</field>
+        <field name="res_model">custom.ppob.wallet</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

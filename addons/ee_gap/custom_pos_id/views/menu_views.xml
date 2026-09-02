@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Mount POS Indonesia entry under the native Point of Sale app.
+         Reuse the standard Point of Sale dashboard action so users land
+         on the familiar POS configuration kanban. -->
+    <menuitem id="menu_pos_id_in_custom"
+              name="POS Indonesia"
+              parent="point_of_sale.menu_point_root"
+              action="point_of_sale.action_pos_config_kanban"
+              sequence="60"
+              groups="custom_pos_id.group_user"/>
+</odoo>

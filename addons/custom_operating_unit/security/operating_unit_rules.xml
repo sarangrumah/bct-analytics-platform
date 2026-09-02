@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Record rule semantics in Odoo, restated because they decide whether this is secure:
+
+      * Rules attached to DIFFERENT groups are OR-ed for a user who holds several of them.
+      * A rule with no group is global and is AND-ed with everything.
+
+      So the pair below reads: an internal user sees only documents in their allowed units
+      (or documents with no unit at all), UNLESS they are also a Settings administrator, who
+      sees everything.
+
+      Fail-closed on purpose: a user with an EMPTY allowed list sees only unit-less documents,
+      not every document. Granting access is an explicit act. See MODULE_KNOWLEDGE.md.
+    -->
+    <data noupdate="0">
+
+        <record id="rule_sale_order_operating_unit" model="ir.rule">
+            <field name="name">Sale Order: own Operating Units</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+            <field name="domain_force">
+                ['|', ('operating_unit_id', '=', False),
+                      ('operating_unit_id', 'in', user.allowed_operating_unit_ids.ids)]
+            </field>
+        </record>
+        <record id="rule_sale_order_operating_unit_admin" model="ir.rule">
+            <field name="name">Sale Order: Operating Unit administrator bypass</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="groups" eval="[(4, ref('custom_operating_unit.group_operating_unit_all'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="rule_account_move_operating_unit" model="ir.rule">
+            <field name="name">Journal Entry: own Operating Units</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+            <field name="domain_force">
+                ['|', ('operating_unit_id', '=', False),
+                      ('operating_unit_id', 'in', user.allowed_operating_unit_ids.ids)]
+            </field>
+        </record>
+        <record id="rule_account_move_operating_unit_admin" model="ir.rule">
+            <field name="name">Journal Entry: Operating Unit administrator bypass</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="groups" eval="[(4, ref('custom_operating_unit.group_operating_unit_all'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="rule_stock_picking_operating_unit" model="ir.rule">
+            <field name="name">Transfer: own Operating Units</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+            <field name="domain_force">
+                ['|', ('operating_unit_id', '=', False),
+                      ('operating_unit_id', 'in', user.allowed_operating_unit_ids.ids)]
+            </field>
+        </record>
+        <record id="rule_stock_picking_operating_unit_admin" model="ir.rule">
+            <field name="name">Transfer: Operating Unit administrator bypass</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="groups" eval="[(4, ref('custom_operating_unit.group_operating_unit_all'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="rule_pos_order_operating_unit" model="ir.rule">
+            <field name="name">POS Order: own Operating Units</field>
+            <field name="model_id" ref="point_of_sale.model_pos_order"/>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+            <field name="domain_force">
+                ['|', ('operating_unit_id', '=', False),
+                      ('operating_unit_id', 'in', user.allowed_operating_unit_ids.ids)]
+            </field>
+        </record>
+        <record id="rule_pos_order_operating_unit_admin" model="ir.rule">
+            <field name="name">POS Order: Operating Unit administrator bypass</field>
+            <field name="model_id" ref="point_of_sale.model_pos_order"/>
+            <field name="groups" eval="[(4, ref('custom_operating_unit.group_operating_unit_all'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <!-- The dimension itself is company-scoped, as every other master record is. -->
+        <record id="rule_operating_unit_company" model="ir.rule">
+            <field name="name">Operating Unit: multi-company</field>
+            <field name="model_id" ref="model_operating_unit"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">
+                ['|', ('company_id', '=', False),
+                      ('company_id', 'in', company_ids)]
+            </field>
+        </record>
+
+    </data>
+</odoo>

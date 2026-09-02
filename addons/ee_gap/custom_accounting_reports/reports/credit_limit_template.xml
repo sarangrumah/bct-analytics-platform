@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_credit_limit">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Customer</th>
+                        <th class="text-end">Credit Limit</th>
+                        <th class="text-end">Outstanding AR</th>
+                        <th class="text-end">Available</th>
+                        <th class="text-end">% Used</th>
+                        <th class="text-center">Over Limit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="lines" t-as="line"
+                        t-att-class="'fw-bold table-secondary' if line.get('type') == 'grand_total' else ('table-danger' if line.get('over_limit') else '')">
+                        <td t-esc="line.get('partner')"/>
+                        <td class="text-end">
+                            <span t-esc="line.get('limit')"
+                                  t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                        </td>
+                        <td class="text-end">
+                            <span t-esc="line.get('outstanding')"
+                                  t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                        </td>
+                        <td class="text-end">
+                            <span t-esc="line.get('available')"
+                                  t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                        </td>
+                        <td class="text-end" t-esc="line.get('pct_used')"/>
+                        <td class="text-center" t-esc="line.get('over_limit')"/>
+                    </tr>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+    </data>
+</odoo>

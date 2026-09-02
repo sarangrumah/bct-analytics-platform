@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Mount under the native Finance app. -->
+    <menuitem id="menu_custom_payment_id_root"
+              name="Indonesia Payments"
+              parent="account.menu_finance"
+              sequence="45"
+              groups="custom_payment_id.group_user"/>
+
+    <menuitem id="menu_custom_payment_id_log"
+              name="Gateway Call Log"
+              parent="menu_custom_payment_id_root"
+              action="action_custom_payment_id_log"
+              sequence="10"/>
+</odoo>

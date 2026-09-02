@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--
+        One ir.actions.server per binding model — appears in the cog "Actions" menu
+        of every record on the bound model. Each action contexts-launches the
+        custom.ai.recommend.wizard (defined in custom_ai_bridge) with
+        default_model_name + default_res_id, which calls
+        ai-gateway /v1/workflow/recommend.
+
+        Bindings cover the 9 high-traffic business models per the platform's
+        AI assistance spec. Models live in dependency modules already declared
+        in __manifest__.py — install order guarantees they exist.
+    -->
+
+    <record id="action_ask_ai_account_move" model="ir.actions.server">
+        <field name="name">Ask AI...</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Ask AI',
+    'res_model': 'custom.ai.recommend.wizard',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {
+        'default_model_name': 'account.move',
+        'default_res_id': record.id if record else 0,
+    },
+}</field>
+    </record>
+
+    <record id="action_ask_ai_purchase_order" model="ir.actions.server">
+        <field name="name">Ask AI...</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Ask AI',
+    'res_model': 'custom.ai.recommend.wizard',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {
+        'default_model_name': 'purchase.order',
+        'default_res_id': record.id if record else 0,
+    },
+}</field>
+    </record>
+
+    <record id="action_ask_ai_sale_order" model="ir.actions.server">
+        <field name="name">Ask AI...</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Ask AI',
+    'res_model': 'custom.ai.recommend.wizard',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {
+        'default_model_name': 'sale.order',
+        'default_res_id': record.id if record else 0,
+    },
+}</field>
+    </record>
+
+    <record id="action_ask_ai_res_partner" model="ir.actions.server">
+        <field name="name">Ask AI...</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Ask AI',
+    'res_model': 'custom.ai.recommend.wizard',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {
+        'default_model_name': 'res.partner',
+        'default_res_id': record.id if record else 0,
+    },
+}</field>
+    </record>
+
+    <record id="action_ask_ai_helpdesk_ticket" model="ir.actions.server">
+        <field name="name">Ask AI...</field>
+        <field name="model_id" ref="custom_helpdesk.model_helpdesk_ticket"/>
+        <field name="binding_model_id" ref="custom_helpdesk.model_helpdesk_ticket"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Ask AI',
+    'res_model': 'custom.ai.recommend.wizard',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {
+        'default_model_name': 'helpdesk.ticket',
+        'default_res_id': record.id if record else 0,
+    },
+}</field>
+    </record>
+
+    <record id="action_ask_ai_hr_payslip" model="ir.actions.server">
+        <field name="name">Ask AI...</field>
+        <field name="model_id" ref="custom_hr_payroll_id.model_hr_payslip"/>
+        <field name="binding_model_id" ref="custom_hr_payroll_id.model_hr_payslip"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Ask AI',
+    'res_model': 'custom.ai.recommend.wizard',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {
+        'default_model_name': 'hr.payslip',
+        'default_res_id': record.id if record else 0,
+    },
+}</field>
+    </record>
+
+    <record id="action_ask_ai_coretax_transaction" model="ir.actions.server">
+        <field name="name">Ask AI...</field>
+        <field name="model_id" ref="custom_coretax_pajakku.model_custom_coretax_transaction"/>
+        <field name="binding_model_id" ref="custom_coretax_pajakku.model_custom_coretax_transaction"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Ask AI',
+    'res_model': 'custom.ai.recommend.wizard',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {
+        'default_model_name': 'custom.coretax.transaction',
+        'default_res_id': record.id if record else 0,
+    },
+}</field>
+    </record>
+
+    <record id="action_ask_ai_fsm_work_order" model="ir.actions.server">
+        <field name="name">Ask AI...</field>
+        <field name="model_id" ref="custom_field_service.model_fsm_work_order"/>
+        <field name="binding_model_id" ref="custom_field_service.model_fsm_work_order"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Ask AI',
+    'res_model': 'custom.ai.recommend.wizard',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {
+        'default_model_name': 'fsm.work.order',
+        'default_res_id': record.id if record else 0,
+    },
+}</field>
+    </record>
+
+    <record id="action_ask_ai_document" model="ir.actions.server">
+        <field name="name">Ask AI...</field>
+        <field name="model_id" ref="custom_documents.model_document_document"/>
+        <field name="binding_model_id" ref="custom_documents.model_document_document"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Ask AI',
+    'res_model': 'custom.ai.recommend.wizard',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {
+        'default_model_name': 'document.document',
+        'default_res_id': record.id if record else 0,
+    },
+}</field>
+    </record>
+
+</odoo>

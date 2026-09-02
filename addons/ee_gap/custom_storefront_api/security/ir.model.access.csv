@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_storefront_token_system,custom.storefront.token system,model_custom_storefront_token,base.group_system,1,1,1,1
+access_custom_wishlist_system,custom.wishlist system,model_custom_wishlist,base.group_system,1,1,1,1
+access_custom_wishlist_portal,custom.wishlist portal,model_custom_wishlist,base.group_portal,1,1,1,1
+access_storefront_content_public,custom.storefront.content public,model_custom_storefront_content,base.group_public,1,0,0,0
+access_storefront_content_portal,custom.storefront.content portal,model_custom_storefront_content,base.group_portal,1,0,0,0
+access_storefront_content_user,custom.storefront.content user,model_custom_storefront_content,base.group_user,1,0,0,0
+access_storefront_content_mgr,custom.storefront.content manager,model_custom_storefront_content,base.group_system,1,1,1,1
+access_storefront_subscriber_mgr,custom.storefront.subscriber manager,model_custom_storefront_subscriber,base.group_system,1,1,1,1
+access_storefront_subscriber_user,custom.storefront.subscriber user,model_custom_storefront_subscriber,base.group_user,1,0,0,0
+access_storefront_payment_proof_mgr,custom.storefront.payment.proof manager,model_custom_storefront_payment_proof,custom_payment_id.group_manager,1,1,1,1
+access_storefront_payment_proof_sys,custom.storefront.payment.proof system,model_custom_storefront_payment_proof,base.group_system,1,1,1,1
+access_storefront_payment_proof_user,custom.storefront.payment.proof user,model_custom_storefront_payment_proof,base.group_user,1,0,0,0

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_ppob_transactions"
+              name="Transactions"
+              parent="custom_ppob_core.menu_ppob_operations"
+              action="action_ppob_transaction"
+              sequence="5"/>
+
+    <menuitem id="menu_ppob_manual_sale"
+              name="New Manual Sale"
+              parent="custom_ppob_core.menu_ppob_operations"
+              action="action_ppob_manual_sale_wizard"
+              sequence="6"
+              groups="custom_ppob_core.group_ppob_ops"/>
+
+</odoo>

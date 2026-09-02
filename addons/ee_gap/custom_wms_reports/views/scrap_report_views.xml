@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_scrap_report_list" model="ir.ui.view">
+        <field name="name">custom.wms.scrap.report.list</field>
+        <field name="model">custom.wms.scrap.report</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <header>
+                    <button name="action_export_xlsx" type="object" string="Export XLSX (with barcode)"
+                            class="btn-primary"/>
+                </header>
+                <field name="date_done"/>
+                <field name="name"/>
+                <field name="origin" optional="show"/>
+                <field name="picking_id" optional="hide"/>
+                <field name="warehouse_id" optional="show"/>
+                <field name="location_id"/>
+                <field name="scrap_location_id" optional="hide"/>
+                <field name="default_code" optional="show"/>
+                <field name="product_id"/>
+                <field name="categ_id" optional="hide"/>
+                <field name="lot_id" optional="show"/>
+                <field name="scrap_qty" sum="Total Qty"/>
+                <field name="unit_cost" optional="hide"/>
+                <field name="scrap_value" sum="Total Value"/>
+                <field name="should_replenish" optional="hide"/>
+                <field name="state"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_scrap_report_pivot" model="ir.ui.view">
+        <field name="name">custom.wms.scrap.report.pivot</field>
+        <field name="model">custom.wms.scrap.report</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="categ_id" type="row"/>
+                <field name="date_done" interval="month" type="col"/>
+                <field name="scrap_qty" type="measure"/>
+                <field name="scrap_value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_scrap_report_search" model="ir.ui.view">
+        <field name="name">custom.wms.scrap.report.search</field>
+        <field name="model">custom.wms.scrap.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="default_code"/>
+                <field name="lot_id"/>
+                <field name="location_id"/>
+                <field name="origin"/>
+                <filter name="filter_done" string="Done" domain="[('state', '=', 'done')]"/>
+                <filter name="filter_to_replenish" string="To Replenish" domain="[('should_replenish', '=', True)]"/>
+                <filter name="filter_date" date="date_done"/>
+                <group>
+                    <filter name="group_warehouse" string="Warehouse" context="{'group_by': 'warehouse_id'}"/>
+                    <filter name="group_location" string="From Location" context="{'group_by': 'location_id'}"/>
+                    <filter name="group_categ" string="Category" context="{'group_by': 'categ_id'}"/>
+                    <filter name="group_product" string="Product (SKU)" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'date_done:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_scrap_report" model="ir.actions.act_window">
+        <field name="name">Scrap Report</field>
+        <field name="res_model">custom.wms.scrap.report</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="view_scrap_report_search"/>
+        <field name="context">{'search_default_filter_done': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">No scrap recorded yet</p>
+            <p>Every write-off out of an internal bin, with its quantity, value
+               and whether it must be replenished.</p>
+        </field>
+    </record>
+
+</odoo>

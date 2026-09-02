@@ -1,0 +1,10 @@
+# Pinned exactly, and matched to the other two Python services in this platform
+# so there is one set to patch rather than three.
+fastapi==0.141.1
+starlette==1.6.0
+uvicorn[standard]==0.52.4
+pydantic==2.13.5
+prometheus-client==0.21.1
+# The production provider. The ollama provider needs nothing beyond stdlib, so
+# a deployment that uses it still carries this - one image, one manifest.
+anthropic==0.75.0

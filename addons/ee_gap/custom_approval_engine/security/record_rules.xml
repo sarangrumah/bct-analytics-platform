@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- A delegation row is owned by its delegator. Users see their own
+             delegations only; admins see all. -->
+        <record id="delegation_own_rule" model="ir.rule">
+            <field name="name">Delegation: own only</field>
+            <field name="model_id" ref="model_approval_delegation"/>
+            <field name="domain_force">[('user_id','=',user.id)]</field>
+            <field name="groups" eval="[Command.link(ref('group_approval_user'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <record id="delegation_admin_rule" model="ir.rule">
+            <field name="name">Delegation: admin all</field>
+            <field name="model_id" ref="model_approval_delegation"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[Command.link(ref('group_approval_admin'))]"/>
+        </record>
+
+        <!-- OOO records: same — own only unless admin. -->
+        <record id="ooo_own_rule" model="ir.rule">
+            <field name="name">OOO: own only</field>
+            <field name="model_id" ref="model_approval_ooo"/>
+            <field name="domain_force">[('user_id','=',user.id)]</field>
+            <field name="groups" eval="[Command.link(ref('group_approval_user'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <record id="ooo_admin_rule" model="ir.rule">
+            <field name="name">OOO: admin all</field>
+            <field name="model_id" ref="model_approval_ooo"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[Command.link(ref('group_approval_admin'))]"/>
+        </record>
+
+        <!-- Approval requests: users see requests where they are the requestor
+             OR they are in the pending approver list (current or historical).
+             Managers see everything. -->
+        <record id="request_user_rule" model="ir.rule">
+            <field name="name">Request: requester or approver</field>
+            <field name="model_id" ref="model_approval_request"/>
+            <field name="domain_force">
+                ['|',
+                    ('requested_by_id','=',user.id),
+                    '|',
+                        ('pending_approver_ids','in',[user.id]),
+                        ('history_ids.action_user_id','=',user.id)
+                ]
+            </field>
+            <field name="groups" eval="[Command.link(ref('group_approval_user'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="request_manager_rule" model="ir.rule">
+            <field name="name">Request: manager all</field>
+            <field name="model_id" ref="model_approval_request"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[Command.link(ref('group_approval_manager'))]"/>
+        </record>
+
+    </data>
+</odoo>

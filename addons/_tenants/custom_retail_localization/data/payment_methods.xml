@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      GIRO and BANK TRANSFER payment methods (feedback Finance-AP #7), inbound
+      and outbound. Manual-style (see models/account_payment_method.py). CHECK
+      is already provided by the account_check_printing module (check_printing).
+      noupdate so admins can rename/deactivate without upgrades reverting it.
+    -->
+    <data noupdate="1">
+        <record id="payment_method_giro_in" model="account.payment.method">
+            <field name="name">Giro</field>
+            <field name="code">giro</field>
+            <field name="payment_type">inbound</field>
+        </record>
+        <record id="payment_method_giro_out" model="account.payment.method">
+            <field name="name">Giro</field>
+            <field name="code">giro</field>
+            <field name="payment_type">outbound</field>
+        </record>
+        <record id="payment_method_transfer_in" model="account.payment.method">
+            <field name="name">Bank Transfer</field>
+            <field name="code">bank_transfer</field>
+            <field name="payment_type">inbound</field>
+        </record>
+        <record id="payment_method_transfer_out" model="account.payment.method">
+            <field name="name">Bank Transfer</field>
+            <field name="code">bank_transfer</field>
+            <field name="payment_type">outbound</field>
+        </record>
+    </data>
+</odoo>

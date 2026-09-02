@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_wms_docs_root"
+              name="Warehouse Documents"
+              parent="stock.menu_stock_warehouse_mgmt"
+              sequence="70"
+              groups="stock.group_stock_user"/>
+
+    <menuitem id="menu_wms_docs_labels"
+              name="Print Labels"
+              parent="menu_wms_docs_root"
+              action="action_wms_label_wizard"
+              sequence="10"/>
+
+</odoo>

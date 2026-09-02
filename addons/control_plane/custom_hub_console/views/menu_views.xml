@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Root menu -->
+    <menuitem id="menu_hub_root" name="Hub" sequence="5"
+              web_icon="custom_hub_console,static/description/icon.png"
+              groups="group_hub_viewer"/>
+
+    <!-- Landing page: OWL dashboard -->
+    <menuitem id="menu_hub_dashboard" name="Dashboard"
+              parent="menu_hub_root"
+              action="action_hub_dashboard" sequence="1"/>
+
+    <!-- Verticals -->
+    <menuitem id="menu_hub_verticals" name="Verticals"
+              parent="menu_hub_root"
+              action="action_hub_verticals" sequence="10"/>
+
+    <!-- Module Catalog -->
+    <menuitem id="menu_hub_catalog" name="Module Catalog"
+              parent="menu_hub_root"
+              action="action_module_catalog" sequence="20"/>
+
+    <menuitem id="menu_hub_deployments" name="Deployments"
+              parent="menu_hub_root"
+              action="action_module_deployment" sequence="21"/>
+
+    <menuitem id="menu_hub_industry_packs" name="Industry Packs"
+              parent="menu_hub_root"
+              action="action_industry_pack" sequence="22"/>
+
+    <menuitem id="menu_hub_catalog_rescan" name="Rescan Catalog"
+              parent="menu_hub_catalog"
+              action="action_rescan_catalog_wizard" sequence="99"
+              groups="group_hub_admin"/>
+
+    <!-- Optional sibling-module passthrough menus (resolved by hooks.py).
+         These have no action= attribute on purpose; hooks.py wires them
+         post-install when the target action exists in the registry,
+         otherwise marks them inactive. -->
+    <menuitem id="menu_hub_monitoring" name="Monitoring"
+              parent="menu_hub_root" sequence="30"/>
+
+    <menuitem id="menu_hub_tenant_health" name="Tenant Health"
+              parent="menu_hub_monitoring" sequence="1"/>
+
+    <menuitem id="menu_hub_capacity" name="Capacity Forecast"
+              parent="menu_hub_monitoring" sequence="2"/>
+
+    <menuitem id="menu_hub_incidents" name="Incidents"
+              parent="menu_hub_monitoring" sequence="3"/>
+
+    <menuitem id="menu_hub_brd" name="BRD Analyzer"
+              parent="menu_hub_root" sequence="40"/>
+
+    <menuitem id="menu_hub_brd_documents" name="BRD Documents"
+              parent="menu_hub_brd" sequence="1"/>
+
+    <menuitem id="menu_hub_brd_recommendations" name="Recommendations"
+              parent="menu_hub_brd" sequence="2"/>
+
+    <menuitem id="menu_hub_brd_capability" name="Capability Catalog"
+              parent="menu_hub_brd" sequence="3"/>
+
+    <menuitem id="menu_hub_hht" name="HHT Devices"
+              parent="menu_hub_root" sequence="50"/>
+
+    <menuitem id="menu_hub_hht_devices" name="Devices"
+              parent="menu_hub_hht" sequence="1"/>
+
+    <menuitem id="menu_hub_ai" name="AI Console"
+              parent="menu_hub_root" sequence="60"/>
+
+    <menuitem id="menu_hub_ai_usage" name="Usage"
+              parent="menu_hub_ai"
+              action="action_ai_usage" sequence="1"/>
+
+    <menuitem id="menu_hub_ai_anomaly" name="Anomaly Findings"
+              parent="menu_hub_ai" sequence="2"/>
+
+    <menuitem id="menu_hub_ai_nlq" name="NLQ Sessions"
+              parent="menu_hub_ai" sequence="3"/>
+
+    <!-- Audit log -->
+    <menuitem id="menu_hub_audit" name="Audit Log"
+              parent="menu_hub_root"
+              action="action_audit_event" sequence="90"/>
+</odoo>

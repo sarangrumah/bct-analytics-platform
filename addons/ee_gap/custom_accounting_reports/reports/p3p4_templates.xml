@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ============ DPP Nilai Lain ============ -->
+        <template id="report_dpp_nilai_lain">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tanggal</th><th>No. Dokumen</th><th>Lawan Transaksi</th><th>Kategori DPP</th>
+                        <th class="text-end">DPP Penuh</th><th class="text-end">Faktor</th>
+                        <th class="text-end">DPP Nilai Lain</th><th class="text-end">PPN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'note'">
+                            <td colspan="8" class="text-muted fst-italic" t-esc="line.get('doc_no')"/>
+                        </tr>
+                        <tr t-elif="line.get('type') == 'grand_total'" class="table-dark fw-bold">
+                            <td colspan="4" t-esc="line.get('doc_no') or 'TOTAL'"/>
+                            <td class="text-end"><span t-esc="line.get('dpp_penuh')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td/>
+                            <td class="text-end"><span t-esc="line.get('dpp_nilai_lain')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('ppn')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                        </tr>
+                        <tr t-else="">
+                            <td t-esc="line.get('date')" t-options="{'widget':'date'}"/>
+                            <td t-esc="line.get('doc_no')"/>
+                            <td t-esc="line.get('partner')"/>
+                            <td t-esc="line.get('kategori')"/>
+                            <td class="text-end"><span t-esc="line.get('dpp_penuh')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end" t-esc="line.get('faktor')"/>
+                            <td class="text-end"><span t-esc="line.get('dpp_nilai_lain')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('ppn')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+
+        <!-- ============ Faktur Pengganti ============ -->
+        <template id="report_faktur_pengganti">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tanggal</th><th>No. Dokumen</th><th>Kode</th><th>Lawan Transaksi</th>
+                        <th>NSFP Asal</th><th>NSFP Pengganti</th>
+                        <th class="text-end">DPP</th><th class="text-end">PPN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'note'">
+                            <td colspan="8" class="text-muted fst-italic" t-esc="line.get('doc_no')"/>
+                        </tr>
+                        <tr t-elif="line.get('type') == 'grand_total'" class="table-dark fw-bold">
+                            <td colspan="6" t-esc="line.get('doc_no') or 'TOTAL'"/>
+                            <td class="text-end"><span t-esc="line.get('dpp')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('ppn')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                        </tr>
+                        <tr t-else="">
+                            <td t-esc="line.get('date')" t-options="{'widget':'date'}"/>
+                            <td t-esc="line.get('doc_no')"/>
+                            <td t-esc="line.get('kode')"/>
+                            <td t-esc="line.get('partner')"/>
+                            <td t-esc="line.get('nsfp_asal')"/>
+                            <td t-esc="line.get('nsfp_pengganti')"/>
+                            <td class="text-end"><span t-esc="line.get('dpp')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('ppn')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+
+        <!-- ============ Ekualisasi Omzet ============ -->
+        <template id="report_ekualisasi_omzet">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Uraian</th><th class="text-end">Jumlah</th></tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'grand_total'" class="table-dark fw-bold">
+                            <td t-esc="line.get('uraian')"/>
+                            <td class="text-end"><span t-esc="line.get('amount')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                        </tr>
+                        <tr t-else="">
+                            <td t-esc="line.get('uraian')"/>
+                            <td class="text-end"><span t-esc="line.get('amount')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+
+        <!-- ============ Ekualisasi Biaya vs Objek PPh ============ -->
+        <template id="report_pph_equalisasi">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tanggal</th><th>No. Dokumen</th><th>No. Dok Jurnal</th>
+                        <th>Lawan Transaksi</th><th>NPWP</th><th>Produk</th><th>COA Expense</th>
+                        <th>Kategori PPh</th><th class="text-end">DPP</th><th class="text-end">Nilai PPN</th>
+                        <th>Status</th><th class="text-end">PPh Dipotong</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'note'">
+                            <td colspan="12" class="text-muted fst-italic" t-esc="line.get('doc_no')"/>
+                        </tr>
+                        <tr t-elif="line.get('type') == 'grand_total'" class="table-dark fw-bold">
+                            <td colspan="8" t-esc="line.get('partner') or 'TOTAL'"/>
+                            <td class="text-end"><span t-esc="line.get('dpp')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('ppn')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td/>
+                            <td class="text-end"><span t-esc="line.get('pph')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                        </tr>
+                        <tr t-else="" t-att-class="'table-warning' if line.get('status') == 'BELUM dipotong' else ''">
+                            <td t-esc="line.get('date')" t-options="{'widget':'date'}"/>
+                            <td t-esc="line.get('doc_no')"/>
+                            <td t-esc="line.get('journal_no')"/>
+                            <td t-esc="line.get('partner')"/>
+                            <td t-esc="line.get('npwp')"/>
+                            <td t-esc="line.get('product')"/>
+                            <td t-esc="line.get('coa_expense')"/>
+                            <td t-esc="line.get('kategori')"/>
+                            <td class="text-end"><span t-esc="line.get('dpp')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('ppn')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td t-esc="line.get('status')"/>
+                            <td class="text-end"><span t-esc="line.get('pph')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+
+        <!-- ============ Monitoring Submission Coretax / Pajakku ============ -->
+        <template id="report_coretax_submission">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Dibuat</th><th>Transaksi</th><th>Jenis</th><th>Dokumen</th>
+                        <th>Status</th><th>NSFP/No.Bupot</th><th class="text-end">Retry</th><th>Pesan DJP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'note'">
+                            <td colspan="8" class="text-muted fst-italic" t-esc="line.get('name')"/>
+                        </tr>
+                        <tr t-elif="line.get('type') == 'subtotal'" class="table-light fw-bold">
+                            <td colspan="6" t-esc="line.get('name')"/>
+                            <td class="text-end" t-esc="line.get('retry')"/>
+                            <td/>
+                        </tr>
+                        <tr t-elif="line.get('type') == 'grand_total'" class="table-dark fw-bold">
+                            <td colspan="6" t-esc="line.get('name') or 'TOTAL'"/>
+                            <td class="text-end" t-esc="line.get('retry')"/>
+                            <td/>
+                        </tr>
+                        <tr t-else="">
+                            <td t-esc="line.get('date')" t-options="{'widget':'date'}"/>
+                            <td t-esc="line.get('name')"/>
+                            <td t-esc="line.get('jenis')"/>
+                            <td t-esc="line.get('doc')"/>
+                            <td t-esc="line.get('status')"/>
+                            <td t-esc="line.get('nsfp')"/>
+                            <td class="text-end" t-esc="line.get('retry')"/>
+                            <td t-esc="line.get('pesan')"/>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+
+        <!-- ============ Usage Meter Pajakku ============ -->
+        <template id="report_pajakku_usage">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Periode</th><th>Company</th>
+                        <th class="text-end">API Calls</th><th class="text-end">Faktur Submits</th>
+                        <th class="text-end">Bupot Submits</th><th class="text-end">Errors</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'note'">
+                            <td colspan="6" class="text-muted fst-italic" t-esc="line.get('company')"/>
+                        </tr>
+                        <tr t-elif="line.get('type') == 'grand_total'" class="table-dark fw-bold">
+                            <td colspan="2" t-esc="line.get('company') or 'TOTAL'"/>
+                            <td class="text-end" t-esc="line.get('api_calls')"/>
+                            <td class="text-end" t-esc="line.get('faktur_submits')"/>
+                            <td class="text-end" t-esc="line.get('bupot_submits')"/>
+                            <td class="text-end" t-esc="line.get('errors')"/>
+                        </tr>
+                        <tr t-else="">
+                            <td t-esc="line.get('period')" t-options="{'widget':'date'}"/>
+                            <td t-esc="line.get('company')"/>
+                            <td class="text-end" t-esc="line.get('api_calls')"/>
+                            <td class="text-end" t-esc="line.get('faktur_submits')"/>
+                            <td class="text-end" t-esc="line.get('bupot_submits')"/>
+                            <td class="text-end" t-esc="line.get('errors')"/>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+    </data>
+</odoo>

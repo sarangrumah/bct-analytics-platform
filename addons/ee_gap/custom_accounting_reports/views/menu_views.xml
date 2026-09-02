@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_custom_reports_root"
+              name="Reports"
+              parent="account.menu_finance_reports"
+              sequence="80"
+              groups="group_report_user"/>
+
+    <menuitem id="menu_custom_reports_gl_analysis"
+              name="GL Analysis"
+              parent="menu_custom_reports_root"
+              action="action_gl_analysis"
+              sequence="5"/>
+
+    <menuitem id="menu_custom_reports_trial_balance"
+              name="Trial Balance"
+              parent="menu_custom_reports_root"
+              action="action_trial_balance_wizard"
+              sequence="10"/>
+
+    <menuitem id="menu_custom_reports_general_ledger"
+              name="General Ledger"
+              parent="menu_custom_reports_root"
+              action="action_general_ledger_wizard"
+              sequence="20"/>
+
+    <menuitem id="menu_custom_reports_balance_sheet"
+              name="Balance Sheet"
+              parent="menu_custom_reports_root"
+              action="action_balance_sheet_wizard"
+              sequence="30"/>
+
+    <menuitem id="menu_custom_reports_profit_loss"
+              name="Profit &amp; Loss"
+              parent="menu_custom_reports_root"
+              action="action_profit_loss_wizard"
+              sequence="40"/>
+
+    <menuitem id="menu_custom_reports_cash_flow"
+              name="Cash Flow"
+              parent="menu_custom_reports_root"
+              action="action_cash_flow_wizard"
+              sequence="50"/>
+
+    <menuitem id="menu_custom_reports_aged_receivable"
+              name="Aged Receivable"
+              parent="menu_custom_reports_root"
+              action="action_aged_receivable_wizard"
+              sequence="60"/>
+
+    <menuitem id="menu_custom_reports_aged_payable"
+              name="Aged Payable"
+              parent="menu_custom_reports_root"
+              action="action_aged_payable_wizard"
+              sequence="70"/>
+
+    <menuitem id="menu_custom_reports_partner_ledger"
+              name="Partner Ledger"
+              parent="menu_custom_reports_root"
+              action="action_partner_ledger_wizard"
+              sequence="80"/>
+
+    <menuitem id="menu_custom_reports_payable_card"
+              name="Kartu Utang"
+              parent="menu_custom_reports_root"
+              action="action_payable_card_wizard"
+              sequence="82"/>
+
+    <menuitem id="menu_custom_reports_receivable_card"
+              name="Kartu Piutang"
+              parent="menu_custom_reports_root"
+              action="action_receivable_card_wizard"
+              sequence="84"/>
+
+    <menuitem id="menu_custom_reports_advance"
+              name="Uang Muka / DP"
+              parent="menu_custom_reports_root"
+              action="action_advance_wizard"
+              sequence="86"/>
+
+    <menuitem id="menu_custom_reports_sales"
+              name="Sales Report"
+              parent="menu_custom_reports_root"
+              action="action_sales_wizard"
+              sequence="88"/>
+
+    <!-- ===== Laporan Pajak (grouped submenu for the tax team) ===== -->
+    <menuitem id="menu_custom_reports_tax_root"
+              name="Laporan Pajak"
+              parent="menu_custom_reports_root"
+              sequence="89"/>
+
+    <menuitem id="menu_custom_reports_tax"
+              name="Tax Report (PPN/PPh)"
+              parent="menu_custom_reports_tax_root"
+              action="action_tax_report_wizard"
+              sequence="10"/>
+
+    <menuitem id="menu_custom_reports_faktur_pajak"
+              name="Rekap Faktur Pajak"
+              parent="menu_custom_reports_tax_root"
+              action="action_faktur_pajak_wizard"
+              sequence="20"/>
+
+    <menuitem id="menu_custom_reports_ppn_masukan_import"
+              name="Import PPN Masukan"
+              parent="menu_custom_reports_tax_root"
+              action="action_ppn_masukan_import_wizard"
+              sequence="21"/>
+
+    <menuitem id="menu_custom_reports_bupot"
+              name="Rekap Bukti Potong PPh"
+              parent="menu_custom_reports_tax_root"
+              action="action_bupot_wizard"
+              sequence="30"/>
+
+    <menuitem id="menu_custom_reports_spt_ppn"
+              name="SPT Masa PPN 1111"
+              parent="menu_custom_reports_tax_root"
+              action="action_spt_ppn_wizard"
+              sequence="40"/>
+
+    <menuitem id="menu_custom_reports_pph_withholding"
+              name="Rekap PPh Pemotongan"
+              parent="menu_custom_reports_tax_root"
+              action="action_pph_withholding_wizard"
+              sequence="50"/>
+
+    <menuitem id="menu_custom_reports_nsfp_monitoring"
+              name="Monitoring NSFP"
+              parent="menu_custom_reports_tax_root"
+              action="action_nsfp_monitoring_wizard"
+              sequence="60"/>
+
+    <menuitem id="menu_custom_reports_npwp_quality"
+              name="Data Quality NPWP/NIK"
+              parent="menu_custom_reports_tax_root"
+              action="action_npwp_quality_wizard"
+              sequence="70"/>
+
+    <menuitem id="menu_custom_reports_dpp_nilai_lain"
+              name="Laporan DPP Nilai Lain"
+              parent="menu_custom_reports_tax_root"
+              action="action_dpp_nilai_lain_wizard"
+              sequence="80"/>
+
+    <menuitem id="menu_custom_reports_faktur_pengganti"
+              name="Daftar Faktur Pengganti"
+              parent="menu_custom_reports_tax_root"
+              action="action_faktur_pengganti_wizard"
+              sequence="90"/>
+
+    <menuitem id="menu_custom_reports_ekualisasi_omzet"
+              name="Ekualisasi Omzet (PPN vs GL)"
+              parent="menu_custom_reports_tax_root"
+              action="action_ekualisasi_omzet_wizard"
+              sequence="100"/>
+
+    <menuitem id="menu_custom_reports_pph_equalisasi"
+              name="Ekualisasi Biaya vs Objek PPh"
+              parent="menu_custom_reports_tax_root"
+              action="action_pph_equalisasi_wizard"
+              sequence="110"/>
+
+    <menuitem id="menu_custom_reports_coretax_submission"
+              name="Monitoring Submission Coretax"
+              parent="menu_custom_reports_tax_root"
+              action="action_coretax_submission_wizard"
+              sequence="120"/>
+
+    <menuitem id="menu_custom_reports_pajakku_usage"
+              name="Usage Meter Pajakku"
+              parent="menu_custom_reports_tax_root"
+              action="action_pajakku_usage_wizard"
+              sequence="130"/>
+
+    <menuitem id="menu_custom_reports_pph_reconciliation"
+              name="Rekonsiliasi PPh (Terutang vs Disetor)"
+              parent="menu_custom_reports_tax_root"
+              action="action_pph_reconciliation_wizard"
+              sequence="140"/>
+
+    <menuitem id="menu_custom_reports_pph25"
+              name="Monitoring Angsuran PPh 25"
+              parent="menu_custom_reports_tax_root"
+              action="action_pph25_wizard"
+              sequence="150"/>
+
+    <menuitem id="menu_custom_reports_tax_audit"
+              name="Jejak Audit Pajak"
+              parent="menu_custom_reports_tax_root"
+              action="action_tax_audit_wizard"
+              sequence="160"/>
+
+    <menuitem id="menu_custom_reports_day_book"
+              name="Day Book"
+              parent="menu_custom_reports_root"
+              action="action_day_book_wizard"
+              sequence="100"/>
+
+    <menuitem id="menu_custom_reports_cash_book"
+              name="Cash Book"
+              parent="menu_custom_reports_root"
+              action="action_cash_book_wizard"
+              sequence="110"/>
+
+    <menuitem id="menu_custom_reports_bank_book"
+              name="Bank Book"
+              parent="menu_custom_reports_root"
+              action="action_bank_book_wizard"
+              sequence="120"/>
+
+    <menuitem id="menu_custom_reports_journal_audit"
+              name="Journal Audit"
+              parent="menu_custom_reports_root"
+              action="action_journal_audit_wizard"
+              sequence="130"/>
+
+    <menuitem id="menu_custom_reports_financial_trees"
+              name="Financial Report Trees"
+              parent="account.menu_finance_configuration"
+              action="action_custom_report_financial"
+              sequence="50"
+              groups="group_report_admin"/>
+    <menuitem id="menu_custom_reports_credit_limit"
+              name="Credit Limit"
+              parent="menu_custom_reports_root"
+              action="action_credit_limit_wizard"
+              sequence="65"/>
+
+    <menuitem id="menu_custom_reports_purchase"
+              name="Purchase Report"
+              parent="menu_custom_reports_root"
+              action="action_purchase_wizard"
+              sequence="87"/>
+
+    <menuitem id="menu_custom_reports_gl_open_items"
+              name="GL Open Items / Outstanding"
+              parent="menu_custom_reports_root"
+              action="action_gl_open_items_wizard"
+              sequence="35"/>
+
+    <menuitem id="menu_custom_reports_sales_detail"
+              name="Sales Detail (XStore X24DN)"
+              parent="menu_custom_reports_root"
+              action="action_sales_detail_wizard"
+              sequence="86"/>
+
+    <menuitem id="menu_custom_reports_bill_payment"
+              name="Mapping Bill vs Payment"
+              parent="menu_custom_reports_root"
+              action="action_bill_payment_wizard"
+              sequence="88"/>
+</odoo>

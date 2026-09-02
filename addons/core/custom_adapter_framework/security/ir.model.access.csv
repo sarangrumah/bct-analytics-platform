@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_adapter_config_user,adapter.config.user,model_custom_adapter_config,custom_core.group_custom_user,1,0,0,0
+access_adapter_config_admin,adapter.config.admin,model_custom_adapter_config,group_adapter_admin,1,1,1,1
+access_adapter_call_log_user,adapter.call.log.user,model_custom_adapter_call_log,custom_core.group_custom_user,1,0,0,0
+access_adapter_call_log_admin,adapter.call.log.admin,model_custom_adapter_call_log,group_adapter_admin,1,0,1,0

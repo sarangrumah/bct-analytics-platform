@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_whatsapp" model="ir.ui.view">
+        <field name="name">account.move.form.whatsapp</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_whatsapp_send"
+                        type="object"
+                        string="Send Invoice via WhatsApp"
+                        groups="custom_whatsapp.group_user"
+                        invisible="move_type not in ('out_invoice','out_refund')"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

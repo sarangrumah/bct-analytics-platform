@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_custom_esg_report_list" model="ir.ui.view">
+        <field name="name">custom.esg.report.list</field>
+        <field name="model">custom.esg.report</field>
+        <field name="arch" type="xml">
+            <list string="ESG Reports">
+                <field name="name"/>
+                <field name="year"/>
+                <field name="framework"/>
+                <field name="state"/>
+                <field name="published_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_esg_report_form" model="ir.ui.view">
+        <field name="name">custom.esg.report.form</field>
+        <field name="model">custom.esg.report</field>
+        <field name="arch" type="xml">
+            <form string="ESG Report">
+                <header>
+                    <button name="action_generate" type="object" string="Generate Report"
+                            class="oe_highlight" invisible="state == 'published'"/>
+                    <button name="action_generate" type="object" string="Regenerate"
+                            invisible="state != 'published'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,published"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Sustainability Report 2026"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="year"/>
+                            <field name="framework"/>
+                        </group>
+                        <group>
+                            <field name="published_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Measurements" name="measurements">
+                            <field name="measurement_ids">
+                                <list>
+                                    <field name="metric_id"/>
+                                    <field name="period_start"/>
+                                    <field name="period_end"/>
+                                    <field name="value"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Generated Report" name="generated">
+                            <field name="generated_html"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_esg_report_search" model="ir.ui.view">
+        <field name="name">custom.esg.report.search</field>
+        <field name="model">custom.esg.report</field>
+        <field name="arch" type="xml">
+            <search string="ESG Reports">
+                <field name="name"/>
+                <field name="year"/>
+                <filter string="Draft" name="filter_draft" domain="[('state','=','draft')]"/>
+                <filter string="Published" name="filter_published" domain="[('state','=','published')]"/>
+                <separator/>
+                <filter string="By Framework" name="group_framework" context="{'group_by': 'framework'}"/>
+                <filter string="By Year" name="group_year" context="{'group_by': 'year'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_esg_report" model="ir.actions.act_window">
+        <field name="name">ESG Reports</field>
+        <field name="res_model">custom.esg.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_esg_report_search"/>
+    </record>
+
+</odoo>

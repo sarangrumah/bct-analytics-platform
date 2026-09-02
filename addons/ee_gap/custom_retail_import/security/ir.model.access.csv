@@ -1,0 +1,17 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_retail_profile_user,profile user read,model_retail_import_profile,group_retail_import_user,1,0,0,0
+access_retail_profile_manager,profile manager all,model_retail_import_profile,group_retail_import_manager,1,1,1,1
+access_retail_log_user,log user,model_retail_import_log,group_retail_import_user,1,0,0,0
+access_retail_log_manager,log manager,model_retail_import_log,group_retail_import_manager,1,1,1,1
+access_retail_feed_user,feed user read,model_retail_import_feed,group_retail_import_user,1,0,0,0
+access_retail_feed_manager,feed manager all,model_retail_import_feed,group_retail_import_manager,1,1,1,1
+access_retail_wizard_user,wizard user,model_retail_import_wizard,group_retail_import_user,1,1,1,1
+access_retail_wizard_manager,wizard manager,model_retail_import_wizard,group_retail_import_manager,1,1,1,1
+access_retail_line_user,line user read,model_retail_import_line,group_retail_import_user,1,0,0,0
+access_retail_line_manager,line manager all,model_retail_import_line,group_retail_import_manager,1,1,1,1
+access_retail_mailbox_user,mailbox user read,model_retail_import_mailbox,group_retail_import_user,1,0,0,0
+access_retail_mailbox_manager,mailbox manager all,model_retail_import_mailbox,group_retail_import_manager,1,1,1,1
+access_retail_mail_message_user,mail message user read,model_retail_import_mail_message,group_retail_import_user,1,0,0,0
+access_retail_mail_message_manager,mail message manager all,model_retail_import_mail_message,group_retail_import_manager,1,1,1,1
+access_retail_mdm_pending_user,pending sku user read,model_retail_mdm_pending_sku,group_retail_import_user,1,0,0,0
+access_retail_mdm_pending_manager,pending sku manager all,model_retail_mdm_pending_sku,group_retail_import_manager,1,1,1,1

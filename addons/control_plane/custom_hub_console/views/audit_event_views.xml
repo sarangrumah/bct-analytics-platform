@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_audit_event_list" model="ir.ui.view">
+        <field name="name">custom.hub.audit.event.list</field>
+        <field name="model">custom.hub.audit.event</field>
+        <field name="arch" type="xml">
+            <list string="Audit Events" create="false" edit="false" delete="false"
+                  default_order="id desc">
+                <field name="timestamp"/>
+                <field name="event_type"/>
+                <field name="user_id"/>
+                <field name="tenant_id"/>
+                <field name="summary"/>
+                <field name="hash" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_audit_event_form" model="ir.ui.view">
+        <field name="name">custom.hub.audit.event.form</field>
+        <field name="model">custom.hub.audit.event</field>
+        <field name="arch" type="xml">
+            <form string="Audit Event" create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="timestamp" readonly="1"/>
+                            <field name="event_type" readonly="1"/>
+                            <field name="user_id" readonly="1"/>
+                            <field name="tenant_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="object_ref" readonly="1"/>
+                            <field name="prev_hash" readonly="1"/>
+                            <field name="hash" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Summary">
+                        <field name="summary" nolabel="1" readonly="1"/>
+                    </group>
+                    <group string="Payload">
+                        <field name="payload" nolabel="1" readonly="1"
+                               widget="ace" options="{'mode': 'javascript'}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_audit_event_search" model="ir.ui.view">
+        <field name="name">custom.hub.audit.event.search</field>
+        <field name="model">custom.hub.audit.event</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="summary"/>
+                <field name="user_id"/>
+                <field name="tenant_id"/>
+                <field name="event_type"/>
+
+                    <filter string="Event Type" name="g_evt"
+                            context="{'group_by': 'event_type'}"/>
+                    <filter string="Tenant" name="g_tenant"
+                            context="{'group_by': 'tenant_id'}"/>
+                    <filter string="User" name="g_user"
+                            context="{'group_by': 'user_id'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_audit_event" model="ir.actions.act_window">
+        <field name="name">Audit Log</field>
+        <field name="res_model">custom.hub.audit.event</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

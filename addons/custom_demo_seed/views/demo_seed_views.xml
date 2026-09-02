@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_demo_seed_generator_form" model="ir.ui.view">
+        <field name="name">demo.seed.generator.form</field>
+        <field name="model">demo.seed.generator</field>
+        <field name="arch" type="xml">
+            <form string="Generate Demo Data">
+                <div class="alert alert-warning" role="alert">
+                    <strong>Fixture module.</strong> This writes synthetic demo volume into the
+                    current database. Never run it against production data.
+                </div>
+                <group>
+                    <group string="Reproducibility">
+                        <field name="seed"/>
+                    </group>
+                    <group string="Master data">
+                        <field name="partner_count"/>
+                        <field name="product_count"/>
+                        <field name="operating_unit_count"/>
+                    </group>
+                    <group string="Volume per month">
+                        <field name="sale_orders_per_month"/>
+                        <field name="pos_orders_per_month"/>
+                        <field name="ppob_per_month"/>
+                    </group>
+                    <group string="Span">
+                        <field name="months"/>
+                        <field name="with_pos"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_generate" type="object" string="Generate"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_demo_seed_generator" model="ir.actions.act_window">
+        <field name="name">Generate Demo Data</field>
+        <field name="res_model">demo.seed.generator</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_demo_seed_generator"
+              name="Generate Demo Data"
+              parent="base.menu_administration"
+              action="action_demo_seed_generator"
+              sequence="99"
+              groups="base.group_system"/>
+
+</odoo>

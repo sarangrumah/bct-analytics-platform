@@ -1,0 +1,349 @@
+/* -------- Sidebar (fixed right) -------- */
+.o_studio_overlay_sidebar {
+    position: fixed;
+    top: 46px;
+    right: 0;
+    bottom: 0;
+    width: 320px;
+    background: #1e1f2c;
+    color: #e8eaf2;
+    border-left: 1px solid #383a4b;
+    box-shadow: -2px 0 12px rgba(0, 0, 0, 0.35);
+    z-index: 1040;
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+
+    .o_studio_overlay_header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        background: #15161f;
+        border-bottom: 1px solid #2c2e3d;
+
+        .o_studio_overlay_title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+
+            i { color: #f0c674; }
+        }
+
+        .btn-link { color: #e8eaf2; }
+    }
+
+    .o_studio_overlay_context,
+    .o_studio_overlay_selected {
+        padding: 8px 12px;
+        border-bottom: 1px solid #2c2e3d;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        background: #232434;
+
+        small {
+            color: #9095a8;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        code {
+            color: #ffd479;
+            background: transparent;
+            font-size: 12px;
+
+            &.o_studio_overlay_warning {
+                color: #ff7878;
+            }
+        }
+    }
+
+    .o_studio_overlay_panel {
+        flex: 1;
+        overflow: auto;
+        padding: 12px;
+
+        h4 {
+            margin: 0 0 4px;
+            font-size: 13px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .o_studio_hint {
+            color: #9095a8;
+            font-size: 11px;
+            margin: 4px 0 8px;
+            line-height: 1.3;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: #1a1b27;
+            border: 1px solid #383a4b;
+            color: #e8eaf2;
+            padding: 4px 8px;
+            border-radius: 3px;
+            margin-bottom: 8px;
+        }
+    }
+
+    .o_studio_overlay_field_list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            border: 1px solid transparent;
+            border-radius: 3px;
+            margin-bottom: 2px;
+
+            &.o_studio_overlay_drag_source {
+                cursor: grab;
+                &:hover {
+                    background: #2a2c3d;
+                    border-color: #404258;
+                }
+                &:active { cursor: grabbing; }
+            }
+
+            &.o_studio_overlay_empty {
+                color: #6c7088;
+                font-style: italic;
+                font-size: 12px;
+                padding: 12px 8px;
+            }
+        }
+
+        .o_studio_drag_handle {
+            color: #6c7088;
+            font-size: 11px;
+        }
+
+        .o_studio_overlay_field_meta {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+
+            code {
+                color: #9095a8;
+                background: transparent;
+                font-size: 11px;
+                padding: 0;
+            }
+        }
+
+        .o_studio_field_type {
+            color: #82c4ff;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+    }
+
+    /* Tab bar */
+    .o_studio_overlay_tabs {
+        display: flex;
+        border-bottom: 1px solid #2c2e3d;
+        background: #1a1b27;
+
+        .o_studio_overlay_tab {
+            flex: 1;
+            background: transparent;
+            border: 0;
+            color: #9095a8;
+            padding: 8px 6px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+
+            &.o_active {
+                color: #fff;
+                border-bottom: 2px solid #f0c674;
+            }
+            &:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
+            i { margin-right: 4px; }
+            small {
+                text-transform: none;
+                color: #9095a8;
+                font-size: 10px;
+            }
+        }
+    }
+
+    .o_studio_overlay_newfield {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 12px;
+
+        input, select {
+            background: #1a1b27;
+            border: 1px solid #383a4b;
+            color: #e8eaf2;
+            padding: 4px 8px;
+            border-radius: 3px;
+        }
+    }
+
+    .o_studio_overlay_props {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 4px;
+        margin-bottom: 12px;
+
+        label {
+            color: #9095a8;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin: 6px 0 2px 0;
+        }
+        code {
+            background: #1a1b27;
+            color: #ffd479;
+            padding: 4px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            border: 1px solid #2c2e3d;
+        }
+        input[type="text"] {
+            background: #1a1b27;
+            border: 1px solid #383a4b;
+            color: #e8eaf2;
+            padding: 4px 8px;
+            border-radius: 3px;
+        }
+    }
+
+    .o_studio_overlay_checks {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-top: 8px;
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: none;
+            color: #e8eaf2;
+            font-size: 13px;
+            margin: 0;
+        }
+    }
+
+    .o_studio_overlay_actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .o_studio_overlay_op_row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #1a1b27;
+        border: 1px solid #2c2e3d;
+        border-radius: 3px;
+        padding: 6px 8px;
+        margin-bottom: 4px;
+
+        .o_studio_overlay_field_meta {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.3;
+
+            strong {
+                color: #f0c674;
+                font-size: 11px;
+                text-transform: uppercase;
+                margin-right: 6px;
+            }
+            code {
+                color: #9095a8;
+                font-size: 11px;
+            }
+        }
+    }
+
+    .o_studio_badge {
+        background: #f0c674;
+        color: #1e1f2c;
+        font-size: 9px;
+        padding: 2px 5px;
+        border-radius: 3px;
+        margin-left: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        &.o_studio_badge_native {
+            background: #82c4ff;
+        }
+        &.o_studio_badge_widget {
+            background: #b88cff;
+        }
+    }
+
+    .o_studio_overlay_saving {
+        padding: 10px 12px;
+        border-top: 1px solid #2c2e3d;
+        background: #232434;
+        color: #f0c674;
+        font-size: 12px;
+
+        i { margin-right: 6px; }
+    }
+}
+
+/* -------- Field decorations when overlay is active -------- */
+body.o_studio_active {
+    /* Push main viewport to the left so it doesn't slide under the sidebar. */
+    .o_action_manager { margin-right: 320px; }
+
+    /* Highlight every form field so users see what's draggable. */
+    .o_field_widget[name] {
+        outline: 1px dashed transparent;
+        outline-offset: 2px;
+        transition: outline-color 0.1s ease, background 0.1s ease;
+        cursor: pointer;
+
+        &:hover {
+            outline-color: #f0c674;
+            background: rgba(240, 198, 116, 0.06);
+        }
+
+        &.o_studio_selected {
+            outline: 2px solid #5cb85c;
+            outline-offset: 2px;
+            background: rgba(92, 184, 92, 0.08);
+        }
+
+        &.o_studio_drag_over {
+            outline: 2px solid #f0c674;
+            outline-offset: 2px;
+            background: rgba(240, 198, 116, 0.20);
+        }
+    }
+
+    /* Dim form readonly affordances while studio is on so the user
+       focuses on field layout rather than data entry. */
+    .o_form_view .o_form_button_save,
+    .o_form_view .o_form_button_cancel {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+}

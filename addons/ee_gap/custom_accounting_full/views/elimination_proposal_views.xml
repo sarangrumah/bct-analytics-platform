@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_elimination_proposal_list" model="ir.ui.view">
+        <field name="name">custom.elimination.proposal.list</field>
+        <field name="model">custom.elimination.proposal</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="chart_id"/>
+                <field name="rule_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_elimination_proposal_form" model="ir.ui.view">
+        <field name="name">custom.elimination.proposal.form</field>
+        <field name="model">custom.elimination.proposal</field>
+        <field name="arch" type="xml">
+            <form string="Elimination Proposal">
+                <header>
+                    <button name="action_compute" type="object" string="Compute"
+                            class="btn-primary" invisible="state not in ('draft', 'proposed')"/>
+                    <button name="action_post" type="object" string="Post"
+                            class="btn-primary" invisible="state != 'proposed'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('draft', 'cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,proposed,posted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="chart_id"/>
+                            <field name="rule_id"/>
+                            <field name="currency_id"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="total_amount"/>
+                            <field name="move_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lines">
+                            <field name="line_ids">
+                                <list>
+                                    <field name="company_id"/>
+                                    <field name="account_id"/>
+                                    <field name="amount"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_elimination_proposal" model="ir.actions.act_window">
+        <field name="name">Elimination Proposals</field>
+        <field name="res_model">custom.elimination.proposal</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

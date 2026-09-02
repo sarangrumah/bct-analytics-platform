@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend forum.post form with AI moderation + PDP masking fields -->
+    <record id="forum_post_view_form_custom_forum" model="ir.ui.view">
+        <field name="name">forum.post.form.custom.forum</field>
+        <field name="model">forum.post</field>
+        <field name="inherit_id" ref="website_forum.forum_post_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="AI Moderation &amp; PDP">
+                    <group>
+                        <field name="x_ai_moderation_label"/>
+                        <field name="x_ai_moderation_score"/>
+                        <field name="x_ai_moderated_at" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="x_pdp_author_masked"/>
+                        <button name="action_ai_moderate"
+                                type="object"
+                                string="Run AI Moderation"
+                                class="btn-primary"
+                                groups="custom_forum.group_user"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add filters to the search view for moderators -->
+    <record id="forum_post_view_search_custom_forum" model="ir.ui.view">
+        <field name="name">forum.post.search.custom.forum</field>
+        <field name="model">forum.post</field>
+        <field name="inherit_id" ref="website_forum.forum_post_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter name="filter_ai_flagged"
+                        string="AI Flagged"
+                        domain="[('x_ai_moderation_label', 'in', ('flag', 'spam'))]"/>
+                <filter name="filter_ai_review"
+                        string="AI Needs Review"
+                        domain="[('x_ai_moderation_label', '=', 'review')]"/>
+                <filter name="filter_ai_unscored"
+                        string="AI Unscored"
+                        domain="[('x_ai_moderation_score', '=', False)]"/>
+                <separator/>
+                <filter name="filter_pdp_masked"
+                        string="PDP Masked Author"
+                        domain="[('x_pdp_author_masked', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_barcode_batch_session_list" model="ir.ui.view">
+        <field name="name">custom.barcode.batch.session.list</field>
+        <field name="model">custom.barcode.batch.session</field>
+        <field name="arch" type="xml">
+            <list string="Batch Sessions"
+                  decoration-info="state == 'scanning'"
+                  decoration-success="state == 'done'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="operator_id"/>
+                <field name="line_count"/>
+                <field name="state" widget="badge"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_barcode_batch_session_form" model="ir.ui.view">
+        <field name="name">custom.barcode.batch.session.form</field>
+        <field name="model">custom.barcode.batch.session</field>
+        <field name="arch" type="xml">
+            <form string="Barcode Batch Session">
+                <header>
+                    <button name="action_start" type="object"
+                            string="Start" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="auto_distribute_lines" type="object"
+                            string="Auto-Distribute" icon="fa-random"
+                            invisible="state not in ('scanning',)"/>
+                    <button name="action_apply" type="object"
+                            string="Apply to Transfers" class="oe_highlight"
+                            invisible="state not in ('scanning',)"/>
+                    <button name="action_cancel" type="object"
+                            string="Cancel"
+                            invisible="state in ('done','cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,scanning,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="operator_id"/>
+                            <field name="line_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Transfers">
+                            <field name="picking_ids" widget="many2many">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="partner_id"/>
+                                    <field name="state"/>
+                                    <field name="scheduled_date"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Scan Lines">
+                            <field name="scan_line_ids">
+                                <list editable="bottom"
+                                      decoration-danger="status == 'not_found'"
+                                      decoration-warning="status in ('duplicate','unallocated')"
+                                      decoration-success="status == 'ok'">
+                                    <field name="scanned_at"/>
+                                    <field name="raw_barcode"/>
+                                    <field name="product_id"/>
+                                    <field name="lot_id"/>
+                                    <field name="quantity"/>
+                                    <field name="picking_id"/>
+                                    <field name="status" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_custom_barcode_batch_session" model="ir.actions.act_window">
+        <field name="name">Batch Sessions</field>
+        <field name="res_model">custom.barcode.batch.session</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

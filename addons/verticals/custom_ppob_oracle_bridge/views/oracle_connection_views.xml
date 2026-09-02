@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_oracle_connection_list" model="ir.ui.view">
+        <field name="name">custom.ppob.oracle.connection.list</field>
+        <field name="model">custom.ppob.oracle.connection</field>
+        <field name="arch" type="xml">
+            <list string="Oracle Connections">
+                <field name="name"/>
+                <field name="dsn"/>
+                <field name="username"/>
+                <field name="schema_name"/>
+                <field name="active"/>
+                <field name="last_test_at"/>
+                <field name="last_test_ok"/>
+                <field name="server_version"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_oracle_connection_form" model="ir.ui.view">
+        <field name="name">custom.ppob.oracle.connection.form</field>
+        <field name="model">custom.ppob.oracle.connection</field>
+        <field name="arch" type="xml">
+            <form string="Oracle Connection">
+                <header>
+                    <button name="action_test_connection" type="object"
+                            string="Test Connection" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Oracle Production"/></h1>
+                    </div>
+                    <group>
+                        <group string="Database">
+                            <field name="active"/>
+                            <field name="dsn" placeholder="host:port/service_name"/>
+                            <field name="username"/>
+                            <field name="password" password="True"/>
+                            <field name="schema_name"/>
+                        </group>
+                        <group string="Pool &amp; Timeout">
+                            <field name="pool_min"/>
+                            <field name="pool_max"/>
+                            <field name="connect_timeout"/>
+                            <field name="stmt_timeout"/>
+                        </group>
+                    </group>
+                    <group string="Stored Procedure Default Parameters" name="sp_defaults">
+                        <p colspan="2" class="text-muted">
+                            Default values passed to SP <code>SellWithDenom_HA</code>.
+                            Leave <code>pwd</code> empty if Oracle bypasses auth for
+                            the configured service account.
+                        </p>
+                        <group>
+                            <field name="sp_default_usr"/>
+                            <field name="sp_default_pwd" password="True"/>
+                        </group>
+                        <group>
+                            <field name="sp_default_macadd"/>
+                            <field name="sp_default_ip"/>
+                        </group>
+                    </group>
+                    <group string="Last Test" invisible="not last_test_at">
+                        <field name="last_test_at"/>
+                        <field name="last_test_ok"/>
+                        <field name="server_version"/>
+                        <field name="last_test_msg" widget="text"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_oracle_connection" model="ir.actions.act_window">
+        <field name="name">Oracle Connection</field>
+        <field name="res_model">custom.ppob.oracle.connection</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--
+        Hari libur nasional Indonesia 2026 (preliminary — refer to SKB 3 Menteri
+        when published; cuti bersama tidak disertakan).
+    -->
+    <record id="hol_2026_01_01" model="id.public.holiday">
+        <field name="name">Tahun Baru Masehi</field>
+        <field name="date">2026-01-01</field>
+        <field name="type_code">national</field>
+    </record>
+    <record id="hol_2026_01_16" model="id.public.holiday">
+        <field name="name">Isra Mikraj Nabi Muhammad SAW</field>
+        <field name="date">2026-01-16</field>
+        <field name="type_code">religious</field>
+    </record>
+    <record id="hol_2026_02_17" model="id.public.holiday">
+        <field name="name">Tahun Baru Imlek 2577 Kongzili</field>
+        <field name="date">2026-02-17</field>
+        <field name="type_code">religious</field>
+    </record>
+    <record id="hol_2026_03_19" model="id.public.holiday">
+        <field name="name">Hari Suci Nyepi (Tahun Baru Saka 1948)</field>
+        <field name="date">2026-03-19</field>
+        <field name="type_code">religious</field>
+    </record>
+    <record id="hol_2026_03_20" model="id.public.holiday">
+        <field name="name">Hari Raya Idul Fitri 1447 H</field>
+        <field name="date">2026-03-20</field>
+        <field name="type_code">religious</field>
+    </record>
+    <record id="hol_2026_03_21" model="id.public.holiday">
+        <field name="name">Hari Raya Idul Fitri 1447 H (Hari Kedua)</field>
+        <field name="date">2026-03-21</field>
+        <field name="type_code">religious</field>
+    </record>
+    <record id="hol_2026_04_03" model="id.public.holiday">
+        <field name="name">Wafat Isa Almasih</field>
+        <field name="date">2026-04-03</field>
+        <field name="type_code">religious</field>
+    </record>
+    <record id="hol_2026_04_05" model="id.public.holiday">
+        <field name="name">Hari Paskah</field>
+        <field name="date">2026-04-05</field>
+        <field name="type_code">religious</field>
+    </record>
+    <record id="hol_2026_05_01" model="id.public.holiday">
+        <field name="name">Hari Buruh Internasional</field>
+        <field name="date">2026-05-01</field>
+        <field name="type_code">national</field>
+    </record>
+    <record id="hol_2026_05_14" model="id.public.holiday">
+        <field name="name">Kenaikan Isa Almasih</field>
+        <field name="date">2026-05-14</field>
+        <field name="type_code">religious</field>
+    </record>
+    <record id="hol_2026_05_31" model="id.public.holiday">
+        <field name="name">Hari Raya Waisak 2570 BE</field>
+        <field name="date">2026-05-31</field>
+        <field name="type_code">religious</field>
+    </record>
+    <record id="hol_2026_05_27" model="id.public.holiday">
+        <field name="name">Hari Raya Idul Adha 1447 H</field>
+        <field name="date">2026-05-27</field>
+        <field name="type_code">religious</field>
+    </record>
+    <record id="hol_2026_06_01" model="id.public.holiday">
+        <field name="name">Hari Lahir Pancasila</field>
+        <field name="date">2026-06-01</field>
+        <field name="type_code">national</field>
+    </record>
+    <record id="hol_2026_06_16" model="id.public.holiday">
+        <field name="name">Tahun Baru Islam 1448 H</field>
+        <field name="date">2026-06-16</field>
+        <field name="type_code">religious</field>
+    </record>
+    <record id="hol_2026_08_17" model="id.public.holiday">
+        <field name="name">Hari Kemerdekaan Republik Indonesia</field>
+        <field name="date">2026-08-17</field>
+        <field name="type_code">national</field>
+    </record>
+    <record id="hol_2026_08_25" model="id.public.holiday">
+        <field name="name">Maulid Nabi Muhammad SAW</field>
+        <field name="date">2026-08-25</field>
+        <field name="type_code">religious</field>
+    </record>
+    <record id="hol_2026_12_25" model="id.public.holiday">
+        <field name="name">Hari Raya Natal</field>
+        <field name="date">2026-12-25</field>
+        <field name="type_code">religious</field>
+    </record>
+</odoo>

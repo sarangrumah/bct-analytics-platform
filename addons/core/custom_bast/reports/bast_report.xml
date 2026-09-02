@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_bast_document" model="ir.actions.report">
+        <field name="name">BAST</field>
+        <field name="model">custom.bast.document</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_bast.report_bast_document</field>
+        <field name="report_file">custom_bast.report_bast_document</field>
+        <field name="print_report_name">'BAST - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_custom_bast_document"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Indonesian long date, e.g. "9 Juni 2026" (accepts date or datetime in `d`). -->
+    <template id="id_date">
+        <t t-set="_bulan" t-value="['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']"/>
+        <t t-if="d"><t t-out="d.day"/> <t t-out="_bulan[d.month]"/> <t t-out="d.year"/></t>
+    </template>
+
+    <template id="report_bast_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="text-center mb-3">
+                            <h2 class="mt-0">BERITA ACARA SERAH TERIMA</h2>
+                            <h4 class="mt-0"><t t-out="doc.name"/></h4>
+                            <p class="text-muted mb-0"><t t-out="dict(doc._fields['kind'].selection).get(doc.kind, doc.kind)"/></p>
+                        </div>
+
+                        <table class="table table-borderless table-sm">
+                            <tr>
+                                <td style="width: 25%"><strong>Tanggal</strong></td>
+                                <td>: <t t-call="custom_bast.id_date"><t t-set="d" t-value="doc.date_handover"/></t></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lokasi</strong></td>
+                                <td>: <t t-out="doc.location_id.display_name or doc.location_text or '-'"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pihak Menyerahkan</strong></td>
+                                <td>: <t t-out="doc.party_from_id.display_name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pihak Menerima</strong></td>
+                                <td>: <t t-out="doc.party_to_id.display_name"/></td>
+                            </tr>
+                            <tr t-if="doc.reference">
+                                <td><strong>Dokumen Sumber</strong></td>
+                                <td>: <t t-out="doc.reference.display_name"/></td>
+                            </tr>
+                            <tr t-if="doc.witness_id">
+                                <td><strong>Saksi</strong></td>
+                                <td>: <t t-out="doc.witness_id.name"/></td>
+                            </tr>
+                            <tr t-if="doc.gps_latitude or doc.gps_longitude">
+                                <td><strong>GPS</strong></td>
+                                <td>: <t t-out="doc.gps_latitude"/>, <t t-out="doc.gps_longitude"/></td>
+                            </tr>
+                        </table>
+
+                        <p class="mt-3">
+                            Pada hari ini telah dilakukan serah terima barang/jasa sesuai rincian di bawah ini:
+                        </p>
+
+                        <table class="table table-bordered table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 4%">No</th>
+                                    <th>Deskripsi</th>
+                                    <th>Lot/Serial</th>
+                                    <th class="text-end" style="width: 8%">Qty</th>
+                                    <th style="width: 8%">UoM</th>
+                                    <th style="width: 12%">Kondisi</th>
+                                    <th>Catatan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="idx" t-value="0"/>
+                                <t t-foreach="doc.line_ids" t-as="line">
+                                    <t t-set="idx" t-value="idx + 1"/>
+                                    <tr>
+                                        <td t-out="idx"/>
+                                        <td t-out="line.item_description"/>
+                                        <td t-out="line.lot_id.name or ''"/>
+                                        <td class="text-end" t-out="line.qty"/>
+                                        <td t-out="line.uom_id.name or ''"/>
+                                        <td t-out="dict(line._fields['condition'].selection).get(line.condition, line.condition)"/>
+                                        <td t-out="line.note or ''"/>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <div t-if="doc.note" class="mt-3">
+                            <strong>Catatan:</strong>
+                            <p t-out="doc.note"/>
+                        </div>
+
+                        <!-- Two signature columns via table (wkhtmltopdf-safe; Bootstrap grid stacks) -->
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 48px;">
+                            <tr>
+                                <td style="width: 50%; text-align: center; vertical-align: top;">
+                                    <p class="mb-0"><strong>Yang Menyerahkan</strong></p>
+                                    <p class="text-muted"><t t-out="doc.party_from_id.display_name"/></p>
+                                    <div style="height: 110px;">
+                                        <img t-if="doc.party_from_signature"
+                                             t-att-src="image_data_uri(doc.party_from_signature)"
+                                             style="max-height: 100px; max-width: 220px;"/>
+                                    </div>
+                                    <hr class="mt-0"/>
+                                    <p class="mb-0">(<t t-out="doc.party_from_signed_by or '_______________'"/>)</p>
+                                    <p class="text-muted small" t-if="doc.party_from_signed_at">
+                                        <t t-call="custom_bast.id_date"><t t-set="d" t-value="doc.party_from_signed_at"/></t>
+                                    </p>
+                                </td>
+                                <td style="width: 50%; text-align: center; vertical-align: top;">
+                                    <p class="mb-0"><strong>Yang Menerima</strong></p>
+                                    <p class="text-muted"><t t-out="doc.party_to_id.display_name"/></p>
+                                    <div style="height: 110px;">
+                                        <img t-if="doc.party_to_signature"
+                                             t-att-src="image_data_uri(doc.party_to_signature)"
+                                             style="max-height: 100px; max-width: 220px;"/>
+                                    </div>
+                                    <hr class="mt-0"/>
+                                    <p class="mb-0">(<t t-out="doc.party_to_signed_by or '_______________'"/>)</p>
+                                    <p class="text-muted small" t-if="doc.party_to_signed_at">
+                                        <t t-call="custom_bast.id_date"><t t-set="d" t-value="doc.party_to_signed_at"/></t>
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

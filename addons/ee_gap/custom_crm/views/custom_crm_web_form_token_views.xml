@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_crm_web_form_token_list" model="ir.ui.view">
+        <field name="name">custom.crm.web.form.token.list</field>
+        <field name="model">custom.crm.web.form.token</field>
+        <field name="arch" type="xml">
+            <list string="Web-Form Tokens">
+                <field name="name"/>
+                <field name="token"/>
+                <field name="team_id"/>
+                <field name="partner_email"/>
+                <field name="use_count"/>
+                <field name="captured_at"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_crm_web_form_token_form" model="ir.ui.view">
+        <field name="name">custom.crm.web.form.token.form</field>
+        <field name="model">custom.crm.web.form.token</field>
+        <field name="arch" type="xml">
+            <form string="Web-Form Token">
+                <header>
+                    <button name="action_rotate_token"
+                            type="object"
+                            string="Rotate Token"
+                            class="btn-secondary"
+                            confirm="Rotate this token? Existing integrations will stop working."/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Landing /demo"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="token" readonly="1"/>
+                            <field name="team_id"/>
+                            <field name="partner_email"/>
+                        </group>
+                        <group>
+                            <field name="captured_at" readonly="1"/>
+                            <field name="use_count" readonly="1"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_crm_web_form_token_search" model="ir.ui.view">
+        <field name="name">custom.crm.web.form.token.search</field>
+        <field name="model">custom.crm.web.form.token</field>
+        <field name="arch" type="xml">
+            <search string="Web-Form Tokens">
+                <field name="name"/>
+                <field name="token"/>
+                <field name="partner_email"/>
+                <separator/>
+                <filter name="filter_active" string="Active" domain="[('active','=',True)]"/>
+                <filter name="filter_archived" string="Archived" domain="[('active','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_crm_web_form_token" model="ir.actions.act_window">
+        <field name="name">Web-Form Tokens</field>
+        <field name="res_model">custom.crm.web.form.token</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'active_test': False}</field>
+    </record>
+</odoo>

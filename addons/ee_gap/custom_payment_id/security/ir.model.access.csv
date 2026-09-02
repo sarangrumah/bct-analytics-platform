@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_payment_id_log_user,custom.payment.id.log user,model_custom_payment_id_log,custom_payment_id.group_user,1,0,0,0
+access_custom_payment_id_log_manager,custom.payment.id.log manager,model_custom_payment_id_log,custom_payment_id.group_manager,1,1,1,1

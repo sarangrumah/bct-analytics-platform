@@ -1,0 +1,39 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_report_financial_user,custom.report.financial user,model_custom_report_financial,group_report_user,1,0,0,0
+access_custom_report_financial_admin,custom.report.financial admin,model_custom_report_financial,group_report_admin,1,1,1,1
+access_gl_wizard_user,gl wizard user,model_custom_report_general_ledger_wizard,group_report_user,1,1,1,1
+access_tb_wizard_user,tb wizard user,model_custom_report_trial_balance_wizard,group_report_user,1,1,1,1
+access_bs_wizard_user,bs wizard user,model_custom_report_balance_sheet_wizard,group_report_user,1,1,1,1
+access_pl_wizard_user,pl wizard user,model_custom_report_profit_loss_wizard,group_report_user,1,1,1,1
+access_cf_wizard_user,cf wizard user,model_custom_report_cash_flow_wizard,group_report_user,1,1,1,1
+access_ar_wizard_user,ar wizard user,model_custom_report_aged_receivable_wizard,group_report_user,1,1,1,1
+access_ap_wizard_user,ap wizard user,model_custom_report_aged_payable_wizard,group_report_user,1,1,1,1
+access_pl2_wizard_user,partner ledger wizard user,model_custom_report_partner_ledger_wizard,group_report_user,1,1,1,1
+access_apcard_wizard_user,kartu utang wizard user,model_custom_report_payable_card_wizard,group_report_user,1,1,1,1
+access_arcard_wizard_user,kartu piutang wizard user,model_custom_report_receivable_card_wizard,group_report_user,1,1,1,1
+access_advance_wizard_user,advance wizard user,model_custom_report_advance_wizard,group_report_user,1,1,1,1
+access_sales_wizard_user,sales wizard user,model_custom_report_sales_wizard,group_report_user,1,1,1,1
+access_tax_wizard_user,tax wizard user,model_custom_report_tax_wizard,group_report_user,1,1,1,1
+access_faktur_pajak_wizard_user,faktur pajak wizard user,model_custom_report_faktur_pajak_wizard,group_report_user,1,1,1,1
+access_ppn_masukan_import_wizard_user,ppn masukan import wizard user,model_custom_report_ppn_masukan_import_wizard,group_report_user,1,1,1,1
+access_bupot_wizard_user,bupot wizard user,model_custom_report_bupot_wizard,group_report_user,1,1,1,1
+access_spt_ppn_wizard_user,spt ppn wizard user,model_custom_report_spt_ppn_wizard,group_report_user,1,1,1,1
+access_pph_withholding_wizard_user,pph withholding wizard user,model_custom_report_pph_withholding_wizard,group_report_user,1,1,1,1
+access_nsfp_monitoring_wizard_user,nsfp monitoring wizard user,model_custom_report_nsfp_monitoring_wizard,group_report_user,1,1,1,1
+access_npwp_quality_wizard_user,npwp quality wizard user,model_custom_report_npwp_quality_wizard,group_report_user,1,1,1,1
+access_dpp_nilai_lain_wizard_user,dpp nilai lain wizard user,model_custom_report_dpp_nilai_lain_wizard,group_report_user,1,1,1,1
+access_faktur_pengganti_wizard_user,faktur pengganti wizard user,model_custom_report_faktur_pengganti_wizard,group_report_user,1,1,1,1
+access_ekualisasi_omzet_wizard_user,ekualisasi omzet wizard user,model_custom_report_ekualisasi_omzet_wizard,group_report_user,1,1,1,1
+access_pph_equalisasi_wizard_user,pph equalisasi wizard user,model_custom_report_pph_equalisasi_wizard,group_report_user,1,1,1,1
+access_coretax_submission_wizard_user,coretax submission wizard user,model_custom_report_coretax_submission_wizard,group_report_user,1,1,1,1
+access_pajakku_usage_wizard_user,pajakku usage wizard user,model_custom_report_pajakku_usage_wizard,group_report_user,1,1,1,1
+access_pph_reconciliation_wizard_user,pph reconciliation wizard user,model_custom_report_pph_reconciliation_wizard,group_report_user,1,1,1,1
+access_pph25_wizard_user,pph25 wizard user,model_custom_report_pph25_wizard,group_report_user,1,1,1,1
+access_tax_audit_wizard_user,tax audit wizard user,model_custom_report_tax_audit_wizard,group_report_user,1,1,1,1
+access_db_wizard_user,day book wizard user,model_custom_report_day_book_wizard,group_report_user,1,1,1,1
+access_gl_analysis_user,gl analysis user,model_custom_report_journal_item_analysis,group_report_user,1,0,0,0
+access_purchase_wizard_user,purchase wizard user,model_custom_report_purchase_wizard,group_report_user,1,1,1,1
+access_credit_limit_wizard_user,credit limit wizard user,model_custom_report_credit_limit_wizard,group_report_user,1,1,1,1
+access_gl_open_items_wizard_user,gl open items wizard user,model_custom_report_gl_open_items_wizard,group_report_user,1,1,1,1
+access_bill_payment_wizard_user,bill payment wizard user,model_custom_report_bill_payment_wizard,group_report_user,1,1,1,1
+access_sales_detail_wizard_user,sales detail wizard user,model_custom_report_sales_detail_wizard,group_report_user,1,1,1,1

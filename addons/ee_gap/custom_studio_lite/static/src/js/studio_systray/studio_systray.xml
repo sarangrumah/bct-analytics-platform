@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="custom_studio_lite.StudioSystrayItem">
+        <div class="o_studio_systray dropdown">
+            <button class="btn btn-link o_studio_systray_btn"
+                    t-att-class="active ? 'o_studio_systray_active' : ''"
+                    t-on-click="onClick"
+                    title="Toggle Studio mode on this view">
+                <i class="fa fa-paint-brush"/>
+            </button>
+        </div>
+    </t>
+</templates>

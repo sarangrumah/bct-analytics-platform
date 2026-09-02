@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_transaction_list" model="ir.ui.view">
+        <field name="name">custom.ppob.transaction.list</field>
+        <field name="model">custom.ppob.transaction</field>
+        <field name="arch" type="xml">
+            <list string="PPOB Transactions" create="false"
+                  decoration-success="state == 'success'"
+                  decoration-danger="state in ['failed','timeout']"
+                  decoration-muted="state == 'refunded'"
+                  decoration-info="state in ['pending','inquiry_ok','in_progress']">
+                <field name="name"/>
+                <field name="create_date"/>
+                <field name="mitra_id"/>
+                <field name="product_id"/>
+                <field name="msisdn"/>
+                <field name="provider_id"/>
+                <field name="sell_price" sum="Total Sell"/>
+                <field name="cost_price" sum="Total Cost"/>
+                <field name="margin" sum="Total Margin"/>
+                <field name="ppn_amount" optional="show" sum="Total PPN"/>
+                <field name="state" widget="badge"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ppob_transaction_form" model="ir.ui.view">
+        <field name="name">custom.ppob.transaction.form</field>
+        <field name="model">custom.ppob.transaction</field>
+        <field name="arch" type="xml">
+            <form string="PPOB Transaction">
+                <header>
+                    <button name="action_dispatch" type="object"
+                            string="Dispatch" class="btn-primary"
+                            invisible="state not in ['pending', 'inquiry_ok']"/>
+                    <button name="action_confirm_inquiry" type="object"
+                            string="Confirm Inquiry" class="btn-secondary"
+                            invisible="state != 'pending'"/>
+                    <button name="action_mark_refunded" type="object"
+                            string="Mark Refunded" class="btn-secondary"
+                            invisible="state not in ['failed','timeout']"
+                            groups="custom_ppob_core.group_ppob_manager"/>
+                    <button name="action_retry" type="object"
+                            string="Retry (Clone)" class="btn-secondary"
+                            invisible="state not in ['failed','timeout','refunded']"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="mitra_id"/>
+                            <field name="wallet_id"/>
+                            <field name="product_id"/>
+                            <field name="class_id"/>
+                            <field name="msisdn"/>
+                        </group>
+                        <group>
+                            <field name="provider_id"/>
+                            <field name="provider_sku"/>
+                            <field name="provider_ref"/>
+                            <field name="serial_token"/>
+                            <field name="idempotency_key" readonly="1"/>
+                            <field name="attempt_no"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Amounts" name="amounts">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="sell_price"/>
+                            <field name="cost_price"/>
+                            <field name="margin"/>
+                            <field name="vat_mode"/>
+                            <field name="dpp_amount"/>
+                            <field name="ppn_amount"/>
+                        </group>
+                        <group string="Timeline" name="timeline">
+                            <field name="dispatched_at"/>
+                            <field name="completed_at"/>
+                            <field name="provider_latency_ms"/>
+                            <field name="error_code"/>
+                            <field name="error_message"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Ledger Links" name="ledger">
+                            <group>
+                                <field name="wallet_move_id"/>
+                                <field name="wallet_refund_move_id"/>
+                                <field name="bucket_id"/>
+                                <field name="bucket_move_id"/>
+                                <field name="bucket_refund_move_id"/>
+                                <field name="move_id"/>
+                                <field name="reverse_move_id"/>
+                            </group>
+                        </page>
+                        <page string="Inquiry" name="inquiry" invisible="not inquiry_reference and not inquiry_amount">
+                            <group>
+                                <field name="inquiry_reference"/>
+                                <field name="inquiry_amount"/>
+                            </group>
+                        </page>
+                        <page string="Provider Response" name="raw">
+                            <field name="raw_response" widget="text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ppob_transaction_search" model="ir.ui.view">
+        <field name="name">custom.ppob.transaction.search</field>
+        <field name="model">custom.ppob.transaction</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="mitra_id"/>
+                <field name="product_id"/>
+                <field name="msisdn"/>
+                <field name="provider_id"/>
+                <field name="provider_ref"/>
+                <separator/>
+                <filter name="f_success" string="Success" domain="[('state','=','success')]"/>
+                <filter name="f_pending" string="Pending / In-Progress" domain="[('state','in',['pending','inquiry_ok','in_progress'])]"/>
+                <filter name="f_failed" string="Failed / Timeout" domain="[('state','in',['failed','timeout'])]"/>
+                <filter name="f_today" string="Today" domain="[('create_date','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <group>
+                    <filter name="g_state" string="State" context="{'group_by': 'state'}"/>
+                    <filter name="g_mitra" string="Mitra" context="{'group_by': 'mitra_id'}"/>
+                    <filter name="g_provider" string="Provider" context="{'group_by': 'provider_id'}"/>
+                    <filter name="g_class" string="Class" context="{'group_by': 'class_id'}"/>
+                    <filter name="g_day" string="Day" context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_ppob_transaction_pivot" model="ir.ui.view">
+        <field name="name">custom.ppob.transaction.pivot</field>
+        <field name="model">custom.ppob.transaction</field>
+        <field name="arch" type="xml">
+            <pivot string="PPOB Transactions">
+                <field name="create_date" interval="month" type="row"/>
+                <field name="mitra_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="sell_price" type="measure"/>
+                <field name="cost_price" type="measure"/>
+                <field name="margin" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_ppob_transaction_graph" model="ir.ui.view">
+        <field name="name">custom.ppob.transaction.graph</field>
+        <field name="model">custom.ppob.transaction</field>
+        <field name="arch" type="xml">
+            <graph string="PPOB Transactions" type="bar">
+                <field name="create_date" interval="day"/>
+                <field name="margin" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_ppob_transaction" model="ir.actions.act_window">
+        <field name="name">PPOB Transactions</field>
+        <field name="res_model">custom.ppob.transaction</field>
+        <field name="view_mode">list,form,pivot,graph</field>
+    </record>
+
+</odoo>

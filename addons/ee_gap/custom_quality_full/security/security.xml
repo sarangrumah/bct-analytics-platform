@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="module_category_quality" model="ir.module.category">
+            <field name="name">Quality</field>
+            <field name="sequence">108</field>
+        </record>
+        <record id="group_quality_user" model="res.groups">
+            <field name="name">Quality User</field>
+        </record>
+        <record id="group_quality_manager" model="res.groups">
+            <field name="name">Quality Manager</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_quality_user'))]"/>
+        </record>
+    </data>
+</odoo>

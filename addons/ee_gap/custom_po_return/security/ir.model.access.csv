@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_po_return_user,custom.po.return.user,model_custom_po_return,purchase.group_purchase_user,1,1,1,0
+access_custom_po_return_manager,custom.po.return.manager,model_custom_po_return,purchase.group_purchase_manager,1,1,1,1
+access_custom_po_return_line_user,custom.po.return.line.user,model_custom_po_return_line,purchase.group_purchase_user,1,1,1,1
+access_custom_po_return_line_manager,custom.po.return.line.manager,model_custom_po_return_line,purchase.group_purchase_manager,1,1,1,1
+access_custom_po_return_allocation_user,custom.po.return.allocation.user,model_custom_po_return_allocation,purchase.group_purchase_user,1,1,1,1
+access_custom_po_return_allocation_manager,custom.po.return.allocation.manager,model_custom_po_return_allocation,purchase.group_purchase_manager,1,1,1,1

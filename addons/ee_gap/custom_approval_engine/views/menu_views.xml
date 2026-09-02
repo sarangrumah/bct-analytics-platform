@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_approval_root"
+              name="Approvals"
+              web_icon="custom_approval_engine,static/description/icon.png"
+              sequence="40"
+              groups="custom_approval_engine.group_approval_user"/>
+
+    <menuitem id="menu_approval_inbox"
+              name="My Inbox"
+              parent="menu_approval_root"
+              action="action_approval_request_inbox"
+              sequence="10"/>
+
+    <menuitem id="menu_approval_requests"
+              name="All Requests"
+              parent="menu_approval_root"
+              action="action_approval_request_all"
+              sequence="20"
+              groups="custom_approval_engine.group_approval_manager"/>
+
+    <menuitem id="menu_approval_delegations"
+              name="My Delegations"
+              parent="menu_approval_root"
+              action="action_approval_delegation"
+              sequence="30"/>
+
+    <menuitem id="menu_approval_ooo"
+              name="Out-of-Office"
+              parent="menu_approval_root"
+              action="action_approval_ooo"
+              sequence="40"/>
+
+    <menuitem id="menu_approval_config"
+              name="Configuration"
+              parent="menu_approval_root"
+              sequence="100"
+              groups="custom_approval_engine.group_approval_admin"/>
+
+    <menuitem id="menu_approval_matrices"
+              name="Matrices"
+              parent="menu_approval_config"
+              action="action_approval_matrix"
+              sequence="10"/>
+
+</odoo>

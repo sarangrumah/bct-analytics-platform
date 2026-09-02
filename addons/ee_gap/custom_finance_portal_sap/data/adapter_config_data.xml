@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Bridge adapter configs, seeded DISABLED. Per tenant: set base_url to the
+         finance-sap-bridge microservice, store the HMAC secret under the
+         credential_ref key, then flip status to "active". -->
+
+    <record id="adapter_finance_sap_bridge" model="custom.adapter.config">
+        <field name="name">finance_sap_bridge</field>
+        <field name="adapter_type">finance_sap_bridge</field>
+        <field name="base_url">http://finance-sap-bridge:8080</field>
+        <field name="auth_method">hmac</field>
+        <field name="credential_ref">custom_finance_portal_sap.sap_bridge_secret</field>
+        <field name="status">disabled</field>
+        <field name="notes">Odoo → SAP bridge. Enable once the bridge microservice is reachable and the HMAC secret is set.</field>
+    </record>
+
+    <record id="adapter_finance_hris_bridge" model="custom.adapter.config">
+        <field name="name">finance_hris_bridge</field>
+        <field name="adapter_type">finance_hris_bridge</field>
+        <field name="base_url">http://finance-sap-bridge:8080</field>
+        <field name="auth_method">hmac</field>
+        <field name="credential_ref">custom_finance_portal_sap.hris_bridge_secret</field>
+        <field name="status">disabled</field>
+        <field name="notes">Odoo ← HRIS bridge (employee master + travel mirror).</field>
+    </record>
+</odoo>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top-level menu so users can always navigate back to Home. -->
+    <menuitem id="menu_home_console_root"
+              name="Home"
+              action="action_home_console"
+              sequence="1"/>
+</odoo>

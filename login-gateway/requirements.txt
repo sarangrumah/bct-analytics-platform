@@ -1,0 +1,31 @@
+# Pinned exactly. Versions resolved together against the live index, not guessed independently:
+# fastapi 0.141.1 is the first release whose starlette range admits the patched starlette 1.x, so
+# the starlette bump forces the fastapi bump. Staying on fastapi 0.115.6 would have meant staying on
+# a vulnerable starlette, which is not a trade worth making in the service that holds the JWT
+# signing key.
+#
+# Security fixes carried by this set (all FIXED-status, not the unfixed-base case policy tolerates):
+#   PyJWT        2.10.1 -> 2.13.0   CVE-2026-48526 authentication bypass via forged JWTs.
+#                                   Everything T-4 does is correct and none of it helps if the
+#                                   library itself can be induced to accept a token this gateway
+#                                   never signed. Also CVE-2026-32597: unknown `crit` headers were
+#                                   accepted, which RFC 7515 4.1.11 says MUST be rejected.
+#   cryptography 44.0.0 -> 50.0.1   GHSA-537c-gmf6 (bundled OpenSSL), CVE-2026-26007 SECT-curve
+#                                   subgroup attack, and two more.
+#   starlette    0.41.3 -> 1.6.0    CVE-2026-48818 SSRF / NTLM credential theft via UNC paths.
+#
+# NOTE FOR ANYONE PATCHING THIS IMAGE: `apt --only-upgrade openssl` does NOT patch the OpenSSL that
+# performs RS256 verification. `cryptography` statically bundles its own copy, which no OS package
+# manager can see. This image carried python-ssl OpenSSL 3.5.7 and cryptography's bundled 3.4.0 at
+# the same time - twenty months apart. The bundled one is upgraded only by upgrading cryptography.
+fastapi==0.141.1
+starlette==1.6.0
+uvicorn[standard]==0.52.4
+pydantic==2.13.5
+PyJWT[crypto]==2.13.0
+cryptography==50.0.1
+prometheus-client==0.21.1
+
+# Reads tenant_registry for the "Active?" decision (app/registry.py). Same pin as
+# the semantic API, so the two services carry one driver version between them.
+psycopg2-binary==2.9.10

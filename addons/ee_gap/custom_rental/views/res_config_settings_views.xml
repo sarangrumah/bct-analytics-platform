@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_config_settings_rental" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.custom_rental</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Rental" string="Rental"
+                     name="custom_rental" groups="custom_rental.group_rental_manager">
+                    <block title="Rental Settings">
+                        <setting id="rental_stock_integration_setting">
+                            <field name="rental_stock_integration"/>
+                            <label for="rental_stock_integration"/>
+                            <div class="text-muted">
+                                Auto-create stock pickings on rental confirm/return.
+                            </div>
+                        </setting>
+                        <setting id="rental_default_late_fee_rate_setting">
+                            <field name="rental_default_late_fee_rate"/>
+                            <label for="rental_default_late_fee_rate"/>
+                            <div class="text-muted">
+                                Default percent-per-day late fee applied to new rentals.
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+    <record id="action_rental_config_settings" model="ir.actions.act_window">
+        <field name="name">Rental Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="context">{'module': 'custom_rental'}</field>
+    </record>
+</odoo>

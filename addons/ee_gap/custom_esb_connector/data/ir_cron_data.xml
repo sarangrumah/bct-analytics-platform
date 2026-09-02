@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- All disabled by default. Enable per tenant once the ESB adapter configs
+         are active and a first manual sync has been verified. -->
+
+    <record id="cron_sync_masters" model="ir.cron">
+        <field name="name">ESB: sync master data</field>
+        <field name="model_id" ref="model_custom_esb_master_sync"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_sync_masters()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="cron_refresh_snapshots" model="ir.cron">
+        <field name="name">ESB: refresh stock snapshots</field>
+        <field name="model_id" ref="model_custom_esb_stock_snapshot"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_refresh_snapshots()</field>
+        <field name="interval_number">4</field>
+        <field name="interval_type">hours</field>
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="cron_refresh_outbox_status" model="ir.cron">
+        <field name="name">ESB: refresh outbound document status</field>
+        <field name="model_id" ref="model_custom_esb_outbox"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_refresh_status()</field>
+        <field name="interval_number">30</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

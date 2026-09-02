@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_form_inherit_qc" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.inbound.qc</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_wms_qc_pass"
+                        string="QC Pass"
+                        type="object"
+                        class="btn-primary"
+                        groups="custom_wms_inbound_qc.group_wms_qc_inspector"
+                        invisible="wms_qc_state != 'pending' or state != 'done'"/>
+                <button name="action_wms_qc_fail"
+                        string="QC Fail"
+                        type="object"
+                        class="btn-danger"
+                        groups="custom_wms_inbound_qc.group_wms_qc_inspector"
+                        invisible="wms_qc_state != 'pending' or state != 'done'"/>
+                <field name="wms_qc_state" widget="statusbar"
+                       statusbar_visible="pending,passed,failed"
+                       invisible="wms_qc_state == 'not_required'"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="Inbound QC" invisible="wms_qc_state == 'not_required'">
+                    <group>
+                        <field name="wms_qc_user_id"/>
+                        <field name="wms_qc_date"/>
+                        <field name="wms_qc_release_picking_id"/>
+                    </group>
+                    <group>
+                        <field name="wms_qc_notes" placeholder="Findings, deviations, sampling notes..."/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_picking_search_inherit_qc" model="ir.ui.view">
+        <field name="name">stock.picking.search.inherit.inbound.qc</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+        <field name="arch" type="xml">
+            <filter name="starred" position="after">
+                <separator/>
+                <filter name="wms_qc_pending" string="QC Pending"
+                        domain="[('wms_qc_state','=','pending')]"/>
+                <filter name="wms_qc_failed" string="QC Failed"
+                        domain="[('wms_qc_state','=','failed')]"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

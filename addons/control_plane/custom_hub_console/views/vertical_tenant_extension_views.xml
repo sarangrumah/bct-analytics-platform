@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_tenant_registry_form_hub" model="ir.ui.view">
+        <field name="name">tenant.registry.form.hub</field>
+        <field name="model">tenant.registry</field>
+        <field name="inherit_id" ref="custom_super_admin.view_tenant_registry_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Hub / Vertical">
+                        <group>
+                            <group string="Business">
+                                <field name="business_domain"/>
+                                <field name="deployment_topology"/>
+                                <field name="vpn_endpoint"
+                                       invisible="deployment_topology == 'centralized'"/>
+                            </group>
+                            <group string="Operations">
+                                <field name="health_status"/>
+                                <field name="last_incident_id"/>
+                                <field name="module_count"/>
+                            </group>
+                        </group>
+                        <group string="Assigned Modules">
+                            <field name="assigned_module_ids"
+                                   widget="many2many_tags" nolabel="1"
+                                   options="{'no_create': True}"/>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_tenant_registry_list_hub" model="ir.ui.view">
+        <field name="name">tenant.registry.list.hub</field>
+        <field name="model">tenant.registry</field>
+        <field name="inherit_id" ref="custom_super_admin.view_tenant_registry_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='state']" position="after">
+                <field name="business_domain" optional="show"/>
+                <field name="deployment_topology" optional="hide"/>
+                <field name="health_status" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_hub_verticals" model="ir.actions.act_window">
+        <field name="name">Verticals</field>
+        <field name="res_model">tenant.registry</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="context">{'search_default_state_active': 1}</field>
+    </record>
+</odoo>

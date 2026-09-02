@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_ppob_wallets"
+              name="Wallets"
+              parent="custom_ppob_core.menu_ppob_operations"
+              action="action_ppob_wallet"
+              sequence="10"/>
+
+    <menuitem id="menu_ppob_wallet_moves"
+              name="Wallet Moves"
+              parent="custom_ppob_core.menu_ppob_operations"
+              action="action_ppob_wallet_move"
+              sequence="15"/>
+
+</odoo>

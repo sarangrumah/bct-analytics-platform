@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_retail_mdr_bin_list" model="ir.ui.view">
+        <field name="name">retail.mdr.bin.list</field>
+        <field name="model">retail.mdr.bin</field>
+        <field name="arch" type="xml">
+            <list string="Card BIN / MDR" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="card_scheme"/>
+                <field name="bin_from"/>
+                <field name="bin_to"/>
+                <field name="acquirer_bank_id"/>
+                <field name="mdr_percent"/>
+                <field name="mdr_fixed"/>
+                <field name="mdr_account_id" options="{'no_create': True}"/>
+                <field name="date_start" optional="hide"/>
+                <field name="date_end" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="company_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_retail_mdr_bin_form" model="ir.ui.view">
+        <field name="name">retail.mdr.bin.form</field>
+        <field name="model">retail.mdr.bin</field>
+        <field name="arch" type="xml">
+            <form string="Card BIN / MDR">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="card_scheme"/>
+                            <field name="acquirer_bank_id"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="bin_from"/>
+                            <field name="bin_to"/>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                    </group>
+                    <group string="MDR">
+                        <field name="mdr_percent"/>
+                        <field name="mdr_fixed"/>
+                        <field name="mdr_account_id" options="{'no_create': True}"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_retail_mdr_bin" model="ir.actions.act_window">
+        <field name="name">Card BIN / MDR</field>
+        <field name="res_model">retail.mdr.bin</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Configure a card BIN / MDR rate</p>
+            <p>Map card BIN ranges to an acquiring bank, MDR rate and expense account.
+               The MDR is netted off customer card receipts at payment registration.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_retail_mdr_bin"
+              name="Card BIN / MDR"
+              parent="account.menu_finance_configuration"
+              action="action_retail_mdr_bin"
+              sequence="90"/>
+</odoo>

@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_fsm_skill_tech,fsm.skill tech,model_fsm_skill,group_fsm_technician,1,0,0,0
+access_fsm_skill_disp,fsm.skill disp,model_fsm_skill,group_fsm_dispatcher,1,1,1,1
+access_fsm_site_tech,fsm.site tech,model_fsm_site,group_fsm_technician,1,0,0,0
+access_fsm_site_disp,fsm.site disp,model_fsm_site,group_fsm_dispatcher,1,1,1,1
+access_fsm_tech_tech,fsm.technician tech,model_fsm_technician,group_fsm_technician,1,0,0,0
+access_fsm_tech_disp,fsm.technician disp,model_fsm_technician,group_fsm_dispatcher,1,1,1,1
+access_fsm_wo_tech,fsm.work.order tech,model_fsm_work_order,group_fsm_technician,1,1,0,0
+access_fsm_wo_disp,fsm.work.order disp,model_fsm_work_order,group_fsm_dispatcher,1,1,1,1
+access_fsm_wo_mat_tech,fsm.wo.material tech,model_fsm_work_order_material,group_fsm_technician,1,1,1,1
+access_fsm_wo_mat_disp,fsm.wo.material disp,model_fsm_work_order_material,group_fsm_dispatcher,1,1,1,1

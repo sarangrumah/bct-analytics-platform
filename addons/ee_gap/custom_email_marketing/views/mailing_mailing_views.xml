@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mail_mass_mailing_form_custom" model="ir.ui.view">
+        <field name="name">mailing.mailing.form.custom_email_marketing</field>
+        <field name="model">mailing.mailing</field>
+        <field name="inherit_id" ref="mass_mailing.view_mail_mass_mailing_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="UU PDP Compliance" name="custom_pdp_group">
+                    <group>
+                        <field name="x_consent_purpose_id"/>
+                        <field name="x_uu_pdp_footer"/>
+                    </group>
+                    <group>
+                        <field name="x_gallery_template_id" readonly="1"/>
+                        <field name="x_consent_filtered_count" readonly="1"/>
+                    </group>
+                </group>
+                <div class="oe_button_box" name="custom_email_marketing_buttons">
+                    <button name="action_open_apply_template_wizard"
+                            type="object"
+                            string="Apply Template"
+                            class="btn-secondary"
+                            icon="fa-magic"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

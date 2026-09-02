@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_token_admin,pmo token admin,model_custom_pmo_token,custom_project_portfolio.group_pmo_admin,1,1,1,1

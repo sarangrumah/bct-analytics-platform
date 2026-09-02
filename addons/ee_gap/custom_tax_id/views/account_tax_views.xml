@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_account_tax_form_dpp" model="ir.ui.view">
+        <field name="name">account.tax.form.dpp</field>
+        <field name="model">account.tax</field>
+        <field name="inherit_id" ref="account.view_tax_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="DPP Nilai Lain (PMK 131/2024)">
+                    <group>
+                        <field name="x_custom_dpp_method"/>
+                        <field name="x_custom_dpp_factor"
+                               invisible="x_custom_dpp_method != 'nilai_lain'"/>
+                        <field name="x_custom_dpp_category"
+                               invisible="x_custom_dpp_method != 'nilai_lain'"/>
+                    </group>
+                    <p class="text-muted">
+                        Set <b>DPP Method = Nilai Lain</b> + a factor (e.g. 0.916667 for the
+                        PPN 11%-effective-via-12% transition, 0.10 for paket wisata)
+                        to apply a reduced base before the rate computation.
+                    </p>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

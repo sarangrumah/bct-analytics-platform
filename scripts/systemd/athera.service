@@ -1,0 +1,78 @@
+# ===========================================================================
+# ATHERA — ordered bring-up at boot.
+#
+# NOT installed by anything in this repo. Copy it to a deployment host by hand:
+#
+#     sudo cp scripts/systemd/athera.service /etc/systemd/system/
+#     sudo systemctl edit --full athera.service     # set User= and WorkingDirectory=
+#     sudo systemctl daemon-reload
+#     sudo systemctl enable --now athera.service
+#
+# WHY THIS EXISTS, given every service already has `restart: unless-stopped`.
+#
+# That policy does bring the containers back after a reboot — independently,
+# and in whatever order the daemon happens to reach them. Compose's
+# `depends_on: service_healthy` is honoured at `up` time and NOT by the
+# daemon's restart policy, so a reboot can start semantic-api before
+# login-gateway. semantic-api fetches JWKS at startup; without the gateway it
+# answers 401 ON EVERY VALID LOGIN, which reads to a user as a wrong password
+# and sends whoever investigates to the wrong service entirely.
+#
+# So this unit is not "start the stack" — the daemon already does that. It is
+# "impose the one order that works", which is what scripts/up-all.sh does:
+#
+#     odoo -> warehouse -> login-gateway -> caddy -> semantic-api -> portal
+#
+# WHAT IT DELIBERATELY DOES NOT DO
+#
+#   make cdc-start is NOT here, and that is the same rule the Makefile and
+#   `make up` already follow. It creates a PUBLICATION and a replication slot,
+#   and a slot begins retaining WAL against a 2 GiB cap (ADR 0001) the instant
+#   it exists. Creating one from a boot script — where nobody is watching and
+#   the consumer may not be ready — is exactly the failure that cap exists to
+#   bound. The cdc container itself has a restart policy and comes back on its
+#   own; its slot already exists after the first deliberate `make cdc-start`.
+#
+#   `make down` is NOT the ExecStop. A stop that removed containers would make
+#   an ordinary `systemctl restart` a much larger event than it looks, and
+#   `docker compose down` in this repo has already cost a volume once when run
+#   without -p. Stopping the unit leaves the stack running; use `make down`
+#   by hand when that is genuinely what is meant.
+# ===========================================================================
+
+[Unit]
+Description=ATHERA platform stack (ordered bring-up)
+Documentation=file:///docs/prod-deploy-checklist.md
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+
+# EDIT BOTH OF THESE on the host. The user must be in the `docker` group and
+# own the checkout; the directory must be the repository root, because every
+# compose invocation here uses paths relative to it.
+User=AtheraAdmin
+WorkingDirectory=/home/AtheraAdmin/athera
+
+# `make up` reads .env itself and passes --env-file to every compose call.
+Environment=COMPOSE_IGNORE_ORPHANS=true
+
+# A first boot after an image change rebuilds nine images, three of them Node
+# multi-stage builds. 0 means no limit: a unit that times out mid-build leaves
+# a half-started stack and reports failure for a reason that is not a failure.
+TimeoutStartSec=0
+
+ExecStart=/usr/bin/make up
+# Observability second, and before anyone reaches for cdc: alerting that comes
+# up after the thing it watches is alerting nobody was relying on anyway.
+ExecStart=/usr/bin/make up-obs
+
+# Intentionally a no-op. See the header: stopping this unit must not tear the
+# stack down.
+ExecStop=/bin/true
+
+[Install]
+WantedBy=multi-user.target

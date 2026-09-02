@@ -1,0 +1,598 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- ============================================================ -->
+    <!-- Receive                                                       -->
+    <!-- ============================================================ -->
+    <t t-name="custom_wms_hht.ReceivePage">
+        <div class="wms-page">
+            <t t-if="!state.picking">
+                <div class="wms-filter" t-if="state.filter">
+                    <span><i class="fa fa-filter"/> filter: <t t-esc="state.filter"/></span>
+                    <button class="wms-filter-clear" t-on-click="() => this.clearFilter()">
+                        <i class="fa fa-times"/> show all
+                    </button>
+                </div>
+                <div class="wms-hint" t-if="state.loading">Loading receipts…</div>
+                <div class="wms-empty" t-elif="!state.pickings.length" t-esc='state.filter ? "Nothing open matches that scan." : "No open receipts."'/>
+                <t t-foreach="state.pickings" t-as="p" t-key="p.id">
+                    <button class="wms-card" t-on-click="() => this.open(p.id)">
+                        <div class="wms-card-head">
+                            <span class="wms-card-title" t-esc="p.name"/>
+                            <span class="wms-chip" t-esc="p.state"/>
+                        </div>
+                        <div class="wms-card-sub"><t t-esc="p.partner"/> · <t t-esc="p.origin"/></div>
+                        <div class="wms-card-meta">
+                            <span><i class="fa fa-list"/> <t t-esc="p.line_count"/> lines</span>
+                            <span><i class="fa fa-clock-o"/> <t t-esc="p.scheduled_date.slice(0, 16)"/></span>
+                        </div>
+                    </button>
+                </t>
+            </t>
+
+            <t t-else="">
+                <div class="wms-detail-head">
+                    <button class="wms-back" t-on-click="() => this.back()"><i class="fa fa-arrow-left"/></button>
+                    <div>
+                        <div class="wms-detail-title" t-esc="state.picking.name"/>
+                        <div class="wms-detail-sub"><t t-esc="state.picking.partner"/> → <t t-esc="state.picking.location_dest"/></div>
+                    </div>
+                </div>
+
+                <div class="wms-inputs">
+                    <label>Qty (blank = 1 / label qty)
+                        <input type="number" step="any" min="0" class="wms-input"
+                               t-model="state.manualQty" placeholder="auto"/>
+                    </label>
+                    <label>Supplier batch
+                        <input type="text" class="wms-input" t-model="state.supplierBatch" placeholder="optional"/>
+                    </label>
+                </div>
+
+                <div class="wms-lastscan" t-if="state.lastScan">
+                    <i class="fa fa-check-circle"/>
+                    <t t-esc="state.lastScan.product"/> · <t t-esc="qty(state.lastScan.quantity)"/>
+                    <span t-if="state.lastScan.lot"> · lot <t t-esc="state.lastScan.lot"/></span>
+                </div>
+
+                <table class="wms-table">
+                    <thead><tr><th>Item</th><th class="num">Demand</th><th class="num">Done</th></tr></thead>
+                    <tbody>
+                        <t t-foreach="state.picking.moves" t-as="m" t-key="m.id">
+                            <tr t-att-class="m.done >= m.demand ? 'complete' : ''">
+                                <td>
+                                    <div class="wms-sku" t-esc="m.default_code"/>
+                                    <div class="wms-name" t-esc="m.product"/>
+                                </td>
+                                <td class="num" t-esc="qty(m.demand)"/>
+                                <td class="num" t-esc="qty(m.done)"/>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <div class="wms-lots" t-if="state.picking.lines.length">
+                    <div class="wms-section-title">Lots / serials captured</div>
+                    <t t-foreach="state.picking.lines" t-as="l" t-key="l.id">
+                        <div class="wms-lot-row" t-if="l.lot">
+                            <span class="wms-lot-name" t-esc="l.lot"/>
+                            <span t-if="l.expiration_date" class="wms-lot-exp">exp <t t-esc="l.expiration_date.slice(0, 10)"/></span>
+                            <span t-if="l.supplier_batch_ref" class="wms-lot-batch">batch <t t-esc="l.supplier_batch_ref"/></span>
+                            <span class="num" t-esc="qty(l.quantity)"/>
+                        </div>
+                    </t>
+                </div>
+
+                <div class="wms-actions">
+                    <t t-if="needsQc">
+                        <button class="wms-btn danger" t-att-disabled="state.busy" t-on-click="() => this.qc('fail')">QC Fail</button>
+                        <button class="wms-btn primary" t-att-disabled="state.busy" t-on-click="() => this.qc('pass')">QC Pass</button>
+                    </t>
+                    <t t-elif="state.picking.state !== 'done'">
+                        <button class="wms-btn primary" t-att-disabled="state.busy" t-on-click="() => this.validate()">
+                            Validate receipt
+                        </button>
+                    </t>
+                </div>
+            </t>
+        </div>
+    </t>
+
+    <!-- ============================================================ -->
+    <!-- Put-away                                                      -->
+    <!-- ============================================================ -->
+    <t t-name="custom_wms_hht.PutawayPage">
+        <div class="wms-page">
+            <t t-if="!state.picking">
+                <div class="wms-filter" t-if="state.filter">
+                    <span><i class="fa fa-filter"/> filter: <t t-esc="state.filter"/></span>
+                    <button class="wms-filter-clear" t-on-click="() => this.clearFilter()">
+                        <i class="fa fa-times"/> show all
+                    </button>
+                </div>
+                <div class="wms-hint" t-if="state.loading">Loading transfers…</div>
+                <div class="wms-empty" t-elif="!state.pickings.length" t-esc='state.filter ? "Nothing waiting matches that scan." : "Nothing waiting for put-away."'/>
+                <t t-foreach="state.pickings" t-as="p" t-key="p.id">
+                    <button class="wms-card" t-on-click="() => this.open(p.id)">
+                        <div class="wms-card-head">
+                            <span class="wms-card-title" t-esc="p.name"/>
+                            <span class="wms-chip" t-esc="p.state"/>
+                        </div>
+                        <div class="wms-card-sub"><t t-esc="p.location"/> → <t t-esc="p.location_dest"/></div>
+                        <div class="wms-card-meta"><span><i class="fa fa-list"/> <t t-esc="p.line_count"/> lines</span></div>
+                    </button>
+                </t>
+            </t>
+
+            <t t-else="">
+                <div class="wms-detail-head">
+                    <button class="wms-back" t-on-click="() => this.back()"><i class="fa fa-arrow-left"/></button>
+                    <div>
+                        <div class="wms-detail-title" t-esc="state.picking.name"/>
+                        <div class="wms-detail-sub">Engine suggestion per line — accept or scan another bin</div>
+                    </div>
+                </div>
+
+                <t t-foreach="state.rows" t-as="row" t-key="row.move_line.id">
+                    <div class="wms-slot" t-att-class="state.activeRow === row.move_line.id ? 'armed' : ''">
+                        <div class="wms-slot-head">
+                            <div>
+                                <div class="wms-sku" t-esc="row.move_line.default_code"/>
+                                <div class="wms-name" t-esc="row.move_line.product"/>
+                                <div class="wms-name" t-if="row.move_line.lot">lot <t t-esc="row.move_line.lot"/></div>
+                            </div>
+                            <div class="wms-slot-qty" t-esc="qty(row.move_line.quantity)"/>
+                        </div>
+
+                        <div class="wms-dest">
+                            <i class="fa fa-map-marker"/> <t t-esc="row.move_line.location_dest"/>
+                        </div>
+
+                        <t t-foreach="row.proposals" t-as="p" t-key="p.location_id">
+                            <div class="wms-proposal" t-att-class="p_index === 0 ? 'top' : ''">
+                                <span class="wms-score" t-esc="p.score"/>
+                                <span class="wms-proposal-loc" t-esc="p.location"/>
+                                <span class="wms-proposal-why" t-esc="p.reason"/>
+                            </div>
+                        </t>
+                        <div class="wms-empty small" t-if="!row.proposals.length">
+                            No rule matched — scan a bin to decide.
+                        </div>
+
+                        <div class="wms-actions tight">
+                            <button class="wms-btn" t-on-click="() => this.armOverride(row)">Scan other bin</button>
+                            <button class="wms-btn primary" t-if="row.proposals.length"
+                                    t-att-disabled="state.busy" t-on-click="() => this.accept(row)">
+                                Accept
+                            </button>
+                        </div>
+                    </div>
+                </t>
+
+                <div class="wms-actions">
+                    <button class="wms-btn primary" t-att-disabled="state.busy" t-on-click="() => this.validate()">
+                        Confirm put-away
+                    </button>
+                </div>
+            </t>
+        </div>
+    </t>
+
+    <!-- ============================================================ -->
+    <!-- Pick &amp; Pack                                               -->
+    <!-- ============================================================ -->
+    <t t-name="custom_wms_hht.PickPage">
+        <div class="wms-page">
+            <t t-if="!state.picking">
+                <div class="wms-filter" t-if="state.filter">
+                    <span><i class="fa fa-filter"/> filter: <t t-esc="state.filter"/></span>
+                    <button class="wms-filter-clear" t-on-click="() => this.clearFilter()">
+                        <i class="fa fa-times"/> show all
+                    </button>
+                </div>
+                <div class="wms-hint" t-if="state.loading">Loading orders…</div>
+                <div class="wms-empty" t-elif="!state.pickings.length" t-esc='state.filter ? "No delivery matches that scan." : "No deliveries to pick."'/>
+                <t t-foreach="state.pickings" t-as="p" t-key="p.id">
+                    <button class="wms-card" t-on-click="() => this.open(p.id)">
+                        <div class="wms-card-head">
+                            <span class="wms-card-title" t-esc="p.name"/>
+                            <span class="wms-chip" t-esc="p.state"/>
+                        </div>
+                        <div class="wms-card-sub"><t t-esc="p.partner"/></div>
+                        <div class="wms-card-meta"><span><i class="fa fa-list"/> <t t-esc="p.line_count"/> lines</span></div>
+                    </button>
+                </t>
+            </t>
+
+            <t t-else="">
+                <div class="wms-detail-head">
+                    <button class="wms-back" t-on-click="() => this.back()"><i class="fa fa-arrow-left"/></button>
+                    <div>
+                        <div class="wms-detail-title" t-esc="state.picking.name"/>
+                        <div class="wms-detail-sub"><t t-esc="pickedLines.length"/> / <t t-esc="state.picking.lines.length"/> picked</div>
+                    </div>
+                </div>
+
+                <t t-if="currentLine">
+                    <div class="wms-nextpick">
+                        <div class="wms-nextpick-bin">
+                            <i class="fa fa-map-marker"/> <t t-esc="currentLine.location"/>
+                        </div>
+                        <div class="wms-sku big" t-esc="currentLine.default_code"/>
+                        <div class="wms-name" t-esc="currentLine.product"/>
+                        <div class="wms-name" t-if="currentLine.lot">lot <t t-esc="currentLine.lot"/></div>
+                        <div class="wms-nextpick-qty">
+                            take <strong t-esc="qty(currentLine.demand)"/> <t t-esc="currentLine.uom"/>
+                        </div>
+                        <button class="wms-btn" t-att-disabled="state.busy"
+                                t-on-click="() => this.confirmManually(currentLine)">
+                            Confirm without scan
+                        </button>
+                    </div>
+                </t>
+                <div class="wms-empty" t-else="">All lines picked.</div>
+
+                <div class="wms-section-title" t-if="pendingLines.length > 1">Still to pick</div>
+                <t t-foreach="pendingLines.slice(1)" t-as="l" t-key="l.id">
+                    <div class="wms-line">
+                        <span class="wms-line-bin" t-esc="l.location"/>
+                        <span class="wms-sku" t-esc="l.default_code"/>
+                        <span class="num" t-esc="qty(l.demand)"/>
+                    </div>
+                </t>
+
+                <div class="wms-section-title" t-if="pickedLines.length">Picked</div>
+                <t t-foreach="pickedLines" t-as="l" t-key="l.id">
+                    <div class="wms-line done">
+                        <i class="fa fa-check"/>
+                        <span class="wms-sku" t-esc="l.default_code"/>
+                        <span class="num" t-esc="qty(l.quantity)"/>
+                        <span class="wms-pack" t-if="l.package" t-esc="l.package"/>
+                    </div>
+                </t>
+
+                <div class="wms-package-card" t-if="state.lastPackage">
+                    <div class="wms-section-title">Package <t t-esc="state.lastPackage.name"/></div>
+                    <t t-foreach="state.lastPackage.content" t-as="c" t-key="c.default_code + c.lot">
+                        <div class="wms-line">
+                            <span class="wms-sku" t-esc="c.default_code"/>
+                            <span t-if="c.lot" class="wms-name" t-esc="c.lot"/>
+                            <span class="num" t-esc="qty(c.quantity)"/>
+                        </div>
+                    </t>
+                </div>
+
+                <div class="wms-actions">
+                    <button class="wms-btn" t-att-disabled="state.busy || !pickedLines.length"
+                            t-on-click="() => this.putInPack()">Put in pack</button>
+                    <button class="wms-btn primary" t-att-disabled="state.busy"
+                            t-on-click="() => this.validate()">Validate</button>
+                </div>
+            </t>
+        </div>
+    </t>
+
+    <!-- ============================================================ -->
+    <!-- Package                                                       -->
+    <!-- ============================================================ -->
+    <t t-name="custom_wms_hht.PackagePage">
+        <div class="wms-page">
+            <div class="wms-hint" t-if="!state.package and !state.location">
+                Scan a package label or a bin barcode to see what is inside.
+            </div>
+
+            <t t-if="state.package">
+                <div class="wms-detail-head">
+                    <button class="wms-back" t-on-click="() => this.clear()"><i class="fa fa-times"/></button>
+                    <div>
+                        <div class="wms-detail-title"><i class="fa fa-cube"/> <t t-esc="state.package.name"/></div>
+                        <div class="wms-detail-sub">
+                            <t t-esc="state.package.package_type or 'no type'"/> · <t t-esc="state.package.location or 'no location'"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wms-section-title">Contents</div>
+                <div class="wms-empty small" t-if="!state.package.content.length">Empty package.</div>
+                <table class="wms-table">
+                    <tbody>
+                        <t t-foreach="state.package.content" t-as="c" t-key="c.default_code + c.lot">
+                            <tr>
+                                <td>
+                                    <div class="wms-sku" t-esc="c.default_code"/>
+                                    <div class="wms-name" t-esc="c.product"/>
+                                    <div class="wms-name" t-if="c.lot">lot <t t-esc="c.lot"/></div>
+                                </td>
+                                <td class="num"><t t-esc="qty(c.quantity)"/> <t t-esc="c.uom"/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <div class="wms-section-title" t-if="state.package.history.length">Recent movements</div>
+                <t t-foreach="state.package.history" t-as="h" t-key="h.picking + h.date">
+                    <div class="wms-line">
+                        <span class="wms-line-bin" t-esc="h.picking"/>
+                        <span class="wms-name" t-esc="h.product"/>
+                        <span class="num" t-esc="qty(h.quantity)"/>
+                    </div>
+                </t>
+
+                <div class="wms-actions">
+                    <t t-if="state.moveArmed">
+                        <button class="wms-btn" t-on-click="() => this.cancelMove()">Cancel</button>
+                        <div class="wms-hint inline">Scan the destination bin…</div>
+                    </t>
+                    <button t-else="" class="wms-btn primary" t-att-disabled="state.busy"
+                            t-on-click="() => this.armMove()">Move to bin</button>
+                </div>
+            </t>
+
+            <t t-if="state.location">
+                <div class="wms-detail-head">
+                    <button class="wms-back" t-on-click="() => this.clear()"><i class="fa fa-times"/></button>
+                    <div>
+                        <div class="wms-detail-title"><i class="fa fa-map-marker"/> <t t-esc="state.location.name"/></div>
+                        <div class="wms-detail-sub"><t t-esc="state.location.content.length"/> item(s) on hand</div>
+                    </div>
+                </div>
+                <table class="wms-table">
+                    <tbody>
+                        <t t-foreach="state.location.content" t-as="c" t-key="c.default_code + c.lot">
+                            <tr>
+                                <td>
+                                    <div class="wms-sku" t-esc="c.default_code"/>
+                                    <div class="wms-name" t-esc="c.product"/>
+                                    <div class="wms-name" t-if="c.lot">lot <t t-esc="c.lot"/></div>
+                                </td>
+                                <td class="num">
+                                    <t t-esc="qty(c.quantity)"/>
+                                    <div class="wms-name" t-if="c.reserved">res <t t-esc="qty(c.reserved)"/></div>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </t>
+        </div>
+    </t>
+
+    <!-- ============================================================ -->
+    <!-- Stock count                                                   -->
+    <!-- ============================================================ -->
+    <t t-name="custom_wms_hht.CountPage">
+        <div class="wms-page">
+            <t t-if="!state.session">
+                <div class="wms-filter" t-if="state.filter">
+                    <span><i class="fa fa-filter"/> filter: <t t-esc="state.filter"/></span>
+                    <button class="wms-filter-clear" t-on-click="() => this.clearFilter()">
+                        <i class="fa fa-times"/> show all
+                    </button>
+                </div>
+                <div class="wms-hint" t-if="state.loading">Loading sessions…</div>
+                <div class="wms-empty" t-elif="!state.sessions.length" t-esc='state.filter ? "No count sheet matches that scan." : "No open counting session."'/>
+                <t t-foreach="state.sessions" t-as="s" t-key="s.id">
+                    <button class="wms-card" t-on-click="() => this.open(s.id)">
+                        <div class="wms-card-head">
+                            <span class="wms-card-title" t-esc="s.name"/>
+                            <span class="wms-chip" t-esc="s.state"/>
+                        </div>
+                        <div class="wms-card-sub"><t t-esc="s.plan"/> · <t t-esc="s.method"/></div>
+                        <div class="wms-card-meta">
+                            <span><t t-esc="s.counted"/> / <t t-esc="s.line_count"/> counted</span>
+                            <span t-if="s.variance_count"><i class="fa fa-exclamation-triangle"/> <t t-esc="s.variance_count"/></span>
+                        </div>
+                    </button>
+                </t>
+            </t>
+
+            <t t-else="">
+                <div class="wms-detail-head">
+                    <button class="wms-back" t-on-click="() => this.back()"><i class="fa fa-arrow-left"/></button>
+                    <div>
+                        <div class="wms-detail-title" t-esc="state.session.name"/>
+                        <div class="wms-detail-sub"><t t-esc="counted.length"/> / <t t-esc="state.lines.length"/> counted</div>
+                    </div>
+                </div>
+
+                <div class="wms-countbox" t-if="state.active">
+                    <div class="wms-countbox-loc"><i class="fa fa-map-marker"/> <t t-esc="state.active.location"/></div>
+                    <div class="wms-sku big" t-esc="state.active.default_code"/>
+                    <div class="wms-name" t-esc="state.active.product"/>
+                    <div class="wms-name" t-if="state.active.lot">lot <t t-esc="state.active.lot"/></div>
+                    <!-- The system quantity is deliberately NOT shown before
+                         entry: a counter who sees it tends to confirm it. -->
+                    <input type="number" step="any" class="wms-input big"
+                           placeholder="counted qty" t-model="state.entry"/>
+                    <button class="wms-btn primary" t-att-disabled="state.busy" t-on-click="() => this.submit()">
+                        Submit count
+                    </button>
+                </div>
+
+                <div class="wms-section-title">To count (<t t-esc="pending.length"/>)</div>
+                <t t-foreach="pending" t-as="l" t-key="l.id">
+                    <button class="wms-line tappable" t-on-click="() => this.select(l)">
+                        <span class="wms-line-bin" t-esc="l.location"/>
+                        <span class="wms-sku" t-esc="l.default_code"/>
+                        <span t-if="l.lot" class="wms-name" t-esc="l.lot"/>
+                    </button>
+                </t>
+
+                <div class="wms-section-title" t-if="counted.length">Counted</div>
+                <t t-foreach="counted" t-as="l" t-key="l.id">
+                    <div class="wms-line done" t-att-class="l.variance_qty ? 'variance' : ''">
+                        <span class="wms-sku" t-esc="l.default_code"/>
+                        <span class="num" t-esc="qty(l.counted_qty)"/>
+                        <span class="num" t-if="l.variance_qty">Δ <t t-esc="qty(l.variance_qty)"/></span>
+                    </div>
+                </t>
+            </t>
+        </div>
+    </t>
+
+    <!-- ============================================================ -->
+    <!-- Bin to bin                                                    -->
+    <!-- ============================================================ -->
+    <t t-name="custom_wms_hht.BinToBinPage">
+        <div class="wms-page">
+            <t t-if="!state.order">
+                <div class="wms-filter" t-if="state.filter">
+                    <span><i class="fa fa-filter"/> filter: <t t-esc="state.filter"/></span>
+                    <button class="wms-filter-clear" t-on-click="() => this.clearFilter()">
+                        <i class="fa fa-times"/> show all
+                    </button>
+                </div>
+                <div class="wms-hint" t-if="state.loading">Loading transfer orders…</div>
+                <div class="wms-empty" t-elif="!state.orders.length" t-esc='state.filter ? "No move matches that scan." : "No replenishment waiting."'/>
+                <t t-foreach="state.orders" t-as="o" t-key="o.id">
+                    <button class="wms-card" t-on-click="() => this.open(o)">
+                        <div class="wms-card-head">
+                            <span class="wms-card-title" t-esc="o.name"/>
+                            <span class="wms-chip" t-esc="o.state"/>
+                        </div>
+                        <div class="wms-card-sub">
+                            <t t-esc="o.default_code"/> · <t t-esc="qty(o.planned_qty)"/>
+                        </div>
+                        <div class="wms-card-meta">
+                            <span><t t-esc="o.source"/> → <t t-esc="o.target"/></span>
+                        </div>
+                    </button>
+                </t>
+            </t>
+
+            <t t-else="">
+                <div class="wms-detail-head">
+                    <button class="wms-back" t-on-click="() => this.back()"><i class="fa fa-arrow-left"/></button>
+                    <div>
+                        <div class="wms-detail-title" t-esc="state.order.name"/>
+                        <div class="wms-detail-sub" t-esc="state.order.reason"/>
+                    </div>
+                </div>
+
+                <div class="wms-steps">
+                    <div class="wms-step" t-att-class="state.step === 'source' ? 'active' : 'done'">
+                        <span class="wms-step-no">1</span>
+                        <div>
+                            <div class="wms-step-title">Take from</div>
+                            <div class="wms-step-body"><t t-esc="state.order.source"/></div>
+                        </div>
+                    </div>
+                    <div class="wms-step" t-att-class="state.step === 'target' ? 'active' : ''">
+                        <span class="wms-step-no">2</span>
+                        <div>
+                            <div class="wms-step-title">Put into</div>
+                            <div class="wms-step-body"><t t-esc="state.order.target"/></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wms-nextpick">
+                    <div class="wms-sku big" t-esc="state.order.default_code"/>
+                    <div class="wms-name" t-esc="state.order.product"/>
+                    <div class="wms-name" t-if="state.order.lot">lot <t t-esc="state.order.lot"/></div>
+                    <div class="wms-nextpick-qty">move <strong t-esc="qty(state.order.planned_qty)"/></div>
+                </div>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="custom_wms_hht.StockPage">
+        <div class="wms-page">
+            <div class="wms-hint" t-if="!state.result and !state.busy">
+                Scan any product barcode — EAN-13, GTIN-14, a GS1 label, an internal
+                reference or a lot/serial number — to see what it is, how much is on
+                hand and in which bins. Nothing is moved by this screen.
+            </div>
+            <div class="wms-hint" t-if="state.busy">Looking up…</div>
+
+            <t t-if="state.result">
+                <div class="wms-detail-head">
+                    <button class="wms-back" t-on-click="() => this.clear()"><i class="fa fa-times"/></button>
+                    <div>
+                        <div class="wms-detail-title" t-esc="state.result.product.default_code or state.result.product.name"/>
+                        <div class="wms-detail-sub" t-esc="state.result.product.name"/>
+                    </div>
+                </div>
+
+                <!-- Inventory header: the four numbers an operator in an aisle
+                     actually acts on, before any per-bin detail. -->
+                <div class="wms-stats">
+                    <div class="wms-stat">
+                        <span class="wms-stat-value" t-esc="qty(state.result.totals.on_hand)"/>
+                        <span class="wms-stat-label">On hand</span>
+                    </div>
+                    <div class="wms-stat accent">
+                        <span class="wms-stat-value" t-esc="qty(state.result.totals.available)"/>
+                        <span class="wms-stat-label">Available</span>
+                    </div>
+                    <div class="wms-stat" t-att-class="state.result.totals.reserved ? 'warn' : ''">
+                        <span class="wms-stat-value" t-esc="qty(state.result.totals.reserved)"/>
+                        <span class="wms-stat-label">Reserved</span>
+                    </div>
+                    <div class="wms-stat">
+                        <span class="wms-stat-value" t-esc="state.result.totals.bin_count"/>
+                        <span class="wms-stat-label">Bins</span>
+                    </div>
+                </div>
+
+                <div class="wms-meta-grid">
+                    <div><span class="wms-name">Barcode</span> <t t-esc="state.result.product.barcode or '—'"/></div>
+                    <div><span class="wms-name">UoM</span> <t t-esc="state.result.product.uom"/></div>
+                    <div><span class="wms-name">Tracking</span> <t t-esc="state.result.product.tracking"/></div>
+                    <div><span class="wms-name">Category</span> <t t-esc="state.result.product.category or '—'"/></div>
+                    <div t-if="state.result.warehouse"><span class="wms-name">Warehouse</span> <t t-esc="state.result.warehouse"/></div>
+                    <div t-if="state.result.scanned !== state.result.product.barcode">
+                        <span class="wms-name">Scanned</span> <t t-esc="state.result.scanned"/>
+                    </div>
+                </div>
+
+                <!-- Where the engine would put this item now. Shown in the header
+                     block because a stock check is most often the step before a
+                     replenishment decision. -->
+                <div class="wms-section-title" t-if="state.result.suggestions.length">Suggested location</div>
+                <t t-foreach="state.result.suggestions" t-as="s" t-key="s.location_id">
+                    <div class="wms-proposal" t-att-class="s_index === 0 ? 'top' : ''">
+                        <span class="wms-score" t-esc="s.score"/>
+                        <span class="wms-proposal-loc">
+                            <t t-esc="s.barcode or s.location"/>
+                            <i class="fa fa-check-circle" t-if="s.has_stock" title="already holds this product"/>
+                        </span>
+                        <span class="wms-proposal-why" t-esc="s.reason"/>
+                    </div>
+                </t>
+                <div class="wms-empty small" t-if="state.result.suggestions_denied">
+                    Put-away suggestions need the Put-away group — stock figures above are complete.
+                </div>
+                <div class="wms-empty small" t-if="!state.result.suggestions.length and !state.result.suggestions_denied">
+                    No put-away rule matches this product in this warehouse.
+                </div>
+
+                <div class="wms-section-title">Stock by location</div>
+                <div class="wms-empty small" t-if="!state.result.bins.length">
+                    No stock on hand in this warehouse.
+                </div>
+                <t t-foreach="state.result.bins" t-as="b" t-key="b.location_id">
+                    <div class="wms-line tappable" t-on-click="() => this.toggleBin(b.location_id)">
+                        <span class="wms-line-bin" t-esc="b.barcode or b.location"/>
+                        <span class="wms-name" t-esc="b.location"/>
+                        <span class="num">
+                            <t t-esc="qty(b.quantity)"/>
+                            <t t-if="b.reserved">
+                                <span class="wms-resv"> (<t t-esc="qty(b.reserved)"/> resv)</span>
+                            </t>
+                        </span>
+                    </div>
+                    <t t-if="this.isOpen(b.location_id)">
+                        <div class="wms-lot-row" t-foreach="b.lots" t-as="l" t-key="l.name">
+                            <span class="wms-lot-name" t-esc="l.name"/>
+                            <span class="wms-lot-exp" t-if="l.expiration_date">exp <t t-esc="l.expiration_date"/></span>
+                            <span class="num" t-esc="qty(l.quantity)"/>
+                        </div>
+                        <div class="wms-empty small" t-if="!b.lots.length">Not lot-tracked.</div>
+                    </t>
+                </t>
+            </t>
+        </div>
+    </t>
+
+</templates>

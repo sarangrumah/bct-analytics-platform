@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Attachments holding script bodies -->
+        <record id="attachment_harden_os" model="ir.attachment">
+            <field name="name">harden_os.sh.template</field>
+            <field name="type">binary</field>
+            <field name="datas" type="base64" file="custom_tenant_infra/data/scripts/harden_os.sh.template"/>
+            <field name="mimetype">application/x-shellscript</field>
+        </record>
+
+        <record id="attachment_install_docker" model="ir.attachment">
+            <field name="name">install_docker.sh.template</field>
+            <field name="type">binary</field>
+            <field name="datas" type="base64" file="custom_tenant_infra/data/scripts/install_docker.sh.template"/>
+            <field name="mimetype">application/x-shellscript</field>
+        </record>
+
+        <record id="attachment_install_caddy" model="ir.attachment">
+            <field name="name">install_caddy.sh.template</field>
+            <field name="type">binary</field>
+            <field name="datas" type="base64" file="custom_tenant_infra/data/scripts/install_caddy.sh.template"/>
+            <field name="mimetype">application/x-shellscript</field>
+        </record>
+
+        <record id="attachment_deploy_odoo" model="ir.attachment">
+            <field name="name">deploy_odoo.sh.template</field>
+            <field name="type">binary</field>
+            <field name="datas" type="base64" file="custom_tenant_infra/data/scripts/deploy_odoo.sh.template"/>
+            <field name="mimetype">application/x-shellscript</field>
+        </record>
+
+        <!-- Template records referencing them -->
+        <record id="template_harden_os_v1" model="tenant.vps.bootstrap.template">
+            <field name="name">Harden OS (v1)</field>
+            <field name="version">1.0.0</field>
+            <field name="script_kind">harden_os</field>
+            <field name="script_attachment_id" ref="attachment_harden_os"/>
+            <field name="variables_json">{"ssh_port": 22}</field>
+        </record>
+
+        <record id="template_install_docker_v1" model="tenant.vps.bootstrap.template">
+            <field name="name">Install Docker (v1)</field>
+            <field name="version">1.0.0</field>
+            <field name="script_kind">install_docker</field>
+            <field name="script_attachment_id" ref="attachment_install_docker"/>
+            <field name="variables_json">{}</field>
+        </record>
+
+        <record id="template_install_caddy_v1" model="tenant.vps.bootstrap.template">
+            <field name="name">Install Caddy (v1)</field>
+            <field name="version">1.0.0</field>
+            <field name="script_kind">install_caddy</field>
+            <field name="script_attachment_id" ref="attachment_install_caddy"/>
+            <field name="variables_json">{}</field>
+        </record>
+
+        <record id="template_deploy_odoo_v1" model="tenant.vps.bootstrap.template">
+            <field name="name">Deploy Odoo Stack (v1)</field>
+            <field name="version">1.0.0</field>
+            <field name="script_kind">deploy_odoo</field>
+            <field name="script_attachment_id" ref="attachment_deploy_odoo"/>
+            <field name="variables_json">{"workers": 2}</field>
+        </record>
+
+    </data>
+</odoo>

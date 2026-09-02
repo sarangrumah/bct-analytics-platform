@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sale_order_form_invoice_timesheet" model="ir.ui.view">
+        <field name="name">sale.order.form.invoice.timesheet</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_open_invoice_timesheet_wizard"
+                        type="object"
+                        string="Invoice Timesheets"
+                        class="btn-secondary"
+                        invisible="x_billable_timesheet_pending_count == 0"
+                        groups="custom_timesheet.group_manager"/>
+                <field name="x_billable_timesheet_pending_count" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

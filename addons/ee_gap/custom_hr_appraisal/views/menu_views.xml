@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_appraisal_root" name="Appraisal" sequence="61"
+              groups="custom_hr_appraisal.group_appraisal_user"/>
+    <menuitem id="menu_appraisal" name="Appraisals" parent="menu_appraisal_root"
+              action="action_appraisal" sequence="10"/>
+    <menuitem id="menu_appraisal_cycles" name="Cycles" parent="menu_appraisal_root"
+              action="action_appraisal_cycle" sequence="20"
+              groups="custom_hr_appraisal.group_appraisal_manager"/>
+    <menuitem id="menu_appraisal_tpl" name="Templates" parent="menu_appraisal_root"
+              action="action_appraisal_template" sequence="30"
+              groups="custom_hr_appraisal.group_appraisal_manager"/>
+</odoo>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_bank_import_root"
+              name="Bank Import"
+              parent="account.menu_finance_configuration"
+              sequence="80"
+              groups="group_bank_import_user"/>
+
+    <menuitem id="menu_bank_import_wizard"
+              name="Import Statement (CSV)"
+              parent="menu_bank_import_root"
+              action="action_bank_import_csv_wizard"
+              sequence="10"/>
+
+    <menuitem id="menu_bank_import_logs"
+              name="Import Logs"
+              parent="menu_bank_import_root"
+              action="action_bank_import_log"
+              sequence="20"/>
+
+    <menuitem id="menu_bank_import_templates"
+              name="Templates"
+              parent="menu_bank_import_root"
+              action="action_bank_import_template"
+              sequence="30"
+              groups="group_bank_import_admin"/>
+
+    <menuitem id="menu_bank_h2h_connections"
+              name="H2H Connections"
+              parent="menu_bank_import_root"
+              action="action_bank_h2h_connection"
+              sequence="40"
+              groups="group_bank_import_admin"/>
+</odoo>

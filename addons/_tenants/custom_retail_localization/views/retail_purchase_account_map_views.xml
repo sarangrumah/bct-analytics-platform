@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_retail_purchase_account_map_list" model="ir.ui.view">
+        <field name="name">retail.purchase.account.map.list</field>
+        <field name="model">retail.purchase.account.map</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="purchase_type"/>
+                <field name="payable_account_id"/>
+                <field name="grir_account_id"/>
+                <field name="expense_account_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_retail_purchase_account_map_form" model="ir.ui.view">
+        <field name="name">retail.purchase.account.map.form</field>
+        <field name="model">retail.purchase.account.map</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="purchase_type"/>
+                        <field name="payable_account_id"/>
+                        <field name="grir_account_id"/>
+                        <field name="expense_account_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_retail_purchase_account_map" model="ir.actions.act_window">
+        <field name="name">Trade / Non-Trade Accounts</field>
+        <field name="res_model">retail.purchase.account.map</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Map the payable and GR/IR clearing accounts per purchase stream.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_retail_purchase_account_map"
+              name="Trade / Non-Trade Accounts"
+              parent="account.menu_finance_configuration"
+              action="action_retail_purchase_account_map"
+              sequence="99"/>
+</odoo>

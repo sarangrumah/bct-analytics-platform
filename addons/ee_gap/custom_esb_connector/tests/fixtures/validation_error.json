@@ -1,0 +1,9 @@
+{
+  "path": "https://stg7.esb.co.id/core-stg/inventory/item-journal",
+  "timestamp": "2026-07-21 13:15:00",
+  "status": "fail",
+  "code": "EC03100400",
+  "message": "Validation failed",
+  "result": null,
+  "errors": [{"attribute": "locationID", "code": "EC03100411", "message": "Location must be warehouse or kitchen type"}]
+}

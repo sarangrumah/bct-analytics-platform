@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="param_pos_only_sla" model="ir.config_parameter">
+            <field name="key">custom_ppob_pos_bridge.pos_only_sla_minutes</field>
+            <field name="value">30</field>
+        </record>
+    </data>
+</odoo>

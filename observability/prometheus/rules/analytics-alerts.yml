@@ -1,0 +1,332 @@
+# ---------------------------------------------------------------------------
+# Analytics alert rules. Owner: Data Warehouse agent.
+# Loaded by rule_files: /etc/prometheus/rules/*.yml.
+#
+# PATH NOTE. The Phase 3 brief names this file
+# observability/prometheus/analytics-alerts.yml. It lives one directory lower
+# because contract 04 section 7 - published after that brief was written -
+# defines rules/analytics-*.yml as the drop-in Prometheus actually globs, and
+# platform.rules.yml's own header says the same. A file at the brief's literal
+# path would be tracked, reviewed, and never loaded.
+#
+# WHAT IS DELIBERATELY *NOT* HERE: the 512 MiB / 1 GiB replication-slot
+# thresholds from ADR 0001. Platform-Infra already implements them in
+# platform.rules.yml as ReplicationSlotWalRetentionWarning and
+# ReplicationSlotWalRetentionCritical, on pg_replication_slots_pg_wal_lsn_diff.
+# Restating them here would double-page on one condition, and two rules for one
+# threshold drift apart the first time somebody tunes one of them. Verified
+# present before deciding not to duplicate:
+#
+#   $ grep -c 'ReplicationSlotWalRetention' observability/prometheus/rules/platform.rules.yml
+#   2
+#
+# What this file adds is the analytics-side signal that file cannot express:
+# reconciliation outcome, per-mart freshness against the ADR's own SLA table,
+# and the CDC consumer's health INCLUDING the case where its metrics vanish.
+#
+# THE PRIMARY SLOT-LAG SIGNAL IS THE ONE FROM POSTGRES, NOT FROM THE CONSUMER.
+# bct_cdc_replication_slot_lag_bytes is emitted BY the consumer. The failure the
+# 2 GB cap exists to bound is the consumer being dead or wedged - and at that
+# moment its metric goes ABSENT, not high. An alert on an absent series either
+# never fires, or fires as a generic scrape-down that does not name WAL
+# retention. So Postgres' own exporter is the primary signal (platform.rules),
+# the consumer's is corroboration, and their DISAGREEMENT is its own alert:
+# that is what catches a consumer which believes it is caught up.
+# ---------------------------------------------------------------------------
+groups:
+
+  # =========================================================================
+  # Reconciliation. A warehouse that quietly serves a wrong number is worse
+  # than one that is down, so this pages.
+  # =========================================================================
+  - name: analytics-reconciliation
+    rules:
+      - alert: WarehouseReconciliationFailing
+        expr: bct_warehouse_reconciliation_failed > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: warehouse
+        annotations:
+          summary: "Reconciliation check {{ $labels.check }} disagrees with Odoo"
+          description: >-
+            The warehouse and the Odoo source report different totals for at least one
+            closed tenant-day. `dbt build` has already failed on this; the mart is
+            serving numbers that do not match the ERP. Query
+            `select * from warehouse.recon_daily where not passed` for the tenant, day
+            and check. Do NOT tune the test - the discrepancy is the finding.
+
+      - alert: WarehouseDbtTestFailing
+        expr: sum(bct_warehouse_dbt_test_failures{severity="error"}) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: warehouse
+        annotations:
+          summary: "{{ $value }} rows failing error-severity dbt tests"
+          description: >-
+            At least one error-severity dbt test returned rows in the most recent run.
+            These are the tests that fail the pipeline: reconciliation, debit == credit,
+            the PDP masking assertions, RLS-forced-on-every-mart, and tenant_id coverage.
+
+      - alert: WarehouseBuildStale
+        # Age of the most recent dbt invocation OF ANY KIND. If nothing has run
+        # for two hours the marts are frozen, and every freshness number
+        # downstream is describing a build that is no longer happening.
+        expr: min(bct_warehouse_dbt_run_age_seconds) > 7200
+        for: 15m
+        labels:
+          severity: warning
+          component: warehouse
+        annotations:
+          summary: "No dbt run has completed for over 2 hours"
+          description: >-
+            warehouse.dbt_run_result's most recent invocation is
+            {{ $value | humanizeDuration }} old. The scheduled `dbt build` is not
+            running, so marts are stale regardless of what the CDC consumer is doing.
+
+      - alert: WarehouseTestsNotRunning
+        # THE ALERT THAT WOULD HAVE CAUGHT THE BUG THAT CREATED IT.
+        #
+        # Every correctness series in this file - reconciliation included - is
+        # derived from the most recent dbt invocation that CONTAINED TESTS.
+        # `make dbt-run` is `dbt build --exclude-resource-type test` and carries
+        # none. So a pipeline that builds every few minutes and never tests has
+        # a perfectly healthy WarehouseBuildStale and a reconciliation check
+        # that has not run since whenever somebody last typed `make dbt-test` -
+        # while Prometheus reports every rule's health as ok.
+        #
+        # That is not a hypothetical: the exporter previously scoped to the
+        # newest invocation of ANY kind, landed on a test-free `dbt-run`, and
+        # silently emitted no reconciliation series at all. Fixed - but the
+        # underlying condition (tests simply not being run) is still possible,
+        # and it makes every other alert here vacuous rather than loud. So it
+        # gets a name.
+        #
+        # Threshold is deliberately looser than the build one: tests are
+        # expected to run less often than builds, just not never.
+        expr: min(bct_warehouse_dbt_test_age_seconds) > 14400
+        for: 15m
+        labels:
+          severity: warning
+          component: warehouse
+        annotations:
+          summary: "dbt tests have not run for over 4 hours - reconciliation is unchecked"
+          description: >-
+            The newest test-bearing dbt invocation is {{ $value | humanizeDuration }}
+            old. WarehouseReconciliationFailing and WarehouseDbtTestFailing read
+            that invocation, so both are reporting on stale results. A green
+            reconciliation panel means nothing while this is firing.
+
+  # =========================================================================
+  # Per-mart freshness, against ADR 0001's own SLA table.
+  #
+  # `on_breach` is a LABEL carried from warehouse.mart_sla, so the ADR's
+  # deliberate non-uniformity (PPOB 60 s pages, finance 60 min alerts) routes
+  # itself. GATE 2 explicitly rejected uniform-strict as wasting VPS headroom;
+  # flattening it back out here would undo that decision by accident.
+  # =========================================================================
+  - name: analytics-freshness
+    rules:
+      # `for: 2m` on a 60-second SLA, and NOT lengthened to ride out a planned
+      # rebuild. It was tempting: a cold start does make this fire. But the
+      # same longer `for:` would delay a REAL PPOB outage by the same amount,
+      # and PPOB is the one mart ADR 0001 deliberately gave the tightest SLA
+      # and a page. The right operational answer to a planned rebuild is a
+      # silence with an end time, not a permanently slower page.
+      #
+      # Verified firing rather than assumed: with pipeline_state an hour stale,
+      # this reached `pending` with 4 instances, all severity=critical,
+      # on_breach=page. Before the on_breach label existed it matched nothing
+      # and could never have fired at all.
+      - alert: MartStalePage
+        expr: bct_warehouse_mart_stale{on_breach="page"} == 1
+        for: 2m
+        labels:
+          severity: critical
+          component: warehouse
+        annotations:
+          summary: "Mart {{ $labels.mart }} is stale for tenant {{ $labels.tenant }}"
+          description: >-
+            This mart has exceeded its SLA from ADR 0001's freshness table, and that
+            table gives it a PAGE rather than an alert because it is operational - a
+            stale PPOB view hides exactly the SLA breaches it exists to show.
+
+      - alert: MartStaleAlert
+        expr: bct_warehouse_mart_stale{on_breach="alert"} == 1
+        for: 10m
+        labels:
+          severity: warning
+          component: warehouse
+        annotations:
+          summary: "Mart {{ $labels.mart }} is stale for tenant {{ $labels.tenant }}"
+          description: >-
+            Age has exceeded this mart's SLA from ADR 0001's freshness table. The
+            dashboard is already showing meta.is_stale for it - both read the same
+            warehouse.mart_freshness view, so an operator and a user are looking at one
+            number rather than two that can disagree.
+
+      - alert: WarehouseFreshnessUnknown
+        # THE GAP THE OTHER TWO CANNOT COVER, and it is the one a cold start
+        # creates. warehouse.mart_freshness JOINs pipeline_state, so when a
+        # re-seed clears that table the freshness series do not go HIGH - they
+        # go ABSENT. MartStalePage and MartStaleAlert are then silent, and a
+        # rebuild that stalls halfway looks exactly like a rebuild that is
+        # going fine.
+        #
+        # Guarded on the exporter being up, so this is "the warehouse cannot
+        # say how fresh it is" rather than "monitoring is down" - the latter is
+        # WarehouseExporterDown and deserves its own name.
+        #
+        # 30m, deliberately: long enough for a full cold start on this hardware
+        # (teardown, module install, seed, backfill, dbt build) to complete
+        # without paging, short enough that a stalled one is noticed.
+        expr: |
+          absent(bct_warehouse_mart_stale) and on() (up{job="warehouse-exporter"} == 1)
+        for: 30m
+        labels:
+          severity: warning
+          component: warehouse
+        annotations:
+          summary: "The warehouse cannot report freshness for any mart"
+          description: >-
+            warehouse.mart_freshness is returning no rows, which means
+            warehouse.pipeline_state is empty. During a deliberate re-seed that is
+            expected and clears itself; after 30 minutes it means the backfill has not
+            finished or has not started. Note that MartStalePage and MartStaleAlert are
+            BLIND in this state - they alert on a stale value, and there is no value.
+
+      - alert: PipelineNeverSucceeded
+        # -1 is the exporter's sentinel for "last_success_at is NULL". A mart
+        # that has never loaded reports is_stale = true rather than "fresh";
+        # this names the cause instead of the symptom.
+        expr: bct_warehouse_pipeline_last_success_age_seconds == -1
+        for: 15m
+        labels:
+          severity: warning
+          component: warehouse
+        annotations:
+          summary: "{{ $labels.source_table }} has never loaded for tenant {{ $labels.tenant }}"
+
+      - alert: PipelineFailureCountRising
+        expr: bct_warehouse_pipeline_failure_count > 0
+        for: 10m
+        labels:
+          severity: warning
+          component: warehouse
+        annotations:
+          summary: "Loader is recording failures on {{ $labels.tenant }}/{{ $labels.source_table }}"
+          description: >-
+            warehouse.pipeline_state.failure_count is {{ $value }}. This is the count the
+            loader COMMITTED rather than the one it reported, so it survives the loader
+            dying mid-run.
+
+  # =========================================================================
+  # CDC consumer. Backend emits bct_cdc_*; these alerts are DWH's because DWH
+  # owns the consequence - a mart with a hole in it.
+  # =========================================================================
+  - name: analytics-cdc
+    rules:
+      - alert: CdcConsumerDown
+        expr: bct_cdc_up == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: cdc
+        annotations:
+          summary: "CDC consumer reports itself down for tenant {{ $labels.tenant }}"
+          description: >-
+            WAL retention starts accumulating the moment the consumer stops.
+            max_slot_wal_keep_size is 2GB; past it Postgres invalidates the slot and the
+            warehouse needs a full resync. That is the deliberate trade - the ERP is not
+            expendable and the pipeline is - but it is not free.
+
+      - alert: CdcConsumerMetricsAbsentWhileSlotExists
+        # THE ALERT THAT EXISTS BECAUSE ABSENCE IS THE REAL FAILURE MODE.
+        # A dead consumer does not report bct_cdc_up == 0; it reports nothing.
+        # Guarded by "a bct_slot_* replication slot actually exists", so it
+        # stays silent before Backend's consumer is ever deployed rather than
+        # firing forever on a metric that has never been seen.
+        expr: |
+          count(pg_replication_slots_pg_wal_lsn_diff{slot_name=~"bct_slot_.*"}) > 0
+          unless on() count(bct_cdc_up) > 0
+        for: 10m
+        labels:
+          severity: critical
+          component: cdc
+        annotations:
+          summary: "A replication slot exists but no CDC consumer is reporting"
+          description: >-
+            Postgres is holding WAL for a bct_slot_* slot and nothing is publishing
+            bct_cdc_up. Either the consumer is dead and its slot is quietly filling the
+            disk, or the slot was left behind after a teardown. Both need a human:
+            ADR 0001 requires pg_drop_replication_slot() BEFORE dropping a database, and
+            an orphaned slot is exactly what the 2 GB cap is bounding.
+
+      - alert: CdcSlotInvalidated
+        expr: bct_cdc_slot_invalidated == 1
+        for: 0m
+        labels:
+          severity: critical
+          component: cdc
+        annotations:
+          summary: "Replication slot {{ $labels.slot }} has been invalidated"
+          description: >-
+            The 2 GB cap fired and Postgres dropped the slot to protect Odoo. The
+            warehouse now has a HOLE in it and the consumer must not silently reconnect
+            - a resync from snapshot is required. Reconciliation will fail on the
+            affected days, which is the intended second net under this.
+
+      - alert: CdcSlotLagDisagreesWithPostgres
+        # THE CORROBORATION RULE. Neither number alone catches a consumer that
+        # believes it is caught up: the consumer reports low lag because it
+        # thinks it has consumed everything, while Postgres reports high lag
+        # because confirmed_flush_lsn is not advancing. Comparing them does.
+        # 256 MiB of disagreement is far outside any legitimate sampling skew
+        # between a 15 s and a 30 s scrape.
+        expr: |
+          max by (tenant) (pg_replication_slots_pg_wal_lsn_diff{slot_name=~"bct_slot_.*"})
+            - on(tenant) group_right()
+          max by (tenant) (bct_cdc_replication_slot_lag_bytes) > 268435456
+        for: 10m
+        labels:
+          severity: warning
+          component: cdc
+        annotations:
+          summary: "CDC consumer's slot lag disagrees with Postgres by over 256 MiB"
+          description: >-
+            The consumer believes it is further ahead than Postgres does. That is the
+            signature of a consumer decoding but not advancing confirmed_flush_lsn: it
+            looks healthy on its own metrics while WAL accumulates behind it. Check
+            confirmed_flush_lsn on pg_replication_slots directly before trusting either
+            number.
+
+      - alert: CdcEndToEndLagHigh
+        expr: max by (tenant, source_table) (bct_cdc_end_to_end_lag_seconds) > 300
+        for: 10m
+        labels:
+          severity: warning
+          component: cdc
+        annotations:
+          summary: "End-to-end CDC lag on {{ $labels.source_table }} is over 5 minutes"
+          description: >-
+            Source commit to landing-zone write is {{ $value | humanizeDuration }}. Every
+            mart fed by this table is at least that stale, whatever its own SLA says.
+
+  # =========================================================================
+  # The exporter itself. A monitoring gap is not a green dashboard.
+  # =========================================================================
+  - name: analytics-monitoring-health
+    rules:
+      - alert: WarehouseExporterDown
+        expr: up{job="warehouse-exporter"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          component: warehouse
+        annotations:
+          summary: "warehouse-exporter is not answering"
+          description: >-
+            Every bct_warehouse_* alert above is blind while this is down, the
+            reconciliation one included. Treat a silent analytics dashboard as unknown,
+            never as healthy.

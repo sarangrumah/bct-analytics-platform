@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_day_book_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.day.book.wizard.form</field>
+        <field name="model">custom.report.day.book.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Day / Cash / Bank Book / Journal Audit">
+                <group>
+                    <group>
+                        <field name="book_type"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group>
+                        <field name="company_ids" widget="many2many_tags"/>
+                        <field name="journal_ids" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print"
+                            type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx"
+                            type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_day_book_wizard" model="ir.actions.act_window">
+        <field name="name">Day Book</field>
+        <field name="res_model">custom.report.day.book.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_book_type': 'day_book'}</field>
+    </record>
+
+    <record id="action_cash_book_wizard" model="ir.actions.act_window">
+        <field name="name">Cash Book</field>
+        <field name="res_model">custom.report.day.book.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_book_type': 'cash_book'}</field>
+    </record>
+
+    <record id="action_bank_book_wizard" model="ir.actions.act_window">
+        <field name="name">Bank Book</field>
+        <field name="res_model">custom.report.day.book.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_book_type': 'bank_book'}</field>
+    </record>
+
+    <record id="action_journal_audit_wizard" model="ir.actions.act_window">
+        <field name="name">Journal Audit</field>
+        <field name="res_model">custom.report.day.book.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_book_type': 'journal_audit'}</field>
+    </record>
+</odoo>

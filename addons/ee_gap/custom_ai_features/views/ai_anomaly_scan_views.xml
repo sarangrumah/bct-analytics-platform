@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_anomaly_scan_list" model="ir.ui.view">
+        <field name="name">ai.anomaly.scan.list</field>
+        <field name="model">ai.anomaly.scan</field>
+        <field name="arch" type="xml">
+            <list create="0">
+                <field name="name"/>
+                <field name="started_at"/>
+                <field name="finished_at"/>
+                <field name="finding_count"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_anomaly_scan_form" model="ir.ui.view">
+        <field name="name">ai.anomaly.scan.form</field>
+        <field name="model">ai.anomaly.scan</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="started_at" readonly="1"/>
+                            <field name="finished_at" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="state" readonly="1"/>
+                            <field name="finding_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="error" invisible="not error" readonly="1"/>
+                    <separator string="Findings"/>
+                    <field name="finding_ids" readonly="1">
+                        <list>
+                            <field name="res_model"/>
+                            <field name="res_name"/>
+                            <field name="metric"/>
+                            <field name="severity" widget="badge"/>
+                            <field name="score"/>
+                            <field name="state" widget="badge"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_anomaly_scan" model="ir.actions.act_window">
+        <field name="name">Scans</field>
+        <field name="res_model">ai.anomaly.scan</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

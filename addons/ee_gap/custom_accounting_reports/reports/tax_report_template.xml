@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_tax">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tax</th>
+                        <th class="text-end">Rate (%)</th>
+                        <th>Fiscal Position</th>
+                        <th class="text-end">Base</th>
+                        <th class="text-end">Tax</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'category'"
+                            class="table-light">
+                            <td colspan="5">
+                                <strong t-esc="line['label']"/>
+                            </td>
+                        </tr>
+                        <t t-if="line.get('type') == 'category'">
+                            <tr t-foreach="line['taxes']" t-as="tax">
+                                <td class="ps-4" t-esc="tax['tax_name']"/>
+                                <td class="text-end" t-esc="tax['tax_rate']"/>
+                                <td t-esc="tax['fiscal_position']"/>
+                                <td class="text-end">
+                                    <span t-esc="tax['base_amount']"
+                                          t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-esc="tax['tax_amount']"
+                                          t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                </td>
+                            </tr>
+                            <tr class="fw-bold">
+                                <td colspan="3">Subtotal</td>
+                                <td class="text-end">
+                                    <span t-esc="line['base_subtotal']"
+                                          t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-esc="line['tax_subtotal']"
+                                          t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr t-if="line.get('type') == 'fp_breakdown'"
+                            class="table-info">
+                            <td colspan="5">
+                                <strong t-esc="line['label']"/>
+                            </td>
+                        </tr>
+                        <t t-if="line.get('type') == 'fp_breakdown'">
+                            <tr t-foreach="line['rows']" t-as="fp">
+                                <td colspan="3" class="ps-4"
+                                    t-esc="fp['fiscal_position']"/>
+                                <td class="text-end">
+                                    <span t-esc="fp['base_subtotal']"
+                                          t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-esc="fp['tax_subtotal']"
+                                          t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr t-if="line.get('type') == 'total'"
+                            class="table-secondary fw-bold">
+                            <td colspan="4" t-esc="line['label']"/>
+                            <td class="text-end">
+                                <span t-esc="line['tax_amount']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                        </tr>
+                        <tr t-if="line.get('type') == 'grand_total'"
+                            class="table-dark fw-bold">
+                            <td colspan="3" t-esc="line['label']"/>
+                            <td class="text-end">
+                                <span t-esc="line['base_amount']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line['tax_amount']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                        </tr>
+                        <tr t-if="line.get('type') == 'reconciliation_header'"
+                            class="table-info">
+                            <td colspan="5"><strong t-esc="line['label']"/></td>
+                        </tr>
+                        <tr t-if="line.get('type') == 'reconciliation_header'"
+                            class="table-light fw-bold">
+                            <td colspan="2">Akun PPN</td>
+                            <td class="text-end">Mutasi via Faktur Pajak</td>
+                            <td class="text-end">Mutasi Buku Besar</td>
+                            <td class="text-end">Selisih</td>
+                        </tr>
+                        <tr t-if="line.get('type') == 'reconciliation'">
+                            <td colspan="2" t-esc="line['account']"/>
+                            <td class="text-end">
+                                <span t-esc="line['tax_movement']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line['gl_movement']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line['selisih']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                        </tr>
+                        <tr t-if="line.get('type') == 'reconciliation_total'"
+                            class="table-secondary fw-bold">
+                            <td colspan="4" t-esc="line['label']"/>
+                            <td class="text-end">
+                                <span t-esc="line['selisih']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+    </data>
+</odoo>

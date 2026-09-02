@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_sign_root" name="Sign" sequence="64"
+              groups="custom_sign.group_sign_user"/>
+    <menuitem id="menu_sign_requests" name="Requests" parent="menu_sign_root"
+              action="action_sign_request" sequence="10"/>
+    <menuitem id="menu_sign_templates" name="Templates" parent="menu_sign_root"
+              action="action_sign_template" sequence="20"
+              groups="custom_sign.group_sign_admin"/>
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- noupdate="0" on purpose: layouts iterate against real corporate
+         H2H sample files until frozen. -->
+    <data noupdate="0">
+        <record id="format_bca_mcm" model="custom.batch.payment.format">
+            <field name="name">BCA MCM Bulk Transfer</field>
+            <field name="code">bca_mcm</field>
+            <field name="bank_label">BCA (KlikBCA Bisnis / MCM)</field>
+            <field name="include_header" eval="False"/>
+            <field name="note">Baseline layout — set Corporate ID and Debit Account, then verify against a real MCM upload sample.</field>
+        </record>
+        <record id="format_mandiri_mcm" model="custom.batch.payment.format">
+            <field name="name">Mandiri MCM Bulk Payment</field>
+            <field name="code">mandiri_mcm</field>
+            <field name="bank_label">Bank Mandiri (Mandiri Cash Management)</field>
+        </record>
+        <record id="format_bni" model="custom.batch.payment.format">
+            <field name="name">BNIDirect Bulk Transfer</field>
+            <field name="code">bni</field>
+            <field name="bank_label">BNI (BNIDirect)</field>
+        </record>
+        <record id="format_bri" model="custom.batch.payment.format">
+            <field name="name">BRI CMS Bulk Transfer</field>
+            <field name="code">bri</field>
+            <field name="bank_label">BRI (Qlola/CMS)</field>
+        </record>
+    </data>
+</odoo>

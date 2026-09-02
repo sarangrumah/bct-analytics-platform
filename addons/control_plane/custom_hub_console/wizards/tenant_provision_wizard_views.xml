@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Inject the Industry Pack selector into the super_admin provisioning
+        wizard. The field is defined in custom_hub_console (see
+        tenant_provision_wizard.py) so this inherited view only exists once the
+        hub console is installed.
+    -->
+    <record id="view_tenant_provision_wizard_form_pack" model="ir.ui.view">
+        <field name="name">tenant.provision.wizard.form.industry-pack</field>
+        <field name="model">tenant.provision.wizard</field>
+        <field name="inherit_id" ref="custom_super_admin.view_tenant_provision_wizard_form"/>
+        <field name="arch" type="xml">
+            <field name="install_modules_extra" position="before">
+                <field name="pack_id" options="{'no_create': True}"/>
+            </field>
+        </field>
+    </record>
+</odoo>

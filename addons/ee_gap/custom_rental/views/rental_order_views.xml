@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rental_order_list" model="ir.ui.view">
+        <field name="name">rental.order.list</field>
+        <field name="model">rental.order</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="asset_id"/>
+                <field name="product_id"/>
+                <field name="qty"/>
+                <field name="loan_qty"/>
+                <field name="pickup_dt"/>
+                <field name="return_dt_expected"/>
+                <field name="total_due"/>
+                <field name="state" widget="badge"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_rental_order_form" model="ir.ui.view">
+        <field name="name">rental.order.form</field>
+        <field name="model">rental.order</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_pickup" string="Mark Picked-up" type="object"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_return" string="Mark Returned" type="object"
+                            class="btn-success" invisible="state != 'picked_up'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('returned','cancelled')"/>
+                    <button name="action_generate_bast_pickup" type="object"
+                            string="Generate BAST Pickup"
+                            invisible="state == 'draft' or bast_pickup_id"/>
+                    <button name="action_generate_bast_return" type="object"
+                            string="Generate BAST Return"
+                            invisible="state != 'returned' or bast_return_id"/>
+                    <button name="action_validate_loan_return" type="object"
+                            string="Validate Loan Return"
+                            invisible="(loan_qty == 0 and not is_internal_loan) or state != 'returned'"
+                            help="Check that all loan/cadangan units and serial-tracked assets have come back in the return picking."/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="asset_id" invisible="product_id"/>
+                            <field name="product_id" invisible="asset_id"/>
+                            <field name="qty" readonly="asset_id"/>
+                            <field name="loan_qty"/>
+                            <field name="is_internal_loan"/>
+                            <field name="on_loan_location_id"
+                                   invisible="not is_internal_loan"
+                                   required="is_internal_loan"/>
+                            <field name="daily_rate"/>
+                            <field name="deposit_amount"/>
+                        </group>
+                        <group>
+                            <field name="pickup_dt"/>
+                            <field name="return_dt_expected"/>
+                            <field name="return_dt_actual" readonly="1"/>
+                            <field name="days_planned" readonly="1"/>
+                            <field name="days_actual" readonly="1"/>
+                        </group>
+                    </group>
+                    <group name="settlement" string="Settlement">
+                        <field name="rental_fee" readonly="1"/>
+                        <field name="late_penalty" readonly="1"/>
+                        <field name="late_fee_rate"/>
+                        <field name="late_fee_total" readonly="1"/>
+                        <field name="total_due" readonly="1" class="oe_subtotal_footer"/>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                        <page name="bast" string="BAST">
+                            <group>
+                                <field name="bast_pickup_id"/>
+                                <field name="bast_return_id"/>
+                            </group>
+                        </page>
+                        <page string="Logistics">
+                            <group>
+                                <field name="pickup_picking_id" readonly="1"/>
+                                <field name="return_picking_id" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Late Fee Accruals">
+                            <field name="late_fee_line_ids" readonly="1">
+                                <list>
+                                    <field name="accrued_on"/>
+                                    <field name="days_overdue"/>
+                                    <field name="rate"/>
+                                    <field name="base_amount"/>
+                                    <field name="fee_amount"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Signature">
+                            <group>
+                                <field name="customer_signed_by"/>
+                                <field name="customer_signed_at" readonly="1"/>
+                                <field name="customer_signature" widget="image"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_rental_order" model="ir.actions.act_window">
+        <field name="name">Rental Orders</field>
+        <field name="res_model">rental.order</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

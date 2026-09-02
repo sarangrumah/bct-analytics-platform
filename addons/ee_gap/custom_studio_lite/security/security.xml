@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="module_category_studio_lite" model="ir.module.category">
+            <field name="name">Studio Lite</field>
+            <field name="sequence">109</field>
+        </record>
+
+        <!--
+            group_designer — narrow privilege intended for power users who
+            should be able to build custom fields and view customizations
+            without becoming full system admins.
+        -->
+        <record id="group_designer" model="res.groups">
+            <field name="name">Studio Designer</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!--
+            group_studio_admin — kept for backwards compatibility with the
+            initial release. Implies both group_system (full admin) and
+            group_designer (so admins automatically get the new tools).
+        -->
+        <record id="group_studio_admin" model="res.groups">
+            <field name="name">Studio Admin (legacy)</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_system')), (4, ref('group_designer'))]"/>
+        </record>
+    </data>
+</odoo>

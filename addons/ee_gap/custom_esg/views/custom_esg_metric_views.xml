@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_custom_esg_metric_list" model="ir.ui.view">
+        <field name="name">custom.esg.metric.list</field>
+        <field name="model">custom.esg.metric</field>
+        <field name="arch" type="xml">
+            <list string="ESG Metrics">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="subcategory"/>
+                <field name="unit"/>
+                <field name="is_active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_esg_metric_form" model="ir.ui.view">
+        <field name="name">custom.esg.metric.form</field>
+        <field name="model">custom.esg.metric</field>
+        <field name="arch" type="xml">
+            <form string="ESG Metric">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. GHG Emissions Scope 1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="category"/>
+                            <field name="subcategory"/>
+                        </group>
+                        <group>
+                            <field name="unit"/>
+                            <field name="is_active"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_esg_metric_search" model="ir.ui.view">
+        <field name="name">custom.esg.metric.search</field>
+        <field name="model">custom.esg.metric</field>
+        <field name="arch" type="xml">
+            <search string="ESG Metrics">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="subcategory"/>
+                <filter string="Active" name="filter_active" domain="[('is_active','=',True)]"/>
+                <separator/>
+                <filter string="Environmental" name="filter_env" domain="[('category','=','environmental')]"/>
+                <filter string="Social" name="filter_soc" domain="[('category','=','social')]"/>
+                <filter string="Governance" name="filter_gov" domain="[('category','=','governance')]"/>
+                <separator/>
+                <filter string="By Category" name="group_category" context="{'group_by': 'category'}"/>
+                <filter string="By Subcategory" name="group_subcategory" context="{'group_by': 'subcategory'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_esg_metric" model="ir.actions.act_window">
+        <field name="name">ESG Metrics</field>
+        <field name="res_model">custom.esg.metric</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_esg_metric_search"/>
+        <field name="context">{'search_default_filter_active': 1}</field>
+    </record>
+
+</odoo>

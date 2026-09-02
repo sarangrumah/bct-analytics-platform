@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_fy_close_wizard_form" model="ir.ui.view">
+        <field name="name">custom.fiscal.year.close.wizard.form</field>
+        <field name="model">custom.fiscal.year.close.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Close Fiscal Year">
+                <group>
+                    <field name="fiscal_year_id" readonly="1"/>
+                    <field name="company_id" readonly="1"/>
+                    <field name="date_to" readonly="1"/>
+                    <field name="draft_move_count"/>
+                </group>
+                <group string="Closing Entry">
+                    <field name="generate_closing_entry"/>
+                    <field name="retained_earnings_account_id"
+                           invisible="not generate_closing_entry"
+                           required="generate_closing_entry"/>
+                    <field name="closing_journal_id"
+                           invisible="not generate_closing_entry"
+                           required="generate_closing_entry"/>
+                </group>
+                <footer>
+                    <button name="action_close" type="object" string="Close Fiscal Year"
+                            class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

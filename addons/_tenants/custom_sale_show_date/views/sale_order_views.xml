@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_tenant_show_date" model="ir.ui.view">
+        <field name="name">sale.order.form.tenant.show.date</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <field name="validity_date" position="after">
+                <field name="x_custom_show_date_required" invisible="1"/>
+                <field name="x_custom_show_date"
+                       invisible="not x_custom_show_date_required"
+                       required="x_custom_show_date_required"/>
+                <field name="x_custom_event_name"
+                       invisible="not x_custom_show_date_required"/>
+                <field name="x_custom_event_location"
+                       invisible="not x_custom_show_date_required"/>
+                <field name="x_custom_dp_note"
+                       invisible="not x_custom_show_date_required"
+                       placeholder="DP 50%"/>
+            </field>
+        </field>
+    </record>
+</odoo>

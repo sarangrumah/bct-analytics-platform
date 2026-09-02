@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_pps_callback_log_list" model="ir.ui.view">
+        <field name="name">custom.ppob.pps.callback.log.list</field>
+        <field name="model">custom.ppob.pps.callback.log</field>
+        <field name="arch" type="xml">
+            <list string="PPS Callback Log" decoration-danger="not ok" create="false">
+                <field name="create_date"/>
+                <field name="transaction_id"/>
+                <field name="url"/>
+                <field name="http_status"/>
+                <field name="attempt_no"/>
+                <field name="ok"/>
+                <field name="error"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pps_callback_log_form" model="ir.ui.view">
+        <field name="name">custom.ppob.pps.callback.log.form</field>
+        <field name="model">custom.ppob.pps.callback.log</field>
+        <field name="arch" type="xml">
+            <form string="PPS Callback">
+                <sheet>
+                    <group>
+                        <field name="transaction_id"/>
+                        <field name="url"/>
+                        <field name="http_status"/>
+                        <field name="attempt_no"/>
+                        <field name="ok"/>
+                        <field name="error"/>
+                    </group>
+                    <field name="querystring"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pps_callback_log" model="ir.actions.act_window">
+        <field name="name">PPS Callback Log</field>
+        <field name="res_model">custom.ppob.pps.callback.log</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,448 @@
+{
+  "metrics": [
+    {
+      "name": "account_balance",
+      "label": "Saldo Akun",
+      "description": "Signed general-ledger balance (debit minus credit) from posted move lines, summed per account. Still deliberately NOT split into separate pnl_account_balance and balance_sheet_account_balance metrics. DWH has now landed account_type and is_profit_and_loss on fct_account_move_line, so the split is finally POSSIBLE - but two metrics differing only in name would return the same numbers under two headings, and the honest form of that split is a group-by, not a second metric name. Group or filter by account_type ('income', 'asset_receivable', 'expense', ...) for the ledger breakdown, is_profit_and_loss to separate P&L from balance sheet, and is_revenue_line to isolate revenue lines. is_profit_and_loss is NULL - not false - on lines with no account at all (section and note lines): a section line is neither P&L nor balance sheet, and filing it under balance sheet by omission is the coalesce-unknown-to-zero mistake. Render the NULL group, do not drop it - and note that this seed contains ZERO such rows (account_id IS NULL count = 0), so the branch is real in the model and UNEXERCISED in the data. A NULL-free result here is not evidence that NULL cannot occur; it is evidence that nobody has posted a section line yet. Live through this API, tenant bct, 2025-01-01..2026-12-31: income -439,850,000 and asset_receivable +439,850,000, summing to exactly 0. A ledger that does not sum to zero over all account types means the binding is wrong, and that is the cheapest check available.",
+      "grain": [
+        "date_day",
+        "tenant_id",
+        "account_id"
+      ],
+      "dimensions": [
+        "date_day",
+        "date_month",
+        "tenant_id",
+        "operating_unit_id",
+        "account_id",
+        "partner_key",
+        "product_key",
+        "company_id",
+        "move_type",
+        "payment_state",
+        "is_revenue_line",
+        "account_type",
+        "is_profit_and_loss"
+      ],
+      "filters": {
+        "date_range": {
+          "type": "daterange",
+          "required": true,
+          "column": "date_day"
+        },
+        "operating_unit_id": {
+          "type": "int[]",
+          "required": false
+        },
+        "account_id": {
+          "type": "int[]",
+          "required": false
+        },
+        "move_type": {
+          "type": "string[]",
+          "required": false
+        },
+        "account_type": {
+          "type": "string[]",
+          "required": false
+        }
+      },
+      "type": "decimal",
+      "unit": "IDR",
+      "aggregation": "sum",
+      "refresh_sla_seconds": 3600,
+      "pdp_class": "internal",
+      "source_model": "fct_account_move_line"
+    },
+    {
+      "name": "ppob_commission_revenue",
+      "label": "Pendapatan Komisi PPOB",
+      "description": "Commission earned on PPOB transactions. This is the ONLY PPOB revenue measure. The much larger pass_through_amount on the same mart is money owed to the biller \u2014 it is not revenue, and the registry refuses any metric that sums it as an IDR amount.",
+      "grain": [
+        "date_day",
+        "tenant_id",
+        "operating_unit_id"
+      ],
+      "dimensions": [
+        "date_day",
+        "date_month",
+        "tenant_id",
+        "operating_unit_id",
+        "biller_key",
+        "biller_code",
+        "biller_category"
+      ],
+      "filters": {
+        "date_range": {
+          "type": "daterange",
+          "required": true,
+          "column": "date_day"
+        },
+        "operating_unit_id": {
+          "type": "int[]",
+          "required": false
+        },
+        "biller_code": {
+          "type": "string[]",
+          "required": false
+        }
+      },
+      "type": "decimal",
+      "unit": "IDR",
+      "aggregation": "sum",
+      "refresh_sla_seconds": 60,
+      "pdp_class": "internal",
+      "source_model": "mart_ppob_transaction"
+    },
+    {
+      "name": "ppob_sla_breach_count",
+      "label": "Pelanggaran SLA PPOB",
+      "description": "PPOB transactions that breached their biller SLA.",
+      "grain": [
+        "date_day",
+        "tenant_id",
+        "operating_unit_id"
+      ],
+      "dimensions": [
+        "date_day",
+        "date_month",
+        "tenant_id",
+        "operating_unit_id",
+        "biller_key",
+        "biller_code",
+        "state"
+      ],
+      "filters": {
+        "date_range": {
+          "type": "daterange",
+          "required": true,
+          "column": "date_day"
+        },
+        "operating_unit_id": {
+          "type": "int[]",
+          "required": false
+        },
+        "biller_code": {
+          "type": "string[]",
+          "required": false
+        }
+      },
+      "type": "count",
+      "unit": null,
+      "aggregation": "sum",
+      "refresh_sla_seconds": 60,
+      "pdp_class": "internal",
+      "source_model": "mart_ppob_transaction"
+    },
+    {
+      "name": "ppob_success_rate",
+      "label": "Tingkat Keberhasilan PPOB",
+      "description": "Share of PPOB transactions that succeeded. Numerator counts rows flagged is_success by the mart; the denominator is every transaction row, so draft, failed and reversed all sit in the denominator and drag the rate down, which is the operationally honest reading. Measured on the live mart: 328 success of 362 total.",
+      "grain": [
+        "date_day",
+        "tenant_id",
+        "operating_unit_id"
+      ],
+      "dimensions": [
+        "date_day",
+        "date_month",
+        "tenant_id",
+        "operating_unit_id",
+        "biller_key",
+        "biller_code",
+        "biller_category",
+        "state"
+      ],
+      "filters": {
+        "date_range": {
+          "type": "daterange",
+          "required": true,
+          "column": "date_day"
+        },
+        "operating_unit_id": {
+          "type": "int[]",
+          "required": false
+        },
+        "biller_code": {
+          "type": "string[]",
+          "required": false
+        }
+      },
+      "type": "percent",
+      "unit": null,
+      "aggregation": "ratio",
+      "refresh_sla_seconds": 60,
+      "pdp_class": "internal",
+      "source_model": "fct_ppob_transaction"
+    },
+    {
+      "name": "ppob_transaction_count",
+      "label": "Jumlah Transaksi PPOB",
+      "description": "Count of PPOB transactions. The 60-second SLA is the tightest in the platform because PPOB is operational: an SLA breach is the point of the view, not an inconvenience (ADR 0001).",
+      "grain": [
+        "date_day",
+        "tenant_id",
+        "operating_unit_id"
+      ],
+      "dimensions": [
+        "date_day",
+        "date_month",
+        "tenant_id",
+        "operating_unit_id",
+        "biller_key",
+        "biller_code",
+        "biller_category",
+        "state"
+      ],
+      "filters": {
+        "date_range": {
+          "type": "daterange",
+          "required": true,
+          "column": "date_day"
+        },
+        "operating_unit_id": {
+          "type": "int[]",
+          "required": false
+        },
+        "state": {
+          "type": "string[]",
+          "required": false
+        },
+        "biller_code": {
+          "type": "string[]",
+          "required": false
+        }
+      },
+      "type": "count",
+      "unit": null,
+      "aggregation": "sum",
+      "refresh_sla_seconds": 60,
+      "pdp_class": "internal",
+      "source_model": "mart_ppob_transaction"
+    },
+    {
+      "name": "revenue_mom_growth",
+      "label": "Pertumbuhan Pendapatan (Bulanan)",
+      "description": "Month-over-month change in net revenue, as a fraction. 0.12 means twelve percent up on the prior month. The first month in any result has no prior month and is therefore NULL, not zero - \"no comparison\" and \"no growth\" are different statements and the API will not conflate them. DO NOT \"FIX\" THIS BACK TO YEAR-OVER-YEAR. Year-over-year was commissioned and is deliberately not what this is. The warehouse holds 2025-09-01 to 2026-08-31 - twelve months exactly - so no month has a same-month-prior-year counterpart, and a YoY metric would return NULL for every row while looking perfectly healthy: a green panel with no data in it. Month-over-month is the strongest comparison this dataset actually supports, and it renders for 11 of 12 months. YoY becomes correct the moment the warehouse holds more than 13 months for a tenant; until then switching this back produces an empty chart, not a better one.",
+      "grain": [
+        "date_month",
+        "tenant_id"
+      ],
+      "dimensions": [
+        "date_month",
+        "tenant_id",
+        "operating_unit_id",
+        "revenue_channel"
+      ],
+      "filters": {
+        "date_range": {
+          "type": "daterange",
+          "required": true,
+          "column": "date_day"
+        },
+        "operating_unit_id": {
+          "type": "int[]",
+          "required": false
+        },
+        "revenue_channel": {
+          "type": "string[]",
+          "required": false
+        }
+      },
+      "type": "percent",
+      "unit": null,
+      "aggregation": "period_growth",
+      "refresh_sla_seconds": 900,
+      "pdp_class": "internal",
+      "source_model": "mart_revenue_daily"
+    },
+    {
+      "name": "revenue_net",
+      "label": "Pendapatan Neto",
+      "description": "Invoiced revenue excluding tax, with credit notes netted off, plus POS takings and PPOB commission. Summed across all three revenue channels.",
+      "grain": [
+        "date_day",
+        "tenant_id",
+        "operating_unit_id"
+      ],
+      "dimensions": [
+        "date_day",
+        "date_month",
+        "tenant_id",
+        "operating_unit_id",
+        "partner_key",
+        "product_key",
+        "company_id",
+        "revenue_channel"
+      ],
+      "filters": {
+        "date_range": {
+          "type": "daterange",
+          "required": true,
+          "column": "date_day"
+        },
+        "operating_unit_id": {
+          "type": "int[]",
+          "required": false
+        },
+        "product_key": {
+          "type": "string[]",
+          "required": false
+        },
+        "revenue_channel": {
+          "type": "string[]",
+          "required": false
+        }
+      },
+      "type": "decimal",
+      "unit": "IDR",
+      "aggregation": "sum",
+      "refresh_sla_seconds": 900,
+      "pdp_class": "internal",
+      "source_model": "mart_revenue_daily"
+    },
+    {
+      "name": "sales_total",
+      "label": "Total Penjualan",
+      "description": "Gross sales order value including tax, before invoicing.",
+      "grain": [
+        "date_day",
+        "tenant_id",
+        "operating_unit_id"
+      ],
+      "dimensions": [
+        "date_day",
+        "date_month",
+        "tenant_id",
+        "operating_unit_id",
+        "partner_key",
+        "product_key",
+        "company_id"
+      ],
+      "filters": {
+        "date_range": {
+          "type": "daterange",
+          "required": true,
+          "column": "date_day"
+        },
+        "operating_unit_id": {
+          "type": "int[]",
+          "required": false
+        },
+        "product_key": {
+          "type": "string[]",
+          "required": false
+        }
+      },
+      "type": "decimal",
+      "unit": "IDR",
+      "aggregation": "sum",
+      "refresh_sla_seconds": 300,
+      "pdp_class": "internal",
+      "source_model": "mart_sales_daily"
+    },
+    {
+      "name": "sales_untaxed",
+      "label": "Penjualan Sebelum Pajak",
+      "description": "Sales order value excluding tax.",
+      "grain": [
+        "date_day",
+        "tenant_id",
+        "operating_unit_id"
+      ],
+      "dimensions": [
+        "date_day",
+        "date_month",
+        "tenant_id",
+        "operating_unit_id",
+        "partner_key",
+        "product_key",
+        "company_id"
+      ],
+      "filters": {
+        "date_range": {
+          "type": "daterange",
+          "required": true,
+          "column": "date_day"
+        },
+        "operating_unit_id": {
+          "type": "int[]",
+          "required": false
+        }
+      },
+      "type": "decimal",
+      "unit": "IDR",
+      "aggregation": "sum",
+      "refresh_sla_seconds": 300,
+      "pdp_class": "internal",
+      "source_model": "mart_sales_daily"
+    },
+    {
+      "name": "stock_net_quantity",
+      "label": "Posisi Stok",
+      "description": "Net quantity moved (in minus out) by product and operating unit.",
+      "grain": [
+        "tenant_id",
+        "operating_unit_id",
+        "product_key"
+      ],
+      "dimensions": [
+        "tenant_id",
+        "operating_unit_id",
+        "product_key",
+        "product_id",
+        "company_id"
+      ],
+      "filters": {
+        "operating_unit_id": {
+          "type": "int[]",
+          "required": false
+        },
+        "product_key": {
+          "type": "string[]",
+          "required": false
+        }
+      },
+      "type": "decimal",
+      "unit": "unit",
+      "aggregation": "sum",
+      "refresh_sla_seconds": 300,
+      "pdp_class": "internal",
+      "source_model": "mart_stock_position"
+    },
+    {
+      "name": "stock_valuation",
+      "label": "Nilai Persediaan",
+      "description": "On-hand stock valued at unit cost, per product and operating unit. Previously undeclarable and now enabled by DWH's dim_product_cost: mart_stock_position carries unit_cost, stock_valuation and has_unit_cost, so the value comes from standard_price unpacked per company - NOT from list_price, which is the sales price and would overstate inventory by the entire margin. READ has_unit_cost BEFORE READING THE TOTAL. Rows for products with no cost carry a NULL stock_valuation, and SQL SUM() skips NULL without comment, so the total is a subtotal that looks finished. Measured on tenant bct: 28 position rows, 27 summed, 1 silently skipped, 250 units of real stock outside a total that reads as complete. has_unit_cost is a declared dimension precisely so a caller can group by it and see the excluded rows; a panel that shows the number without it is reporting an incomplete figure as a final one.",
+      "grain": [
+        "tenant_id",
+        "operating_unit_id",
+        "product_key"
+      ],
+      "dimensions": [
+        "tenant_id",
+        "operating_unit_id",
+        "product_key",
+        "product_id",
+        "company_id",
+        "has_unit_cost"
+      ],
+      "filters": {
+        "operating_unit_id": {
+          "type": "int[]",
+          "required": false
+        },
+        "product_key": {
+          "type": "string[]",
+          "required": false
+        }
+      },
+      "type": "decimal",
+      "unit": "IDR",
+      "aggregation": "sum",
+      "refresh_sla_seconds": 300,
+      "pdp_class": "internal",
+      "source_model": "mart_stock_position"
+    }
+  ]
+}

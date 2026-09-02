@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_retail_payment" model="report.paperformat">
+        <field name="name">the apparel brand Payment Document A4</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">40</field>
+        <field name="margin_bottom">28</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Landscape format for the wide COA/GL vouchers (Payment Voucher,
+         Payment Receipt, Journal Billing). -->
+    <record id="paperformat_retail_landscape" model="report.paperformat">
+        <field name="name">the apparel brand Voucher A4 Landscape</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">12</field>
+        <field name="margin_bottom">12</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">8</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Portrait variant of the voucher format for Journal Billing: same tight
+         margins as the landscape voucher, but A4 Portrait so the print matches
+         the vendor-bill review orientation requested by Accounting. -->
+    <record id="paperformat_retail_voucher_portrait" model="report.paperformat">
+        <field name="name">the apparel brand Voucher A4 Portrait</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">12</field>
+        <field name="margin_bottom">12</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">8</field>
+        <field name="dpi">90</field>
+    </record>
+</odoo>

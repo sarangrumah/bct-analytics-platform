@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- ESB serves three different hosts; each needs its own config row.
+         All seeded DISABLED and pointing at STAGING. Per tenant:
+           1. set base_url for the target environment,
+           2. store the ESB password (or static API key) under the
+              credential_ref key in ir.config_parameter,
+           3. fill in the username on the ESB session,
+           4. flip status to "active".
+         See docs/integrations/esb-core-api.md for the full base-URL matrix. -->
+
+    <record id="adapter_esb_core" model="custom.adapter.config">
+        <field name="name">esb_core</field>
+        <field name="adapter_type">esb_core</field>
+        <field name="base_url">https://stg7.esb.co.id/core-stg</field>
+        <field name="auth_method">bearer</field>
+        <field name="credential_ref">custom_esb_connector.esb_password</field>
+        <field name="timeout_s">30</field>
+        <field name="status">disabled</field>
+        <field name="notes">ESB Core host: /auth, /inventory/*, /purchase/*, /product*, /report/*.
+Prod: https://services.esb.co.id/core — Staging: https://stg7.esb.co.id/core-stg — INT: https://stg7.esb.co.id/core-int</field>
+    </record>
+
+    <record id="adapter_esb_corev1" model="custom.adapter.config">
+        <field name="name">esb_corev1</field>
+        <field name="adapter_type">esb_corev1</field>
+        <field name="base_url">https://stg7.esb.co.id/api-fnb-backend/web</field>
+        <field name="auth_method">bearer</field>
+        <field name="credential_ref">custom_esb_connector.esb_password</field>
+        <field name="timeout_s">60</field>
+        <field name="status">disabled</field>
+        <field name="notes">corev1/extv1 host: /corev1/master/product (the only product feed carrying productDetailID), /corev1/sales/*.
+Prod: https://core-api.esb.co.id — Staging: https://stg7.esb.co.id/api-fnb-backend/web</field>
+    </record>
+
+    <record id="adapter_esb_oms" model="custom.adapter.config">
+        <field name="name">esb_oms</field>
+        <field name="adapter_type">esb_oms</field>
+        <field name="base_url">https://int-erp.esb.co.id</field>
+        <field name="auth_method">bearer</field>
+        <field name="credential_ref">custom_esb_connector.esb_password</field>
+        <field name="timeout_s">60</field>
+        <field name="status">disabled</field>
+        <field name="notes">ESB OMS host: /external/general/* POS sales feeds. Paginates via X-Pagination-* headers.
+Prod: https://esbcore.co.id — Staging: https://int-erp.esb.co.id</field>
+    </record>
+
+    <!-- One session per host. All three share the same ESB credentials; the
+         session for esb_core is the one that actually logs in, the others fall
+         back to it (see custom.esb.session._for_config). -->
+    <record id="session_esb_core" model="custom.esb.session">
+        <field name="adapter_config_id" ref="adapter_esb_core"/>
+        <field name="auth_mode">jwt</field>
+        <field name="credential_ref">custom_esb_connector.esb_password</field>
+    </record>
+
+    <!-- Feature switches, all off. The platform convention is ir.config_parameter. -->
+    <record id="param_esb_master_sync_enabled" model="ir.config_parameter">
+        <field name="key">esb.master_sync_enabled</field>
+        <field name="value">0</field>
+    </record>
+    <record id="param_esb_snapshot_enabled" model="ir.config_parameter">
+        <field name="key">esb.snapshot_enabled</field>
+        <field name="value">0</field>
+    </record>
+    <record id="param_esb_snapshot_lookback_days" model="ir.config_parameter">
+        <field name="key">esb.snapshot_lookback_days</field>
+        <field name="value">90</field>
+    </record>
+    <record id="param_esb_snapshot_stale_hours" model="ir.config_parameter">
+        <field name="key">esb.snapshot_stale_hours</field>
+        <field name="value">24</field>
+    </record>
+    <!-- Hard kill-switch for every outbound write to ESB. -->
+    <record id="param_esb_push_enabled" model="ir.config_parameter">
+        <field name="key">esb.push_enabled</field>
+        <field name="value">0</field>
+    </record>
+    <record id="param_esb_auto_authorize" model="ir.config_parameter">
+        <field name="key">esb.auto_authorize_item_journal</field>
+        <field name="value">0</field>
+    </record>
+    <record id="param_esb_branch_whitelist" model="ir.config_parameter">
+        <field name="key">esb.branch_whitelist</field>
+        <field name="value"></field>
+    </record>
+</odoo>

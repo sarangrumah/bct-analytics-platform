@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_dpp_nilai_lain_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.dpp.nilai.lain.wizard.form</field>
+        <field name="model">custom.report.dpp.nilai.lain.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Laporan DPP Nilai Lain">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group><field name="company_ids" widget="many2many_tags"/></group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print" type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Lihat Transaksi" name="action_view_source" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_dpp_nilai_lain_wizard" model="ir.actions.act_window">
+        <field name="name">Laporan DPP Nilai Lain</field>
+        <field name="res_model">custom.report.dpp.nilai.lain.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_faktur_pengganti_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.faktur.pengganti.wizard.form</field>
+        <field name="model">custom.report.faktur.pengganti.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Daftar Faktur Pengganti">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group><field name="company_ids" widget="many2many_tags"/></group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print" type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Lihat Transaksi" name="action_view_source" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_faktur_pengganti_wizard" model="ir.actions.act_window">
+        <field name="name">Daftar Faktur Pengganti</field>
+        <field name="res_model">custom.report.faktur.pengganti.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_ekualisasi_omzet_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.ekualisasi.omzet.wizard.form</field>
+        <field name="model">custom.report.ekualisasi.omzet.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Ekualisasi Omzet (PPN vs Buku Besar)">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group><field name="company_ids" widget="many2many_tags"/></group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print" type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_ekualisasi_omzet_wizard" model="ir.actions.act_window">
+        <field name="name">Ekualisasi Omzet</field>
+        <field name="res_model">custom.report.ekualisasi.omzet.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_pph_equalisasi_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.pph.equalisasi.wizard.form</field>
+        <field name="model">custom.report.pph.equalisasi.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Ekualisasi Biaya vs Objek PPh">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group><field name="company_ids" widget="many2many_tags"/></group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print" type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Lihat Transaksi" name="action_view_source" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_pph_equalisasi_wizard" model="ir.actions.act_window">
+        <field name="name">Ekualisasi Biaya vs Objek PPh</field>
+        <field name="res_model">custom.report.pph.equalisasi.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_coretax_submission_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.coretax.submission.wizard.form</field>
+        <field name="model">custom.report.coretax.submission.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Monitoring Submission Coretax / Pajakku">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group><field name="company_ids" widget="many2many_tags"/></group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print" type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Lihat Transaksi" name="action_view_source" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_coretax_submission_wizard" model="ir.actions.act_window">
+        <field name="name">Monitoring Submission Coretax</field>
+        <field name="res_model">custom.report.coretax.submission.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_pajakku_usage_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.pajakku.usage.wizard.form</field>
+        <field name="model">custom.report.pajakku.usage.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Usage Meter Pajakku">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group><field name="company_ids" widget="many2many_tags"/></group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print" type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Lihat Transaksi" name="action_view_source" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_pajakku_usage_wizard" model="ir.actions.act_window">
+        <field name="name">Usage Meter Pajakku</field>
+        <field name="res_model">custom.report.pajakku.usage.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

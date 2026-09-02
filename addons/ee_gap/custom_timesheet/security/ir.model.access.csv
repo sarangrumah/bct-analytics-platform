@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_weekly_summary_user,custom.timesheet.weekly.summary user,model_custom_timesheet_weekly_summary,custom_timesheet.group_user,1,0,0,0
+access_weekly_summary_manager,custom.timesheet.weekly.summary manager,model_custom_timesheet_weekly_summary,custom_timesheet.group_manager,1,1,1,1
+access_invoice_wizard_user,custom.timesheet.invoice.wizard user,model_custom_timesheet_invoice_wizard,custom_timesheet.group_user,1,1,1,1
+access_invoice_wizard_manager,custom.timesheet.invoice.wizard manager,model_custom_timesheet_invoice_wizard,custom_timesheet.group_manager,1,1,1,1
+access_invoice_wizard_line_user,custom.timesheet.invoice.wizard.line user,model_custom_timesheet_invoice_wizard_line,custom_timesheet.group_user,1,1,1,1
+access_invoice_wizard_line_manager,custom.timesheet.invoice.wizard.line manager,model_custom_timesheet_invoice_wizard_line,custom_timesheet.group_manager,1,1,1,1

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_approval_delegation_list" model="ir.ui.view">
+        <field name="name">approval.delegation.list</field>
+        <field name="model">approval.delegation</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active">
+                <field name="user_id"/>
+                <field name="delegate_to_id"/>
+                <field name="valid_from"/>
+                <field name="valid_until"/>
+                <field name="reason"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_approval_delegation_form" model="ir.ui.view">
+        <field name="name">approval.delegation.form</field>
+        <field name="model">approval.delegation</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="delegate_to_id"/>
+                            <field name="reason"/>
+                        </group>
+                        <group>
+                            <field name="valid_from"/>
+                            <field name="valid_until"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <separator string="Limit to Specific Models (empty = all)"/>
+                    <field name="model_ids" widget="many2many_tags"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_approval_delegation" model="ir.actions.act_window">
+        <field name="name">Delegations</field>
+        <field name="res_model">approval.delegation</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

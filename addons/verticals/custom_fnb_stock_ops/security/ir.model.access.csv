@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_fnb_demand_history_user,custom.fnb.demand.history user,model_custom_fnb_demand_history,group_fnb_user,1,0,0,0
+access_fnb_demand_history_planner,custom.fnb.demand.history planner,model_custom_fnb_demand_history,group_fnb_planner,1,1,1,1
+access_fnb_demand_forecast_user,custom.fnb.demand.forecast user,model_custom_fnb_demand_forecast,group_fnb_user,1,0,0,0
+access_fnb_demand_forecast_planner,custom.fnb.demand.forecast planner,model_custom_fnb_demand_forecast,group_fnb_planner,1,1,1,1
+access_fnb_replenishment_rule_user,custom.fnb.replenishment.rule user,model_custom_fnb_replenishment_rule,group_fnb_user,1,0,0,0
+access_fnb_replenishment_rule_planner,custom.fnb.replenishment.rule planner,model_custom_fnb_replenishment_rule,group_fnb_planner,1,1,1,1
+access_fnb_proposal_user,custom.fnb.replenishment.proposal user,model_custom_fnb_replenishment_proposal,group_fnb_user,1,0,0,0
+access_fnb_proposal_planner,custom.fnb.replenishment.proposal planner,model_custom_fnb_replenishment_proposal,group_fnb_planner,1,1,1,1
+access_fnb_proposal_line_user,custom.fnb.replenishment.proposal.line user,model_custom_fnb_replenishment_proposal_line,group_fnb_user,1,0,0,0
+access_fnb_proposal_line_planner,custom.fnb.replenishment.proposal.line planner,model_custom_fnb_replenishment_proposal_line,group_fnb_planner,1,1,1,1

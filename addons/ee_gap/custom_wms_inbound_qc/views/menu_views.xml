@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_wms_inbound_qc_root"
+              name="Inbound QC"
+              parent="stock.menu_stock_root"
+              sequence="86"
+              groups="custom_wms_inbound_qc.group_wms_qc_inspector"/>
+
+    <menuitem id="menu_wms_product_registration"
+              name="Unknown-Item Registrations"
+              parent="menu_wms_inbound_qc_root"
+              action="action_wms_product_registration"
+              sequence="10"/>
+</odoo>

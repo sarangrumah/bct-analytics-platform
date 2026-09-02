@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template Gallery submenu under standard Email Marketing root -->
+    <menuitem id="menu_email_template_gallery"
+              name="Template Gallery"
+              parent="mass_mailing.mass_mailing_menu_root"
+              action="action_email_template_gallery"
+              sequence="35"
+              groups="custom_email_marketing.group_user"/>
+
+    <!-- A/B Tests submenu under Email Marketing root -->
+    <menuitem id="menu_custom_email_ab_test"
+              name="A/B Tests"
+              parent="mass_mailing.mass_mailing_menu_root"
+              action="action_custom_email_ab_test"
+              sequence="36"
+              groups="custom_email_marketing.group_user"/>
+</odoo>

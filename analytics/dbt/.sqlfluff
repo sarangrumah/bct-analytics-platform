@@ -1,0 +1,60 @@
+# ---------------------------------------------------------------------------
+# sqlfluff, scoped to the dbt project.
+#
+# sqlfluff merges configuration from the nearest .sqlfluff upwards, so the root
+# file (owned by the Security agent) still supplies dialect, max_line_length,
+# exclude_rules and every capitalisation policy. This file adds ONLY what the
+# root cannot know: where this project's macros live, and stand-ins for the two
+# macros that cannot be evaluated without a database.
+#
+# WHY templater STAYS `jinja` AND IS NOT SWITCHED TO `dbt`.
+# The root file's Phase 3 handover note says to flip it once analytics/dbt
+# lands. Doing so would break the hook for everyone, and it is worth writing
+# down why rather than silently not doing it:
+#
+#   * `templater = dbt` needs sqlfluff-templater-dbt AND dbt-core installed in
+#     the pre-commit hook's own virtualenv. That means editing
+#     additional_dependencies in .pre-commit-config.yaml, which is the Security
+#     agent's file (master prompt §2.1).
+#   * The dbt templater does not just render Jinja - it runs `dbt parse`, which
+#     needs a resolvable profile and a reachable warehouse. A developer with no
+#     stack running, and CI with no warehouse container, would both get an
+#     ERROR rather than a finding. That is exactly what the Phase 1 acceptance
+#     criteria forbid, and it is the same reasoning that put `jinja` there in
+#     the first place.
+#
+# So the macros are loaded from disk instead, which lints the REAL expansion of
+# surrogate_key and raw_latest - not a placeholder - with no database and no
+# new dependency.
+# ---------------------------------------------------------------------------
+
+[sqlfluff:templater:jinja]
+apply_dbt_builtins = true
+load_macros_from_path = macros
+
+[sqlfluff:templater:jinja:macros]
+# active_tenants() reads warehouse.tenant_registry through run_query(), which
+# only exists inside a real dbt invocation. This stand-in returns the two
+# tenants the registry actually holds, so recon_daily lints as the SQL it will
+# really be, including both arms of its UNION ALL.
+dwh_active_tenants = {% macro active_tenants() %}{{ return(['bct', 'bct_t2']) }}{% endmacro %}
+
+# ---------------------------------------------------------------------------
+# RF04 (references.keywords) exception, scoped to three words.
+#
+# `name`, `ref` and `function` are SQL keywords AND they are the physical column
+# names on res_partner. The warehouse column should carry its source's name -
+# the brief's own evidence query is `select partner_key, name from
+# marts.dim_partner` - and renaming them to dodge a lint rule would make the
+# mart disagree with the system it mirrors.
+#
+# Quoting them is not the answer either: it trades RF04 for RF06 (unnecessary
+# quoted identifier), because Postgres treats all three as non-reserved. So the
+# exception is declared here, narrowly and with its reason, rather than sprayed
+# across the models as noqa comments where nobody would ever review it.
+#
+# This is three words, not a policy change: the rule stays on for everything
+# else, including any future column that happens to be called `order` or `user`.
+# ---------------------------------------------------------------------------
+[sqlfluff:rules:references.keywords]
+ignore_words = name,ref,function

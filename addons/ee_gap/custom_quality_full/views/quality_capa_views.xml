@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_quality_capa_list" model="ir.ui.view">
+        <field name="name">custom.quality.capa.list</field>
+        <field name="model">custom.quality.capa</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'done'"
+                  decoration-info="state == 'in_progress'"
+                  decoration-muted="state == 'canceled'">
+                <field name="name"/>
+                <field name="alert_id"/>
+                <field name="action_type"/>
+                <field name="responsible_id"/>
+                <field name="deadline"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_custom_quality_capa_form" model="ir.ui.view">
+        <field name="name">custom.quality.capa.form</field>
+        <field name="model">custom.quality.capa</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" type="object" string="Start"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_done" type="object" string="Mark Done"
+                            class="btn-success"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('done','canceled')"/>
+                    <button name="action_reset" type="object" string="Reset to Draft"
+                            invisible="state not in ('done','canceled')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="alert_id"/>
+                            <field name="action_type"/>
+                            <field name="responsible_id"/>
+                        </group>
+                        <group>
+                            <field name="deadline"/>
+                            <field name="completion_date" readonly="1"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+                    <separator string="Description"/>
+                    <field name="description"/>
+                    <separator string="Signatures"/>
+                    <field name="signature_ids">
+                        <list>
+                            <field name="signer_name"/>
+                            <field name="purpose"/>
+                            <field name="signed_at"/>
+                            <field name="is_valid" widget="boolean_toggle" readonly="1"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_custom_quality_capa" model="ir.actions.act_window">
+        <field name="name">CAPA Actions</field>
+        <field name="res_model">custom.quality.capa</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

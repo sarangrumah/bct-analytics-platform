@@ -1,0 +1,9 @@
+{
+  "path": "https://stg7.esb.co.id/core-stg/inventory/item-journal/IU202607210023/authorize",
+  "timestamp": "2026-07-21 13:59:14",
+  "status": "ok",
+  "code": "EC03100000",
+  "message": "OK",
+  "result": null,
+  "errors": null
+}

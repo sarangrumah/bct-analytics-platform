@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_barcode_cluster_run_list" model="ir.ui.view">
+        <field name="name">custom.barcode.cluster.run.list</field>
+        <field name="model">custom.barcode.cluster.run</field>
+        <field name="arch" type="xml">
+            <list string="Cluster Runs"
+                  decoration-info="state == 'picking'"
+                  decoration-success="state == 'done'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="operator_id"/>
+                <field name="state" widget="badge"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_barcode_cluster_run_form" model="ir.ui.view">
+        <field name="name">custom.barcode.cluster.run.form</field>
+        <field name="model">custom.barcode.cluster.run</field>
+        <field name="arch" type="xml">
+            <form string="Cluster Run">
+                <header>
+                    <button name="build_plan" type="object"
+                            string="Build Plan" class="oe_highlight"
+                            invisible="state not in ('draft',)"/>
+                    <button name="action_start_picking" type="object"
+                            string="Start Picking" class="oe_highlight"
+                            invisible="state != 'planned'"/>
+                    <button name="action_apply" type="object"
+                            string="Apply" class="oe_highlight"
+                            invisible="state != 'picking'"/>
+                    <button name="action_cancel" type="object"
+                            string="Cancel"
+                            invisible="state in ('done','cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,planned,picking,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <field name="operator_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Transfers">
+                            <field name="picking_ids" widget="many2many">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="partner_id"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Pick Plan">
+                            <field name="assignment_ids" readonly="1">
+                                <list>
+                                    <field name="location_id"/>
+                                    <field name="product_id"/>
+                                    <field name="picking_id"/>
+                                    <field name="expected_qty"/>
+                                    <field name="scanned_qty"/>
+                                    <field name="remaining_qty"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Scans">
+                            <field name="scan_line_ids">
+                                <list editable="bottom"
+                                      decoration-danger="status == 'not_found'"
+                                      decoration-warning="status in ('duplicate','unallocated')">
+                                    <field name="scanned_at"/>
+                                    <field name="raw_barcode"/>
+                                    <field name="product_id"/>
+                                    <field name="lot_id"/>
+                                    <field name="quantity"/>
+                                    <field name="picking_id"/>
+                                    <field name="status" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_custom_barcode_cluster_run" model="ir.actions.act_window">
+        <field name="name">Cluster Runs</field>
+        <field name="res_model">custom.barcode.cluster.run</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

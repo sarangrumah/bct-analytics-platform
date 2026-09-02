@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_asset_register" model="report.paperformat">
+        <field name="name">Asset Register Landscape A4</field>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_spacing">8</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_asset_register" model="ir.actions.report">
+        <field name="name">Asset Register</field>
+        <field name="model">custom.report.asset.register.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_accounting_asset.report_asset_register</field>
+        <field name="report_file">custom_accounting_asset.report_asset_register</field>
+        <field name="paperformat_id" ref="paperformat_asset_register"/>
+        <field name="binding_model_id" eval="False"/>
+        <field name="print_report_name">'Asset Register'</field>
+    </record>
+</odoo>

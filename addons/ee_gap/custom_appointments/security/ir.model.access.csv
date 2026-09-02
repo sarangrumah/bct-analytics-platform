@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_appt_type_user,appointment.type user,model_appointment_type,group_appointment_user,1,0,0,0
+access_appt_type_admin,appointment.type admin,model_appointment_type,group_appointment_manager,1,1,1,1
+access_appt_type_public,appointment.type public,model_appointment_type,base.group_public,1,0,0,0
+access_appt_resource_user,appointment.resource user,model_appointment_resource,group_appointment_user,1,0,0,0
+access_appt_resource_admin,appointment.resource admin,model_appointment_resource,group_appointment_manager,1,1,1,1
+access_appt_resource_public,appointment.resource public,model_appointment_resource,base.group_public,1,0,0,0
+access_appt_booking_user,appointment.booking user,model_appointment_booking,group_appointment_user,1,1,1,0
+access_appt_booking_admin,appointment.booking admin,model_appointment_booking,group_appointment_manager,1,1,1,1
+access_appt_booking_public,appointment.booking public create,model_appointment_booking,base.group_public,0,0,1,0

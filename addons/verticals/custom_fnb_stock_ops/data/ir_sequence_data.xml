@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="seq_fnb_replenishment_proposal" model="ir.sequence">
+        <field name="name">F&amp;B Replenishment Proposal</field>
+        <field name="code">custom.fnb.replenishment.proposal</field>
+        <field name="prefix">REPL/%(year)s/%(month)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- custom_wms_cycle_count ships a placeholder sequence file, so its sessions
+         all fall back to the literal name "CC/NEW". That name is what lands in the
+         ESB item journal's additionalInfo, where it has to identify one count. -->
+    <record id="seq_cycle_count_session" model="ir.sequence">
+        <field name="name">Cycle Count Session</field>
+        <field name="code">custom.cycle.count.session</field>
+        <field name="prefix">CC/%(year)s/%(month)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

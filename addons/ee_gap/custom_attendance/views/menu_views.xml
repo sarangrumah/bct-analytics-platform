@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top-level app menu -->
+    <menuitem id="menu_attendance_ext_root"
+              name="Attendance+"
+              sequence="58"
+              groups="custom_attendance.group_user"/>
+
+    <menuitem id="menu_attendance_ext_config"
+              name="Configuration"
+              parent="menu_attendance_ext_root"
+              sequence="90"
+              groups="custom_attendance.group_manager"/>
+
+    <menuitem id="menu_attendance_geofences"
+              name="Geofences"
+              parent="menu_attendance_ext_config"
+              action="action_attendance_geofence"
+              sequence="10"/>
+
+    <menuitem id="menu_attendance_overtime_rules"
+              name="Overtime Rules"
+              parent="menu_attendance_ext_config"
+              action="action_custom_attendance_overtime_rule"
+              sequence="20"/>
+</odoo>

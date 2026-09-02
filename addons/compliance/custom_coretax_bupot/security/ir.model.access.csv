@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bupot_unifikasi_user,custom.bupot.unifikasi user,model_custom_bupot_unifikasi,group_bupot_user,1,1,1,0
+access_bupot_unifikasi_manager,custom.bupot.unifikasi manager,model_custom_bupot_unifikasi,group_bupot_manager,1,1,1,1
+access_bupot_unifikasi_line_user,custom.bupot.unifikasi.line user,model_custom_bupot_unifikasi_line,group_bupot_user,1,1,1,1
+access_bupot_unifikasi_line_manager,custom.bupot.unifikasi.line manager,model_custom_bupot_unifikasi_line,group_bupot_manager,1,1,1,1
+access_bupot_xml_export_wizard,custom.bupot.xml.export.wizard,model_custom_bupot_xml_export_wizard,group_bupot_user,1,1,1,1
+access_bupot_number_upload_wizard,custom.bupot.number.upload.wizard,model_custom_bupot_number_upload_wizard,group_bupot_user,1,1,1,1

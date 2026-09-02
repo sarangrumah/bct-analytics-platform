@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_sales_detail">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered" style="font-size: 8px;">
+                <thead class="table-light">
+                    <tr>
+                        <th>Store</th>
+                        <th>Nama Store</th>
+                        <th>Reg</th>
+                        <th>Trans</th>
+                        <th>Tanggal</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Kategori</th>
+                        <th class="text-end">Qty</th>
+                        <th class="text-end">Gross</th>
+                        <th class="text-end">Diskon</th>
+                        <th class="text-end">Pajak</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-end">Net (DPP)</th>
+                        <th class="text-end">COGS</th>
+                        <th class="text-end">Margin</th>
+                        <th>Catatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'note'">
+                            <td colspan="17" class="text-muted fst-italic" t-esc="line.get('store_code')"/>
+                        </tr>
+                        <tr t-elif="line.get('type') == 'grand_total'" class="table-dark fw-bold">
+                            <td colspan="8" t-esc="line.get('store_code')"/>
+                            <td class="text-end" t-esc="line.get('qty')"/>
+                            <td class="text-end"><span t-esc="line.get('gross')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('discount')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('tax')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('total')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('net')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('cogs')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('margin')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td/>
+                        </tr>
+                        <tr t-else="" t-att-class="'table-warning' if line.get('note') else ''">
+                            <td t-esc="line.get('store_code')"/>
+                            <td t-esc="line.get('store_name')"/>
+                            <td t-esc="line.get('register')"/>
+                            <td t-esc="line.get('txn_no')"/>
+                            <td t-esc="line.get('txn_date')" t-options="{'widget':'date'}"/>
+                            <td t-esc="line.get('item_code')"/>
+                            <td t-esc="line.get('item_name')"/>
+                            <td t-esc="line.get('categ')"/>
+                            <td class="text-end" t-esc="line.get('qty')"/>
+                            <td class="text-end"><span t-esc="line.get('gross')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('discount')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('tax')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('total')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('net')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('cogs')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('margin')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td t-esc="line.get('note')"/>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+    </data>
+</odoo>

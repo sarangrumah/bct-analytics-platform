@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_storage_section_list" model="ir.ui.view">
+        <field name="name">custom.wms.storage.section.list</field>
+        <field name="model">custom.wms.storage.section</field>
+        <field name="arch" type="xml">
+            <list string="Storage Sections">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="is_general"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_storage_section_form" model="ir.ui.view">
+        <field name="name">custom.wms.storage.section.form</field>
+        <field name="model">custom.wms.storage.section</field>
+        <field name="arch" type="xml">
+            <form string="Storage Section">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="RU1"/>
+                            <field name="name" placeholder="Run"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="is_general"/>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Search Sequence" name="search_sequence">
+                            <p class="text-muted">
+                                Storage sections tried in order when slotting a product of this section.
+                                The first entry is normally the section itself.
+                            </p>
+                            <field name="search_line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="target_section_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_storage_section" model="ir.actions.act_window">
+        <field name="name">Storage Sections</field>
+        <field name="res_model">custom.wms.storage.section</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

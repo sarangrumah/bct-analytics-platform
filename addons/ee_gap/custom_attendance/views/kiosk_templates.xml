@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="kiosk_page" name="Attendance Kiosk">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <title>Attendance Kiosk</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 0; padding: 0;
+                           background: #1f2937; color: #f3f4f6; min-height: 100vh;
+                           display: flex; align-items: center; justify-content: center; }
+                    .kiosk-box { background: #111827; padding: 40px; border-radius: 12px;
+                                 box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 340px;
+                                 text-align: center; }
+                    .kiosk-box h1 { margin: 0 0 24px; font-size: 24px; }
+                    .kiosk-box input[type=password] { font-size: 28px; text-align: center;
+                                 padding: 12px; width: 80%; border: none; border-radius: 6px;
+                                 letter-spacing: 8px; }
+                    .kiosk-box button { margin-top: 24px; padding: 14px 28px;
+                                 font-size: 16px; font-weight: 600; border: none;
+                                 border-radius: 6px; background: #2563eb; color: white;
+                                 cursor: pointer; width: 85%; }
+                    .kiosk-msg { margin-top: 18px; padding: 10px; border-radius: 6px; }
+                    .kiosk-msg.ok { background: #065f46; }
+                    .kiosk-msg.error { background: #991b1b; }
+                </style>
+            </head>
+            <body>
+                <div class="kiosk-box">
+                    <h1>Attendance Kiosk</h1>
+                    <form action="/custom_attendance/kiosk/submit" method="post">
+                        <input type="password" name="pin" placeholder="PIN"
+                               autocomplete="off" inputmode="numeric" maxlength="8"
+                               required="required" autofocus="autofocus"/>
+                        <input type="hidden" name="lat" id="kiosk_lat"/>
+                        <input type="hidden" name="lng" id="kiosk_lng"/>
+                        <button type="submit">Check In / Out</button>
+                    </form>
+                    <div t-if="status == 'ok'" class="kiosk-msg ok">
+                        <t t-esc="message"/>
+                    </div>
+                    <div t-if="status == 'error'" class="kiosk-msg error">
+                        <t t-esc="message"/>
+                    </div>
+                </div>
+                <script>
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function(p) {
+                            document.getElementById('kiosk_lat').value = p.coords.latitude;
+                            document.getElementById('kiosk_lng').value = p.coords.longitude;
+                        });
+                    }
+                </script>
+            </body>
+        </html>
+    </template>
+</odoo>

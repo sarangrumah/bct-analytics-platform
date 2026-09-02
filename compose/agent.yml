@@ -1,0 +1,121 @@
+# ===========================================================================
+# ATHERA Agent — the floating assistant, end to end.
+#
+#   make up-agent
+#
+# The fourth product stack. compose/odoo.yml, compose/insight.yml and
+# compose/platform.yml have named this file since the split; this is it.
+#
+# WHAT THE PRODUCT IS: a client asks a question in their own words and gets an
+# answer drawn from their own data, and nothing else. The Odoo half already
+# exists — custom_ai_bridge and custom_ai_features are installed in every
+# tenant and serve the chat at /ai/chat. The server they call did not.
+#
+# HOW THE TENANT FENCE HOLDS, since "the model only knows your data" is the
+# whole product claim and a prompt cannot enforce it:
+#
+#   * ai-gateway reads NO database. No DSN, no driver, no route to Postgres.
+#     Whatever it were talked into saying, it cannot fetch a row.
+#   * /v1/workflow/nlq returns an Odoo DOMAIN, never SQL. Odoo executes it
+#     through the ORM, under that user's record rules and that tenant's PDP
+#     masking. Generated SQL would bypass all of it.
+#   * The model is shown only the models and fields the asker may read, and
+#     the plan it returns is re-checked against that list before it leaves the
+#     gateway.
+#
+# See ai-gateway/app/main.py, which states the same four properties in the
+# order they matter.
+# ===========================================================================
+
+x-restart-policy: &restart-policy
+  restart: unless-stopped
+
+x-default-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-hardening: &hardening
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+services:
+
+  ai-gateway:
+    build:
+      context: ../ai-gateway
+      dockerfile: Dockerfile
+    image: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-ai-gateway:local
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-ai-gateway
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    read_only: true
+    mem_limit: 512m
+    environment:
+      # Shared with custom_ai_bridge, which signs every call with it through
+      # custom.security.sign_payload. The gateway refuses to start on a short
+      # or placeholder value rather than run a boundary a guess could cross.
+      GATEWAY_SHARED_SECRET: ${GATEWAY_SHARED_SECRET:?GATEWAY_SHARED_SECRET is required - run `make dev-bootstrap`}
+      AI_GATEWAY_HMAC_WINDOW_SECONDS: ${AI_GATEWAY_HMAC_WINDOW_SECONDS:-300}
+      # anthropic is the production path. A deployment that wants the local
+      # model has to say so — the gateway does NOT silently degrade to it when
+      # a key goes missing, because a quietly weaker model is worse than a
+      # loud failure.
+      AI_GATEWAY_PROVIDER: ${AI_GATEWAY_PROVIDER:-anthropic}
+      AI_GATEWAY_MODEL: ${AI_GATEWAY_MODEL:-}
+      AI_GATEWAY_EFFORT: ${AI_GATEWAY_EFFORT:-medium}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+      TZ: ${TZ:-UTC}
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${AI_GATEWAY_HOST_PORT:-38400}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/healthz',timeout=3).status==200 else 1)\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - bct
+
+  # =========================================================================
+  # ollama — a local model, so the chain is runnable without an API key.
+  #
+  # `profiles: [local-llm]` keeps it OUT of `up`. It is several gigabytes of
+  # image and model weights for something a deployment with an ANTHROPIC_API_KEY
+  # never touches, and this host already runs three other stacks inside a
+  # 4 GiB budget.
+  #
+  #   docker compose ... --profile local-llm up -d ollama
+  #   docker exec odoo19-bct-ollama ollama pull llama3.2:3b
+  #   AI_GATEWAY_PROVIDER=ollama make up-agent
+  # =========================================================================
+  ollama:
+    image: ollama/ollama:0.5.7@sha256:7e672211886f8bd4448a98ed577e26c816b9e8b052112860564afaa2c105800e
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-ollama
+    profiles: [local-llm]
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    mem_limit: 4g
+    volumes:
+      - ollamadata:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - bct
+
+networks:
+  bct:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_bct
+    driver: bridge
+
+volumes:
+  ollamadata:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_ollamadata

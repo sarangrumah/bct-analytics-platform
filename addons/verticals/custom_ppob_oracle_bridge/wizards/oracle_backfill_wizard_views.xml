@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_oracle_backfill_wizard_form" model="ir.ui.view">
+        <field name="name">custom.ppob.oracle.backfill.wizard.form</field>
+        <field name="model">custom.ppob.oracle.backfill.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Oracle Bridge: Backfill MSG016T">
+                <sheet>
+                    <group>
+                        <field name="from_msg016t_id"/>
+                        <field name="to_msg016t_id" placeholder="0 = no upper limit"/>
+                        <field name="dry_run"/>
+                    </group>
+                    <group string="Result" invisible="not result_summary">
+                        <field name="result_summary" nolabel="1" readonly="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_run" type="object" string="Run" class="btn-primary"/>
+                    <button special="cancel" string="Close" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_oracle_backfill_wizard" model="ir.actions.act_window">
+        <field name="name">Backfill Wizard</field>
+        <field name="res_model">custom.ppob.oracle.backfill.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

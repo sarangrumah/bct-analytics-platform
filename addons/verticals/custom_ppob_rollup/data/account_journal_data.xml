@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="journal_ppob_summary" model="account.journal">
+            <field name="name">PPOB Summary (non-GL)</field>
+            <field name="code">PSUM</field>
+            <field name="type">sale</field>
+            <field name="show_on_dashboard" eval="False"/>
+            <field name="x_custom_report_excluded" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

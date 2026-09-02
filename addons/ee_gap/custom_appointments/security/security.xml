@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="module_category_appointments" model="ir.module.category">
+            <field name="name">Appointments</field>
+            <field name="sequence">97</field>
+        </record>
+        <record id="group_appointment_user" model="res.groups">
+            <field name="name">Appointments User</field>
+        </record>
+        <record id="group_appointment_manager" model="res.groups">
+            <field name="name">Appointments Manager</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_appointment_user'))]"/>
+        </record>
+    </data>
+</odoo>

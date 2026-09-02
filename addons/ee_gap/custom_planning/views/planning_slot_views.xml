@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_planning_slot_list" model="ir.ui.view">
+        <field name="name">planning.slot.list</field>
+        <field name="model">planning.slot</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'published'"
+                  decoration-info="state == 'assigned'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="role_id"/>
+                <field name="employee_id"/>
+                <field name="start_dt"/>
+                <field name="end_dt"/>
+                <field name="duration_hours"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_planning_slot_kanban" model="ir.ui.view">
+        <field name="name">planning.slot.kanban</field>
+        <field name="model">planning.slot</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="role_id">
+                <field name="employee_id"/>
+                <field name="start_dt"/>
+                <field name="end_dt"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <strong>
+                            <t t-if="record.employee_id.raw_value">
+                                <field name="employee_id"/>
+                            </t>
+                            <t t-else="">OPEN</t>
+                        </strong>
+                        <div><field name="start_dt"/></div>
+                        <div class="text-muted">→ <field name="end_dt"/></div>
+                        <span class="badge text-bg-info"><field name="state"/></span>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="view_planning_slot_form" model="ir.ui.view">
+        <field name="name">planning.slot.form</field>
+        <field name="model">planning.slot</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_publish" string="Publish" type="object" class="btn-primary"
+                            invisible="state != 'assigned'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state == 'cancelled'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="role_id"/>
+                            <field name="employee_id"/>
+                        </group>
+                        <group>
+                            <field name="start_dt"/>
+                            <field name="end_dt"/>
+                            <field name="duration_hours" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Notes"/>
+                    <field name="notes"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_planning_slot" model="ir.actions.act_window">
+        <field name="name">Shifts</field>
+        <field name="res_model">planning.slot</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+</odoo>

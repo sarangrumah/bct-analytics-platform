@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Menu lives under Accounting > Tax > Bupot Unifikasi.
+         If the host doesn't have account.menu_finance present, we
+         create a self-contained root so the module remains usable. -->
+
+    <menuitem id="menu_bupot_root"
+              name="Bupot Unifikasi"
+              parent="account.menu_finance"
+              sequence="50"
+              groups="group_bupot_user"/>
+
+    <menuitem id="menu_bupot_periods"
+              name="Periode Bupot"
+              parent="menu_bupot_root"
+              action="action_bupot_unifikasi"
+              sequence="10"/>
+
+</odoo>

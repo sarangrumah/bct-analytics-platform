@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_witholding_application_form" model="ir.ui.view">
+        <field name="name">custom.witholding.application.form</field>
+        <field name="model">custom.witholding.application</field>
+        <field name="arch" type="xml">
+            <form string="Witholding Application">
+                <header>
+                    <button string="Mark Applied"
+                            name="action_mark_applied" type="object"
+                            invisible="state != 'computed'"/>
+                    <button string="Reverse"
+                            name="action_reverse" type="object"
+                            invisible="state == 'reversed'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="pph_type"/>
+                            <field name="service_category"/>
+                            <field name="has_npwp"/>
+                            <field name="source_doc"/>
+                        </group>
+                        <group>
+                            <field name="gross"/>
+                            <field name="rate"/>
+                            <field name="withheld"/>
+                            <field name="rule_id"/>
+                            <field name="bupot_line_id"/>
+                            <field name="currency_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_witholding_application_list" model="ir.ui.view">
+        <field name="name">custom.witholding.application.list</field>
+        <field name="model">custom.witholding.application</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="create_date"/>
+                <field name="partner_id"/>
+                <field name="pph_type"/>
+                <field name="service_category"/>
+                <field name="has_npwp"/>
+                <field name="gross"/>
+                <field name="rate"/>
+                <field name="withheld"/>
+                <field name="state" decoration-success="state=='applied'" decoration-muted="state=='reversed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_witholding_application" model="ir.actions.act_window">
+        <field name="name">Witholding Applications</field>
+        <field name="res_model">custom.witholding.application</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

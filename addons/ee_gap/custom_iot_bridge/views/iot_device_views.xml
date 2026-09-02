@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_iot_device_list" model="ir.ui.view">
+        <field name="name">iot.device.list</field>
+        <field name="model">iot.device</field>
+        <field name="arch" type="xml">
+            <list decoration-success="status == 'online'"
+                  decoration-muted="status == 'decommissioned'"
+                  decoration-warning="status == 'offline'">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="kind"/>
+                <field name="location"/>
+                <field name="last_seen_at"/>
+                <field name="reading_count"/>
+                <field name="alert_count"/>
+                <field name="status" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_iot_device_form" model="ir.ui.view">
+        <field name="name">iot.device.form</field>
+        <field name="model">iot.device</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_rotate_token" string="Rotate API Token" type="object"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="kind"/>
+                            <field name="location"/>
+                        </group>
+                        <group>
+                            <field name="api_token" readonly="1" widget="CopyClipboardChar"/>
+                            <field name="last_seen_at" readonly="1"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <separator string="Thresholds"/>
+                    <field name="threshold_ids">
+                        <list editable="bottom">
+                            <field name="metric"/>
+                            <field name="condition"/>
+                            <field name="threshold_value"/>
+                            <field name="severity"/>
+                            <field name="alert_active" readonly="1"/>
+                            <field name="last_evaluated_at" readonly="1"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_iot_device" model="ir.actions.act_window">
+        <field name="name">Devices</field>
+        <field name="res_model">iot.device</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

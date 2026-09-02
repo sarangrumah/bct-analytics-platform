@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!--
+        Minimal UAT demo seed for the dev_cycle module.
+
+        One dev.cycle linked to the seed retail BRD recommendation. Keeps
+        the Kanban dashboard non-empty on a fresh landing_demo DB.
+    -->
+
+    <record id="demo_cycle_retail_ext" model="dev.cycle">
+        <field name="name">Extend POS for retail outlets</field>
+        <field name="brd_recommendation_id" ref="custom_brd_analyzer.demo_brd_rec_pos_offline"/>
+        <field name="state">in_dev</field>
+        <field name="env_progress">dev</field>
+        <field name="estimate_md">10.0</field>
+        <field name="branch_name">feature/brd-1-extend-pos</field>
+        <field name="repo_url">https://github.com/example-org/odoo-custom</field>
+    </record>
+
+</odoo>

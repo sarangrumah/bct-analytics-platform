@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bupot_number_upload_wizard_form" model="ir.ui.view">
+        <field name="name">custom.bupot.number.upload.wizard.form</field>
+        <field name="model">custom.bupot.number.upload.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Upload DJP Bupot Numbers">
+                <group>
+                    <field name="bupot_id" readonly="1"/>
+                    <field name="csv_file" filename="csv_filename"/>
+                    <field name="csv_filename" invisible="1"/>
+                </group>
+                <group invisible="not report">
+                    <field name="report" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_apply" type="object"
+                            string="Apply" class="btn-primary"/>
+                    <button special="cancel" string="Close"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_purchase_return_report_user,purchase.return.report.user,model_custom_wms_purchase_return_report,stock.group_stock_user,1,0,0,0
+access_stock_summary_report_user,stock.summary.report.user,model_custom_wms_stock_summary_report,stock.group_stock_user,1,0,0,0
+access_stock_take_report_user,stock.take.report.user,model_custom_wms_stock_take_report,stock.group_stock_user,1,0,0,0
+access_transfer_report_user,transfer.report.user,model_custom_wms_transfer_report,stock.group_stock_user,1,0,0,0
+access_scrap_report_user,scrap.report.user,model_custom_wms_scrap_report,stock.group_stock_user,1,0,0,0

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_accounting_full_root"
+              name="Group Reporting"
+              parent="account.menu_finance"
+              sequence="50"
+              groups="custom_accounting_full.group_consolidation_viewer"/>
+
+    <menuitem id="menu_consol_wizard"
+              name="Run Consolidation Report"
+              parent="menu_accounting_full_root"
+              action="action_consolidation_report_wizard"
+              sequence="10"/>
+
+    <menuitem id="menu_consol_config"
+              name="Perimeters"
+              parent="menu_accounting_full_root"
+              action="action_consol_config"
+              sequence="20"
+              groups="custom_accounting_full.group_consolidation_admin"/>
+
+    <menuitem id="menu_ic_rule"
+              name="Intercompany Rules"
+              parent="menu_accounting_full_root"
+              action="action_ic_rule"
+              sequence="30"
+              groups="custom_accounting_full.group_consolidation_admin"/>
+
+    <!-- v0.2 — Consolidation chart menu (gated by ICP toggle) -->
+    <menuitem id="menu_consol_chart_root"
+              name="Consolidation Charts"
+              parent="menu_accounting_full_root"
+              sequence="40"
+              groups="custom_accounting_full.group_consolidation_admin"/>
+
+    <menuitem id="menu_consol_chart"
+              name="Charts"
+              parent="menu_consol_chart_root"
+              action="action_consolidation_chart"
+              sequence="10"/>
+
+    <menuitem id="menu_elimination_rule"
+              name="Elimination Rules"
+              parent="menu_consol_chart_root"
+              action="action_elimination_rule"
+              sequence="20"/>
+
+    <menuitem id="menu_elimination_proposal"
+              name="Elimination Proposals"
+              parent="menu_consol_chart_root"
+              action="action_elimination_proposal"
+              sequence="30"/>
+
+    <!-- Configuration submenus -->
+    <menuitem id="menu_fiscal_year"
+              name="Fiscal Years"
+              parent="account.menu_finance_configuration"
+              action="action_fiscal_year"
+              sequence="70"
+              groups="custom_accounting_full.group_fiscal_year_admin"/>
+
+    <menuitem id="menu_reconcile_rule"
+              name="Auto-Reconcile Rules"
+              parent="account.menu_finance_configuration"
+              action="action_reconcile_rule"
+              sequence="75"
+              groups="custom_accounting_full.group_reconcile_admin"/>
+
+    <menuitem id="menu_followup_root"
+              name="Customer Follow-up"
+              parent="account.menu_finance"
+              sequence="55"/>
+
+    <menuitem id="menu_followup_stat"
+              name="Statistics"
+              parent="menu_followup_root"
+              action="action_followup_stat"
+              sequence="10"/>
+
+    <menuitem id="menu_followup_level"
+              name="Levels"
+              parent="menu_followup_root"
+              action="action_followup_level"
+              sequence="20"
+              groups="custom_accounting_full.group_followup_admin"/>
+
+    <menuitem id="menu_credit_check_log"
+              name="Credit Check Logs"
+              parent="account.menu_finance"
+              action="action_credit_check_log"
+              sequence="56"
+              groups="custom_accounting_full.group_credit_limit_admin"/>
+
+    <menuitem id="menu_match_policy"
+              name="3-Way Match Policy"
+              parent="account.menu_finance_configuration"
+              action="action_match_policy"
+              sequence="80"
+              groups="custom_accounting_full.group_match_admin"/>
+
+    <menuitem id="menu_match_result"
+              name="3-Way Match Results"
+              parent="account.menu_finance"
+              action="action_match_result"
+              sequence="57"
+              groups="custom_accounting_full.group_match_admin"/>
+
+</odoo>

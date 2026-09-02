@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_retail_sales_target_list" model="ir.ui.view">
+        <field name="name">retail.sales.target.list</field>
+        <field name="model">retail.sales.target</field>
+        <field name="arch" type="xml">
+            <list string="Sales Targets" editable="bottom" multi_edit="1" sample="1">
+                <field name="warehouse_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="day_count" optional="show"/>
+                <field name="target_amount" sum="Target"/>
+                <field name="amount_per_day" optional="hide"/>
+                <field name="target_qty" optional="hide" sum="Units"/>
+                <field name="target_transactions" optional="hide" sum="Transactions"/>
+                <field name="note" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_retail_sales_target_form" model="ir.ui.view">
+        <field name="name">retail.sales.target.form</field>
+        <field name="model">retail.sales.target</field>
+        <field name="arch" type="xml">
+            <form string="Sales Target">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="warehouse_id" string="Store"/>
+                        <h1><field name="warehouse_id" placeholder="Store..."/></h1>
+                    </div>
+                    <group>
+                        <group string="Period">
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="day_count"/>
+                            <field name="active" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Target">
+                            <field name="target_amount"/>
+                            <field name="amount_per_day"/>
+                            <field name="target_qty"/>
+                            <field name="target_transactions"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note" placeholder="e.g. includes the Ramadan campaign uplift"/>
+                    </group>
+                    <div class="text-muted mt-2">
+                        A target is compared day-for-day: a month-to-date dashboard measures
+                        actuals against the matching share of this target, not against its
+                        full amount.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_retail_sales_target_search" model="ir.ui.view">
+        <field name="name">retail.sales.target.search</field>
+        <field name="model">retail.sales.target</field>
+        <field name="arch" type="xml">
+            <search string="Sales Targets">
+                <field name="warehouse_id"/>
+                <field name="note"/>
+                <filter name="filter_current" string="Covers today"
+                        domain="[('date_from', '&lt;=', time.strftime('%Y-%m-%d')),
+                                 ('date_to', '&gt;=', time.strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_future" string="Upcoming"
+                        domain="[('date_from', '&gt;', time.strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="filter_archived" string="Archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="group_store" string="Store" context="{'group_by': 'warehouse_id'}"/>
+                    <filter name="group_period" string="Period" context="{'group_by': 'date_from'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_retail_sales_target" model="ir.actions.act_window">
+        <field name="name">Sales Targets</field>
+        <field name="res_model">retail.sales.target</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_retail_sales_target_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Set a monthly target per store</p>
+            <p>
+                Until a store has a target, the dashboard shows its sales but no
+                attainment — an unset target reads as "not measured", never as 0% achieved.
+            </p>
+        </field>
+    </record>
+
+</odoo>

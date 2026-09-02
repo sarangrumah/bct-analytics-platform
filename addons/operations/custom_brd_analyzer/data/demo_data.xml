@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!--
+        Minimal UAT demo seed for the BRD analyzer.
+
+        Provides one fully-populated brd.document already in 'analyzed' state
+        plus three brd.recommendation rows of varying severity. This keeps
+        the BRD list page, the report page and the recommendations dashboard
+        meaningfully populated on a fresh landing_demo DB.
+
+        A tiny placeholder attachment is created because brd.document
+        requires document_attachment_id; it is NOT meant to be re-extracted.
+    -->
+
+    <record id="demo_brd_attachment" model="ir.attachment">
+        <field name="name">demo_retail_brd_placeholder.txt</field>
+        <field name="res_model">brd.document</field>
+        <field name="type">binary</field>
+        <field name="mimetype">text/plain</field>
+        <field name="datas">UGxhY2Vob2xkZXIgQlJEIGZvciBVQVQgZGVtby4=</field>
+    </record>
+
+    <record id="demo_brd_retail" model="brd.document">
+        <field name="name">Sample Retail BRD</field>
+        <field name="document_attachment_id" ref="demo_brd_attachment"/>
+        <field name="document_filename">demo_retail_brd_placeholder.txt</field>
+        <field name="document_mime">text/plain</field>
+        <field name="vertical_target">retail</field>
+        <field name="business_domain">retail</field>
+        <field name="language">id</field>
+        <field name="state">analyzed</field>
+        <field name="company_profile_json">{"name":"PT Demo Retail","npwp":"01.234.567.8-901.000","bank":{"name":"BCA","account":"0123456789"}}</field>
+    </record>
+
+    <record id="demo_brd_rec_pos_offline" model="brd.recommendation">
+        <field name="document_id" ref="demo_brd_retail"/>
+        <field name="sequence">10</field>
+        <field name="name">custom_retail_pos_offline</field>
+        <field name="scope">Add offline-first cache + sync queue to the existing POS workflow so outlets keep selling during connectivity outages.</field>
+        <field name="estimated_md">10</field>
+        <field name="severity">must_have</field>
+        <field name="justification">Outlets in remote areas experience daily disconnects; the current POS rejects sales without network. Offline cache is required for go-live.</field>
+        <field name="breaking_change" eval="False"/>
+        <field name="compat_strategy">extend</field>
+        <field name="cross_vertical_impact_json">{}</field>
+    </record>
+
+    <record id="demo_brd_rec_loyalty" model="brd.recommendation">
+        <field name="document_id" ref="demo_brd_retail"/>
+        <field name="sequence">20</field>
+        <field name="name">custom_retail_loyalty_points</field>
+        <field name="scope">Tiered loyalty points engine with QR-code redemption, integrated with the POS receipt and the marketing CRM.</field>
+        <field name="estimated_md">15</field>
+        <field name="severity">should_have</field>
+        <field name="justification">Customer retention KPI in the BRD requires a measurable loyalty mechanism; nice-to-have for MVP but high business value.</field>
+        <field name="breaking_change" eval="False"/>
+        <field name="compat_strategy">extend</field>
+        <field name="cross_vertical_impact_json">{}</field>
+    </record>
+
+    <record id="demo_brd_rec_dashboard" model="brd.recommendation">
+        <field name="document_id" ref="demo_brd_retail"/>
+        <field name="sequence">30</field>
+        <field name="name">custom_retail_outlet_dashboard</field>
+        <field name="scope">Cross-outlet realtime sales / stock dashboard for the regional manager role.</field>
+        <field name="estimated_md">5</field>
+        <field name="severity">nice_to_have</field>
+        <field name="justification">Mentioned in the management reporting section; can be deferred to phase 2.</field>
+        <field name="breaking_change" eval="False"/>
+        <field name="compat_strategy">extend</field>
+        <field name="cross_vertical_impact_json">{}</field>
+    </record>
+
+</odoo>

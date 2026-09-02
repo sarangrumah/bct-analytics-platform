@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Odoo 19 renamed two res.groups fields: category_id (ir.module.category) -> privilege_id
+     (res.groups.privilege), and users -> user_ids. Both stale names survived here only
+     because noupdate="1" skips existing records on -u: upgrades kept passing while every
+     fresh install of this module died in _tag_record with "Invalid field ... in
+     'res.groups'". Follow the platform convention used by the other addons. -->
+<odoo noupdate="1">
+
+    <!-- Own privilege: groups that share one are rendered as a single
+         pick-one dropdown on the user form, so sharing it across modules
+         makes saving a user silently drop every other module's group. -->
+    <record id="res_groups_privilege_retail_import" model="res.groups.privilege">
+        <field name="name">Retail Import</field>
+        <field name="sequence">114</field>
+        <field name="category_id" ref="custom_core.module_category_custom_platform"/>
+    </record>
+
+    <record id="group_retail_import_user" model="res.groups">
+        <field name="name">Retail Import / User</field>
+        <field name="privilege_id" ref="res_groups_privilege_retail_import"/>
+    </record>
+
+    <record id="group_retail_import_manager" model="res.groups">
+        <field name="name">Retail Import / Manager</field>
+        <field name="privilege_id" ref="res_groups_privilege_retail_import"/>
+        <field name="implied_ids" eval="[(4, ref('group_retail_import_user'))]"/>
+        <field name="user_ids" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_spt_1721_a1" name="SPT 1721 A1">
+        <t t-call="web.html_container">
+            <t t-foreach="data['rows']" t-as="row">
+                <t t-call="web.external_layout">
+                    <div class="page" style="page-break-after: always;">
+                        <div class="text-center mb-3">
+                            <h3>BUKTI PEMOTONGAN PAJAK PENGHASILAN PASAL 21</h3>
+                            <h4>(Formulir 1721 A1 — Tahun Pajak <span t-out="data['fiscal_year']"/>)</h4>
+                        </div>
+                        <table class="table table-bordered" style="font-size: 11px;">
+                            <tr>
+                                <td colspan="4"><b>IDENTITAS PEMOTONG</b></td>
+                            </tr>
+                            <tr>
+                                <td>Nama Perusahaan</td>
+                                <td colspan="3"><span t-out="user.env.company.name"/></td>
+                            </tr>
+                            <tr>
+                                <td>NPWP Perusahaan</td>
+                                <td colspan="3"><span t-out="user.env.company.partner_id.x_custom_npwp or '—'"/></td>
+                            </tr>
+                        </table>
+
+                        <table class="table table-bordered" style="font-size: 11px;">
+                            <tr>
+                                <td colspan="4"><b>IDENTITAS PENERIMA PENGHASILAN</b></td>
+                            </tr>
+                            <tr>
+                                <td>Nama</td><td colspan="3"><span t-out="row['employee_name']"/></td>
+                            </tr>
+                            <tr>
+                                <td>NPWP / NIK</td>
+                                <td><span t-out="row['npwp'] or '—'"/></td>
+                                <td>NIK</td>
+                                <td><span t-out="row['nik'] or '—'"/></td>
+                            </tr>
+                            <tr>
+                                <td>Status PTKP</td><td><span t-out="row['ptkp_status']"/></td>
+                                <td>Kategori TER</td><td><span t-out="row['ter_category']"/></td>
+                            </tr>
+                        </table>
+
+                        <table class="table table-bordered" style="font-size: 11px;">
+                            <tr><th colspan="2">RINCIAN PENGHITUNGAN PPh 21</th></tr>
+                            <tr><td>Penghasilan Bruto Setahun</td><td class="text-end"><span t-out="'%.0f' % row['bruto_year']"/></td></tr>
+                            <tr><td>Biaya Jabatan</td><td class="text-end"><span t-out="'%.0f' % row['biaya_jabatan']"/></td></tr>
+                            <tr><td>Iuran JHT Karyawan</td><td class="text-end"><span t-out="'%.0f' % row['jht_emp']"/></td></tr>
+                            <tr><td>Iuran JP Karyawan</td><td class="text-end"><span t-out="'%.0f' % row['jp_emp']"/></td></tr>
+                            <tr><td>PTKP</td><td class="text-end"><span t-out="'%.0f' % row['ptkp']"/></td></tr>
+                            <tr><td><b>Penghasilan Kena Pajak</b></td><td class="text-end"><b><span t-out="'%.0f' % row['taxable_year']"/></b></td></tr>
+                            <tr><td><b>PPh 21 Terutang Setahun</b></td><td class="text-end"><b><span t-out="'%.0f' % row['pph_due']"/></b></td></tr>
+                            <tr><td>PPh 21 Telah Dipotong (Jan-Des)</td><td class="text-end"><span t-out="'%.0f' % row['pph_paid']"/></td></tr>
+                            <tr>
+                                <td><b>Kurang / (Lebih) Bayar</b></td>
+                                <td class="text-end"><b><span t-out="'%.0f' % row['delta']"/></b></td>
+                            </tr>
+                        </table>
+
+                        <p class="text-muted" style="font-size: 9px;">
+                            Dokumen ini diterbitkan berdasarkan UU HPP 2021, PP 58/2023, dan
+                            PER-04/PJ/2023. Untuk pertanyaan hubungi unit Pajak perusahaan.
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_spt_1721_a1" model="ir.actions.report">
+        <field name="name">SPT 1721 A1</field>
+        <field name="model">hr.payroll.spt.a1.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_hr_payroll_id.report_spt_1721_a1</field>
+        <field name="report_file">custom_hr_payroll_id.report_spt_1721_a1</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+</odoo>

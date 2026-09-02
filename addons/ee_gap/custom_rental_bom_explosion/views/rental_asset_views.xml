@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rental_asset_form_inherit_bom" model="ir.ui.view">
+        <field name="name">rental.asset.form.bom</field>
+        <field name="model">rental.asset</field>
+        <field name="inherit_id" ref="custom_rental.view_rental_asset_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="bom_id"/>
+                <field name="has_bundle"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

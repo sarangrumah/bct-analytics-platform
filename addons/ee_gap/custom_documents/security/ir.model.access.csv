@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_doc_workspace_user,workspace user,model_document_workspace,group_doc_user,1,0,0,0
+access_doc_workspace_admin,workspace admin,model_document_workspace,group_doc_admin,1,1,1,1
+access_doc_tag_user,tag user,model_document_tag,group_doc_user,1,1,1,0
+access_doc_tag_admin,tag admin,model_document_tag,group_doc_admin,1,1,1,1
+access_doc_user,document user,model_document_document,group_doc_user,1,1,1,0
+access_doc_admin,document admin,model_document_document,group_doc_admin,1,1,1,1
+access_doc_ver_user,version user,model_document_version,group_doc_user,1,0,1,0
+access_doc_ver_admin,version admin,model_document_version,group_doc_admin,1,0,1,0

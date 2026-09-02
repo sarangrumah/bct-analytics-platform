@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- License: LGPL-3 -->
+<odoo>
+
+    <record id="action_hht_open_pwa" model="ir.actions.act_url">
+        <field name="name">Open PWA</field>
+        <field name="url">/hht/</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_hht_root"
+              name="HHT"
+              sequence="80"
+              web_icon="custom_hht_bridge,static/description/icon.png"/>
+
+    <menuitem id="menu_hht_devices"
+              name="Devices"
+              parent="menu_hht_root"
+              action="action_hht_device"
+              sequence="10"/>
+
+    <menuitem id="menu_hht_scan_logs"
+              name="Scan Logs"
+              parent="menu_hht_root"
+              action="action_hht_scan_log"
+              sequence="20"/>
+
+    <menuitem id="menu_hht_sync_queue"
+              name="Sync Queue"
+              parent="menu_hht_root"
+              action="action_hht_sync_queue"
+              sequence="30"/>
+
+    <menuitem id="menu_hht_open_pwa"
+              name="Open PWA"
+              parent="menu_hht_root"
+              action="action_hht_open_pwa"
+              sequence="40"/>
+
+</odoo>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+
+    <!-- Fiscal positions for the tenant (Indonesia).
+         Tax substitution mapping is configured via UI / a follow-up data file
+         because Odoo 19 replaced account.fiscal.position.tax with a M2M on
+         account.tax.original_tax_ids. -->
+
+    <record id="tenant_fp_domestic" model="account.fiscal.position">
+        <field name="name">Indonesia — Domestik (PKP)</field>
+        <field name="sequence">10</field>
+        <field name="auto_apply" eval="True"/>
+        <field name="country_id" ref="base.id"/>
+        <field name="company_id" ref="base.main_company"/>
+    </record>
+
+    <record id="tenant_fp_vendor_non_pkp" model="account.fiscal.position">
+        <field name="name">Indonesia — Vendor Non-PKP (tanpa PPN)</field>
+        <field name="sequence">20</field>
+        <field name="auto_apply" eval="False"/>
+        <field name="country_id" ref="base.id"/>
+        <field name="company_id" ref="base.main_company"/>
+    </record>
+
+    <record id="tenant_fp_vendor_no_npwp" model="account.fiscal.position">
+        <field name="name">Indonesia — Vendor Tanpa NPWP (PPh 23 4%)</field>
+        <field name="sequence">30</field>
+        <field name="auto_apply" eval="False"/>
+        <field name="country_id" ref="base.id"/>
+        <field name="company_id" ref="base.main_company"/>
+    </record>
+
+    <record id="tenant_fp_foreign_vendor" model="account.fiscal.position">
+        <field name="name">Indonesia — Vendor Luar Negeri (PPh 26)</field>
+        <field name="sequence">40</field>
+        <field name="auto_apply" eval="False"/>
+        <field name="company_id" ref="base.main_company"/>
+    </record>
+
+</odoo>

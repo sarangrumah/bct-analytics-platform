@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_approval_matrix_list" model="ir.ui.view">
+        <field name="name">approval.matrix.list</field>
+        <field name="model">approval.matrix</field>
+        <field name="arch" type="xml">
+            <list string="Approval Matrices" decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="trigger"/>
+                <field name="priority"/>
+                <field name="tier_count"/>
+                <field name="active"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_approval_matrix_form" model="ir.ui.view">
+        <field name="name">approval.matrix.form</field>
+        <field name="model">approval.matrix</field>
+        <field name="arch" type="xml">
+            <form string="Approval Matrix">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Purchase orders > 100M"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="model_id" options="{'no_create': True}"/>
+                            <field name="trigger"/>
+                            <field name="priority"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="condition_domain"
+                                   placeholder="[('amount_total','&gt;',100000000)]"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Tiers">
+                            <field name="tier_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="approver_type"/>
+                                    <field name="approver_ids" widget="many2many_tags"
+                                           column_invisible="parent.trigger and parent.trigger == 'invisible'"/>
+                                    <field name="approver_group_id"/>
+                                    <field name="require_all"/>
+                                    <field name="sla_hours"/>
+                                    <field name="on_overdue"/>
+                                    <field name="escalation_user_id"/>
+                                </list>
+                                <form string="Tier">
+                                    <group>
+                                        <group>
+                                            <field name="sequence"/>
+                                            <field name="name"/>
+                                            <field name="approver_type"/>
+                                            <field name="approver_ids" widget="many2many_tags"
+                                                   invisible="approver_type != 'user'"/>
+                                            <field name="approver_group_id"
+                                                   invisible="approver_type != 'group'"/>
+                                            <field name="approver_domain"
+                                                   invisible="approver_type != 'domain'"/>
+                                            <field name="require_all"/>
+                                        </group>
+                                        <group>
+                                            <field name="sla_hours"/>
+                                            <field name="on_overdue"/>
+                                            <field name="escalation_user_id"
+                                                   invisible="on_overdue != 'escalate_to_user'"/>
+                                            <field name="notify_on_overdue"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes" placeholder="Why this matrix exists, owner, last review date..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_approval_matrix" model="ir.actions.act_window">
+        <field name="name">Approval Matrices</field>
+        <field name="res_model">approval.matrix</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

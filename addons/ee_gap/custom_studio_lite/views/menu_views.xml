@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_studio_root" name="Studio" sequence="75"
+              groups="custom_studio_lite.group_designer"/>
+    <menuitem id="menu_studio_fields" name="Custom Fields" parent="menu_studio_root"
+              action="action_studio_field" sequence="10"/>
+    <menuitem id="menu_studio_view_customization" name="View Customizations" parent="menu_studio_root"
+              action="action_studio_view_customization" sequence="20"/>
+    <menuitem id="menu_studio_view_editor" name="Visual View Editor" parent="menu_studio_root"
+              action="action_studio_view_editor" sequence="25"/>
+    <menuitem id="menu_studio_automation" name="Automation Rules" parent="menu_studio_root"
+              action="action_studio_automation_rule" sequence="30"/>
+    <menuitem id="menu_studio_reports" name="Report Customizations" parent="menu_studio_root"
+              action="action_studio_report_customization" sequence="40"/>
+</odoo>

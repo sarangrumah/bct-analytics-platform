@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_provider_bucket_list" model="ir.ui.view">
+        <field name="name">custom.ppob.provider.bucket.list</field>
+        <field name="model">custom.ppob.provider.bucket</field>
+        <field name="arch" type="xml">
+            <list string="Provider Buckets">
+                <field name="provider_id"/>
+                <field name="mode"/>
+                <field name="product_id"/>
+                <field name="denom_value"/>
+                <field name="balance" sum="Total"/>
+                <field name="low_water_mark"/>
+                <field name="state" widget="badge"
+                       decoration-success="state=='active'"
+                       decoration-muted="state=='archived'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ppob_provider_bucket_form" model="ir.ui.view">
+        <field name="name">custom.ppob.provider.bucket.form</field>
+        <field name="model">custom.ppob.provider.bucket</field>
+        <field name="arch" type="xml">
+            <form string="Provider Bucket">
+                <header>
+                    <button name="%(action_ppob_provider_topup_wizard)d" type="action"
+                            string="Top-up" class="btn-primary"
+                            context="{'default_provider_id': provider_id, 'default_bucket_id': id}"/>
+                    <button name="action_recompute_balance" type="object"
+                            string="Recompute Balance" class="btn-secondary"
+                            groups="custom_ppob_core.group_ppob_manager"
+                            confirm="Recompute balance from posted moves? This heals drift between the stored balance and the ledger."/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="provider_id"/>
+                            <field name="mode"/>
+                            <field name="product_id" invisible="mode != 'fixed_denom'"/>
+                            <field name="denom_value" invisible="mode != 'fixed_denom'"/>
+                        </group>
+                        <group>
+                            <field name="account_id"/>
+                            <field name="journal_id"/>
+                            <field name="balance"/>
+                            <field name="low_water_mark"/>
+                            <field name="currency_id"/>
+                        </group>
+                    </group>
+                    <group string="Stock integration (optional)">
+                        <field name="inventory_product_id"/>
+                        <field name="inventory_warehouse_id"
+                               invisible="not inventory_product_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Moves">
+                            <field name="move_ids" readonly="1">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="name"/>
+                                    <field name="type"/>
+                                    <field name="amount_signed" sum="Sum"/>
+                                    <field name="tax_amount"/>
+                                    <field name="gross_amount"/>
+                                    <field name="balance_after"/>
+                                    <field name="ref"/>
+                                    <field name="move_id"/>
+                                    <field name="state"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ppob_provider_bucket_move_list" model="ir.ui.view">
+        <field name="name">custom.ppob.provider.bucket.move.list</field>
+        <field name="model">custom.ppob.provider.bucket.move</field>
+        <field name="arch" type="xml">
+            <list string="Bucket Moves" create="false">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="provider_id"/>
+                <field name="mode"/>
+                <field name="product_id"/>
+                <field name="type"/>
+                <field name="amount_signed" sum="Sum"/>
+                <field name="tax_amount"/>
+                <field name="balance_after"/>
+                <field name="ref"/>
+                <field name="move_id"/>
+                <field name="state"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ppob_provider_bucket_pivot" model="ir.ui.view">
+        <field name="name">custom.ppob.provider.bucket.pivot</field>
+        <field name="model">custom.ppob.provider.bucket</field>
+        <field name="arch" type="xml">
+            <pivot string="Provider Buckets">
+                <field name="provider_id" type="row"/>
+                <field name="product_id" type="row"/>
+                <field name="balance" type="measure"/>
+                <field name="low_water_mark" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_ppob_provider_bucket_move_pivot" model="ir.ui.view">
+        <field name="name">custom.ppob.provider.bucket.move.pivot</field>
+        <field name="model">custom.ppob.provider.bucket.move</field>
+        <field name="arch" type="xml">
+            <pivot string="Bucket Moves">
+                <field name="provider_id" type="row"/>
+                <field name="date" interval="month" type="row"/>
+                <field name="type" type="col"/>
+                <field name="amount_signed" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_ppob_provider_bucket_move_graph" model="ir.ui.view">
+        <field name="name">custom.ppob.provider.bucket.move.graph</field>
+        <field name="model">custom.ppob.provider.bucket.move</field>
+        <field name="arch" type="xml">
+            <graph string="Bucket Moves" type="bar">
+                <field name="date" interval="day"/>
+                <field name="type"/>
+                <field name="amount_signed" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_ppob_provider_bucket" model="ir.actions.act_window">
+        <field name="name">Provider Buckets</field>
+        <field name="res_model">custom.ppob.provider.bucket</field>
+        <field name="view_mode">list,form,pivot</field>
+    </record>
+
+    <record id="action_ppob_provider_bucket_move" model="ir.actions.act_window">
+        <field name="name">Bucket Moves</field>
+        <field name="res_model">custom.ppob.provider.bucket.move</field>
+        <field name="view_mode">list,form,pivot,graph</field>
+    </record>
+
+</odoo>

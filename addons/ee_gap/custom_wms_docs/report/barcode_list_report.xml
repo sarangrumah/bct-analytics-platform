@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Self-contained wrapper (see picking_list_report.xml for the rationale):
+         no web.html_container / web.external_layout, and a mandatory <main>. -->
+    <template id="report_wms_barcode_list" name="WMS Barcode List">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+            </head>
+            <body>
+                <main>
+                <!-- The style and charset live INSIDE <main>, not in <head>:
+                     ir_actions_report._prepare_html keeps only the children of
+                     <main> and writes them to a bare .html file, so anything in
+                     <head> is silently dropped — the report would print
+                     unstyled and non-ASCII text would come out mojibake. -->
+                    <meta charset="utf-8"/>
+                    <style>
+                        @page { margin: 10mm; }
+                        * { box-sizing: border-box; }
+                        body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; margin: 0; padding: 0; }
+                        h1 { font-size: 16px; margin: 0 0 2px 0; }
+                        .muted { color: #666; }
+                        table.grid { width: 100%; border-collapse: collapse; }
+                        table.grid td { width: 50%; border: 1px solid #b0b0b0; padding: 5px; vertical-align: top; page-break-inside: avoid; }
+                        .kind { font-size: 9px; text-transform: uppercase; color: #666; letter-spacing: 0.5px; }
+                        .label { font-weight: bold; font-size: 10px; }
+                        .value { font-family: "Courier New", monospace; font-size: 11px; margin-top: 2px; }
+                        .codes { margin-top: 3px; }
+                        .codes img { vertical-align: middle; }
+                    </style>
+                    <t t-foreach="docs" t-as="o">
+                        <div class="page" style="page-break-after: always;">
+                            <h1>BARCODE SCAN SHEET</h1>
+                            <div>
+                                <b t-out="o.name"/>
+                                <span class="muted"> — </span>
+                                <span t-out="o.partner_id.display_name or ''"/>
+                            </div>
+                            <div class="muted" style="margin-bottom: 6px;">
+                                <span t-out="o.company_id.display_name"/>
+                                <span> | Scheduled: </span>
+                                <span t-out="o.scheduled_date"/>
+                            </div>
+
+                            <t t-set="pairs" t-value="o._wms_barcode_row_pairs(2)"/>
+                            <p t-if="not pairs" class="muted">No packages or barcoded products on this transfer.</p>
+
+                            <table class="grid" t-if="pairs">
+                                <tr t-foreach="pairs" t-as="pair">
+                                    <td t-foreach="pair" t-as="r">
+                                        <div class="kind" t-out="r['kind']"/>
+                                        <div class="label" t-out="r['label']"/>
+                                        <div class="codes">
+                                            <img t-att-src="r['qr_src']" alt="QR" style="height: 52px;"/>
+                                            <img t-att-src="r['code128_src']" alt="Code128"
+                                                 style="height: 40px; margin-left: 8px;"/>
+                                        </div>
+                                        <div class="value" t-out="r['value']"/>
+                                    </td>
+                                    <td t-if="len(pair) == 1"/>
+                                </tr>
+                            </table>
+                        </div>
+                    </t>
+                </main>
+            </body>
+        </html>
+    </template>
+
+    <record id="action_report_wms_barcode_list" model="ir.actions.report">
+        <field name="name">Barcode List (WMS)</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_wms_docs.report_wms_barcode_list</field>
+        <field name="report_file">custom_wms_docs.report_wms_barcode_list</field>
+        <field name="binding_model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Barcode List - %s' % object.name</field>
+    </record>
+
+</odoo>

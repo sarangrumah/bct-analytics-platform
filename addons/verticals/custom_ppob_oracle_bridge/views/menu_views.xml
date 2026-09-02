@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_oracle_bridge_root"
+              name="Oracle Bridge"
+              parent="custom_ppob_core.menu_ppob_configuration"
+              sequence="80"/>
+
+    <menuitem id="menu_oracle_connection"
+              name="Connection"
+              parent="menu_oracle_bridge_root"
+              action="action_oracle_connection"
+              sequence="10"/>
+
+    <menuitem id="menu_oracle_member_map"
+              name="Member Mapping"
+              parent="menu_oracle_bridge_root"
+              action="action_oracle_member_map"
+              sequence="20"/>
+
+    <menuitem id="menu_oracle_ingest_skipped"
+              name="Skipped Inbound"
+              parent="menu_oracle_bridge_root"
+              action="action_oracle_ingest_skipped"
+              sequence="30"/>
+
+    <menuitem id="menu_oracle_backfill_wizard"
+              name="Backfill Wizard"
+              parent="menu_oracle_bridge_root"
+              action="action_oracle_backfill_wizard"
+              sequence="40"/>
+
+</odoo>

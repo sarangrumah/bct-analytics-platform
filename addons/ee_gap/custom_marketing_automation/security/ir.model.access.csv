@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_marketing_segment_user,marketing.segment user,model_marketing_segment,group_marketing_user,1,1,1,0
+access_marketing_segment_mgr,marketing.segment mgr,model_marketing_segment,group_marketing_manager,1,1,1,1
+access_marketing_campaign_user,marketing.campaign user,model_marketing_campaign,group_marketing_user,1,1,1,0
+access_marketing_campaign_mgr,marketing.campaign mgr,model_marketing_campaign,group_marketing_manager,1,1,1,1
+access_marketing_step_user,marketing.campaign.step user,model_marketing_campaign_step,group_marketing_user,1,1,1,1
+access_marketing_step_mgr,marketing.campaign.step mgr,model_marketing_campaign_step,group_marketing_manager,1,1,1,1
+access_marketing_participant_user,marketing.participant user,model_marketing_participant,group_marketing_user,1,1,0,0
+access_marketing_participant_mgr,marketing.participant mgr,model_marketing_participant,group_marketing_manager,1,1,1,1

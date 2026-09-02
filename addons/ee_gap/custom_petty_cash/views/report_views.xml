@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Outstanding wizard -->
+        <record id="view_petty_cash_outstanding_wizard_form" model="ir.ui.view">
+            <field name="name">petty.cash.outstanding.wizard.form</field>
+            <field name="model">petty.cash.outstanding.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Petty Cash Outstanding">
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group>
+                            <field name="company_ids" widget="many2many_tags"
+                                   groups="base.group_multi_company"/>
+                            <field name="employee_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_view" type="object" string="View" class="btn-primary"/>
+                        <button name="action_print" type="object" string="Print PDF"/>
+                        <button name="action_export_xlsx" type="object" string="Export Excel"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_petty_cash_outstanding" model="ir.actions.act_window">
+            <field name="name">Petty Cash Outstanding</field>
+            <field name="res_model">petty.cash.outstanding.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Aging wizard -->
+        <record id="view_petty_cash_aging_wizard_form" model="ir.ui.view">
+            <field name="name">petty.cash.aging.wizard.form</field>
+            <field name="model">petty.cash.aging.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Petty Cash Aging">
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group>
+                            <field name="company_ids" widget="many2many_tags"
+                                   groups="base.group_multi_company"/>
+                            <field name="employee_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_view" type="object" string="View" class="btn-primary"/>
+                        <button name="action_print" type="object" string="Print PDF"/>
+                        <button name="action_export_xlsx" type="object" string="Export Excel"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_petty_cash_aging" model="ir.actions.act_window">
+            <field name="name">Petty Cash Aging</field>
+            <field name="res_model">petty.cash.aging.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

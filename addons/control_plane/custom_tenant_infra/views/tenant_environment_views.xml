@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_tenant_environment_list" model="ir.ui.view">
+        <field name="name">tenant.environment.list</field>
+        <field name="model">tenant.environment</field>
+        <field name="arch" type="xml">
+            <list string="Tenant Environments">
+                <field name="name"/>
+                <field name="tenant_registry_id"/>
+                <field name="env_type"/>
+                <field name="vps_id"/>
+                <field name="db_name"/>
+                <field name="addons_revision"/>
+                <field name="last_deploy_at"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_tenant_environment_form" model="ir.ui.view">
+        <field name="name">tenant.environment.form</field>
+        <field name="model">tenant.environment</field>
+        <field name="arch" type="xml">
+            <form string="Tenant Environment">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="tenant_registry_id"/>
+                            <field name="env_type"/>
+                            <field name="vps_id"/>
+                        </group>
+                        <group>
+                            <field name="db_name"/>
+                            <field name="odoo_url"/>
+                            <field name="addons_revision"/>
+                            <field name="last_deploy_id"/>
+                            <field name="last_deploy_at"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_tenant_environment" model="ir.actions.act_window">
+        <field name="name">Tenant Environments</field>
+        <field name="res_model">tenant.environment</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

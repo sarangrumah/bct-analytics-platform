@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_financial">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm">
+                <tbody>
+                    <tr t-foreach="lines" t-as="line"
+                        t-att-class="line.get('style') == 'total' and 'table-secondary fw-bold' or
+                                     line.get('style') == 'subtotal' and 'fw-bold' or
+                                     line.get('style') == 'header' and 'table-light fw-bold' or ''">
+                        <td t-att-style="'padding-left:%dpx' % ((line.get('level') or 0) * 18)">
+                            <span t-esc="line['label']"/>
+                        </td>
+                        <td class="text-end">
+                            <span t-esc="line.get('signed_balance', 0.0)"
+                                  t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+    </data>
+</odoo>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_spreadsheet_load_wizard_form" model="ir.ui.view">
+        <field name="name">custom.spreadsheet.load.wizard.form</field>
+        <field name="model">custom.spreadsheet.load.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Load from Model">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="workbook_id"/>
+                            <field name="model_id"/>
+                            <field name="model_name"/>
+                        </group>
+                        <group>
+                            <field name="sheet_name"/>
+                            <field name="mode"/>
+                        </group>
+                    </group>
+                    <group string="Filters and Fields">
+                        <field name="domain" placeholder="[('active','=',True)]"/>
+                        <field name="fields_csv" placeholder="id, name, email"/>
+                    </group>
+                    <p class="text-muted">
+                        Maximum 10,000 records. Many2one / x2many fields render as display names.
+                    </p>
+                </sheet>
+                <footer>
+                    <button name="action_load"
+                            type="object"
+                            string="Load"
+                            class="oe_highlight"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_custom_spreadsheet_load_wizard" model="ir.actions.act_window">
+        <field name="name">Load from Model</field>
+        <field name="res_model">custom.spreadsheet.load.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_brd_reject_as_lesson_wizard_form" model="ir.ui.view">
+            <field name="name">brd.reject.as.lesson.wizard.form</field>
+            <field name="model">brd.reject.as.lesson.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Reject &amp; Save as Lesson">
+                    <sheet>
+                        <group>
+                            <field name="recommendation_id" readonly="1"/>
+                            <field name="name"/>
+                            <field name="severity"/>
+                            <field name="rejected_proposals"
+                                   placeholder="Comma-separated module names that should NOT be proposed."/>
+                            <field name="correct_module_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"/>
+                        </group>
+                        <separator string="Section pattern (LLM will match against future BRDs)"/>
+                        <field name="section_pattern" nolabel="1"/>
+                        <separator string="Reason"/>
+                        <field name="reason" nolabel="1"/>
+                    </sheet>
+                    <footer>
+                        <button string="Save Lesson" name="action_save_lesson" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_brd_reject_as_lesson_wizard" model="ir.actions.act_window">
+            <field name="name">Reject &amp; Save as Lesson</field>
+            <field name="res_model">brd.reject.as.lesson.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="model_brd_recommendation"/>
+            <field name="binding_view_types">form</field>
+        </record>
+
+    </data>
+</odoo>

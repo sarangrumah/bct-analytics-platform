@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="custom_retail_sales_dashboard.SalesDashboard">
+    <div class="o_lsd_dashboard">
+
+        <!-- ============================ Header ============================ -->
+        <div class="o_lsd_header">
+            <div>
+                <h2 class="o_lsd_title">Sales Command Centre</h2>
+                <div class="o_lsd_subtitle">
+                    <span t-esc="state.options.date_from"/> → <span t-esc="state.options.date_to"/>
+                    <span class="o_lsd_sep">·</span>
+                    <span>vs <t t-esc="compareLabel"/></span>
+                </div>
+            </div>
+            <div class="o_lsd_header_actions">
+                <button class="btn btn-sm btn-link" t-on-click="() =&gt; this.drillAll()">
+                    Open Sales Analysis
+                </button>
+                <button class="btn btn-sm btn-secondary" t-on-click="() =&gt; this.load()">
+                    Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- ============================ Filters =========================== -->
+        <div class="o_lsd_filters">
+            <div class="o_lsd_presets btn-group btn-group-sm">
+                <t t-foreach="presets" t-as="preset" t-key="preset.key">
+                    <button class="btn"
+                            t-att-class="state.preset === preset.key ? 'btn-primary' : 'btn-outline-secondary'"
+                            t-on-click="() =&gt; this.applyPreset(preset.key)"
+                            t-esc="preset.label"/>
+                </t>
+            </div>
+
+            <div class="o_lsd_filter_group">
+                <label>From</label>
+                <input type="date" class="form-control form-control-sm"
+                       t-att-value="state.options.date_from"
+                       t-on-change="(ev) =&gt; this.onDateInput('date_from', ev)"/>
+                <label>To</label>
+                <input type="date" class="form-control form-control-sm"
+                       t-att-value="state.options.date_to"
+                       t-on-change="(ev) =&gt; this.onDateInput('date_to', ev)"/>
+            </div>
+
+            <div class="o_lsd_filter_group o_lsd_store_picker">
+                <button class="btn btn-sm btn-outline-secondary"
+                        t-on-click="() =&gt; this.toggleStoreMenu()">
+                    <t t-esc="storeFilterLabel"/> ▾
+                </button>
+                <div class="o_lsd_dropdown" t-if="state.storeMenuOpen">
+                    <div class="o_lsd_dropdown_head">
+                        <span>Stores</span>
+                        <button class="btn btn-sm btn-link p-0"
+                                t-on-click="() =&gt; this.clearStores()">Clear</button>
+                    </div>
+                    <t t-foreach="state.data ? state.data.filters.warehouses : []"
+                       t-as="wh" t-key="wh.id">
+                        <label class="o_lsd_dropdown_item">
+                            <input type="checkbox"
+                                   t-att-checked="state.options.warehouse_ids.includes(wh.id)"
+                                   t-on-change="() =&gt; this.toggleStore(wh.id)"/>
+                            <span t-esc="wh.name"/>
+                        </label>
+                    </t>
+                </div>
+            </div>
+
+            <div class="o_lsd_filter_group">
+                <label>Compare</label>
+                <select class="form-select form-select-sm"
+                        t-on-change="(ev) =&gt; this.setOption('compare', ev.target.value)">
+                    <option value="previous" t-att-selected="state.options.compare === 'previous'">
+                        Previous period
+                    </option>
+                    <option value="year" t-att-selected="state.options.compare === 'year'">
+                        Same period last year
+                    </option>
+                    <option value="none" t-att-selected="state.options.compare === 'none'">
+                        No comparison
+                    </option>
+                </select>
+            </div>
+
+            <div class="o_lsd_filter_group">
+                <label>Channel</label>
+                <select class="form-select form-select-sm"
+                        t-on-change="(ev) =&gt; this.setOption('channel', ev.target.value)">
+                    <option value="all" t-att-selected="state.options.channel === 'all'">All</option>
+                    <option value="store" t-att-selected="state.options.channel === 'store'">In-store</option>
+                    <option value="omni" t-att-selected="state.options.channel === 'omni'">Omnichannel</option>
+                </select>
+            </div>
+
+            <label class="o_lsd_switch">
+                <input type="checkbox" t-att-checked="state.options.include_returns"
+                       t-on-change="(ev) =&gt; this.setOption('include_returns', ev.target.checked)"/>
+                <span>Net of returns</span>
+            </label>
+        </div>
+
+        <!-- ============================ States ============================ -->
+        <div t-if="state.loading" class="o_lsd_state">Loading trading data…</div>
+        <div t-if="state.error" class="o_lsd_state o_lsd_error">
+            <strong>Could not load the dashboard.</strong>
+            <div t-esc="state.error"/>
+        </div>
+
+        <t t-if="!state.loading and !state.error and state.data">
+
+            <!-- ========================= Target ========================== -->
+            <div class="o_lsd_target" t-if="state.data.kpi.target.has_target">
+                <div class="o_lsd_target_head">
+                    <span class="o_lsd_target_label">Target attainment</span>
+                    <span class="o_lsd_target_value">
+                        <t t-esc="pct(state.data.kpi.target.attainment_pct)"/>
+                    </span>
+                    <span class="o_lsd_target_detail">
+                        <t t-esc="moneyFull(state.data.kpi.totals.net)"/>
+                        of <t t-esc="moneyFull(state.data.kpi.target.amount)"/>
+                        <t t-if="state.data.kpi.target.gap &gt; 0">
+                            · <t t-esc="moneyFull(state.data.kpi.target.gap)"/> to go
+                        </t>
+                        <t t-else="">· target met</t>
+                    </span>
+                </div>
+                <div class="o_lsd_target_track">
+                    <div class="o_lsd_target_fill"
+                         t-att-class="state.data.kpi.target.attainment_pct >= 100 ? 'is_ok' : ''"
+                         t-attf-style="width: {{ Math.min(100, state.data.kpi.target.attainment_pct) }}%"/>
+                </div>
+            </div>
+            <div class="o_lsd_target o_lsd_target_empty" t-else="">
+                No target is set for this period and selection — sales are shown without attainment.
+            </div>
+
+            <!-- =========================== KPIs ========================== -->
+            <div class="o_lsd_kpis">
+                <t t-foreach="state.data.kpi.tiles" t-as="tile" t-key="tile.key">
+                    <div class="o_lsd_kpi" t-att-title="tile.hint">
+                        <div class="o_lsd_kpi_label" t-esc="tile.label"/>
+                        <div class="o_lsd_kpi_value" t-esc="formatKpi(tile)"/>
+                        <div class="o_lsd_kpi_delta" t-att-class="deltaClass(tile)">
+                            <t t-esc="deltaLabel(tile.delta_pct)"/>
+                            <span class="o_lsd_kpi_prev">vs prior</span>
+                        </div>
+                    </div>
+                </t>
+            </div>
+
+            <!-- ========================== Trend ========================== -->
+            <!-- trendGeom is a getter that walks the whole series; bind it once
+                 per render rather than once per point. -->
+            <t t-set="geom" t-value="trendGeom"/>
+            <div class="o_lsd_card">
+                <div class="o_lsd_card_head">
+                    <h3>Sales trend</h3>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn"
+                                t-att-class="state.trendMode === 'daily' ? 'btn-primary' : 'btn-outline-secondary'"
+                                t-on-click="() =&gt; this.setTrendMode('daily')">Daily</button>
+                        <button class="btn"
+                                t-att-class="state.trendMode === 'cumulative' ? 'btn-primary' : 'btn-outline-secondary'"
+                                t-on-click="() =&gt; this.setTrendMode('cumulative')">Cumulative vs target</button>
+                    </div>
+                </div>
+                <div class="o_lsd_legend">
+                    <span><i t-attf-style="background: {{ COLOR.current }}"/>This period</span>
+                    <span t-if="state.options.compare !== 'none' and state.trendMode === 'daily'">
+                        <i t-attf-style="background: {{ COLOR.previous }}"/>Comparison
+                    </span>
+                    <span t-if="state.data.kpi.target.has_target">
+                        <i t-attf-style="background: {{ COLOR.target }}"/>Target pace
+                    </span>
+                    <span class="o_lsd_legend_hint">click a day to open its receipts</span>
+                </div>
+
+                <svg class="o_lsd_chart" t-att-viewBox="'0 0 ' + geom.W + ' ' + geom.H"
+                     preserveAspectRatio="xMidYMid meet"
+                     t-on-mouseleave="() =&gt; this.clearHover()">
+                    <!-- gridlines -->
+                    <t t-foreach="geom.ticks" t-as="tick" t-key="tick_index">
+                        <line class="o_lsd_grid"
+                              t-att-x1="geom.PAD.left" t-att-x2="geom.W - geom.PAD.right"
+                              t-att-y1="tick.y" t-att-y2="tick.y"/>
+                        <text class="o_lsd_axis" t-att-x="geom.PAD.left - 8" t-att-y="tick.y + 4"
+                              text-anchor="end" t-esc="tick.label"/>
+                    </t>
+                    <!-- x labels -->
+                    <t t-foreach="geom.xLabels" t-as="lbl" t-key="lbl_index">
+                        <text class="o_lsd_axis" t-att-x="lbl.x" t-att-y="geom.H - 8"
+                              text-anchor="middle" t-esc="lbl.label"/>
+                    </t>
+                    <!-- series -->
+                    <path t-att-d="geom.areaPath" class="o_lsd_area"/>
+                    <path t-if="geom.prevPath" t-att-d="geom.prevPath"
+                          fill="none" t-att-stroke="COLOR.previous" stroke-width="2"
+                          stroke-dasharray="5 4"/>
+                    <path t-if="geom.targetPath" t-att-d="geom.targetPath"
+                          fill="none" t-att-stroke="COLOR.target" stroke-width="2"
+                          stroke-dasharray="2 5"/>
+                    <path t-att-d="geom.linePath" fill="none"
+                          t-att-stroke="COLOR.current" stroke-width="2.5"
+                          stroke-linejoin="round" stroke-linecap="round"/>
+                    <!-- hit areas + markers -->
+                    <t t-foreach="geom.points" t-as="point" t-key="point.date">
+                        <rect class="o_lsd_hit"
+                              t-att-x="point.cx - Math.max(4, geom.step / 2)"
+                              t-att-y="geom.PAD.top"
+                              t-att-width="Math.max(8, geom.step)"
+                              t-att-height="geom.inner.h"
+                              t-on-mouseenter="() =&gt; this.onTrendHover(point)"
+                              t-on-click="() =&gt; this.drillDay(point)"/>
+                        <circle t-if="state.hover and state.hover.index === point.i"
+                                t-att-cx="point.cx" t-att-cy="point.cy" r="4.5"
+                                t-att-fill="COLOR.current" stroke="#fff" stroke-width="2"/>
+                    </t>
+                    <!-- tooltip -->
+                    <g t-if="state.hover" class="o_lsd_tooltip"
+                       t-attf-transform="translate({{ tooltipX(state.hover) }}, {{ geom.PAD.top + 8 }})">
+                        <rect x="0" y="0" width="210"
+                              t-att-height="28 + state.hover.lines.length * 18" rx="4"/>
+                        <text class="o_lsd_tt_title" x="10" y="18" t-esc="state.hover.title"/>
+                        <t t-foreach="state.hover.lines" t-as="line" t-key="line_index">
+                            <text class="o_lsd_tt_line" x="10" t-att-y="36 + line_index * 18">
+                                <tspan t-att-fill="line.color || '#cbd5e1'" t-esc="line.label"/>
+                                <tspan x="200" text-anchor="end" t-esc="line.value"/>
+                            </text>
+                        </t>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- ================= Stores + category mix =================== -->
+            <div class="o_lsd_row">
+                <div class="o_lsd_card o_lsd_col_wide">
+                    <div class="o_lsd_card_head">
+                        <h3>Store performance</h3>
+                        <small class="text-muted">ranked by net sales · click a store to drill in</small>
+                    </div>
+                    <div class="o_lsd_stores">
+                        <t t-foreach="storeRows" t-as="store" t-key="store.id">
+                            <div class="o_lsd_store" t-on-click="() =&gt; this.drillStore(store)">
+                                <div class="o_lsd_store_name" t-esc="store.name"/>
+                                <div class="o_lsd_store_bar">
+                                    <div class="o_lsd_store_fill"
+                                         t-attf-style="width: {{ store.width }}%; background: {{ store.color }}"/>
+                                </div>
+                                <div class="o_lsd_store_net" t-esc="money(store.net)"/>
+                                <div class="o_lsd_store_delta" t-att-class="store.delta_pct === null ? 'o_lsd_delta_flat' : (store.delta_pct >= 0 ? 'o_lsd_delta_up' : 'o_lsd_delta_down')"
+                                     t-esc="deltaLabel(store.delta_pct)"/>
+                                <div class="o_lsd_store_attain" t-att-class="store.attainClass">
+                                    <t t-if="store.attainment_pct === null">no target</t>
+                                    <t t-else="" t-esc="pct(store.attainment_pct, 0)"/>
+                                </div>
+                            </div>
+                        </t>
+                        <div t-if="!storeRows.length" class="o_lsd_empty">No sales in this selection.</div>
+                    </div>
+                </div>
+
+                <div class="o_lsd_card o_lsd_col_narrow">
+                    <div class="o_lsd_card_head"><h3>Revenue mix</h3></div>
+                    <t t-set="donutGeom" t-value="donut"/>
+                    <div class="o_lsd_donut_wrap">
+                        <svg class="o_lsd_donut" viewBox="0 0 200 200">
+                            <g transform="translate(100,100) rotate(-90)">
+                                <t t-foreach="donutGeom.segments" t-as="seg" t-key="seg.id || seg_index">
+                                    <circle t-att-r="donutGeom.R" fill="none"
+                                            t-att-stroke="seg.color"
+                                            t-att-stroke-width="donutGeom.STROKE"
+                                            t-att-stroke-dasharray="seg.dash"
+                                            t-att-stroke-dashoffset="seg.offset"
+                                            class="o_lsd_donut_seg"
+                                            t-on-click="() =&gt; this.drillCategory(seg)"/>
+                                </t>
+                            </g>
+                            <text x="100" y="96" text-anchor="middle" class="o_lsd_donut_total"
+                                  t-esc="money(donutGeom.total)"/>
+                            <text x="100" y="114" text-anchor="middle" class="o_lsd_donut_caption">
+                                net sales
+                            </text>
+                        </svg>
+                        <div class="o_lsd_donut_legend">
+                            <t t-foreach="donutGeom.segments" t-as="seg" t-key="seg.id || seg_index">
+                                <div class="o_lsd_legend_row" t-on-click="() =&gt; this.drillCategory(seg)">
+                                    <i t-attf-style="background: {{ seg.color }}"/>
+                                    <span class="o_lsd_legend_name" t-esc="seg.name"/>
+                                    <span class="o_lsd_legend_val" t-esc="pct(seg.share_pct, 0)"/>
+                                </div>
+                            </t>
+                            <div t-if="!donutGeom.segments.length" class="o_lsd_empty">No revenue to split.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= Weekday + calendar ====================== -->
+            <div class="o_lsd_row">
+                <div class="o_lsd_card o_lsd_col_narrow">
+                    <div class="o_lsd_card_head">
+                        <h3>Weekday profile</h3>
+                        <small class="text-muted">average per occurrence</small>
+                    </div>
+                    <div class="o_lsd_dow">
+                        <t t-foreach="dowBars" t-as="bar" t-key="bar.dow">
+                            <div class="o_lsd_dow_col" t-on-click="() =&gt; this.drillDow(bar)"
+                                 t-attf-title="{{ bar.label }} · {{ moneyFull(bar.avg_net) }} avg over {{ bar.days }} day(s)">
+                                <div class="o_lsd_dow_bar_wrap">
+                                    <div class="o_lsd_dow_bar"
+                                         t-attf-style="height: {{ bar.height }}%; background: {{ bar.color }}"/>
+                                </div>
+                                <div class="o_lsd_dow_label" t-esc="bar.label"/>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <div class="o_lsd_card o_lsd_col_wide">
+                    <div class="o_lsd_card_head">
+                        <h3>Trading calendar</h3>
+                        <small class="text-muted">darker is a stronger day · click to open</small>
+                    </div>
+                    <t t-set="cal" t-value="calendar"/>
+                    <svg class="o_lsd_calendar"
+                         t-att-viewBox="'0 0 ' + (cal.weeks.length * (cal.cell + 3) + 34) + ' ' + (7 * (cal.cell + 3) + 6)"
+                         preserveAspectRatio="xMinYMid meet">
+                        <t t-foreach="[1,2,3,4,5,6,7]" t-as="row" t-key="row">
+                            <text class="o_lsd_cal_label" x="0"
+                                  t-att-y="(row - 1) * (cal.cell + 3) + cal.cell - 2"
+                                  t-esc="DOW_LABEL[row]"/>
+                        </t>
+                        <t t-foreach="cal.weeks" t-as="week" t-key="week.index">
+                            <t t-foreach="week.days" t-as="day" t-key="day.date">
+                                <rect class="o_lsd_cal_cell"
+                                      t-att-x="34 + week.index * (cal.cell + 3)"
+                                      t-att-y="day.row * (cal.cell + 3)"
+                                      t-att-width="cal.cell" t-att-height="cal.cell"
+                                      rx="3"
+                                      t-att-fill="cellFill(day)"
+                                      t-on-click="() =&gt; this.drillDay(day)">
+                                    <title><t t-esc="day.date"/>: <t t-esc="moneyFull(day.net)"/></title>
+                                </rect>
+                            </t>
+                        </t>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- ========================= Tables ========================== -->
+            <div class="o_lsd_row">
+                <div class="o_lsd_card o_lsd_col_third">
+                    <div class="o_lsd_card_head"><h3>Top products</h3></div>
+                    <table class="o_lsd_table">
+                        <thead>
+                            <tr><th>SKU / Product</th><th class="text-end">Units</th><th class="text-end">Net</th></tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.data.products" t-as="product" t-key="product.id">
+                                <tr t-on-click="() =&gt; this.drillProduct(product)">
+                                    <td>
+                                        <div class="o_lsd_cell_main" t-esc="product.name"/>
+                                        <div class="o_lsd_cell_sub" t-esc="product.code"/>
+                                    </td>
+                                    <td class="text-end" t-esc="int(product.units)"/>
+                                    <td class="text-end" t-esc="money(product.net)"/>
+                                </tr>
+                            </t>
+                            <tr t-if="!state.data.products.length">
+                                <td colspan="3" class="o_lsd_empty">Nothing sold.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="o_lsd_card o_lsd_col_third">
+                    <div class="o_lsd_card_head">
+                        <h3>Cashiers</h3>
+                        <small class="text-muted">by ATV</small>
+                    </div>
+                    <table class="o_lsd_table">
+                        <thead>
+                            <tr><th>Cashier</th><th class="text-end">Txn</th><th class="text-end">ATV</th></tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.data.staff" t-as="person" t-key="person.name">
+                                <tr t-on-click="() =&gt; this.drillStaff(person)">
+                                    <td>
+                                        <div class="o_lsd_cell_main" t-esc="person.name"/>
+                                        <div class="o_lsd_cell_sub">
+                                            UPT <t t-esc="decimal(person.upt)"/> ·
+                                            <t t-esc="money(person.net)"/>
+                                        </div>
+                                    </td>
+                                    <td class="text-end" t-esc="int(person.transactions)"/>
+                                    <td class="text-end" t-esc="money(person.atv)"/>
+                                </tr>
+                            </t>
+                            <tr t-if="!state.data.staff.length">
+                                <td colspan="3" class="o_lsd_empty">
+                                    No cashier recorded on these sales.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="o_lsd_card o_lsd_col_third">
+                    <div class="o_lsd_card_head">
+                        <h3>Promotions</h3>
+                        <small class="text-muted">by amount given away</small>
+                    </div>
+                    <table class="o_lsd_table">
+                        <thead>
+                            <tr><th>Promo</th><th class="text-end">Depth</th><th class="text-end">Discount</th></tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.data.promos" t-as="promo" t-key="promo.code">
+                                <tr t-on-click="() =&gt; this.drillPromo(promo)">
+                                    <td>
+                                        <div class="o_lsd_cell_main" t-esc="promo.code"/>
+                                        <div class="o_lsd_cell_sub" t-esc="promo.type"/>
+                                    </td>
+                                    <td class="text-end" t-esc="pct(promo.depth_pct, 1)"/>
+                                    <td class="text-end" t-esc="money(promo.discount)"/>
+                                </tr>
+                            </t>
+                            <tr t-if="!state.data.promos.length">
+                                <td colspan="3" class="o_lsd_empty">No discounts in this period.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </t>
+    </div>
+</t>
+
+</templates>

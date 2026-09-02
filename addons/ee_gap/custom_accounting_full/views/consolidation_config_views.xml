@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_consol_config_list" model="ir.ui.view">
+        <field name="name">account.consolidation.config.list</field>
+        <field name="model">account.consolidation.config</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active">
+                <field name="name"/>
+                <field name="fiscal_year"/>
+                <field name="parent_company_id"/>
+                <field name="presentation_currency_id"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_consol_config_form" model="ir.ui.view">
+        <field name="name">account.consolidation.config.form</field>
+        <field name="model">account.consolidation.config</field>
+        <field name="arch" type="xml">
+            <form string="Consolidation Perimeter">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="parent_company_id"/>
+                            <field name="fiscal_year"/>
+                            <field name="presentation_currency_id"/>
+                        </group>
+                        <group>
+                            <field name="subsidiary_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Eliminations">
+                            <field name="elimination_account_ids" widget="many2many_tags"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_consol_config" model="ir.actions.act_window">
+        <field name="name">Consolidation Perimeters</field>
+        <field name="res_model">account.consolidation.config</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,23 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_brd_document_user,brd.document user,model_brd_document,group_brd_user,1,1,1,0
+access_brd_document_analyst,brd.document analyst,model_brd_document,group_brd_analyst,1,1,1,1
+access_brd_document_admin,brd.document admin,model_brd_document,group_brd_admin,1,1,1,1
+access_brd_section_user,brd.document.section user,model_brd_document_section,group_brd_user,1,1,1,1
+access_brd_section_analyst,brd.document.section analyst,model_brd_document_section,group_brd_analyst,1,1,1,1
+access_brd_analysis_user,brd.analysis user,model_brd_analysis,group_brd_user,1,0,0,0
+access_brd_analysis_analyst,brd.analysis analyst,model_brd_analysis,group_brd_analyst,1,1,1,1
+access_brd_recommendation_user,brd.recommendation user,model_brd_recommendation,group_brd_user,1,0,0,0
+access_brd_recommendation_analyst,brd.recommendation analyst,model_brd_recommendation,group_brd_analyst,1,1,1,1
+access_brd_recommendation_admin,brd.recommendation admin,model_brd_recommendation,group_brd_admin,1,1,1,1
+access_capability_entry_user,capability.entry user,model_custom_module_capability_entry,group_brd_user,1,0,0,0
+access_capability_entry_analyst,capability.entry analyst,model_custom_module_capability_entry,group_brd_analyst,1,0,0,0
+access_capability_entry_admin,capability.entry admin,model_custom_module_capability_entry,group_brd_admin,1,1,1,1
+access_capability_tag_user,capability.tag user,model_custom_module_capability_tag,group_brd_user,1,0,0,0
+access_capability_tag_analyst,capability.tag analyst,model_custom_module_capability_tag,group_brd_analyst,1,1,1,0
+access_capability_tag_admin,capability.tag admin,model_custom_module_capability_tag,group_brd_admin,1,1,1,1
+access_brd_lesson_user,brd.lesson user,model_brd_lesson,group_brd_user,1,0,0,0
+access_brd_lesson_analyst,brd.lesson analyst,model_brd_lesson,group_brd_analyst,1,1,1,0
+access_brd_lesson_admin,brd.lesson admin,model_brd_lesson,group_brd_admin,1,1,1,1
+access_reject_lesson_wizard_analyst,reject lesson wizard,model_brd_reject_as_lesson_wizard,group_brd_analyst,1,1,1,1
+access_reject_lesson_wizard_admin,reject lesson wizard admin,model_brd_reject_as_lesson_wizard,group_brd_admin,1,1,1,1
+access_knowledge_regen_wizard_admin,knowledge regen wizard admin,model_brd_knowledge_regen_wizard,group_brd_admin,1,1,1,1

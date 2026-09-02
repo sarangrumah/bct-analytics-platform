@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_module_catalog_list" model="ir.ui.view">
+        <field name="name">custom.hub.module.catalog.list</field>
+        <field name="model">custom.hub.module.catalog</field>
+        <field name="arch" type="xml">
+            <list string="Module Catalog">
+                <field name="module_name"/>
+                <field name="category"/>
+                <field name="maturity"
+                       decoration-success="maturity == 'production'"
+                       decoration-warning="maturity == 'partial'"
+                       decoration-muted="maturity == 'scaffold'"
+                       widget="badge"/>
+                <field name="version"/>
+                <field name="models_own_count"/>
+                <field name="models_inherit_count"/>
+                <field name="deployment_count"/>
+                <field name="last_scanned"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_module_catalog_form" model="ir.ui.view">
+        <field name="name">custom.hub.module.catalog.form</field>
+        <field name="model">custom.hub.module.catalog</field>
+        <field name="arch" type="xml">
+            <form string="Catalog Entry">
+                <header>
+                    <button name="action_open_deploy_wizard" type="object"
+                            string="Deploy to Tenant" class="btn-primary"
+                            groups="custom_hub_console.group_hub_admin"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="module_name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="category"/>
+                            <field name="maturity" widget="badge"/>
+                            <field name="version"/>
+                            <field name="source_module_id"/>
+                        </group>
+                        <group>
+                            <field name="models_own_count"/>
+                            <field name="models_inherit_count"/>
+                            <field name="deployment_count"/>
+                            <field name="last_scanned"/>
+                        </group>
+                    </group>
+                    <group string="Summary">
+                        <field name="summary" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Tags">
+                            <field name="capability_tag_ids"
+                                   widget="many2many_tags"
+                                   options="{'color_field': 'color'}"/>
+                        </page>
+                        <page string="Depends On">
+                            <field name="depends_module_ids"
+                                   widget="many2many_tags"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_module_catalog_kanban" model="ir.ui.view">
+        <field name="name">custom.hub.module.catalog.kanban</field>
+        <field name="model">custom.hub.module.catalog</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="category" class="o_kanban_small_column">
+                <field name="module_name"/>
+                <field name="maturity"/>
+                <field name="category"/>
+                <field name="version"/>
+                <field name="deployment_count"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="o_kanban_record_top">
+                            <strong><field name="module_name"/></strong>
+                            <span class="float-end">
+                                <field name="maturity" widget="badge"/>
+                            </span>
+                        </div>
+                        <div class="o_kanban_record_body">
+                            <small>v<field name="version"/></small>
+                            <div>
+                                Deployments:
+                                <field name="deployment_count"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_module_catalog_search" model="ir.ui.view">
+        <field name="name">custom.hub.module.catalog.search</field>
+        <field name="model">custom.hub.module.catalog</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="module_name"/>
+                <field name="capability_tag_ids"/>
+                <filter string="Production" name="prod"
+                        domain="[('maturity', '=', 'production')]"/>
+                <filter string="Partial" name="partial"
+                        domain="[('maturity', '=', 'partial')]"/>
+                <filter string="Scaffold" name="scaffold"
+                        domain="[('maturity', '=', 'scaffold')]"/>
+                <separator/>
+                <filter string="Core" name="cat_core"
+                        domain="[('category', '=', 'core')]"/>
+                <filter string="Control Plane" name="cat_control_plane"
+                        domain="[('category', '=', 'control_plane')]"/>
+                <filter string="Compliance" name="cat_compliance"
+                        domain="[('category', '=', 'compliance')]"/>
+                <filter string="EE-Gap" name="cat_ee_gap"
+                        domain="[('category', '=', 'ee_gap')]"/>
+                <filter string="Operations" name="cat_ops"
+                        domain="[('category', '=', 'operations')]"/>
+                <filter string="Vertical" name="cat_vertical"
+                        domain="[('category', '=', 'vertical')]"/>
+
+                    <filter string="Category" name="g_cat"
+                            context="{'group_by': 'category'}"/>
+                    <filter string="Maturity" name="g_mat"
+                            context="{'group_by': 'maturity'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_module_catalog" model="ir.actions.act_window">
+        <field name="name">Module Catalog</field>
+        <field name="res_model">custom.hub.module.catalog</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_module_catalog_search"/>
+    </record>
+</odoo>

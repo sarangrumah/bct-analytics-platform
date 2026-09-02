@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="module_category_plm" model="ir.module.category">
+            <field name="name">PLM</field>
+            <field name="sequence">107</field>
+        </record>
+        <record id="group_plm_user" model="res.groups">
+            <field name="name">PLM User</field>
+        </record>
+        <record id="group_plm_manager" model="res.groups">
+            <field name="name">PLM Manager</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_plm_user'))]"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_receipt_import_wizard_form" model="ir.ui.view">
+        <field name="name">custom.wms.receipt.import.wizard.form</field>
+        <field name="model">custom.wms.receipt.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import Receipt Template">
+                <group>
+                    <field name="picking_id"/>
+                    <field name="data_file" filename="data_file_name"/>
+                    <field name="data_file_name" invisible="1"/>
+                </group>
+                <div class="text-muted">
+                    Columns: <code>barcode</code> (or ean/gtin/sku), <code>serial</code> (or imei),
+                    <code>lot</code>, <code>qty</code>, <code>expiry</code>, <code>supplier_batch</code>.
+                    One row per serial (qty 1) or per lot. CSV or XLSX.
+                </div>
+                <footer>
+                    <button name="action_import" string="Import" type="object" class="btn-primary"/>
+                    <button name="action_download_template" string="Download Template" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_receipt_import_wizard" model="ir.actions.act_window">
+        <field name="name">Import Receipt Template</field>
+        <field name="res_model">custom.wms.receipt.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_view_types">form,list</field>
+    </record>
+
+</odoo>

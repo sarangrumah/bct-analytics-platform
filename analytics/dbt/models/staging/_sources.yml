@@ -1,0 +1,81 @@
+version: 2
+
+sources:
+  # =========================================================================
+  # raw — the append-only landing zone of contract 05.
+  #
+  # These tables are NOT created by dbt. They are generated from
+  # warehouse.column_policy by `make warehouse-raw-ddl`, because CREATE TABLE
+  # is the exact point where "no unclassified column can land" and "a `secret`
+  # column does not exist" stop being conventions and become structural facts.
+  # Backend's CDC loader writes into them and holds no CREATE privilege.
+  #
+  # FRESHNESS. Measured on `_ingested_at`, the loader's own write timestamp,
+  # never on a clock. The thresholds are the ADR 0001 SLA for the mart each
+  # table feeds, doubled for `error` — a source that is twice its SLA behind is
+  # not late, it is broken. ADR 0001's "Risks accepted" names source freshness
+  # as one of the two things that must catch an upstream schema change loudly.
+  # =========================================================================
+  - name: raw
+    schema: raw
+    description: >-
+      Append-only landing zone. Every row carries _ingested_at, _op (I|U|D),
+      _tenant_id and _lsn. Personal data was masked BEFORE it landed here;
+      there is no unmasking path because the cleartext never arrived.
+    loaded_at_field: _ingested_at
+    tables:
+      - name: res_company
+        freshness: {warn_after: {count: 60, period: minute}, error_after: {count: 120, period: minute}}
+      - name: res_partner
+        freshness: {warn_after: {count: 60, period: minute}, error_after: {count: 120, period: minute}}
+      - name: product_template
+        freshness: {warn_after: {count: 60, period: minute}, error_after: {count: 120, period: minute}}
+      - name: product_product
+        freshness: {warn_after: {count: 60, period: minute}, error_after: {count: 120, period: minute}}
+      - name: operating_unit
+        freshness: {warn_after: {count: 60, period: minute}, error_after: {count: 120, period: minute}}
+      - name: sale_order
+        freshness: {warn_after: {count: 5, period: minute}, error_after: {count: 10, period: minute}}
+      - name: sale_order_line
+        freshness: {warn_after: {count: 5, period: minute}, error_after: {count: 10, period: minute}}
+      - name: account_account
+        freshness: {warn_after: {count: 60, period: minute}, error_after: {count: 120, period: minute}}
+      - name: account_move
+        freshness: {warn_after: {count: 60, period: minute}, error_after: {count: 120, period: minute}}
+      - name: account_move_line
+        freshness: {warn_after: {count: 60, period: minute}, error_after: {count: 120, period: minute}}
+      - name: stock_picking
+        freshness: {warn_after: {count: 5, period: minute}, error_after: {count: 10, period: minute}}
+      - name: stock_move
+        freshness: {warn_after: {count: 5, period: minute}, error_after: {count: 10, period: minute}}
+      - name: pos_order
+        freshness: {warn_after: {count: 5, period: minute}, error_after: {count: 10, period: minute}}
+      - name: pos_order_line
+        freshness: {warn_after: {count: 5, period: minute}, error_after: {count: 10, period: minute}}
+      - name: ppob_biller
+        freshness: {warn_after: {count: 60, period: minute}, error_after: {count: 120, period: minute}}
+      # PPOB is the 60-second mart. Its source gets the tightest threshold in
+      # the project, because a stale PPOB view hides exactly the SLA breaches
+      # it exists to show.
+      - name: ppob_transaction
+        freshness: {warn_after: {count: 1, period: minute}, error_after: {count: 5, period: minute}}
+
+  # =========================================================================
+  # warehouse — pipeline metadata. Not data, but dim_tenant is built from it
+  # and the freshness the dashboard shows is served from it.
+  # =========================================================================
+  - name: warehouse
+    schema: warehouse
+    description: Pipeline metadata and PDP policy (contract 05).
+    tables:
+      - name: tenant_registry
+        description: >-
+          The tenant list. Source of dim_tenant. mask_salt_env holds the NAME of
+          the environment variable carrying a tenant's HMAC salt, never the value.
+      - name: column_policy
+        description: >-
+          The PDP instruction set DWH writes and Backend's loader executes.
+          Read here only so tests can ASSERT the outcome against the policy
+          rather than against a hardcoded list of column names.
+      - name: pipeline_state
+        description: The only source of meta.last_refreshed_at and meta.is_stale.

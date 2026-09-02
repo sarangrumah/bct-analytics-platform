@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_putaway_propose_wizard_form" model="ir.ui.view">
+        <field name="name">custom.wms.putaway.propose.wizard.form</field>
+        <field name="model">custom.wms.putaway.propose.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Re-Propose Putaway">
+                <group>
+                    <field name="picking_id"/>
+                    <field name="only_pending"/>
+                    <field name="auto_apply_high_confidence"/>
+                </group>
+                <footer>
+                    <button name="action_propose" type="object" string="Propose" class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_putaway_propose_wizard" model="ir.actions.act_window">
+        <field name="name">Re-Propose Putaway</field>
+        <field name="res_model">custom.wms.putaway.propose.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

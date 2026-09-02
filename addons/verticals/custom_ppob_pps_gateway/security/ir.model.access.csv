@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pps_mitra_credential_user,pps mitra credential user,model_custom_ppob_pps_mitra_credential,custom_ppob_core.group_ppob_user,1,0,0,0
+access_pps_mitra_credential_manager,pps mitra credential manager,model_custom_ppob_pps_mitra_credential,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_pps_callback_log_user,pps callback log user,model_custom_ppob_pps_callback_log,custom_ppob_core.group_ppob_user,1,0,0,0
+access_pps_callback_log_ops,pps callback log ops,model_custom_ppob_pps_callback_log,custom_ppob_core.group_ppob_ops,1,0,0,0
+access_pps_callback_log_manager,pps callback log manager,model_custom_ppob_pps_callback_log,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_pps_game_field_user,pps game field user,model_custom_ppob_pps_game_field,custom_ppob_core.group_ppob_user,1,0,0,0
+access_pps_game_field_manager,pps game field manager,model_custom_ppob_pps_game_field,custom_ppob_core.group_ppob_manager,1,1,1,1

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_studio_view_customization_list" model="ir.ui.view">
+        <field name="name">studio.view.customization.list</field>
+        <field name="model">studio.view.customization</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'applied'"
+                  decoration-danger="state == 'error'">
+                <field name="name"/>
+                <field name="target_view_id"/>
+                <field name="target_model_name"/>
+                <field name="state" widget="badge"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_studio_view_customization_form" model="ir.ui.view">
+        <field name="name">studio.view.customization.form</field>
+        <field name="model">studio.view.customization</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_apply" string="Apply" type="object" class="btn-primary"/>
+                    <button name="action_revert" string="Revert" type="object" class="btn-secondary"
+                            invisible="state != 'applied'"
+                            confirm="Disable the materialised view inheritance. The original view will render again. Continue?"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" placeholder="e.g. Partner: show account manager"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="target_view_id"
+                                   options="{'no_create': True}"
+                                   domain="[('type', 'in', ('form', 'list', 'kanban', 'search'))]"/>
+                            <field name="target_model_name" readonly="1"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="inherit_view_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Operations"/>
+                    <field name="operation_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="op_type"/>
+                            <field name="field_name"/>
+                            <field name="anchor_field" optional="show"
+                                   invisible="op_type == 'hide_field' or op_type == 'set_attr'"/>
+                            <field name="position" optional="show"
+                                   invisible="op_type == 'hide_field' or op_type == 'set_attr'"/>
+                            <field name="attr_name" optional="show"
+                                   invisible="op_type != 'set_attr'"/>
+                            <field name="attr_value" optional="show"
+                                   invisible="op_type != 'set_attr'"/>
+                        </list>
+                    </field>
+                    <notebook>
+                        <page string="Generated XML" invisible="not arch_inherit">
+                            <field name="arch_inherit" widget="ace"
+                                   options="{'mode': 'xml'}" readonly="1" nolabel="1"/>
+                        </page>
+                        <page string="Last error" invisible="not last_error">
+                            <field name="last_error" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_studio_view_customization" model="ir.actions.act_window">
+        <field name="name">View Customizations</field>
+        <field name="res_model">studio.view.customization</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_studio_field_impact_wizard_form" model="ir.ui.view">
+        <field name="name">studio.field.impact.wizard.form</field>
+        <field name="model">studio.field.impact.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Field Impact">
+                <group>
+                    <field name="custom_field_id" readonly="1"/>
+                    <field name="operation"/>
+                    <field name="new_technical_name"
+                           invisible="operation != 'rename'"
+                           required="operation == 'rename'"
+                           placeholder="x_studio_new_name"/>
+                    <field name="cascade"/>
+                </group>
+                <separator string="Affected views"/>
+                <field name="view_ids" readonly="1" nolabel="1">
+                    <list>
+                        <field name="name"/>
+                        <field name="model"/>
+                        <field name="type"/>
+                        <field name="xml_id"/>
+                    </list>
+                </field>
+                <separator/>
+                <field name="summary" nolabel="1" readonly="1"/>
+                <footer>
+                    <button name="action_confirm" string="Confirm" type="object" class="btn-primary"/>
+                    <button special="cancel" string="Cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

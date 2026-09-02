@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- License: LGPL-3 -->
+<odoo>
+
+    <record id="view_hht_sync_queue_list" model="ir.ui.view">
+        <field name="name">hht.sync.queue.list</field>
+        <field name="model">hht.sync.queue</field>
+        <field name="arch" type="xml">
+            <list string="Sync Queue"
+                  decoration-info="state == 'queued'"
+                  decoration-success="state == 'applied'"
+                  decoration-danger="state == 'failed'"
+                  decoration-muted="state == 'deduped'">
+                <header>
+                    <button name="action_retry_failed" type="object"
+                            string="Retry Failed" class="btn-warning"/>
+                </header>
+                <field name="received_at"/>
+                <field name="device_id"/>
+                <field name="action"/>
+                <field name="client_id"/>
+                <field name="batch_id"/>
+                <field name="state"/>
+                <field name="error" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hht_sync_queue_form" model="ir.ui.view">
+        <field name="name">hht.sync.queue.form</field>
+        <field name="model">hht.sync.queue</field>
+        <field name="arch" type="xml">
+            <form string="Sync Queue Item">
+                <header>
+                    <button name="action_retry_failed" type="object"
+                            string="Retry"
+                            invisible="state != 'failed'"
+                            class="btn-warning"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="queued,processing,applied,failed,deduped"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="device_id"/>
+                            <field name="action"/>
+                            <field name="client_id"/>
+                            <field name="batch_id"/>
+                        </group>
+                        <group>
+                            <field name="queued_at"/>
+                            <field name="received_at"/>
+                            <field name="error"/>
+                        </group>
+                    </group>
+                    <group string="Payload">
+                        <field name="payload" widget="ace" options="{'mode': 'javascript'}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hht_sync_queue_search" model="ir.ui.view">
+        <field name="name">hht.sync.queue.search</field>
+        <field name="model">hht.sync.queue</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="device_id"/>
+                <field name="client_id"/>
+                <field name="batch_id"/>
+                <filter string="Queued" name="f_q" domain="[('state', '=', 'queued')]"/>
+                <filter string="Failed" name="f_f" domain="[('state', '=', 'failed')]"/>
+                <filter string="Applied" name="f_a" domain="[('state', '=', 'applied')]"/>
+
+                    <filter string="Device" name="g_dev" context="{'group_by': 'device_id'}"/>
+                    <filter string="State" name="g_state" context="{'group_by': 'state'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hht_sync_queue" model="ir.actions.act_window">
+        <field name="name">Sync Queue</field>
+        <field name="res_model">hht.sync.queue</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_hht_sync_queue_search"/>
+    </record>
+
+</odoo>

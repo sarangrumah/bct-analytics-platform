@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add "by Show" buttons to the shared Profit & Loss wizard. the tenant only:
+         this view (and the underlying report) ship with custom_sale_show_date,
+         so non-the tenant tenants never see the button and never hit the show-date
+         column. -->
+    <record id="view_profit_loss_wizard_form_tenant_show" model="ir.ui.view">
+        <field name="name">custom.report.profit.loss.wizard.form.tenant.show</field>
+        <field name="model">custom.report.profit.loss.wizard</field>
+        <field name="inherit_id" ref="custom_accounting_reports.view_profit_loss_wizard_form"/>
+        <field name="arch" type="xml">
+            <button name="action_view_by_branch" position="after">
+                <button string="View by Show" name="action_view_by_show"
+                        type="object" class="btn-secondary"/>
+            </button>
+            <button name="action_export_xlsx_by_branch" position="after">
+                <button string="Export by Show" name="action_export_xlsx_by_show"
+                        type="object" class="btn-secondary"/>
+            </button>
+        </field>
+    </record>
+</odoo>

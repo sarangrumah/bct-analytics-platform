@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_voip_root" name="VoIP" sequence="66"
+              groups="custom_voip.group_voip_user"/>
+    <menuitem id="menu_voip_calls" name="Call Log" parent="menu_voip_root"
+              action="action_voip_call" sequence="10"/>
+    <menuitem id="menu_voip_providers" name="Providers" parent="menu_voip_root"
+              action="action_voip_provider" sequence="20"
+              groups="custom_voip.group_voip_admin"/>
+</odoo>

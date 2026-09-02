@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bank_template_user,template user read,model_custom_bank_import_template,group_bank_import_user,1,0,0,0
+access_bank_template_admin,template admin all,model_custom_bank_import_template,group_bank_import_admin,1,1,1,1
+access_bank_log_user,log user,model_custom_bank_import_log,group_bank_import_user,1,1,1,0
+access_bank_log_admin,log admin,model_custom_bank_import_log,group_bank_import_admin,1,1,1,1
+access_bank_h2h_user,h2h connection user read,model_custom_bank_h2h_connection,group_bank_import_user,1,0,0,0
+access_bank_h2h_admin,h2h connection admin,model_custom_bank_h2h_connection,group_bank_import_admin,1,1,1,1
+access_bank_wizard_user,wizard user,model_custom_bank_import_csv_wizard,group_bank_import_user,1,1,1,1

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_pdp_audit"
+              name="Audit Log"
+              parent="custom_pdp_taxonomy.menu_pdp_root"
+              action="action_pdp_audit_log"
+              sequence="10"
+              groups="group_audit_viewer"/>
+</odoo>

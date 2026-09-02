@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============ SPT Masa PPN 1111 (Induk) ============ -->
+    <record id="view_spt_ppn_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.spt.ppn.wizard.form</field>
+        <field name="model">custom.report.spt.ppn.wizard</field>
+        <field name="arch" type="xml">
+            <form string="SPT Masa PPN 1111 (Induk)">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group>
+                        <field name="company_ids" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print" type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_spt_ppn_wizard" model="ir.actions.act_window">
+        <field name="name">SPT Masa PPN 1111</field>
+        <field name="res_model">custom.report.spt.ppn.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- ============ Rekap PPh Pemotongan ============ -->
+    <record id="view_pph_withholding_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.pph.withholding.wizard.form</field>
+        <field name="model">custom.report.pph.withholding.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Rekap PPh Pemotongan">
+                <group>
+                    <group>
+                        <field name="pph_kind"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group>
+                        <field name="company_ids" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print" type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Lihat Transaksi" name="action_view_source" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_pph_withholding_wizard" model="ir.actions.act_window">
+        <field name="name">Rekap PPh Pemotongan</field>
+        <field name="res_model">custom.report.pph.withholding.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- ============ Monitoring NSFP ============ -->
+    <record id="view_nsfp_monitoring_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.nsfp.monitoring.wizard.form</field>
+        <field name="model">custom.report.nsfp.monitoring.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Monitoring NSFP &amp; Status Faktur">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group>
+                        <field name="company_ids" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print" type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Lihat Transaksi" name="action_view_source" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_nsfp_monitoring_wizard" model="ir.actions.act_window">
+        <field name="name">Monitoring NSFP</field>
+        <field name="res_model">custom.report.nsfp.monitoring.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- ============ Data Quality NPWP/NIK ============ -->
+    <record id="view_npwp_quality_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.npwp.quality.wizard.form</field>
+        <field name="model">custom.report.npwp.quality.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Data Quality Lawan Transaksi (NPWP/NIK)">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group>
+                        <field name="company_ids" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print" type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Lihat Transaksi" name="action_view_source" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_npwp_quality_wizard" model="ir.actions.act_window">
+        <field name="name">Data Quality NPWP/NIK</field>
+        <field name="res_model">custom.report.npwp.quality.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

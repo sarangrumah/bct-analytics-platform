@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_move_form_approval" model="ir.ui.view">
+        <field name="name">account.move.form.approval</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_open_approval_request"
+                        string="View Approval"
+                        type="object"
+                        invisible="not x_custom_approval_request_id"/>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="before">
+                <field name="x_custom_approval_state" widget="badge"
+                       invisible="not x_custom_approval_state"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_stock_location_form_inherit_qc" model="ir.ui.view">
+        <field name="name">stock.location.form.inherit.inbound.qc</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Inbound Quarantine">
+                    <field name="wms_is_qc_area"/>
+                    <field name="wms_block_reservation"/>
+                    <div colspan="2" class="text-muted" invisible="not wms_block_reservation">
+                        Stock in this location and every location beneath it is
+                        excluded from outbound reservation until inbound QC passes.
+                    </div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

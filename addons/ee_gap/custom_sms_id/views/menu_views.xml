@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top-level SMS ID app menu -->
+    <menuitem id="menu_sms_id_root"
+              name="SMS ID"
+              sequence="59"
+              groups="custom_sms_id.group_user"/>
+
+    <menuitem id="menu_sms_id_messages"
+              name="Messages"
+              parent="menu_sms_id_root"
+              action="action_custom_sms_message"
+              sequence="10"/>
+
+    <menuitem id="menu_sms_id_config"
+              name="Configuration"
+              parent="menu_sms_id_root"
+              sequence="90"
+              groups="custom_sms_id.group_manager"/>
+
+    <menuitem id="menu_sms_id_accounts"
+              name="Accounts"
+              parent="menu_sms_id_config"
+              action="action_custom_sms_account"
+              sequence="10"/>
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Requirement 1: surface the HS Code (native stock_delivery field) on the
+      product master General Information tab, next to the internal reference,
+      so it is captured during master-data entry. stock_delivery already shows
+      it on the Inventory tab; this makes it prominent on the main form.
+    -->
+    <record id="product_template_form_hs_code" model="ir.ui.view">
+        <field name="name">product.template.form.retail.hs_code</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <field name="categ_id" position="after">
+                <field name="hs_code"/>
+            </field>
+        </field>
+    </record>
+</odoo>

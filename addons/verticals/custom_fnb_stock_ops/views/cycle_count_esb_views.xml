@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend the cycle-count session form with its ESB half. -->
+    <record id="view_cycle_count_session_form_esb" model="ir.ui.view">
+        <field name="name">custom.cycle.count.session.form.esb</field>
+        <field name="model">custom.cycle.count.session</field>
+        <field name="inherit_id" ref="custom_wms_cycle_count.view_cycle_count_session_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_generate_lines_from_esb" type="object"
+                        string="Load Lines from ESB" class="btn-secondary"
+                        invisible="not esb_location_id or state not in ('draft', 'in_progress')"/>
+                <button name="action_refresh_expected_from_esb" type="object"
+                        string="Refresh Expected from ESB"
+                        invisible="not esb_location_id or state not in ('in_progress', 'reviewing')"
+                        help="Re-reads the authoritative per-SKU balance from ESB so the variance
+                              is computed against current stock, not a stale snapshot."/>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-warning" role="alert"
+                     invisible="not esb_stale_snapshot or state == 'closed'">
+                    Some expected quantities came from a stale ESB snapshot. Use
+                    <b>Refresh Expected from ESB</b> before approving, or the variance
+                    posted to ESB will be measured against an out-of-date balance.
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='assigned_user_ids']" position="after">
+                <field name="is_esb_backed" invisible="1"/>
+                <field name="esb_stale_snapshot" invisible="1"/>
+                <field name="esb_branch_id" readonly="state != 'draft'"/>
+                <field name="esb_location_id" readonly="state != 'draft'"/>
+                <field name="esb_item_journal_num" invisible="not esb_outbox_id"/>
+                <field name="esb_state" invisible="not esb_outbox_id"/>
+                <field name="esb_outbox_id" invisible="not esb_outbox_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_cycle_count_session_list_esb" model="ir.ui.view">
+        <field name="name">custom.cycle.count.session.list.esb</field>
+        <field name="model">custom.cycle.count.session</field>
+        <field name="inherit_id" ref="custom_wms_cycle_count.view_cycle_count_session_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="before">
+                <field name="esb_location_id" optional="show"/>
+                <field name="esb_item_journal_num" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Map an ESB location onto an Odoo location so it can anchor count lines. -->
+    <record id="view_esb_location_list_fnb" model="ir.ui.view">
+        <field name="name">custom.esb.location.list.fnb</field>
+        <field name="model">custom.esb.location</field>
+        <field name="inherit_id" ref="custom_esb_connector.view_esb_location_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='last_synced_at']" position="after">
+                <button name="action_create_odoo_location" type="object" icon="fa-link"
+                        string="Map to Odoo" invisible="location_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Submenus under the im_livechat root menu -->
+    <menuitem id="menu_livechat_canned_responses"
+              name="Canned Responses"
+              parent="im_livechat.menu_livechat_root"
+              action="action_custom_livechat_canned_response"
+              sequence="60"
+              groups="custom_livechat.group_user"/>
+
+    <menuitem id="menu_livechat_escalated_channels"
+              name="Escalated Channels"
+              parent="im_livechat.menu_livechat_root"
+              action="action_discuss_channel_escalated"
+              sequence="70"
+              groups="custom_livechat.group_user"/>
+
+    <menuitem id="menu_livechat_chatbot_scripts"
+              name="Chatbot Scripts"
+              parent="im_livechat.menu_livechat_root"
+              action="action_custom_livechat_chatbot_script"
+              sequence="80"
+              groups="custom_livechat.group_user"/>
+</odoo>

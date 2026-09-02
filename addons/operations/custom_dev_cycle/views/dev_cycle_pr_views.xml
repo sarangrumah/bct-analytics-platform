@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_dev_cycle_pr_list" model="ir.ui.view">
+            <field name="name">dev.cycle.pr.list</field>
+            <field name="model">dev.cycle.pr</field>
+            <field name="arch" type="xml">
+                <list decoration-success="state == 'merged'"
+                      decoration-muted="state == 'closed'"
+                      decoration-info="state == 'open'">
+                    <field name="cycle_id"/>
+                    <field name="provider"/>
+                    <field name="pr_number"/>
+                    <field name="pr_url" widget="url"/>
+                    <field name="state"/>
+                    <field name="ci_status" widget="badge"/>
+                    <field name="merged_at"/>
+                    <field name="last_synced_at"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_dev_cycle_pr_form" model="ir.ui.view">
+            <field name="name">dev.cycle.pr.form</field>
+            <field name="model">dev.cycle.pr</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="cycle_id"/>
+                                <field name="provider"/>
+                                <field name="pr_number"/>
+                                <field name="pr_url" widget="url"/>
+                            </group>
+                            <group>
+                                <field name="state"/>
+                                <field name="ci_status"/>
+                                <field name="reviewers"/>
+                                <field name="merged_at"/>
+                                <field name="merged_by"/>
+                                <field name="last_synced_at"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_dev_cycle_pr" model="ir.actions.act_window">
+            <field name="name">Pull Requests</field>
+            <field name="res_model">dev.cycle.pr</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+    </data>
+</odoo>

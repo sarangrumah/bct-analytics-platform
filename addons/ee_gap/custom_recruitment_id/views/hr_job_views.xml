@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_job_form_recruitment_id" model="ir.ui.view">
+        <field name="name">hr.job.form.recruitment.id</field>
+        <field name="model">hr.job</field>
+        <field name="inherit_id" ref="hr.view_hr_job_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header position="inside">
+                    <button name="action_post_to_jobstreet"
+                            type="object"
+                            string="Post to Jobstreet"
+                            invisible="not x_publish_jobstreet"
+                            groups="custom_recruitment_id.group_manager"/>
+                    <button name="action_post_to_glints"
+                            type="object"
+                            string="Post to Glints"
+                            invisible="not x_publish_glints"
+                            groups="custom_recruitment_id.group_manager"/>
+                </header>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="External Job Board Publishing" name="recruitment_id_publish">
+                    <group>
+                        <field name="x_publish_jobstreet"/>
+                        <field name="x_external_post_id_jobstreet" readonly="1"
+                               invisible="not x_external_post_id_jobstreet"/>
+                    </group>
+                    <group>
+                        <field name="x_publish_glints"/>
+                        <field name="x_external_post_id_glints" readonly="1"
+                               invisible="not x_external_post_id_glints"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

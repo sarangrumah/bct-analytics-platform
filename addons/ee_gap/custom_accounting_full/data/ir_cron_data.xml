@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--
+        Cron jobs for custom_accounting_full.
+        Empty placeholder — module does not currently define scheduled jobs;
+        the manifest entry exists for forward compatibility.
+    -->
+</odoo>

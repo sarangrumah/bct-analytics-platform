@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_brd_document_list" model="ir.ui.view">
+            <field name="name">brd.document.list</field>
+            <field name="model">brd.document</field>
+            <field name="arch" type="xml">
+                <list decoration-info="state == 'analyzed'" decoration-success="state == 'approved'" decoration-warning="state in ('reviewed','analyzing')" decoration-muted="state == 'draft'">
+                    <field name="reference"/>
+                    <field name="name"/>
+                    <field name="business_domain"/>
+                    <field name="vertical_target_id"/>
+                    <field name="state"/>
+                    <field name="overall_fit_pct" widget="progressbar"/>
+                    <field name="severity_summary"/>
+                    <field name="owner_user_id"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_brd_document_kanban" model="ir.ui.view">
+            <field name="name">brd.document.kanban</field>
+            <field name="model">brd.document</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="state" class="o_kanban_small_column">
+                    <field name="name"/>
+                    <field name="reference"/>
+                    <field name="overall_fit_pct"/>
+                    <field name="business_domain"/>
+                    <field name="state"/>
+                    <templates>
+                        <t t-name="card">
+                            <div class="oe_kanban_card oe_kanban_global_click">
+                                <strong><field name="reference"/></strong>
+                                <div><field name="name"/></div>
+                                <div class="text-muted"><field name="business_domain"/></div>
+                                <div>Fit: <field name="overall_fit_pct"/>%</div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="view_brd_document_form" model="ir.ui.view">
+            <field name="name">brd.document.form</field>
+            <field name="model">brd.document</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_extract" type="object" string="Extract" class="btn-primary" invisible="state != 'draft'"/>
+                        <button name="action_analyze_async" type="object" string="Run AI Analysis" class="btn-primary" invisible="state not in ('extracted','analyzed')"/>
+                        <button name="action_analyze" type="object" string="Run AI Analysis (sync)" invisible="state not in ('extracted','analyzed')" groups="custom_brd_analyzer.group_brd_admin"/>
+                        <button name="action_request_review" type="object" string="Request Review" invisible="state != 'analyzed'"/>
+                        <button name="action_approve" type="object" string="Approve" class="btn-success" invisible="state != 'reviewed'" groups="custom_brd_analyzer.group_brd_admin"/>
+                        <button name="action_reset_to_draft" type="object" string="Reset to Draft" invisible="state == 'draft'"/>
+                        <button name="action_open_report" type="object" string="Open Report"/>
+                        <button name="action_generate_share_token" type="object" string="Generate Share Link"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,extracted,analyzing,analyzed,reviewed,approved"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1><field name="name"/></h1>
+                            <field name="reference" readonly="1"/>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="document_attachment_id" widget="many2one_binary"/>
+                                <field name="document_filename"/>
+                                <field name="document_mime"/>
+                                <field name="business_domain"/>
+                                <field name="language"/>
+                            </group>
+                            <group>
+                                <field name="vertical_target_id"/>
+                                <field name="vertical_target"/>
+                                <!-- journey_id is injected by custom_onboarding_journey -->
+                                <field name="contact_person"/>
+                                <field name="contact_email"/>
+                                <field name="owner_user_id"/>
+                                <field name="overall_fit_pct" widget="progressbar"/>
+                                <field name="severity_summary"/>
+                                <field name="token_uuid" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Sections">
+                                <field name="section_ids" readonly="1">
+                                    <list>
+                                        <field name="sequence"/>
+                                        <field name="title"/>
+                                        <field name="level"/>
+                                        <field name="page_or_slide"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Analysis">
+                                <field name="analysis_ids" readonly="1">
+                                    <list decoration-success="gap_status == 'covered'" decoration-warning="gap_status == 'partial'" decoration-danger="gap_status == 'missing'" decoration-muted="gap_status == 'unclear'">
+                                        <field name="section_id"/>
+                                        <field name="capability_required"/>
+                                        <field name="mapped_module_ids" widget="many2many_tags"/>
+                                        <field name="fit_score" widget="progressbar"/>
+                                        <field name="gap_status"/>
+                                        <field name="gap_severity"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Recommendations">
+                                <field name="recommendation_ids">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="recommendation_type" widget="badge" decoration-danger="recommendation_type == 'new'" decoration-warning="recommendation_type == 'extend'" decoration-success="recommendation_type == 'reuse'"/>
+                                        <field name="severity"/>
+                                        <field name="estimated_md"/>
+                                        <field name="depends_on_module_ids" widget="many2many_tags"/>
+                                        <field name="impact_module_ids" widget="many2many_tags"/>
+                                        <field name="state"/>
+                                        <button name="action_push_to_project" type="object" string="Push to Backlog" icon="fa-tasks"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Extracted Text">
+                                <field name="extracted_text" readonly="1"/>
+                            </page>
+                            <page string="Company Profile">
+                                <div class="text-muted">
+                                    JSON capturing intake data:
+                                    <code>{"name": "...", "logo_url": "...", "npwp": "...", "bank": {...}}</code>.
+                                </div>
+                                <field name="company_profile_json" widget="text"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_brd_document" model="ir.actions.act_window">
+            <field name="name">BRD Documents</field>
+            <field name="res_model">brd.document</field>
+            <field name="view_mode">kanban,list,form</field>
+        </record>
+
+    </data>
+</odoo>

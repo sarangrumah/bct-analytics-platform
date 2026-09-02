@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_approval_ooo_list" model="ir.ui.view">
+        <field name="name">approval.ooo.list</field>
+        <field name="model">approval.ooo</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active">
+                <field name="user_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="auto_delegate_to_id"/>
+                <field name="leave_id" optional="show"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_approval_ooo_form" model="ir.ui.view">
+        <field name="name">approval.ooo.form</field>
+        <field name="model">approval.ooo</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="auto_delegate_to_id"/>
+                            <field name="leave_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <field name="note"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_approval_ooo" model="ir.actions.act_window">
+        <field name="name">Out-of-Office</field>
+        <field name="res_model">approval.ooo</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Script list / form / search -->
+    <record id="view_custom_livechat_chatbot_script_list" model="ir.ui.view">
+        <field name="name">custom.livechat.chatbot.script.list</field>
+        <field name="model">custom.livechat.chatbot.script</field>
+        <field name="arch" type="xml">
+            <list string="Chatbot Scripts">
+                <field name="name"/>
+                <field name="channel_id"/>
+                <field name="step_count"/>
+                <field name="is_active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_livechat_chatbot_script_form" model="ir.ui.view">
+        <field name="name">custom.livechat.chatbot.script.form</field>
+        <field name="model">custom.livechat.chatbot.script</field>
+        <field name="arch" type="xml">
+            <form string="Chatbot Script">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Welcome bot"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="channel_id"/>
+                            <field name="is_active"/>
+                        </group>
+                        <group>
+                            <field name="step_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Steps">
+                            <field name="step_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="step_type"/>
+                                    <field name="message"/>
+                                    <field name="expected_answers"/>
+                                    <field name="next_step_default"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_livechat_chatbot_script_search" model="ir.ui.view">
+        <field name="name">custom.livechat.chatbot.script.search</field>
+        <field name="model">custom.livechat.chatbot.script</field>
+        <field name="arch" type="xml">
+            <search string="Chatbot Scripts">
+                <field name="name"/>
+                <field name="channel_id"/>
+                <filter name="active" string="Active" domain="[('is_active','=',True)]"/>
+                <filter name="inactive" string="Inactive" domain="[('is_active','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_livechat_chatbot_script" model="ir.actions.act_window">
+        <field name="name">Chatbot Scripts</field>
+        <field name="res_model">custom.livechat.chatbot.script</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_livechat_chatbot_script_search"/>
+    </record>
+
+    <!-- Step list / form (rarely opened directly, but useful) -->
+    <record id="view_custom_livechat_chatbot_step_list" model="ir.ui.view">
+        <field name="name">custom.livechat.chatbot.step.list</field>
+        <field name="model">custom.livechat.chatbot.step</field>
+        <field name="arch" type="xml">
+            <list string="Chatbot Steps">
+                <field name="script_id"/>
+                <field name="sequence"/>
+                <field name="step_type"/>
+                <field name="message"/>
+                <field name="expected_answers"/>
+                <field name="next_step_default"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_livechat_chatbot_step_form" model="ir.ui.view">
+        <field name="name">custom.livechat.chatbot.step.form</field>
+        <field name="model">custom.livechat.chatbot.step</field>
+        <field name="arch" type="xml">
+            <form string="Chatbot Step">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="script_id"/>
+                            <field name="sequence"/>
+                            <field name="step_type"/>
+                        </group>
+                        <group>
+                            <field name="next_step_default"/>
+                        </group>
+                    </group>
+                    <group string="Content">
+                        <field name="message"/>
+                        <field name="expected_answers"
+                               placeholder="yes|y, no|n, billing"
+                               help="Comma-separated regex patterns matched against the visitor's reply."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_custom_livechat_chatbot_step" model="ir.actions.act_window">
+        <field name="name">Chatbot Steps</field>
+        <field name="res_model">custom.livechat.chatbot.step</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

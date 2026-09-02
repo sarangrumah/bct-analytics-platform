@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_throughput_sample_list" model="ir.ui.view">
+        <field name="name">custom.ppob.throughput.sample.list</field>
+        <field name="model">custom.ppob.throughput.sample</field>
+        <field name="arch" type="xml">
+            <list create="0"
+                  decoration-danger="breach not in ('ok', 'no_target')"
+                  decoration-muted="breach == 'no_target'">
+                <field name="bucket_start"/>
+                <field name="source" widget="badge"
+                       decoration-info="source == 'oracle'"
+                       decoration-success="source == 'odoo'"/>
+                <field name="provider_id" optional="show"/>
+                <field name="class_id" optional="show"/>
+                <field name="txn_count" sum="Transactions"/>
+                <field name="mean_tps" optional="hide"/>
+                <field name="peak_tps"/>
+                <field name="p95_latency_ms"/>
+                <field name="avg_latency_ms" optional="hide"/>
+                <field name="success_rate_pct"/>
+                <field name="gross_amount" sum="Gross" optional="hide"/>
+                <field name="breach" widget="badge"
+                       decoration-danger="breach not in ('ok', 'no_target')"
+                       decoration-success="breach == 'ok'"/>
+                <field name="target_id" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ppob_throughput_sample_graph" model="ir.ui.view">
+        <field name="name">custom.ppob.throughput.sample.graph</field>
+        <field name="model">custom.ppob.throughput.sample</field>
+        <field name="arch" type="xml">
+            <graph type="line" sample="1">
+                <field name="bucket_start" interval="hour"/>
+                <field name="source"/>
+                <field name="peak_tps" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- The parallel-run view: same scope, oracle rows beside odoo rows. -->
+    <record id="view_ppob_throughput_sample_pivot" model="ir.ui.view">
+        <field name="name">custom.ppob.throughput.sample.pivot</field>
+        <field name="model">custom.ppob.throughput.sample</field>
+        <field name="arch" type="xml">
+            <pivot sample="1">
+                <field name="provider_id" type="row"/>
+                <field name="class_id" type="row"/>
+                <field name="source" type="col"/>
+                <field name="txn_count" type="measure"/>
+                <field name="peak_tps" type="measure"/>
+                <field name="p95_latency_ms" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_ppob_throughput_sample_search" model="ir.ui.view">
+        <field name="name">custom.ppob.throughput.sample.search</field>
+        <field name="model">custom.ppob.throughput.sample</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="provider_id"/>
+                <field name="class_id"/>
+                <filter name="filter_source_odoo" string="Odoo (actual)"
+                        domain="[('source', '=', 'odoo')]"/>
+                <filter name="filter_source_oracle" string="Oracle (baseline)"
+                        domain="[('source', '=', 'oracle')]"/>
+                <!-- No "Breaching Target" filter: breach is computed live
+                     against the current target rather than stored, so that
+                     re-tuning a target immediately re-evaluates history against
+                     it. That is worth more during calibration than filterability
+                     is, but it does make the field unsearchable. Breaches are
+                     visible as red rows in the list. -->
+                <separator/>
+                <filter name="filter_last_7d" string="Last 7 Days"
+                        domain="[('bucket_start', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <group>
+                    <filter name="group_source" string="Source" context="{'group_by': 'source'}"/>
+                    <filter name="group_provider" string="Provider" context="{'group_by': 'provider_id'}"/>
+                    <filter name="group_class" string="Product Class" context="{'group_by': 'class_id'}"/>
+                    <filter name="group_bucket_day" string="Day" context="{'group_by': 'bucket_start:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ppob_throughput_sample" model="ir.actions.act_window">
+        <field name="name">Throughput Samples</field>
+        <field name="res_model">custom.ppob.throughput.sample</field>
+        <field name="view_mode">list,graph,pivot</field>
+        <field name="search_view_id" ref="view_ppob_throughput_sample_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No throughput sampled yet</p>
+            <p>
+                The hourly cron samples each complete hour of dispatched
+                transactions. Empty is expected before go-live.
+            </p><p>
+                Import the Oracle MSG016T history here as
+                <b>source = oracle</b> to establish the D4 baseline, then compare
+                it against <b>source = odoo</b> in the pivot during the parallel run.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_capacity_forecast_list" model="ir.ui.view">
+        <field name="name">custom.ops.capacity.forecast.list</field>
+        <field name="model">custom.ops.capacity.forecast</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="severity == 'critical'"
+                  decoration-warning="severity == 'warn'">
+                <field name="generated_at"/>
+                <field name="tenant_id"/>
+                <field name="metric"/>
+                <field name="current_value"/>
+                <field name="forecast_30d"/>
+                <field name="forecast_90d"/>
+                <field name="forecast_365d"/>
+                <field name="severity" widget="badge"/>
+                <field name="recommended_action"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_capacity_forecast_form" model="ir.ui.view">
+        <field name="name">custom.ops.capacity.forecast.form</field>
+        <field name="model">custom.ops.capacity.forecast</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="tenant_id"/>
+                            <field name="metric"/>
+                            <field name="generated_at"/>
+                            <field name="severity"/>
+                        </group>
+                        <group>
+                            <field name="current_value"/>
+                            <field name="forecast_30d"/>
+                            <field name="forecast_90d"/>
+                            <field name="forecast_365d"/>
+                            <field name="confidence_lower"/>
+                            <field name="confidence_upper"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="recommended_action"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_capacity_forecast" model="ir.actions.act_window">
+        <field name="name">Capacity Forecast</field>
+        <field name="res_model">custom.ops.capacity.forecast</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

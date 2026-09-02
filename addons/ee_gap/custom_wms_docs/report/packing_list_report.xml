@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Self-contained wrapper (see picking_list_report.xml for the rationale):
+         no web.html_container / web.external_layout, and a mandatory <main>. -->
+    <template id="report_wms_packing_list" name="WMS Packing List">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+            </head>
+            <body>
+                <main>
+                <!-- The style and charset live INSIDE <main>, not in <head>:
+                     ir_actions_report._prepare_html keeps only the children of
+                     <main> and writes them to a bare .html file, so anything in
+                     <head> is silently dropped — the report would print
+                     unstyled and non-ASCII text would come out mojibake. -->
+                    <meta charset="utf-8"/>
+                    <style>
+                        @page { margin: 10mm; }
+                        * { box-sizing: border-box; }
+                        body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; margin: 0; padding: 0; }
+                        h1 { font-size: 16px; margin: 0 0 2px 0; }
+                        h2 { font-size: 12px; margin: 0 0 3px 0; }
+                        .muted { color: #666; }
+                        table.meta { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+                        table.meta td { padding: 1px 4px; vertical-align: top; }
+                        .block { border: 1px solid #999; padding: 5px; margin-bottom: 8px; page-break-inside: avoid; }
+                        .block .head { width: 100%; border-collapse: collapse; }
+                        .block .head td { vertical-align: top; padding: 0 4px; }
+                        table.data { width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 4px; }
+                        table.data th, table.data td { border: 1px solid #b0b0b0; padding: 2px 4px; }
+                        table.data thead th { background-color: #f3f3f3; text-align: left; }
+                        table.data td.num, table.data th.num { text-align: right; }
+                        tr.total td { font-weight: bold; background-color: #e8e8e8; }
+                    </style>
+                    <t t-foreach="docs" t-as="o">
+                        <div class="page" style="page-break-after: always;">
+                            <table class="meta">
+                                <tr>
+                                    <td style="width: 62%;">
+                                        <h1>PACKING LIST</h1>
+                                        <div><b t-out="o.name"/></div>
+                                        <div class="muted" t-out="o.company_id.display_name"/>
+                                    </td>
+                                    <td style="width: 38%; text-align: right;">
+                                        <img t-att-src="o._wms_barcode_src(o.name, 'Code128', 500, 90)"
+                                             alt="Picking barcode" style="height: 45px;"/>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <t t-set="ship_to" t-value="o._wms_delivery_partner()"/>
+                            <t t-set="carrier_name" t-value="o._wms_carrier_name()"/>
+                            <table class="meta">
+                                <tr>
+                                    <td style="width: 50%;">
+                                        <div><b>Ship To</b></div>
+                                        <div t-if="ship_to" t-out="ship_to.display_name"/>
+                                        <div t-if="ship_to and ship_to.street" t-out="ship_to.street"/>
+                                        <div t-if="ship_to and ship_to.street2" t-out="ship_to.street2"/>
+                                        <div t-if="ship_to">
+                                            <span t-out="ship_to.zip or ''"/>
+                                            <span t-out="ship_to.city or ''"/>
+                                            <span t-out="ship_to.state_id.name or ''"/>
+                                            <span t-out="ship_to.country_id.name or ''"/>
+                                        </div>
+                                        <div t-if="not ship_to" class="muted">No partner set.</div>
+                                    </td>
+                                    <td style="width: 50%;">
+                                        <div><b>Customer:</b> <span t-out="o.partner_id.display_name or '-'"/></div>
+                                        <!-- carrier_id only exists when `delivery` is installed; the
+                                             helper probes _fields and returns '' otherwise. -->
+                                        <div t-if="carrier_name"><b>Carrier:</b> <span t-out="carrier_name"/></div>
+                                        <div><b>Scheduled:</b> <span t-out="o.scheduled_date"/></div>
+                                        <div><b>Source Document:</b> <span t-out="o.origin or '-'"/></div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <t t-set="blocks" t-value="o._wms_packing_blocks()"/>
+                            <p t-if="not blocks" class="muted">No detailed operations on this transfer.</p>
+
+                            <div t-foreach="blocks" t-as="b" class="block">
+                                <table class="head">
+                                    <tr>
+                                        <td style="width: 55%;">
+                                            <h2 t-out="b['name']"/>
+                                            <div t-if="b['package_type_name']">
+                                                <b>Type:</b> <span t-out="b['package_type_name']"/>
+                                            </div>
+                                            <div t-if="b['package']">
+                                                <b>PxLxT:</b>
+                                                <span t-out="'%.1f x %.1f x %.1f' % (b['dims'][0], b['dims'][1], b['dims'][2])"/>
+                                            </div>
+                                            <div>
+                                                <b>Net Weight:</b> <span t-out="'%.3f' % b['net_weight']"/>
+                                                <span class="muted"> / </span>
+                                                <b>Gross Weight:</b> <span t-out="'%.3f' % b['gross_weight']"/>
+                                            </div>
+                                            <div t-if="b['max_weight']" class="muted">
+                                                Max weight: <span t-out="'%.3f' % b['max_weight']"/>
+                                            </div>
+                                        </td>
+                                        <td style="width: 45%; text-align: right;">
+                                            <img t-if="b['barcode_code128']" t-att-src="b['barcode_code128']"
+                                                 alt="Package Code128" style="height: 38px;"/>
+                                            <img t-if="b['barcode_qr']" t-att-src="b['barcode_qr']"
+                                                 alt="Package QR" style="height: 38px; margin-left: 6px;"/>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <table class="data">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 15%;">Code</th>
+                                            <th style="width: 45%;">Product</th>
+                                            <th style="width: 25%;">Lot / Serial</th>
+                                            <th class="num" style="width: 15%;">Qty</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="b['lines']" t-as="ml">
+                                            <td t-out="ml.product_id.default_code or ''"/>
+                                            <td t-out="ml.product_id.display_name"/>
+                                            <td t-out="ml.lot_id.name or ml.lot_name or ''"/>
+                                            <td class="num">
+                                                <span t-out="'%.3f' % (ml.quantity or 0.0)"/>
+                                                <span class="muted" t-out="ml.product_uom_id.display_name or ''"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <t t-set="totals" t-value="o._wms_packing_totals()"/>
+                            <table class="data" t-if="blocks">
+                                <tr class="total">
+                                    <td>TOTAL PACKAGES</td>
+                                    <td class="num" t-out="totals['package_count']"/>
+                                    <td>TOTAL GROSS WEIGHT</td>
+                                    <td class="num" t-out="'%.3f' % totals['gross_weight']"/>
+                                </tr>
+                            </table>
+                        </div>
+                    </t>
+                </main>
+            </body>
+        </html>
+    </template>
+
+    <record id="action_report_wms_packing_list" model="ir.actions.report">
+        <field name="name">Packing List (WMS)</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_wms_docs.report_wms_packing_list</field>
+        <field name="report_file">custom_wms_docs.report_wms_packing_list</field>
+        <field name="binding_model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Packing List - %s' % object.name</field>
+    </record>
+
+</odoo>

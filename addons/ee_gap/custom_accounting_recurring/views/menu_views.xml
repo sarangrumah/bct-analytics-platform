@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_recurring_root"
+              name="Recurring"
+              parent="account.menu_finance"
+              sequence="60"
+              groups="custom_accounting_recurring.group_recurring_user"/>
+
+    <menuitem id="menu_recurring_journal_template"
+              name="Journal Entry Templates"
+              parent="menu_recurring_root"
+              action="action_recurring_journal_template"
+              sequence="10"/>
+
+    <menuitem id="menu_recurring_payment_template"
+              name="Payment Templates"
+              parent="menu_recurring_root"
+              action="action_recurring_payment_template"
+              sequence="20"/>
+
+</odoo>

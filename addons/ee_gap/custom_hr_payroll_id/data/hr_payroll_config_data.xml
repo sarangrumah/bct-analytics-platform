@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--
+        Default Indonesian payroll config (PMK/PP-based defaults are already
+        encoded in the field defaults; this record just instantiates one).
+    -->
+    <record id="hr_payroll_config_default" model="hr.payroll.config">
+        <field name="name">Default (Indonesia)</field>
+        <field name="calc_method">ter</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

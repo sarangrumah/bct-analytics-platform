@@ -1,0 +1,5 @@
+"id","sequence","name","auto_apply","country_id"
+"id_psak_fp_domestic",10,"Indonesia — Domestik (PKP)","True","base.id"
+"id_psak_fp_vendor_non_pkp",20,"Indonesia — Vendor Non-PKP (tanpa PPN)","False","base.id"
+"id_psak_fp_vendor_no_npwp",30,"Indonesia — Vendor Tanpa NPWP (PPh 23 4%)","False","base.id"
+"id_psak_fp_foreign_vendor",40,"Indonesia — Vendor Luar Negeri (PPh 26)","False",""

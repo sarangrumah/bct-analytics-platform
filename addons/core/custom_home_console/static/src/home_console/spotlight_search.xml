@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="custom_home_console.SpotlightSearch">
+        <div class="o_hc_spotlight">
+            <i class="fa fa-search o_hc_spotlight_icon" aria-hidden="true"/>
+            <input type="text"
+                   class="o_hc_spotlight_input"
+                   placeholder="Search apps, records, settings…  (Ctrl+K)"
+                   t-ref="input"
+                   t-on-click="onClick"
+                   t-on-input="onInput"
+                   t-on-keydown="onKeydown"/>
+            <kbd class="o_hc_spotlight_hint">Ctrl K</kbd>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_studio_report_customization_list" model="ir.ui.view">
+        <field name="name">studio.report.customization.list</field>
+        <field name="model">studio.report.customization</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'applied'"
+                  decoration-danger="state == 'error'">
+                <field name="name"/>
+                <field name="base_report_id"/>
+                <field name="paper_format_id" optional="show"/>
+                <field name="state" widget="badge"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_studio_report_customization_form" model="ir.ui.view">
+        <field name="name">studio.report.customization.form</field>
+        <field name="model">studio.report.customization</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_apply" string="Apply" type="object" class="btn-primary"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Sales Order — branded header"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="base_report_id" options="{'no_create': True}"/>
+                            <field name="base_view_id" readonly="1"/>
+                            <field name="paper_format_id" options="{'no_create': True}"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="inherit_view_id" readonly="1"/>
+                            <field name="inherit_report_id" readonly="1"
+                                   invisible="not inherit_report_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Header">
+                            <group>
+                                <field name="header_mode"/>
+                            </group>
+                            <field name="header_text" nolabel="1"
+                                   placeholder="Custom header text. Use \\n for line breaks."/>
+                        </page>
+                        <page string="Footer">
+                            <group>
+                                <field name="footer_mode"/>
+                            </group>
+                            <field name="footer_text" nolabel="1"
+                                   placeholder="Custom footer text."/>
+                        </page>
+                        <page string="Advanced — Custom QWeb XPath">
+                            <p class="text-muted">
+                                Each row is a single <code>&lt;xpath ...&gt;...&lt;/xpath&gt;</code> snippet
+                                inserted into the inheritance. Only safe QWeb directives are allowed
+                                (no <code>t-call</code>, <code>t-raw</code>, etc.).
+                            </p>
+                            <field name="custom_xpath_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="label"/>
+                                    <field name="xpath_snippet"
+                                           widget="ace"
+                                           options="{'mode': 'xml'}"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Generated arch" invisible="not arch_inherit">
+                            <field name="arch_inherit" widget="ace"
+                                   options="{'mode': 'xml'}" readonly="1" nolabel="1"/>
+                        </page>
+                        <page string="Last error" invisible="not last_error">
+                            <field name="last_error" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_studio_report_customization" model="ir.actions.act_window">
+        <field name="name">Report Customizations</field>
+        <field name="res_model">studio.report.customization</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

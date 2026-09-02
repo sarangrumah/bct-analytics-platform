@@ -1,0 +1,105 @@
+# ===========================================================================
+# bct_warehouse — dbt project for the analytics warehouse.
+#
+# LAYERING, per the brief: raw -> stg_ -> int_ -> fct_/dim_/mart_.
+#   staging/         views over raw.*, one per source table. Deduplicate to the
+#                    latest version per key and drop tombstones. NO business
+#                    logic lives here.
+#   intermediate/    the joins that more than one mart needs, so a rule is
+#                    written once.
+#   marts/           facts, dimensions and pre-aggregated marts. Tables.
+#   reconciliation/  the models that compare the warehouse against ODOO. They
+#                    live in the `warehouse` schema, not `marts`, because they
+#                    are pipeline metadata rather than a published surface.
+#
+# NO PACKAGES. packages.yml does not exist and `dbt deps` is never run. The two
+# things this project would have taken from dbt_utils - generate_surrogate_key
+# and date_spine - are twenty lines of SQL in macros/, and that is a better
+# trade than a network fetch at run time inside a container that otherwise
+# talks to nothing but the warehouse.
+# ===========================================================================
+name: bct_warehouse
+version: 1.0.0
+config-version: 2
+profile: bct_warehouse
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+# Explicitly "seeds", never the default-by-layout "data": .gitignore carries an
+# unanchored `data/` pattern that swallows a directory of that name at any
+# depth, and a seed CSV that is invisible to git only fails on a clean clone.
+seed-paths: ["seeds"]
+snapshot-paths: ["snapshots"]
+test-paths: ["tests"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+# Written into every dbt run so a mart carries provenance in the catalogue.
+models:
+  bct_warehouse:
+    +persist_docs:
+      relation: true
+      columns: true
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: marts
+      # THE TENANT BOUNDARY. Applied as a post-hook on every mart rather than
+      # once by hand, because dbt drops and recreates a table on
+      # --full-refresh and takes any hand-created policy with it. A control
+      # that disappears on a full refresh is a control nobody re-checks.
+      +post-hook:
+        - "{{ apply_rls() }}"
+    reconciliation:
+      +materialized: table
+      +schema: warehouse
+      +post-hook:
+        - "{{ apply_rls() }}"
+
+seeds:
+  bct_warehouse:
+    # STAGING, not marts, and the two structural tests are why.
+    #
+    # A seed in `marts` is a table in `marts`, and every table in `marts` must
+    # carry tenant_id and must have RLS forced on it - those are asserted by
+    # assert_every_mart_carries_tenant_id and assert_rls_forced_on_every_mart,
+    # and both of them failed on this seed before it moved. That was the tests
+    # working, not the tests being wrong: a public holiday list is reference
+    # data that is identical for every tenant, it has no tenant_id to key a
+    # policy on, and inventing one would be fabricating a tenant boundary that
+    # does not exist.
+    #
+    # In `staging` it is invisible to warehouse_rls (which holds no privilege
+    # on that schema at all), and its tenant-scoped published form is dim_date,
+    # which does carry tenant_id and is protected like every other dimension.
+    +schema: staging
+    id_public_holiday:
+      +column_types:
+        holiday_date: date
+
+snapshots:
+  bct_warehouse:
+    +target_schema: snapshots
+
+on-run-end:
+  # Persist what the run did into warehouse.dbt_run_result, which is what the
+  # Prometheus exporter reads. This is what makes "a reconciliation failure is
+  # an alert" true rather than "a reconciliation failure is a red line in
+  # somebody's terminal".
+  - "{{ log_dbt_results(results) }}"
+
+vars:
+  # dim_date's span. Wide enough to cover the seeded 12 months plus a year
+  # either side, narrow enough that the cross join with tenants stays small.
+  date_spine_start: "2024-01-01"
+  date_spine_end: "2027-12-31"
+  # Indonesian fiscal year. Stated as a variable rather than hardcoded because
+  # a tenant on a non-calendar fiscal year is a configuration change, not a
+  # model rewrite. 1 = January, which is what UU KUP and res.company's default
+  # fiscalyear_last_month imply for an Indonesian entity.
+  fiscal_year_start_month: 1

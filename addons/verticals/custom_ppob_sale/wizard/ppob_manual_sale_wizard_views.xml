@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_manual_sale_wizard_form" model="ir.ui.view">
+        <field name="name">custom.ppob.manual.sale.wizard.form</field>
+        <field name="model">custom.ppob.manual.sale.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Manual PPOB Sale">
+                <group>
+                    <group>
+                        <field name="mitra_id"/>
+                        <field name="product_id"/>
+                        <field name="msisdn"/>
+                        <field name="provider_id"/>
+                    </group>
+                    <group>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="sell_price"/>
+                        <field name="cost_price"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_create_and_dispatch" type="object"
+                            string="Create + Dispatch" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ppob_manual_sale_wizard" model="ir.actions.act_window">
+        <field name="name">Manual PPOB Sale</field>
+        <field name="res_model">custom.ppob.manual.sale.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

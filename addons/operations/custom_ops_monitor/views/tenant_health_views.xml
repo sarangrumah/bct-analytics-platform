@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_tenant_health_list" model="ir.ui.view">
+        <field name="name">custom.ops.tenant.health.list</field>
+        <field name="model">custom.ops.tenant.health</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="status == 'red'"
+                  decoration-warning="status == 'yellow'"
+                  decoration-success="status == 'green'">
+                <field name="snapshot_at"/>
+                <field name="tenant_id"/>
+                <field name="cpu_pct" widget="progressbar"/>
+                <field name="memory_pct" widget="progressbar"/>
+                <field name="disk_pct" widget="progressbar"/>
+                <field name="error_rate_pct"/>
+                <field name="request_rate_per_min"/>
+                <field name="db_size_mb"/>
+                <field name="redis_hit_rate_pct"/>
+                <field name="backup_status" widget="badge"/>
+                <field name="health_score" widget="progressbar"/>
+                <field name="status" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_tenant_health_form" model="ir.ui.view">
+        <field name="name">custom.ops.tenant.health.form</field>
+        <field name="model">custom.ops.tenant.health</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="tenant_id"/>
+                            <field name="snapshot_at"/>
+                            <field name="status" widget="badge"/>
+                            <field name="health_score" widget="progressbar"/>
+                        </group>
+                        <group>
+                            <field name="cpu_pct"/>
+                            <field name="memory_pct"/>
+                            <field name="memory_mb_used"/>
+                            <field name="memory_mb_total"/>
+                            <field name="disk_pct"/>
+                            <field name="disk_gb_used"/>
+                            <field name="disk_gb_total"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="request_rate_per_min"/>
+                            <field name="error_rate_pct"/>
+                        </group>
+                        <group>
+                            <field name="db_size_mb"/>
+                            <field name="redis_hit_rate_pct"/>
+                            <field name="last_backup_at"/>
+                            <field name="backup_status"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tenant_health_search" model="ir.ui.view">
+        <field name="name">custom.ops.tenant.health.search</field>
+        <field name="model">custom.ops.tenant.health</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="tenant_id"/>
+                <filter name="green" string="Green" domain="[('status','=','green')]"/>
+                <filter name="yellow" string="Yellow" domain="[('status','=','yellow')]"/>
+                <filter name="red" string="Red" domain="[('status','=','red')]"/>
+
+                    <filter name="g_tenant" string="Tenant"
+                            context="{'group_by':'tenant_id'}"/>
+                    <filter name="g_status" string="Status"
+                            context="{'group_by':'status'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_tenant_health" model="ir.actions.act_window">
+        <field name="name">Tenant Health (History)</field>
+        <field name="res_model">custom.ops.tenant.health</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

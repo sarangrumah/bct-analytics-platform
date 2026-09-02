@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_retail_inventory_reconciliation_form" model="ir.ui.view">
+        <field name="name">retail.inventory.reconciliation.form</field>
+        <field name="model">retail.inventory.reconciliation</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Reconciliation">
+                <header>
+                    <button name="action_compute" type="object" string="Compute"
+                            class="btn-primary"
+                            invisible="state == 'generated'"/>
+                    <button name="action_generate_move" type="object"
+                            string="Generate Journal Entry" class="btn-primary"
+                            invisible="state == 'generated'"/>
+                    <button name="action_view_move" type="object"
+                            string="View Journal Entry"
+                            invisible="not move_id"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,computed,generated"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="journal_id"/>
+                            <field name="counterpart_account_id"/>
+                            <field name="move_id" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                        <list editable="bottom" create="false">
+                            <field name="account_id"/>
+                            <field name="counterpart_account_id"/>
+                            <field name="book_value" sum="GL Balance"/>
+                            <field name="stock_value" sum="Stock Value"/>
+                            <field name="difference" sum="Difference"/>
+                            <field name="currency_id" column_invisible="1"/>
+                        </list>
+                    </field>
+                    <group class="oe_subtotal_footer">
+                        <field name="total_difference"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_retail_inventory_reconciliation_list" model="ir.ui.view">
+        <field name="name">retail.inventory.reconciliation.list</field>
+        <field name="model">retail.inventory.reconciliation</field>
+        <field name="arch" type="xml">
+            <list string="Inventory Reconciliations">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="total_difference"/>
+                <field name="state"
+                       decoration-success="state == 'generated'"
+                       decoration-info="state == 'computed'"
+                       widget="badge"/>
+                <field name="move_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_retail_inventory_reconciliation" model="ir.actions.act_window">
+        <field name="name">Inventory Reconciliation</field>
+        <field name="res_model">retail.inventory.reconciliation</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a periodic inventory reconciliation</p>
+            <p>Compare the GL inventory-asset balance against the actual on-hand
+               stock value and generate a draft adjustment journal entry.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_retail_inventory_reconciliation"
+              name="Inventory Reconciliation"
+              parent="account.menu_finance_entries"
+              action="action_retail_inventory_reconciliation"
+              sequence="90"/>
+</odoo>

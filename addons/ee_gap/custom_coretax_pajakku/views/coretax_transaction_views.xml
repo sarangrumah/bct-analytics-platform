@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_coretax_transaction_list" model="ir.ui.view">
+        <field name="name">custom.coretax.transaction.list</field>
+        <field name="model">custom.coretax.transaction</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'approved'"
+                  decoration-danger="state in ('rejected', 'error')"
+                  decoration-warning="state == 'queued'"
+                  decoration-info="state in ('submitting', 'submitted')"
+                  create="0">
+                <field name="create_date"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="transaction_type"/>
+                <field name="external_uuid"/>
+                <field name="nsfp"/>
+                <field name="account_move_id"/>
+                <field name="bukti_potong_id"/>
+                <field name="retry_count"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_coretax_transaction_form" model="ir.ui.view">
+        <field name="name">custom.coretax.transaction.form</field>
+        <field name="model">custom.coretax.transaction</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <header>
+                    <button name="action_retry" string="Retry" type="object"
+                            class="btn-primary"
+                            invisible="state not in ('error', 'rejected')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="queued,submitting,submitted,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="config_id"/>
+                            <field name="transaction_type"/>
+                            <field name="external_uuid" readonly="1"/>
+                            <field name="nsfp" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="account_move_id"/>
+                            <field name="bukti_potong_id"/>
+                            <field name="submitted_at" readonly="1"/>
+                            <field name="last_polled_at" readonly="1"/>
+                            <field name="completed_at" readonly="1"/>
+                            <field name="retry_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Payload">
+                            <field name="payload" filename="payload_filename"/>
+                            <field name="payload_filename" invisible="1"/>
+                        </page>
+                        <page string="DJP Response">
+                            <field name="response_xml" filename="response_filename"/>
+                            <field name="response_filename" invisible="1"/>
+                            <field name="response_pdf" filename="response_pdf_filename"/>
+                            <field name="response_pdf_filename" invisible="1"/>
+                            <group>
+                                <field name="djp_status_code" readonly="1"/>
+                                <field name="djp_message" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Last Error" invisible="not last_error">
+                            <field name="last_error" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coretax_transaction_search" model="ir.ui.view">
+        <field name="name">custom.coretax.transaction.search</field>
+        <field name="model">custom.coretax.transaction</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="external_uuid"/>
+                <field name="nsfp"/>
+                <field name="account_move_id"/>
+                <filter name="approved" string="Approved" domain="[('state','=','approved')]"/>
+                <filter name="pending" string="Pending"
+                        domain="[('state','in',('queued','submitting','submitted'))]"/>
+                <filter name="errors" string="Errors / Rejected"
+                        domain="[('state','in',('error','rejected'))]"/>
+                <group>
+                    <filter name="by_state" string="State" context="{'group_by': 'state'}"/>
+                    <filter name="by_type" string="Type" context="{'group_by': 'transaction_type'}"/>
+                    <filter name="by_company" string="Company" context="{'group_by': 'company_id'}"
+                            groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_coretax_transaction" model="ir.actions.act_window">
+        <field name="name">Pajakku Transactions</field>
+        <field name="res_model">custom.coretax.transaction</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_coretax_transaction_search"/>
+    </record>
+
+</odoo>

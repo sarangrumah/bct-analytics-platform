@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="group_recurring_user" model="res.groups">
+            <field name="name">Recurring: User</field>
+            <field name="comment">Can view templates and execute them manually.</field>
+        </record>
+
+        <record id="group_recurring_admin" model="res.groups">
+            <field name="name">Recurring: Administrator</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_recurring_user'))]"/>
+            <field name="comment">Full CRUD on recurring templates.</field>
+        </record>
+
+    </data>
+</odoo>

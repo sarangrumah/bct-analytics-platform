@@ -1,0 +1,28 @@
+.o_brd_report_owl_root {
+    .o_brd_gauge {
+        .progress {
+            border-radius: 12px;
+            overflow: hidden;
+            background: #eef2f7;
+        }
+    }
+
+    .card {
+        border: 1px solid #e3e6ea;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .badge {
+        font-weight: 500;
+    }
+}
+
+.o_brd_report {
+    pre.mermaid {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        white-space: pre-wrap;
+    }
+}

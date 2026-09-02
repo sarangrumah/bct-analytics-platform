@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ops_reports_root"
+              name="Operational Reports"
+              web_icon="stock,static/description/icon.png"
+              sequence="95"
+              groups="custom_accounting_reports.group_report_user"/>
+
+    <menuitem id="menu_ops_reports_asset_opname"
+              name="General Report Aset (Opname)"
+              parent="menu_ops_reports_root"
+              action="action_asset_opname_wizard"
+              sequence="10"/>
+
+    <menuitem id="menu_ops_reports_event_movement"
+              name="History Aset per Event"
+              parent="menu_ops_reports_root"
+              action="action_event_movement_wizard"
+              sequence="20"/>
+
+    <menuitem id="menu_ops_reports_spareparts"
+              name="List Sparepart"
+              parent="menu_ops_reports_root"
+              action="action_spareparts_wizard"
+              sequence="30"/>
+
+    <menuitem id="menu_ops_reports_maintenance"
+              name="Maintenance Report"
+              parent="menu_ops_reports_root"
+              action="action_maintenance_health_wizard"
+              sequence="40"/>
+
+    <menuitem id="menu_ops_reports_repair"
+              name="Repair Report"
+              parent="menu_ops_reports_root"
+              action="action_repair_history_wizard"
+              sequence="50"/>
+</odoo>

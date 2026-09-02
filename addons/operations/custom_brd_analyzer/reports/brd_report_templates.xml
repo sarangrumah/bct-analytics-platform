@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Backend / portal HTML report page -->
+        <template id="brd_report_page" name="BRD Analysis Report">
+            <t t-call="web.layout">
+                <t t-set="head">
+                    <link rel="stylesheet" type="text/css" href="/web/static/lib/bootstrap/dist/css/bootstrap.css"/>
+                </t>
+                <t t-set="body_classname" t-value="'o_brd_report'"/>
+                <div class="container my-4">
+                    <header class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h1 t-esc="doc.name"/>
+                            <div class="text-muted">
+                                <span t-esc="doc.reference"/> ·
+                                <span t-esc="doc.business_domain or ''"/> ·
+                                <span t-if="doc.vertical_target_id" t-esc="doc.vertical_target_id.display_name"/>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="display-6">
+                                <span t-esc="doc.overall_fit_pct"/>%
+                            </div>
+                            <small class="text-muted">Overall Fit</small>
+                            <div t-if="not public" class="mt-2">
+                                <a t-att-href="'/brd/%s/report.pdf' % doc.id" class="btn btn-outline-secondary btn-sm">Download PDF</a>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div class="alert alert-light" t-esc="doc.severity_summary"/>
+
+                    <section class="mb-4">
+                        <h3>Section Analysis</h3>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Section</th>
+                                    <th>Capability</th>
+                                    <th>Mapped Modules</th>
+                                    <th>Fit</th>
+                                    <th>Status</th>
+                                    <th>Severity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="sections" t-as="s">
+                                    <td t-esc="s.sequence"/>
+                                    <td>
+                                        <strong t-esc="s.title"/>
+                                        <div class="text-muted small" t-if="s.page_or_slide">p.<span t-esc="s.page_or_slide"/></div>
+                                    </td>
+                                    <td t-esc="analyses.get(s.id) and analyses[s.id].capability_required or ''"/>
+                                    <td>
+                                        <t t-if="analyses.get(s.id)">
+                                            <span t-foreach="analyses[s.id].mapped_module_ids" t-as="m" class="badge bg-info me-1" t-esc="m.module_name"/>
+                                        </t>
+                                    </td>
+                                    <td t-esc="analyses.get(s.id) and analyses[s.id].fit_score or 0"/>
+                                    <td>
+                                        <t t-if="analyses.get(s.id)">
+                                            <span t-att-class="'badge bg-success' if analyses[s.id].gap_status == 'covered' else ('badge bg-warning' if analyses[s.id].gap_status == 'partial' else ('badge bg-danger' if analyses[s.id].gap_status == 'missing' else 'badge bg-secondary'))" t-esc="analyses[s.id].gap_status"/>
+                                        </t>
+                                    </td>
+                                    <td t-esc="analyses.get(s.id) and analyses[s.id].gap_severity or ''"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section class="mb-4">
+                        <h3>Recommended New Modules</h3>
+                        <div class="row">
+                            <div class="col-md-6 mb-3" t-foreach="recommendations" t-as="r">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between">
+                                        <strong t-esc="r.name"/>
+                                        <span t-att-class="'badge bg-danger' if r.severity == 'must_have' else ('badge bg-warning' if r.severity == 'should_have' else 'badge bg-secondary')" t-esc="r.severity"/>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="small text-muted mb-1">Estimated: <span t-esc="r.estimated_md"/> MD</p>
+                                        <p t-esc="r.scope"/>
+                                        <div class="mb-2">
+                                            <strong>Depends on:</strong>
+                                            <span t-foreach="r.depends_on_module_ids" t-as="d" class="badge bg-light text-dark me-1" t-esc="d.module_name"/>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Impacts:</strong>
+                                            <span t-foreach="r.impact_module_ids" t-as="i" class="badge bg-light text-dark me-1" t-esc="i.module_name"/>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Tags:</strong>
+                                            <span t-foreach="r.capability_tag_ids" t-as="t" class="badge bg-info me-1" t-esc="t.technical_code"/>
+                                        </div>
+                                        <details>
+                                            <summary>Justification</summary>
+                                            <p t-esc="r.justification"/>
+                                        </details>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="mb-4">
+                        <h3>Module Impact Diagram</h3>
+                        <pre class="mermaid" t-esc="mermaid_src"/>
+                        <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"/>
+                        <script>
+                            try { mermaid.initialize({ startOnLoad: true }); } catch (e) {}
+                        </script>
+                    </section>
+
+                    <!-- OWL-mountable container with embedded JSON payload -->
+                    <div class="o_brd_report_owl" t-att-data-payload="json_payload"/>
+                </div>
+            </t>
+        </template>
+
+        <!-- PDF report -->
+        <record id="action_report_brd" model="ir.actions.report">
+            <field name="name">BRD Gap Analysis Report</field>
+            <field name="model">brd.document</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">custom_brd_analyzer.report_brd_document</field>
+            <field name="report_file">custom_brd_analyzer.report_brd_document</field>
+            <field name="binding_model_id" ref="model_brd_document"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="report_brd_document">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <h1 t-esc="doc.name"/>
+                            <p>
+                                <strong>Reference:</strong> <span t-esc="doc.reference"/><br/>
+                                <strong>Domain:</strong> <span t-esc="doc.business_domain or ''"/><br/>
+                                <strong>Overall Fit:</strong> <span t-esc="doc.overall_fit_pct"/>%<br/>
+                                <strong>Severity:</strong> <span t-esc="doc.severity_summary"/>
+                            </p>
+
+                            <h2>Section Analysis</h2>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Section</th>
+                                        <th>Capability</th>
+                                        <th>Modules</th>
+                                        <th>Fit</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.section_ids.sorted('sequence')" t-as="s">
+                                        <t t-set="a" t-value="doc.analysis_ids.filtered(lambda x: x.section_id.id == s.id)[:1]"/>
+                                        <td t-esc="s.sequence"/>
+                                        <td t-esc="s.title"/>
+                                        <td t-esc="a and a.capability_required or ''"/>
+                                        <td t-esc="a and ', '.join(a.mapped_module_ids.mapped('module_name')) or ''"/>
+                                        <td t-esc="a and a.fit_score or 0"/>
+                                        <td t-esc="a and a.gap_status or ''"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h2>Recommendations</h2>
+                            <t t-foreach="doc.recommendation_ids.sorted('sequence')" t-as="r">
+                                <h3><span t-esc="r.name"/> <small>(<span t-esc="r.severity"/>, <span t-esc="r.estimated_md"/> MD)</small></h3>
+                                <p><strong>Scope:</strong> <span t-esc="r.scope"/></p>
+                                <p><strong>Justification:</strong> <span t-esc="r.justification"/></p>
+                                <p><strong>Depends:</strong> <span t-esc="', '.join(r.depends_on_module_ids.mapped('module_name'))"/></p>
+                                <p><strong>Impacts:</strong> <span t-esc="', '.join(r.impact_module_ids.mapped('module_name'))"/></p>
+                            </t>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>

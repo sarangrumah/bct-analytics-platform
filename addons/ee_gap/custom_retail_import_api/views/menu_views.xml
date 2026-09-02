@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_retail_mdm_requests" name="MDM Requests"
+              parent="custom_retail_import.menu_retail_import_root"
+              action="action_retail_mdm_request" sequence="16"/>
+
+    <menuitem id="menu_retail_mdm_category_map" name="MDM Category Crosswalk"
+              parent="custom_retail_import.menu_retail_import_config"
+              action="action_retail_mdm_category_map" sequence="40"/>
+</odoo>

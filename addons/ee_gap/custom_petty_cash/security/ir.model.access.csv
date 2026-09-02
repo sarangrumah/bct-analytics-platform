@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_petty_cash_request_user,petty.cash.request.user,model_petty_cash_request,group_petty_cash_user,1,1,1,0
+access_petty_cash_request_finance,petty.cash.request.finance,model_petty_cash_request,group_petty_cash_finance,1,1,1,1
+access_petty_cash_request_line_user,petty.cash.request.line.user,model_petty_cash_request_line,group_petty_cash_user,1,1,1,1
+access_petty_cash_request_line_finance,petty.cash.request.line.finance,model_petty_cash_request_line,group_petty_cash_finance,1,1,1,1
+access_petty_cash_realization_user,petty.cash.realization.user,model_petty_cash_realization,group_petty_cash_user,1,1,1,0
+access_petty_cash_realization_finance,petty.cash.realization.finance,model_petty_cash_realization,group_petty_cash_finance,1,1,1,1
+access_petty_cash_realization_line_user,petty.cash.realization.line.user,model_petty_cash_realization_line,group_petty_cash_user,1,1,1,1
+access_petty_cash_realization_line_finance,petty.cash.realization.line.finance,model_petty_cash_realization_line,group_petty_cash_finance,1,1,1,1
+access_petty_cash_outstanding_wizard,petty.cash.outstanding.wizard,model_petty_cash_outstanding_wizard,group_petty_cash_user,1,1,1,1
+access_petty_cash_aging_wizard,petty.cash.aging.wizard,model_petty_cash_aging_wizard,group_petty_cash_user,1,1,1,1

@@ -1,0 +1,79 @@
+# ---------------------------------------------------------------------------
+# Loki 3.x, single-binary, filesystem-backed.
+#
+# Sized for one VPS, not for a cluster: no object store, no ring beyond a local
+# inmemory KV, TSDB index. Retention is ON and bounded — an unbounded log store
+# on the same disk as Postgres is the second-most-likely way to fill it, after
+# an uncapped replication slot.
+# ---------------------------------------------------------------------------
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+  log_level: warn
+  # Odoo tracebacks are long; the default 4MB limit truncates a batch of them.
+  grpc_server_max_recv_msg_size: 8388608
+  grpc_server_max_send_msg_size: 8388608
+
+common:
+  instance_addr: 127.0.0.1
+  path_prefix: /loki
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+schema_config:
+  configs:
+    - from: 2024-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+storage_config:
+  tsdb_shipper:
+    active_index_directory: /loki/tsdb-index
+    cache_location: /loki/tsdb-cache
+  filesystem:
+    directory: /loki/chunks
+
+limits_config:
+  # Container clocks and Docker log timestamps drift; rejecting "too old"
+  # entries at the default 1 week silently loses logs after a host sleep.
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+  max_query_series: 5000
+  ingestion_rate_mb: 8
+  ingestion_burst_size_mb: 16
+  # Bounded retention. Enforced by the compactor below.
+  retention_period: 168h
+  volume_enabled: true
+
+compactor:
+  working_directory: /loki/compactor
+  compaction_interval: 10m
+  # Without these three, retention_period above is advisory and nothing ever
+  # deletes a chunk.
+  retention_enabled: true
+  retention_delete_delay: 2h
+  delete_request_store: filesystem
+
+ruler:
+  storage:
+    type: local
+    local:
+      directory: /loki/rules
+  rule_path: /loki/rules-temp
+  alertmanager_url: http://alertmanager:9093
+  enable_api: true
+
+analytics:
+  reporting_enabled: false

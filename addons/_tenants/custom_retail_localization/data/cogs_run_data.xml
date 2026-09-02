@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="seq_retail_cogs_run" model="ir.sequence">
+        <field name="name">Periodic COGS Run</field>
+        <field name="code">retail.cogs.run</field>
+        <field name="prefix">COGS/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

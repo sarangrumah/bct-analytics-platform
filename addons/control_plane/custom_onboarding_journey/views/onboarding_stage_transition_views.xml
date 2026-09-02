@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_onboarding_stage_transition_list" model="ir.ui.view">
+        <field name="name">onboarding.stage.transition.list</field>
+        <field name="model">onboarding.stage.transition</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false">
+                <field name="transitioned_at"/>
+                <field name="journey_id"/>
+                <field name="from_stage"/>
+                <field name="to_stage"/>
+                <field name="user_id"/>
+                <field name="notes"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_onboarding_stage_transition" model="ir.actions.act_window">
+        <field name="name">Stage Transitions</field>
+        <field name="res_model">onboarding.stage.transition</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

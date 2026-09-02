@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_chat_page" name="AI Chat">
+        <t t-call="website.layout">
+            <div class="container py-4">
+                <h2>🤖 Ask the Platform</h2>
+                <p class="text-muted">
+                    Bertanya dalam Bahasa Indonesia atau English tentang data yang Anda
+                    bisa akses (faktur, payslip, partner, dst). Read-only.
+                </p>
+
+                <div class="card mb-3">
+                    <div class="card-body" style="max-height: 60vh; overflow-y: auto;">
+                        <div t-foreach="messages" t-as="m"
+                             t-attf-class="mb-3 #{m.role == 'user' and 'text-end' or ''}">
+                            <div t-attf-class="d-inline-block p-2 rounded #{m.role == 'user' and 'bg-primary text-white' or (m.is_error and 'bg-danger text-white' or 'bg-light')}">
+                                <div>
+                                    <small class="text-muted" t-if="m.role != 'user'">
+                                        <t t-if="m.is_error">⚠ Error</t>
+                                        <t t-else="">🤖 Assistant</t>
+                                    </small>
+                                </div>
+                                <div t-out="m.content"/>
+                                <details t-if="m.role == 'assistant' and m.result_json" class="mt-2">
+                                    <summary>Results JSON</summary>
+                                    <pre style="max-height: 200px; overflow: auto;"
+                                         t-out="m.result_json"/>
+                                </details>
+                            </div>
+                        </div>
+                        <div t-if="not messages" class="text-muted text-center py-4">
+                            Tanya saya pertanyaan tentang data Odoo Anda di bawah ini.
+                        </div>
+                    </div>
+                </div>
+
+                <form action="/ai/chat/ask" method="POST">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="input-group">
+                        <input name="question" class="form-control"
+                               placeholder="Contoh: tampilkan vendor bills > Rp 100 juta bulan ini"
+                               required="required" autofocus="autofocus"/>
+                        <button type="submit" class="btn btn-primary">Tanya</button>
+                    </div>
+                </form>
+            </div>
+        </t>
+    </template>
+</odoo>

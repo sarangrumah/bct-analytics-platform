@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_event_form_inherit_custom_events" model="ir.ui.view">
+        <field name="name">event.event.form.inherit.custom_events</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="WhatsApp &amp; Check-in" name="custom_events_ext">
+                        <group>
+                            <group string="WhatsApp Tickets">
+                                <field name="x_whatsapp_ticket_template_id"
+                                       options="{'no_create': True}"/>
+                            </group>
+                            <group string="Check-in">
+                                <field name="x_qr_checkin_enabled"/>
+                            </group>
+                            <group string="Marketing Follow-up (PDP)">
+                                <field name="x_marketing_consent_purpose"/>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+</odoo>

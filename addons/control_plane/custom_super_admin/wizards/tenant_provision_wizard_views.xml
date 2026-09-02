@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_tenant_provision_wizard_form" model="ir.ui.view">
+        <field name="name">tenant.provision.wizard.form</field>
+        <field name="model">tenant.provision.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Provision Tenant">
+                <sheet>
+                    <div invisible="not run_done" class="alert alert-success" role="alert">
+                        <h4>✅ Tenant provisioned</h4>
+                        <p><strong>⚠ Capture these credentials NOW — they are shown only once.</strong></p>
+                    </div>
+                    <group invisible="run_done">
+                        <group string="Identity">
+                            <field name="slug" placeholder="acme"/>
+                            <field name="display_name" placeholder="Acme Corporation"/>
+                            <field name="plan_tier"/>
+                            <field name="csm_user_id"/>
+                        </group>
+                        <group string="Contact">
+                            <field name="contact_email"/>
+                            <field name="contact_phone"/>
+                        </group>
+                        <group string="Operations">
+                            <field name="backup_schedule_cron"/>
+                            <field name="install_modules_extra" placeholder="custom_marketplace, custom_field_service"/>
+                        </group>
+                        <group string="Feature flags">
+                            <field name="feature_pajakku"/>
+                            <field name="feature_marketplace"/>
+                        </group>
+                    </group>
+                    <group invisible="not run_done" string="Initial credentials (capture now)">
+                        <field name="admin_password" readonly="1" widget="CopyClipboardChar"/>
+                        <field name="fernet_key_dek" readonly="1" widget="CopyClipboardChar"
+                               help="Pass this to ops via the secure channel — Odoo will not be able to retrieve it again."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_provision"
+                            string="Provision"
+                            type="object"
+                            class="btn-primary"
+                            invisible="run_done"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_tenant_provision_wizard" model="ir.actions.act_window">
+        <field name="name">Provision New Tenant</field>
+        <field name="res_model">tenant.provision.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

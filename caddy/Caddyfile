@@ -1,0 +1,291 @@
+# ===========================================================================
+# ATHERA — single entry point.
+#
+# Adapted from the platform repo's caddy/Caddyfile.multitenant on 2026-09-01.
+# Made environment-driven on 2026-09-02: every hostname and the TLS mode now
+# come from .env, so a deployment host differs from a workstation by
+# configuration rather than by a patched copy of this file.
+#
+# WHY THIS EXISTS AT ALL, and it is not TLS convenience.
+#
+# Odoo serves a database only if `dbfilter` matches it. With one database the
+# anchored form ^bct$ is enough. With two, a filter naming both was MEASURED to
+# serve NEITHER: Odoo cannot choose, so /web/login answers
+# `303 -> /web/database/selector`, and list_db=False disables that selector.
+# A wider regex does not admit a second database; it breaks the first one.
+#
+# The only thing that makes more than one database reachable is a per-request
+# way to say WHICH — and in Odoo that is the Host header, through dbfilter's
+# %d. So the reverse proxy is not decoration in front of a working stack; it is
+# the mechanism that makes multi-tenancy work at all.
+#
+# %d IS THE FIRST LABEL OF THE HOST, not the whole thing. That is the one
+# subtlety here. `odoo-admin.<domain>` would give %d = "odoo-admin" and look
+# for a database of that name. So that route REWRITES the upstream Host to
+# `<ATHERA_ADMIN_DB>.<domain>`, which makes %d resolve to exactly the right
+# database. Tenant routes need no such rewrite: their hostname's first label
+# already IS the slug.
+#
+# TWO VARIABLES DECIDE THE ENVIRONMENT, and nothing else in this file does:
+#
+#   ATHERA_DOMAIN   athera.localhost on a workstation, the real domain in
+#                   production. compose/odoo.yml already builds its network
+#                   aliases from the same variable, so the browser-facing
+#                   routes here and the in-network RPC names cannot drift
+#                   apart — which they silently could while this file
+#                   hardcoded its hostnames.
+#   ATHERA_TLS      `internal` for a local CA, or an EMAIL ADDRESS to turn on
+#                   ACME with that address as the account. `tls <email>` is
+#                   Caddy's own syntax for exactly that, so moving from a local
+#                   certificate to Let's Encrypt is one .env value and no edit
+#                   here.
+#
+# DO NOT point ATHERA_TLS at an email before the DNS A records exist and have
+# propagated. Let's Encrypt rate-limits failed validations (5 per hostname per
+# hour), so a Caddy that starts first spends that budget and is then locked out
+# at the moment DNS becomes correct.
+#
+# EVERY HOSTNAME BELOW NEEDS A DNS RECORD in production. Currently:
+#   @  www  app  admin  odoo-admin  auth  bct  acme
+#
+# HOSTS FILE, workstation only. Windows does not resolve *.localhost
+# automatically. Add:
+#     127.0.0.1  athera.localhost
+#     127.0.0.1  admin.athera.localhost
+#     127.0.0.1  odoo-admin.athera.localhost
+#     127.0.0.1  app.athera.localhost
+#     127.0.0.1  bct.athera.localhost
+#     127.0.0.1  <slug>.athera.localhost      per provisioned client
+# Anything scripted can skip that with `curl -H 'Host: ...'`, which is how the
+# verification in scripts/ tests these routes without touching the host file.
+#
+# NO WILDCARD ROUTE, deliberately. Every hostname below is written out. A
+# wildcard `*.<domain> -> odoo` plus dbfilter ^%d$ would make every database in
+# the cluster reachable by guessing its name, which is precisely the exposure
+# contract 04 s8 asks to be reviewed rather than assumed.
+# ===========================================================================
+{
+	# Loopback only. On a workstation this host also runs odoo19-platform-*,
+	# odoo19-analytics-* and smart-warga-*; an admin endpoint on 0.0.0.0 would
+	# be reachable from the LAN alongside them. On a VPS it would be reachable
+	# from the internet, which is worse.
+	admin 127.0.0.1:2019
+
+	# A local CA, so https works without a certificate warning being trained
+	# out of people. Trust the root once from
+	# data/caddy/pki/authorities/local/root.crt
+	# Unused when ATHERA_TLS names an email — issuance then goes to ACME.
+	pki {
+		ca local {
+			name "ATHERA Local CA"
+		}
+	}
+}
+
+# The TLS policy, in one place. Every site imports this rather than naming a
+# mode of its own, so no route can end up on a different issuer than its
+# siblings by being edited alone.
+(site_tls) {
+	tls {$ATHERA_TLS:internal}
+}
+
+# Shared reverse-proxy headers. Odoo runs with proxy_mode=True, which makes it
+# TRUST X-Forwarded-*; that setting was already on in this repo while nothing
+# sat in front of Odoo, which meant a client could forge them. It is correct
+# only now, and only because these are set here on every proxied route.
+(odoo_headers) {
+	header_up Host {host}
+	header_up X-Real-IP {remote_host}
+	header_up X-Forwarded-For {remote_host}
+	header_up X-Forwarded-Proto {scheme}
+}
+
+# Headers for a non-Odoo upstream: the Host passes through unchanged because
+# nothing downstream selects a database from it.
+(app_headers) {
+	header_up Host {host}
+	header_up X-Real-IP {remote_host}
+	header_up X-Forwarded-For {remote_host}
+	header_up X-Forwarded-Proto {scheme}
+}
+
+# ----- Public site -------------------------------------------------------
+# The diagram's top-left. Pages come from cms.page in the control-plane
+# database, so "Company Profile / Product / ETC." are rows rather than routes.
+{$ATHERA_DOMAIN:athera.localhost} {
+	encode zstd gzip
+	import site_tls
+
+	handle /onboarding/* {
+		# The public intake controller already exists in Odoo
+		# (custom_onboarding_journey, with Turnstile and a per-IP rate limit),
+		# so the marketing site's form has a live endpoint before the site
+		# itself does.
+		reverse_proxy odoo:8069 {
+			header_up Host "{$ODOO_DB_NAME:bct}.{$ATHERA_DOMAIN:athera.localhost}"
+			header_up X-Forwarded-Host "{$ODOO_DB_NAME:bct}.{$ATHERA_DOMAIN:athera.localhost}"
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	handle {
+		reverse_proxy marketing-site:3000 {
+			import app_headers
+		}
+	}
+
+	log {
+		output stdout
+		format json
+		level INFO
+	}
+}
+
+# ----- www -> apex -------------------------------------------------------
+# A redirect rather than a second copy of the site: one canonical origin keeps
+# cookies, CSP and absolute URLs from having two valid spellings. In production
+# `www` is a CNAME to the apex — RFC 1034 forbids a name holding both a CNAME
+# and an A record, so it cannot be an A record there and does not need to be.
+www.{$ATHERA_DOMAIN:athera.localhost} {
+	import site_tls
+	redir https://{$ATHERA_DOMAIN:athera.localhost}{uri} permanent
+}
+
+# ----- Super Admin CMS ---------------------------------------------------
+# The console, since hub-portal landed. It gates on the is_super_admin claim
+# the login gateway mints, signs to the orchestrator server-side, and edits the
+# CMS the public site reads.
+admin.{$ATHERA_DOMAIN:athera.localhost} {
+	encode zstd gzip
+	import site_tls
+
+	reverse_proxy hub-portal:3000 {
+		import app_headers
+	}
+
+	log {
+		output stdout
+		format json
+		level INFO
+	}
+}
+
+# ----- The admin database's Odoo UI --------------------------------------
+# Still reachable, and still needed: tenant.registry, custom_hub_console and
+# the onboarding journey are Odoo models, and hub-portal covers the lifecycle
+# rather than replacing the whole console. The Host rewrite is the trick
+# described in the header — %d is the FIRST LABEL, so `odoo-admin` would look
+# for a database of that name.
+odoo-admin.{$ATHERA_DOMAIN:athera.localhost} {
+	encode zstd gzip
+	import site_tls
+
+	reverse_proxy odoo:8069 {
+		# BOTH headers, and that is the whole fix. Rewriting Host alone was
+		# measured to leave this route on 303 -> /web/database/selector while a
+		# direct request carrying the same Host answered 200. The reason:
+		# odoo runs with proxy_mode=True, which makes it prefer
+		# X-Forwarded-Host over Host when deciding what %d is — and Caddy sets
+		# X-Forwarded-Host automatically from the ORIGINAL request, so it said
+		# "odoo-admin" and looked for a database of that name. Overriding only
+		# the header a human thinks of is how this fails silently.
+		header_up Host "{$ATHERA_ADMIN_DB:athera_admin}.{$ATHERA_DOMAIN:athera.localhost}"
+		header_up X-Forwarded-Host "{$ATHERA_ADMIN_DB:athera_admin}.{$ATHERA_DOMAIN:athera.localhost}"
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+
+	log {
+		output stdout
+		format json
+		level INFO
+	}
+}
+
+# ----- Client Dashboard (ATHERA Insight) ---------------------------------
+# No dbfilter involvement: the portal is not Odoo. It authenticates through
+# login-gateway and reads figures through semantic-api, both by service name.
+app.{$ATHERA_DOMAIN:athera.localhost} {
+	encode zstd gzip
+	import site_tls
+
+	reverse_proxy insight-portal:3000 {
+		import app_headers
+	}
+
+	log {
+		output stdout
+		format json
+		level INFO
+	}
+}
+
+# ----- Login gateway -----------------------------------------------------
+# Published under its own hostname so a browser can reach the refresh cookie's
+# path on the same site as the portal when they are put behind one domain.
+auth.{$ATHERA_DOMAIN:athera.localhost} {
+	encode zstd gzip
+	import site_tls
+
+	reverse_proxy login-gateway:8080 {
+		import app_headers
+	}
+}
+
+# ----- Tenants -----------------------------------------------------------
+# One block per provisioned client. `bct` is the internal tenant. Adding a
+# client adds a block here; scripts/tenant-provision.sh prints the snippet.
+# Written out rather than wildcarded — see the header.
+bct.{$ATHERA_DOMAIN:athera.localhost} {
+	encode zstd gzip
+	import site_tls
+
+	# Long-polling has its own port in Odoo and must not go to the HTTP
+	# workers, or every bus subscription occupies a worker for its full
+	# timeout and the instance stops answering ordinary requests.
+	@longpoll path /longpolling/* /websocket
+	handle @longpoll {
+		reverse_proxy odoo:8072 {
+			import odoo_headers
+		}
+	}
+
+	handle {
+		reverse_proxy odoo:8069 {
+			import odoo_headers
+		}
+	}
+
+	log {
+		output stdout
+		format json
+		level INFO
+	}
+}
+
+acme.{$ATHERA_DOMAIN:athera.localhost} {
+	encode zstd gzip
+	import site_tls
+
+	@longpoll path /longpolling/* /websocket
+	handle @longpoll {
+		reverse_proxy odoo:8072 {
+			import odoo_headers
+		}
+	}
+
+	handle {
+		reverse_proxy odoo:8069 {
+			import odoo_headers
+		}
+	}
+
+	log {
+		output stdout
+		format json
+		level INFO
+	}
+}

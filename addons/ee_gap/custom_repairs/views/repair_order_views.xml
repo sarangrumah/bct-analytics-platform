@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view inherit -->
+    <record id="view_repair_order_form_inherit_custom_repairs" model="ir.ui.view">
+        <field name="name">repair.order.form.inherit.custom_repairs</field>
+        <field name="model">repair.order</field>
+        <field name="inherit_id" ref="repair.view_repair_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_maintenance_request"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-wrench"
+                        invisible="not x_maintenance_request_id">
+                    <field name="x_maintenance_request_id" widget="statinfo"
+                           string="Maintenance"/>
+                </button>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="Asset / Internal Request">
+                    <group>
+                        <field name="x_equipment_id"/>
+                        <field name="x_maintenance_request_id" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="x_requesting_user_id"/>
+                        <field name="x_requesting_team_id"/>
+                    </group>
+                </group>
+                <group string="SLA &amp; Turnaround">
+                    <group>
+                        <field name="x_promised_completion_date"/>
+                        <field name="x_actual_completion_date"/>
+                    </group>
+                    <group>
+                        <field name="x_sla_status" widget="badge"/>
+                    </group>
+                </group>
+                <group string="Fault Description (Internal)">
+                    <field name="x_id_complaint" nolabel="1"
+                           placeholder="Describe the fault / reason for the repair..."/>
+                </group>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_set_rework"
+                        type="object"
+                        string="Re-open / Rework"
+                        groups="custom_repairs.group_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- List view inherit -->
+    <record id="view_repair_order_list_inherit_custom_repairs" model="ir.ui.view">
+        <field name="name">repair.order.list.inherit.custom_repairs</field>
+        <field name="model">repair.order</field>
+        <field name="inherit_id" ref="repair.view_repair_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_equipment_id" optional="show"/>
+                <field name="x_promised_completion_date" optional="show"/>
+                <field name="x_sla_status" widget="badge" optional="show"/>
+                <field name="x_maintenance_request_id" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Standalone action for internal asset repairs -->
+    <record id="action_repair_order_custom" model="ir.actions.act_window">
+        <field name="name">Asset Repairs</field>
+        <field name="res_model">repair.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

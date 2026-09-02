@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Two-tier approval for every product category reclassification.
+
+      noupdate="1": once an administrator retunes the tiers (different group,
+      different SLA, an extra tier) a module upgrade must not overwrite that.
+
+      on_overdue is "none" on both tiers on purpose. The engine's default,
+      escalate_to_next, would let tier 1 lapse into tier 2 after the SLA and a
+      ledger-changing correction would then carry only one signature — the
+      opposite of what a two-tier matrix is for. Overdue here just nags.
+    -->
+    <data noupdate="1">
+
+        <record id="approval_matrix_categ_reclass" model="approval.matrix">
+            <field name="name">Product Category Reclassification</field>
+            <field name="model_id" ref="custom_retail_localization.model_retail_categ_reclass"/>
+            <field name="condition_domain">[]</field>
+            <field name="trigger">manual</field>
+            <!-- Company-agnostic: _resolve_for matches on company_id in
+                 [False, record.company_id], so leaving the default (the company
+                 active at install time) would silently exempt every other
+                 company in the database. -->
+            <field name="company_id" eval="False"/>
+            <field name="sequence">10</field>
+            <field name="priority">10</field>
+        </record>
+
+        <record id="approval_tier_categ_reclass_accounting" model="approval.matrix.tier">
+            <field name="matrix_id" ref="approval_matrix_categ_reclass"/>
+            <field name="name">Accounting Manager</field>
+            <field name="sequence">10</field>
+            <field name="approver_type">group</field>
+            <field name="approver_group_id" ref="account.group_account_manager"/>
+            <field name="require_all" eval="False"/>
+            <field name="sla_hours">24.0</field>
+            <field name="on_overdue">none</field>
+            <field name="notify_on_overdue" eval="True"/>
+        </record>
+
+        <record id="approval_tier_categ_reclass_finance" model="approval.matrix.tier">
+            <field name="matrix_id" ref="approval_matrix_categ_reclass"/>
+            <field name="name">Finance Manager</field>
+            <field name="sequence">20</field>
+            <field name="approver_type">group</field>
+            <field name="approver_group_id" ref="group_categ_reclass_finance_manager"/>
+            <field name="require_all" eval="False"/>
+            <field name="sla_hours">24.0</field>
+            <field name="on_overdue">none</field>
+            <field name="notify_on_overdue" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

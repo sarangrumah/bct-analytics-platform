@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_brd_recommendation_list" model="ir.ui.view">
+            <field name="name">brd.recommendation.list</field>
+            <field name="model">brd.recommendation</field>
+            <field name="arch" type="xml">
+                <list decoration-success="state == 'built'" decoration-info="state == 'in_backlog'" decoration-warning="state == 'approved'" decoration-muted="state == 'canceled'">
+                    <field name="document_id"/>
+                    <field name="sequence"/>
+                    <field name="name"/>
+                    <field name="recommendation_type" widget="badge" decoration-danger="recommendation_type == 'new'" decoration-warning="recommendation_type == 'extend'" decoration-success="recommendation_type == 'reuse'"/>
+                    <field name="severity"/>
+                    <field name="estimated_md"/>
+                    <field name="breaking_change" widget="boolean_toggle"/>
+                    <field name="impact_severity" decoration-danger="impact_severity == 'critical'" decoration-warning="impact_severity == 'high'" decoration-info="impact_severity == 'medium'" decoration-muted="impact_severity == 'low'" widget="badge"/>
+                    <field name="state"/>
+                    <field name="project_task_id"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_brd_recommendation_form" model="ir.ui.view">
+            <field name="name">brd.recommendation.form</field>
+            <field name="model">brd.recommendation</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_approve" type="object" string="Approve" class="btn-success" invisible="state != 'draft'"/>
+                        <button name="action_push_to_project" type="object" string="Push to Backlog" class="btn-primary" invisible="state not in ('approved','draft') or project_task_id"/>
+                        <button name="action_mark_built" type="object" string="Mark Built" invisible="state != 'in_backlog'"/>
+                        <button name="%(action_brd_reject_as_lesson_wizard)d" type="action" string="Reject &amp; Save as Lesson" class="btn-warning" invisible="state in ('built','canceled')" context="{'default_recommendation_id': id}"/>
+                        <button name="action_cancel" type="object" string="Cancel" invisible="state in ('built','canceled')"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1><field name="name"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="document_id"/>
+                                <field name="recommendation_type" widget="badge" decoration-danger="recommendation_type == 'new'" decoration-warning="recommendation_type == 'extend'" decoration-success="recommendation_type == 'reuse'"/>
+                                <field name="severity"/>
+                                <field name="estimated_md"/>
+                                <field name="assigned_user_id"/>
+                                <field name="project_task_id"/>
+                            </group>
+                            <group>
+                                <field name="capability_tag_ids" widget="many2many_tags"/>
+                                <field name="depends_on_module_ids" widget="many2many_tags"/>
+                                <field name="depends_on_proposed_ids" widget="many2many_tags"/>
+                                <field name="impact_module_ids" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Scope">
+                                <field name="scope"/>
+                            </page>
+                            <page string="Justification">
+                                <field name="justification"/>
+                            </page>
+                            <page string="Related BRD Sections">
+                                <field name="related_section_ids" widget="many2many_tags"/>
+                            </page>
+                            <page string="Cross-Vertical Impact">
+                                <group>
+                                    <group>
+                                        <field name="breaking_change"/>
+                                        <field name="compat_strategy"/>
+                                        <field name="impact_severity" widget="badge" decoration-danger="impact_severity == 'critical'" decoration-warning="impact_severity == 'high'" decoration-info="impact_severity == 'medium'" decoration-muted="impact_severity == 'low'"/>
+                                    </group>
+                                </group>
+                                <!-- affects_existing_module_ids injected by custom_onboarding_journey -->
+                                <separator string="Cross-Vertical Impact Map (JSON)"/>
+                                <div class="text-muted">
+                                    Map of <code>{"module_name": ["vertical_a", "vertical_b"]}</code> showing
+                                    which verticals consume each affected module. Used to score
+                                    blast-radius and select a compatibility strategy.
+                                </div>
+                                <field name="cross_vertical_impact_json" readonly="1" widget="text"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_brd_recommendation" model="ir.actions.act_window">
+            <field name="name">Recommendations Backlog</field>
+            <field name="res_model">brd.recommendation</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+    </data>
+</odoo>

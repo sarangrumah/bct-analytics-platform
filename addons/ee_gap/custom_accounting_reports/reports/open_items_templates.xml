@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ============ GL Open Items / Outstanding Balance ============ -->
+        <template id="report_gl_open_items">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Akun</th>
+                        <th>Tanggal</th>
+                        <th>No. Dokumen</th>
+                        <th>Referensi</th>
+                        <th>Lawan Transaksi</th>
+                        <th>Jatuh Tempo</th>
+                        <th class="text-end">Umur (hari)</th>
+                        <th class="text-end">Debit</th>
+                        <th class="text-end">Kredit</th>
+                        <th class="text-end">Outstanding</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'note'">
+                            <td colspan="10" class="text-muted fst-italic" t-esc="line.get('account')"/>
+                        </tr>
+                        <tr t-elif="line.get('type') == 'subtotal'" class="table-light fw-bold">
+                            <td colspan="9" t-esc="line.get('account')"/>
+                            <td class="text-end">
+                                <span t-esc="line.get('outstanding')" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                        </tr>
+                        <tr t-elif="line.get('type') == 'grand_total'" class="table-dark fw-bold">
+                            <td colspan="9" t-esc="line.get('account')"/>
+                            <td class="text-end">
+                                <span t-esc="line.get('outstanding')" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                        </tr>
+                        <tr t-else="">
+                            <td t-esc="line.get('account')"/>
+                            <td t-esc="line.get('date')" t-options="{'widget': 'date'}"/>
+                            <td t-esc="line.get('doc_no')"/>
+                            <td t-esc="line.get('reference')"/>
+                            <td t-esc="line.get('partner')"/>
+                            <td t-esc="line.get('due_date')" t-options="{'widget': 'date'}"/>
+                            <td class="text-end" t-esc="line.get('age')"/>
+                            <td class="text-end">
+                                <span t-esc="line.get('debit')" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line.get('credit')" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line.get('outstanding')" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+
+        <!-- ============ Mapping Vendor Bill vs Payment ============ -->
+        <template id="report_bill_payment">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>No. Bill</th>
+                        <th>Tgl Bill</th>
+                        <th>Vendor</th>
+                        <th>NPWP</th>
+                        <th class="text-end">Nilai Bill</th>
+                        <th>No. Payment</th>
+                        <th>Tgl Payment</th>
+                        <th>Journal</th>
+                        <th>Metode</th>
+                        <th class="text-end">Nilai Dialokasikan</th>
+                        <th class="text-end">Sisa Bill</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'note'">
+                            <td colspan="12" class="text-muted fst-italic" t-esc="line.get('bill_no')"/>
+                        </tr>
+                        <tr t-elif="line.get('type') == 'grand_total'" class="table-dark fw-bold">
+                            <td t-esc="line.get('bill_no')"/>
+                            <td colspan="8" t-esc="line.get('partner')"/>
+                            <td class="text-end">
+                                <span t-esc="line.get('allocated')" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line.get('residual')" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td/>
+                        </tr>
+                        <tr t-else="" t-att-class="'table-warning' if line.get('status') == 'Belum dibayar' else ''">
+                            <td t-esc="line.get('bill_no')"/>
+                            <td t-esc="line.get('bill_date')" t-options="{'widget': 'date'}"/>
+                            <td t-esc="line.get('partner')"/>
+                            <td t-esc="line.get('npwp')"/>
+                            <td class="text-end">
+                                <span t-esc="line.get('bill_amount')" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td t-esc="line.get('payment_no')"/>
+                            <td t-esc="line.get('payment_date')" t-options="{'widget': 'date'}"/>
+                            <td t-esc="line.get('payment_journal')"/>
+                            <td t-esc="line.get('payment_method')"/>
+                            <td class="text-end">
+                                <span t-esc="line.get('allocated')" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line.get('residual')" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td t-esc="line.get('status')"/>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+    </data>
+</odoo>

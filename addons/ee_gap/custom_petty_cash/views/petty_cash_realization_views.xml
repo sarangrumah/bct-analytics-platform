@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_petty_cash_realization_form" model="ir.ui.view">
+            <field name="name">petty.cash.realization.form</field>
+            <field name="model">petty.cash.realization</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_submit" type="object" string="Submit"
+                                class="btn-primary" invisible="state != 'draft'"/>
+                        <button name="action_post" type="object" string="Post"
+                                class="btn-primary" invisible="state not in ('draft', 'submitted')"
+                                groups="custom_petty_cash.group_petty_cash_finance"/>
+                        <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                                invisible="state not in ('submitted', 'cancelled')"/>
+                        <button name="action_cancel" type="object" string="Cancel"
+                                invisible="state in ('posted', 'cancelled')"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,submitted,posted"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_bills" type="object" class="oe_stat_button"
+                                    icon="fa-book" invisible="bill_count == 0">
+                                <field name="bill_count" widget="statinfo" string="Journal Entries"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="request_id" readonly="state != 'draft'"/>
+                                <field name="employee_id"/>
+                                <field name="l10n_ou_analytic_id"/>
+                            </group>
+                            <group>
+                                <field name="date" readonly="state == 'posted'"/>
+                                <field name="amount_total"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="company_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Lines" name="lines">
+                                <field name="line_ids" readonly="state == 'posted'">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="line_type"/>
+                                        <field name="name"/>
+                                        <field name="partner_id"
+                                               column_invisible="0"
+                                               required="line_type == 'third_party'"/>
+                                        <field name="product_id" optional="hide"/>
+                                        <field name="account_id"/>
+                                        <field name="price_unit"/>
+                                        <field name="tax_ids" widget="many2many_tags"
+                                               optional="show"/>
+                                        <field name="x_custom_withholding_category_id" optional="show"/>
+                                        <field name="price_total" sum="Total"/>
+                                        <field name="attachment_ids" widget="many2many_binary"
+                                               string="Invoice/Proof"/>
+                                        <field name="currency_id" column_invisible="1"/>
+                                    </list>
+                                </field>
+                                <p class="text-muted">
+                                    Third-party lines require the supplier invoice attached and
+                                    generate a full vendor bill (billing → PPN/PPh → payment against
+                                    the advance). Expense lines post Dr Expense / Cr Uang Muka.
+                                </p>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_petty_cash_realization_list" model="ir.ui.view">
+            <field name="name">petty.cash.realization.list</field>
+            <field name="model">petty.cash.realization</field>
+            <field name="arch" type="xml">
+                <list decoration-success="state == 'posted'" decoration-muted="state == 'cancelled'">
+                    <field name="name"/>
+                    <field name="request_id"/>
+                    <field name="employee_id"/>
+                    <field name="date"/>
+                    <field name="amount_total" sum="Total"/>
+                    <field name="currency_id" column_invisible="1"/>
+                    <field name="state" widget="badge"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_petty_cash_realization_search" model="ir.ui.view">
+            <field name="name">petty.cash.realization.search</field>
+            <field name="model">petty.cash.realization</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="request_id"/>
+                    <field name="employee_id"/>
+                    <filter name="my" string="My Realizations"
+                            domain="[('employee_id.user_id', '=', uid)]"/>
+                    <separator/>
+                    <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                    <filter name="submitted" string="Submitted" domain="[('state', '=', 'submitted')]"/>
+                    <filter name="posted" string="Posted" domain="[('state', '=', 'posted')]"/>
+                    <group>
+                        <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                        <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_petty_cash_realization" model="ir.actions.act_window">
+            <field name="name">Realizations</field>
+            <field name="res_model">petty.cash.realization</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_petty_cash_realization_search"/>
+        </record>
+    </data>
+</odoo>

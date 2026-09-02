@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_retail_import_recon_list" model="ir.ui.view">
+        <field name="name">retail.import.recon.list</field>
+        <field name="model">retail.import.recon</field>
+        <field name="arch" type="xml">
+            <list string="X-Store vs Odoo"
+                  create="false" edit="false" delete="false"
+                  decoration-danger="status in ('parked','missing')"
+                  decoration-warning="status == 'skipped' or (status == 'posted' and difference != 0)"
+                  default_order="trans_date desc, store_code, transnum">
+                <field name="trans_date"/>
+                <field name="store_code" optional="show"/>
+                <field name="store_name"/>
+                <field name="txn_ref"/>
+                <field name="register" optional="hide"/>
+                <field name="transnum" optional="hide"/>
+                <field name="staff_name" optional="show"/>
+                <field name="member_id" optional="hide"/>
+                <field name="transaction_note" optional="hide"/>
+                <field name="line_count" optional="hide" sum="Lines"/>
+                <field name="source_qty" optional="hide" sum="Qty"/>
+                <field name="source_amount" sum="Source"/>
+                <field name="source_tax" optional="hide" sum="Tax"/>
+                <field name="odoo_amount" sum="Odoo"/>
+                <field name="difference" sum="Difference"/>
+                <field name="status" widget="badge"
+                       decoration-success="status == 'posted'"
+                       decoration-danger="status in ('parked','missing')"
+                       decoration-warning="status == 'skipped'"/>
+                <field name="reason" optional="show"/>
+                <field name="pos_order_id" optional="hide"/>
+                <field name="log_id" optional="hide"/>
+                <field name="company_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_retail_import_recon_search" model="ir.ui.view">
+        <field name="name">retail.import.recon.search</field>
+        <field name="model">retail.import.recon</field>
+        <field name="arch" type="xml">
+            <search string="Reconciliation">
+                <field name="txn_ref" string="Receipt"
+                       filter_domain="['|','|',('txn_ref','ilike',self),('transnum','ilike',self),('store_name','ilike',self)]"/>
+                <field name="store_name"/>
+                <field name="staff_name"/>
+                <field name="member_id"/>
+                <field name="reason"/>
+                <field name="trans_date"/>
+
+                <!-- The two questions finance actually opens this report to ask. -->
+                <filter name="not_in_odoo" string="Not in Odoo"
+                        domain="[('status','in',('parked','missing'))]"/>
+                <filter name="has_difference" string="Has a Difference"
+                        domain="[('difference','!=',0)]"/>
+                <separator/>
+                <filter name="f_posted" string="Posted" domain="[('status','=','posted')]"/>
+                <filter name="f_parked" string="Parked" domain="[('status','=','parked')]"/>
+                <filter name="f_missing" string="Missing" domain="[('status','=','missing')]"/>
+                <filter name="f_skipped" string="Skipped" domain="[('status','=','skipped')]"/>
+                <separator/>
+                <filter name="this_month" string="This Month"
+                        domain="[('trans_date','&gt;=',(context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="last_month" string="Last Month"
+                        domain="['&amp;',('trans_date','&gt;=',(context_today() + relativedelta(months=-1, day=1)).strftime('%Y-%m-%d')),('trans_date','&lt;',(context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+
+                <group name="groupby">
+                    <filter name="g_status" string="Status" context="{'group_by': 'status'}"/>
+                    <filter name="g_store" string="Store" context="{'group_by': 'store_name'}"/>
+                    <filter name="g_date" string="Trading Day" context="{'group_by': 'trans_date'}"/>
+                    <filter name="g_reason" string="Reason" context="{'group_by': 'reason'}"/>
+                    <filter name="g_log" string="Import Log" context="{'group_by': 'log_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_retail_import_recon_pivot" model="ir.ui.view">
+        <field name="name">retail.import.recon.pivot</field>
+        <field name="model">retail.import.recon</field>
+        <field name="arch" type="xml">
+            <pivot string="X-Store vs Odoo">
+                <field name="trans_date" type="row" interval="day"/>
+                <field name="status" type="col"/>
+                <!-- No aggregator= here: that is a model field attribute, not a view
+                     one, and the RNG rejects it. Float measures sum by default. -->
+                <field name="source_amount" type="measure"/>
+                <field name="odoo_amount" type="measure"/>
+                <field name="difference" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_retail_import_recon_graph" model="ir.ui.view">
+        <field name="name">retail.import.recon.graph</field>
+        <field name="model">retail.import.recon</field>
+        <field name="arch" type="xml">
+            <graph string="X-Store vs Odoo" type="bar">
+                <field name="trans_date" interval="day"/>
+                <field name="difference" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_retail_import_recon" model="ir.actions.act_window">
+        <field name="name">X-Store vs Odoo Reconciliation</field>
+        <field name="res_model">retail.import.recon</field>
+        <field name="view_mode">list,pivot,graph</field>
+        <field name="search_view_id" ref="view_retail_import_recon_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing to reconcile yet</p>
+            <p>
+                This report lines every transaction in the X24DN sales file up against the
+                POS order Odoo booked for it. Once a sales file has been imported, each
+                receipt appears here with its source amount, what Odoo booked, the
+                difference, and — for anything the importer rejected — the reason.
+            </p>
+        </field>
+    </record>
+
+</odoo>

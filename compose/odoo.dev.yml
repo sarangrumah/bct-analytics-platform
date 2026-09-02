@@ -1,0 +1,71 @@
+# ===========================================================================
+# odoo19-bct — development overlay.
+#
+#   docker compose -f compose/odoo.yml -f compose/odoo.dev.yml up -d
+#   (or `make up-dev`, or a bare `docker compose up -d` — COMPOSE_FILE in .env
+#    already names both files)
+#
+# This overlay adds the three things that are environment-specific and must not
+# live in the base file:
+#   1. host port publication,
+#   2. bind mounts for live editing,
+#   3. developer-friendly logging.
+#
+# PORTS ARE BOUND TO 127.0.0.1, NEVER 0.0.0.0.
+# This host runs other stacks and is not firewalled per-container; publishing
+# on 0.0.0.0 would expose an admin-password-protected database manager and an
+# unauthenticated Postgres to the LAN. ${BIND_ADDRESS} defaults to 127.0.0.1
+# and there is no reason to change it on a workstation.
+#
+# Allocated here (see .env.example for the full block, including the ports
+# reserved for the DWH / Backend / Frontend agents):
+#   127.0.0.1:38069  odoo http
+#   127.0.0.1:38072  odoo longpolling (gevent)
+#   127.0.0.1:35432  postgres
+#   127.0.0.1:36379  redis
+# ===========================================================================
+
+# Dev logging: fewer, larger files than the base 10m x 5. Rebuild loops produce
+# a lot of output and truncating it mid-traceback wastes more time than disk.
+x-dev-logging: &dev-logging
+  driver: json-file
+  options:
+    max-size: "50m"
+    max-file: "3"
+
+services:
+
+  postgres:
+    logging: *dev-logging
+    ports:
+      # Exposed so `make psql`, pgAdmin, dbt and the Phase 3 CDC consumer can
+      # reach it from the host without an exec.
+      - "${BIND_ADDRESS:-127.0.0.1}:${POSTGRES_HOST_PORT:-35432}:5432"
+    volumes:
+      # Untracked drop-in for machine-local tuning. `include_if_exists` at the
+      # end of postgresql.conf picks it up, so it wins over everything above.
+      - ../postgres/conf.d:/etc/postgresql/conf.d:ro
+
+  redis:
+    logging: *dev-logging
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${REDIS_HOST_PORT:-36379}:6379"
+
+  odoo:
+    logging: *dev-logging
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${ODOO_HOST_HTTP_PORT:-38069}:8069"
+      - "${BIND_ADDRESS:-127.0.0.1}:${ODOO_HOST_LONGPOLLING_PORT:-38072}:8072"
+    volumes:
+      # The addons mount moved to compose/odoo.yml on 2026-09-01. It is needed
+      # in every environment, not just this one — see the comment there.
+      #
+      # Live-edit the config template: `docker compose restart odoo` re-renders
+      # it without a rebuild. This one IS dev-only: production ships the
+      # template baked into the image.
+      - ../odoo/odoo.conf:/opt/odoo/odoo.conf.template:ro
+    environment:
+      # Verbose enough to see SQL-level problems, quiet enough to read.
+      ODOO_LOG_LEVEL: ${ODOO_LOG_LEVEL:-info}
+      # Dev boxes want a fast worker restart on crash, not a slow backoff.
+      ODOO_LIMIT_TIME_REAL: ${ODOO_LIMIT_TIME_REAL:-240}

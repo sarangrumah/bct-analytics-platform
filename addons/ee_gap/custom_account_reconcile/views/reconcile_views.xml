@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============ Overview: reconcilable accounts with open items ============ -->
+    <record id="view_custom_reconcile_account_list" model="ir.ui.view">
+        <field name="name">custom.reconcile.account.list</field>
+        <field name="model">custom.reconcile.account</field>
+        <field name="arch" type="xml">
+            <list create="false" delete="false" edit="false" default_order="residual desc">
+                <field name="account_id"/>
+                <field name="oldest_date"/>
+                <field name="line_count" sum="Total"/>
+                <field name="debit" sum="Total"/>
+                <field name="credit" sum="Total"/>
+                <field name="residual" sum="Total"/>
+                <field name="currency_id" column_invisible="1"/>
+                <button name="action_open_lines" type="object" string="Reconcile"
+                        class="btn btn-primary" icon="fa-play"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_reconcile_account_search" model="ir.ui.view">
+        <field name="name">custom.reconcile.account.search</field>
+        <field name="model">custom.reconcile.account</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="account_id"/>
+                <filter name="with_residual" string="Residual ≠ 0"
+                        domain="[('residual', '!=', 0)]"/>
+                <filter name="netted" string="Fully Netted (match-only)"
+                        domain="[('residual', '=', 0)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_reconcile_overview" model="ir.actions.act_window">
+        <field name="name">Reconcile</field>
+        <field name="res_model">custom.reconcile.account</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_custom_reconcile_account_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing left to reconcile</p>
+            <p>Every reconcilable account is fully matched. Open items on
+               clearing/suspense accounts will show up here.</p>
+        </field>
+    </record>
+
+    <!-- ============ Wizard ============ -->
+    <record id="view_custom_account_reconcile_wizard_form" model="ir.ui.view">
+        <field name="name">custom.account.reconcile.wizard.form</field>
+        <field name="model">custom.account.reconcile.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reconcile">
+                <group>
+                    <group>
+                        <field name="account_id"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="is_balanced" invisible="1"/>
+                    </group>
+                    <group>
+                        <field name="debit"/>
+                        <field name="credit"/>
+                        <field name="residual"/>
+                    </group>
+                </group>
+                <group invisible="is_balanced">
+                    <field name="mode" widget="radio"/>
+                    <group invisible="mode != 'writeoff'">
+                        <field name="writeoff_account_id" required="mode == 'writeoff'"/>
+                        <field name="writeoff_journal_id" required="mode == 'writeoff'"/>
+                        <field name="writeoff_date"/>
+                        <field name="writeoff_label"/>
+                    </group>
+                </group>
+                <field name="line_ids" readonly="1">
+                    <list>
+                        <field name="date"/>
+                        <field name="move_id"/>
+                        <field name="partner_id"/>
+                        <field name="name"/>
+                        <field name="debit"/>
+                        <field name="credit"/>
+                        <field name="amount_residual"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_reconcile" type="object" string="Reconcile"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- "Reconcile" in the Journal Items list-view action menu -->
+    <record id="action_custom_reconcile_lines" model="ir.actions.act_window">
+        <field name="name">Reconcile</field>
+        <field name="res_model">custom.account.reconcile.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="account.model_account_move_line"/>
+        <field name="binding_view_types">list</field>
+    </record>
+
+    <!-- ============ Menus ============ -->
+    <menuitem id="menu_custom_reconciliation"
+              name="Reconciliation"
+              parent="account.menu_finance_entries"
+              sequence="10"
+              groups="account.group_account_user"/>
+    <menuitem id="menu_custom_reconcile_overview"
+              action="action_custom_reconcile_overview"
+              parent="menu_custom_reconciliation"
+              sequence="1"/>
+
+</odoo>

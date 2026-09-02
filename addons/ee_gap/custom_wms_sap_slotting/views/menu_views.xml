@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_storage_type"
+              name="Storage Types"
+              parent="custom_wms_putaway.menu_putaway_root"
+              action="action_storage_type"
+              sequence="40"/>
+
+    <menuitem id="menu_storage_section"
+              name="Storage Sections"
+              parent="custom_wms_putaway.menu_putaway_root"
+              action="action_storage_section"
+              sequence="45"/>
+</odoo>

@@ -1,0 +1,11 @@
+source_table,source_column,pdp_class,nullable
+shop_customer,id,public,
+shop_customer,created_at,public,
+shop_customer,full_name,personal,
+shop_customer,email,personal,
+shop_customer,national_id,sensitive,true
+shop_customer,password_hash,secret,
+shop_order,id,public,
+shop_order,customer_id,public,
+shop_order,total_amount,internal,
+shop_order,placed_at,public,

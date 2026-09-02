@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_putaway_strategy_list" model="ir.ui.view">
+        <field name="name">custom.wms.putaway.strategy.list</field>
+        <field name="model">custom.wms.putaway.strategy</field>
+        <field name="arch" type="xml">
+            <list default_order="sequence,id">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="warehouse_id"/>
+                <field name="rule_set"/>
+                <field name="auto_apply_suggestions"/>
+                <field name="rule_count"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_putaway_strategy_form" model="ir.ui.view">
+        <field name="name">custom.wms.putaway.strategy.form</field>
+        <field name="model">custom.wms.putaway.strategy</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_view_rules" type="object" string="Rules"/>
+                    <button name="action_view_suggestions" type="object" string="Suggestions"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="warehouse_id"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="sequence"/>
+                        <field name="rule_set"/>
+                        <field name="auto_apply_suggestions"/>
+                        <field name="active"/>
+                    </group>
+                    <notebook>
+                        <page string="Rules">
+                            <field name="rule_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="tier"/>
+                                    <field name="name"/>
+                                    <field name="kind"/>
+                                    <field name="target_location_id"/>
+                                    <field name="abc_class"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_putaway_strategy" model="ir.actions.act_window">
+        <field name="name">Putaway Strategies</field>
+        <field name="res_model">custom.wms.putaway.strategy</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

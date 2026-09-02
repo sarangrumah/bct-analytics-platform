@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_cash_book">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <t t-call="custom_accounting_reports.report_book_table"/>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+    </data>
+</odoo>

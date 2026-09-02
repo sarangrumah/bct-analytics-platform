@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ref_position_list" model="ir.ui.view">
+        <field name="name">referral.position.list</field>
+        <field name="model">referral.position</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'open'" decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="job_id"/>
+                <field name="reward_amount"/>
+                <field name="candidate_count"/>
+                <field name="state" widget="badge"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_ref_position_form" model="ir.ui.view">
+        <field name="name">referral.position.form</field>
+        <field name="model">referral.position</field>
+        <field name="arch" type="xml">
+            <form>
+                <header><field name="state" widget="statusbar"/></header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="department_id"/>
+                            <field name="job_id"/>
+                        </group>
+                        <group>
+                            <field name="reward_amount"/>
+                            <field name="currency_id"/>
+                            <field name="candidate_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Description"/>
+                    <field name="description"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_ref_position" model="ir.actions.act_window">
+        <field name="name">Positions</field>
+        <field name="res_model">referral.position</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

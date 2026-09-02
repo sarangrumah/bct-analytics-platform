@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_iot_root" name="IoT" sequence="78"
+              groups="custom_iot_bridge.group_iot_user"/>
+    <menuitem id="menu_iot_devices" name="Devices" parent="menu_iot_root"
+              action="action_iot_device" sequence="10"/>
+    <menuitem id="menu_iot_readings" name="Readings" parent="menu_iot_root"
+              action="action_iot_reading" sequence="20"/>
+    <menuitem id="menu_iot_thresholds" name="Thresholds" parent="menu_iot_root"
+              action="action_iot_threshold" sequence="30"
+              groups="custom_iot_bridge.group_iot_admin"/>
+</odoo>

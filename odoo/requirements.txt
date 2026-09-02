@@ -1,0 +1,38 @@
+# Python packages the imported addon suite needs, beyond what the pinned base
+# image ships. Generated, then committed -- do not hand-edit a hash.
+#
+# Regenerate after adding a module that declares external_dependencies:
+#   docker run --rm -u 0 --entrypoint bash odoo19-bct-odoo:local -c \
+#     'pip install --dry-run --report /tmp/r.json <pkgs> && python3 -c "..."'
+#   (the exact command is in docs/adr/0002-addon-import.md)
+#
+# Installed with --require-hashes --no-deps, so this list is the COMPLETE
+# transitive closure: pip resolves nothing at build time. A package that is
+# already satisfied by the base image is deliberately absent (requests,
+# cryptography, lxml, qrcode, openpyxl all ship with odoo:19.0).
+#
+# Who needs what:
+#   xmlschema     custom_coretax            e-Faktur XSD validation
+#   PyJWT         auth_jwt                  JWT bearer auth
+#   httpx         custom_ai_bridge, custom_super_admin
+#   croniter      custom_super_admin        backup schedule parsing
+#   pymupdf       custom_brd_analyzer       PDF text extraction
+#   python-docx   custom_brd_analyzer       .docx requirement documents
+#   python-pptx   custom_brd_analyzer       .pptx requirement decks
+#   oracledb      custom_ppob_oracle_bridge legacy EVShop pipeline
+
+PyJWT==2.13.0 --hash=sha256:66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728
+anyio==4.14.2 --hash=sha256:9f505dda5ac9f0c8309b5e8bd445a8c2bf7246f3ce950121e45ea15bc41d1494
+croniter==6.2.4 --hash=sha256:8ef3d544107a5c05a150a2d78f8bf5a8eb9c5c4d93405a736b824109574e3f4d
+elementpath==5.1.4 --hash=sha256:5ec8d7bb44b16c98414a6a95e20cb150f3cbfc3cac65edc14773288c7a937376
+h11==0.16.0 --hash=sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86
+httpcore==1.0.9 --hash=sha256:2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55
+httpx==0.28.1 --hash=sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad
+oracledb==4.0.2 --hash=sha256:579f2c568433523a990cde5bea73c980d144754dc54d3ab2cd37efd670dc31d6
+pymupdf==1.28.2 --hash=sha256:397d6715c1f0df7548a92d0afd8ce370fc48fa47aeefac16be2bc04a16a8227f
+python-docx==1.2.0 --hash=sha256:3fd478f3250fbbbfd3b94fe1e985955737c145627498896a8a6bf81f4baf66c7
+python-pptx==1.0.2 --hash=sha256:160838e0b8565a8b1f67947675886e9fea18aa5e795db7ae531606d68e785cba
+# typing_extensions is intentionally absent: the base image carries a
+# Debian-packaged 4.10.0 with no RECORD file, so pip cannot replace it and
+# --no-deps means nothing tries to. Every package below works against it.
+xmlschema==4.3.2 --hash=sha256:cf5c970a30f6ebcb3da35260e694704cc0b6794d8ace46125bb2a95e38ed9307

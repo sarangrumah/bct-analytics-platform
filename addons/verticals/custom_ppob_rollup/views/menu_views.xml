@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_ppob_rollup_so"
+              name="Daily Rollup Orders"
+              parent="custom_ppob_core.menu_ppob_operations"
+              action="action_ppob_rollup_so"
+              sequence="60"/>
+
+</odoo>

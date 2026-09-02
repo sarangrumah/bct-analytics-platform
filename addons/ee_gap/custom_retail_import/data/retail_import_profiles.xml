@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--
+      Seed import profiles for the apparel brand (PT Sinar Eka Selaras). namespace="retail"
+      isolates the external IDs per tenant. Column indices are 1-based (A=1) and
+      match the headers observed in docs/projects/retail/. Adjust per-tenant by editing
+      these records (data, not code).
+    -->
+
+    <!-- X101 — Material Master (products). Header row 2, data row 3. -->
+    <record id="profile_retail_x101" model="retail.import.profile">
+        <field name="name">the apparel brand — X101 Material Master</field>
+        <field name="code">retail_x101</field>
+        <field name="file_type">x101</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">3</field>
+        <field name="date_format">%Y-%m-%d %H:%M:%S</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"product_code": 2, "description": 3, "brand": 4, "category": 5, "klass": 6, "subclass": 7, "sku": 10, "size": 11, "inseam": 12, "gtin": 13, "retail_price": 15, "price_eff": 16}</field>
+    </record>
+
+    <!-- CoA EBR — already clean (code,name,account_type). Header row 2, data row 3. -->
+    <record id="profile_retail_coa" model="retail.import.profile">
+        <field name="name">the apparel brand — Chart of Accounts (EBR)</field>
+        <field name="code">retail_coa</field>
+        <field name="file_type">coa</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">3</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"code": 1, "account_name": 2, "account_type": 3}</field>
+    </record>
+
+    <!-- Company / legal entity (SES). Key:Value layout in a single column. -->
+    <record id="profile_retail_company" model="retail.import.profile">
+        <field name="name">the apparel brand — Company (SES)</field>
+        <field name="code">retail_company</field>
+        <field name="file_type">company</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">4</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"field": 2, "value": 3}</field>
+    </record>
+
+    <!-- X20 — Current on-hand inventory (CSV, SSRS export). Data from row 2. -->
+    <record id="profile_retail_x20" model="retail.import.profile">
+        <field name="name">the apparel brand — X20 On-hand Inventory</field>
+        <field name="code">retail_x20</field>
+        <field name="file_type">x20</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">csv</field>
+        <field name="encoding">utf-8-sig</field>
+        <field name="data_start_row">2</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"store_code": 16, "sap_store_code": 17, "store_name": 18, "item_id": 19, "ean": 23, "onhand_qty": 29}</field>
+    </record>
+
+    <!-- X24DN — Retail Sales Detail (POS). Header row 1, data row 2. Phase-5 gated. -->
+    <record id="profile_retail_x24" model="retail.import.profile">
+        <field name="name">the apparel brand — X24DN Retail Sales</field>
+        <field name="code">retail_x24</field>
+        <field name="file_type">x24</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">2</field>
+        <field name="date_format">%Y-%m-%d</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"store_code": 1, "sap_store_code": 2, "store_name": 3, "trans_date": 4, "register": 5, "transnum": 6, "staff_id": 10, "staff_name": 11, "item_type": 12, "line_id": 13, "item_code": 14, "waist": 15, "inseam": 16, "item_description": 17, "brand": 18, "category": 19, "class": 20, "subclass": 21, "ean": 22, "retail_price": 23, "gross_price": 24, "net_qty": 25, "net_discount": 26, "net_amount": 27, "tax_rate": 28, "tax_amount": 29, "total_amount": 30, "discount_type_1": 31, "discount_code_1": 32, "discount_description_1": 33, "discount_amount_1": 34, "discount_percentage_1": 35, "discount_type_2": 36, "discount_code_2": 37, "discount_description_2": 38, "discount_amount_2": 39, "discount_percentage_2": 40, "discount_type_3": 41, "discount_code_3": 42, "discount_description_3": 43, "discount_amount_3": 44, "discount_percentage_3": 45, "discount_type_4": 46, "discount_code_4": 47, "discount_description_4": 48, "discount_amount_4": 49, "discount_percentage_4": 50, "line_comment": 51, "transaction_note": 52, "member_id": 56, "member_type": 57, "customer_phone": 58, "omni_order_id": 59}</field>
+    </record>
+
+    <!-- X70D — Tender Detail (payments). Header row 1, data row 2. Staged (Phase-5 gated). -->
+    <record id="profile_retail_x70d" model="retail.import.profile">
+        <field name="name">the apparel brand — X70D Tender Detail</field>
+        <field name="code">retail_x70d</field>
+        <field name="file_type">x70d</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">2</field>
+        <field name="date_format">%Y-%m-%d</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"store_code": 1, "sap_store_code": 2, "store_name": 3, "trans_date": 4, "register": 5, "transnum": 6, "tender_type": 9, "tender_amount": 10, "auth": 11, "voucher": 12}</field>
+    </record>
+
+    <!-- X31 — Discount Journal. 7 metadata rows, header row 8, data row 9. -->
+    <record id="profile_retail_x31" model="retail.import.profile">
+        <field name="name">the apparel brand — X31 Discount Journal</field>
+        <field name="code">retail_x31</field>
+        <field name="file_type">x31</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">9</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"store_code": 1, "sap_store_code": 2, "store_name": 3, "transnum": 4, "trans_date": 5, "discount_code": 8, "product_code": 14, "waist": 18, "inseam": 19, "net_qty": 20, "net_amount": 22, "discount_amount": 23}</field>
+    </record>
+
+    <!-- X32P — Stock Movement with Price. 9 metadata rows, header row 10, summary row 11, data row 12. -->
+    <record id="profile_retail_x32p" model="retail.import.profile">
+        <field name="name">the apparel brand — X32P Stock Movement</field>
+        <field name="code">retail_x32p</field>
+        <field name="file_type">x32p</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">12</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"store_code": 1, "sap_store_code": 2, "store_name": 3, "product_code": 4, "waist": 5, "inseam": 6, "opening_onhand": 12, "item_sale": 16, "ending_onhand": 35}</field>
+    </record>
+
+    <!-- X70 — Tender Breakdown. 8 metadata rows, header row 9, data row 10. Col 2/11/13 blank (merged). -->
+    <record id="profile_retail_x70" model="retail.import.profile">
+        <field name="name">the apparel brand — X70 Tender Breakdown</field>
+        <field name="code">retail_x70</field>
+        <field name="file_type">x70</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">10</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"store_code": 1, "sap_store_code": 3, "store_name": 4, "trans_date": 5, "total_amount": 6, "tender_amount": 7}</field>
+    </record>
+
+    <!-- X26 — Shipping Report. 8 metadata rows, header row 9, data row 10. Cols 2-3 blank (merged). -->
+    <record id="profile_retail_x26" model="retail.import.profile">
+        <field name="name">the apparel brand — X26 Shipping Report</field>
+        <field name="code">retail_x26</field>
+        <field name="file_type">x26</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">10</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"store_code": 1, "sap_store_code": 4, "store_name": 5, "document_id": 7, "product_code": 20, "waist": 21, "inseam": 22, "receiving_qty": 29}</field>
+    </record>
+
+    <!-- X29 — Inventory Adjustment. Row 1 empty, header row 2, data row 3. -->
+    <record id="profile_retail_x29" model="retail.import.profile">
+        <field name="name">the apparel brand — X29 Inventory Adjustment</field>
+        <field name="code">retail_x29</field>
+        <field name="file_type">x29</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">3</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"store_code": 1, "sap_store_code": 2, "store_name": 3, "adj_date": 4, "document_id": 8, "product_code": 11, "waist": 13, "inseam": 14, "qty_before": 20, "qty_adjusted": 21, "qty_after": 22}</field>
+    </record>
+
+    <!-- X48 — Customer Return. Header row 1, data row 2. -->
+    <record id="profile_retail_x48" model="retail.import.profile">
+        <field name="name">the apparel brand — X48 Customer Return</field>
+        <field name="code">retail_x48</field>
+        <field name="file_type">x48</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">2</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"store_code": 1, "sap_store_code": 2, "store_name": 3, "trans_date": 4, "register": 5, "transnum": 6, "product_code": 15, "waist": 16, "inseam": 17, "category": 21, "ean": 24, "net_qty": 27, "net_discount": 28, "net_amount": 29, "tax_amount": 30, "total_amount": 31}</field>
+    </record>
+
+    <!-- X53 — RTV Report (standard). Header row 1, data row 2. -->
+    <record id="profile_retail_x53" model="retail.import.profile">
+        <field name="name">the apparel brand — X53 RTV Report</field>
+        <field name="code">retail_x53</field>
+        <field name="file_type">x53</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">2</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"store_code": 1, "sap_store_code": 2, "store_name": 3, "doc_id": 4, "product_code": 13, "waist": 14, "inseam": 15, "retail_price": 22, "qty": 23}</field>
+    </record>
+
+    <!-- X53 EBR — RTV alternate format (DEC_25 & JAN_26). Header row 1, data row 2. 12-col schema. -->
+    <record id="profile_retail_x53_ebr" model="retail.import.profile">
+        <field name="name">the apparel brand — X53 RTV (EBR alternate)</field>
+        <field name="code">retail_x53_ebr</field>
+        <field name="file_type">x53_ebr</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">2</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"sap_store_code": 3, "store_name": 4, "product_code": 5, "waist": 7, "inseam": 8, "doc_id": 9, "qty": 11, "retail_price": 12}</field>
+    </record>
+
+    <!-- X21 — Payment Report. 8 metadata rows, header row 9, subheader row 10, data row 11. -->
+    <record id="profile_retail_x21" model="retail.import.profile">
+        <field name="name">the apparel brand — X21 Payment Report</field>
+        <field name="code">retail_x21</field>
+        <field name="file_type">x21</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">11</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"store_name": 1, "store_code": 2, "trans_date": 3, "register": 4, "transnum": 5, "tax": 6, "net_amount": 7, "cash": 12, "total": 20}</field>
+    </record>
+
+    <!-- X25N — Receiving Report. 9 metadata rows, header row 10, summary row 11, data row 12. Cols 2-3 blank (merged). -->
+    <record id="profile_retail_x25n" model="retail.import.profile">
+        <field name="name">the apparel brand — X25N Receiving Report</field>
+        <field name="code">retail_x25n</field>
+        <field name="file_type">x25n</field>
+        <field name="namespace">retail</field>
+        <field name="file_format">xlsx</field>
+        <field name="data_start_row">12</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="column_map_json">{"store_code": 1, "sap_store_code": 4, "store_name": 5, "document_id": 7, "product_code": 17, "waist": 18, "inseam": 19, "receiving_qty": 29, "received_qty": 30}</field>
+    </record>
+
+</odoo>

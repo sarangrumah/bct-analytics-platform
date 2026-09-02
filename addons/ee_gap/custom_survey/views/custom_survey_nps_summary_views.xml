@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_survey_nps_summary_list" model="ir.ui.view">
+        <field name="name">custom.survey.nps.summary.list</field>
+        <field name="model">custom.survey.nps.summary</field>
+        <field name="arch" type="xml">
+            <list string="NPS Summaries">
+                <header>
+                    <button name="action_export_csv"
+                            type="object"
+                            string="Export CSV"
+                            display="always"/>
+                </header>
+                <field name="name"/>
+                <field name="survey_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="promoter_count"/>
+                <field name="passive_count"/>
+                <field name="detractor_count"/>
+                <field name="response_count"/>
+                <field name="nps_score" widget="float" digits="[6,1]"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_survey_nps_summary_form" model="ir.ui.view">
+        <field name="name">custom.survey.nps.summary.form</field>
+        <field name="model">custom.survey.nps.summary</field>
+        <field name="arch" type="xml">
+            <form string="NPS Summary">
+                <header>
+                    <button name="action_export_csv"
+                            type="object"
+                            string="Export CSV"
+                            class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="survey_id"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group>
+                            <field name="promoter_count"/>
+                            <field name="passive_count"/>
+                            <field name="detractor_count"/>
+                            <field name="response_count"/>
+                            <field name="nps_score" widget="float" digits="[6,1]"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes" name="notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_survey_nps_summary_search" model="ir.ui.view">
+        <field name="name">custom.survey.nps.summary.search</field>
+        <field name="model">custom.survey.nps.summary</field>
+        <field name="arch" type="xml">
+            <search string="Search NPS Summaries">
+                <field name="name"/>
+                <field name="survey_id"/>
+                <filter name="filter_positive_nps"
+                        string="Positive NPS"
+                        domain="[('nps_score', '&gt;', 0)]"/>
+                <filter name="filter_negative_nps"
+                        string="Negative NPS"
+                        domain="[('nps_score', '&lt;', 0)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_survey_nps_summary" model="ir.actions.act_window">
+        <field name="name">NPS Summaries</field>
+        <field name="res_model">custom.survey.nps.summary</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_survey_nps_summary_search"/>
+    </record>
+</odoo>

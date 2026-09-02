@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ppob_commission_rule_user,ppob commission rule user,model_custom_ppob_commission_rule,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_commission_rule_manager,ppob commission rule manager,model_custom_ppob_commission_rule,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_commission_accrual_user,ppob commission accrual user,model_custom_ppob_commission_accrual,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_commission_accrual_ops,ppob commission accrual ops,model_custom_ppob_commission_accrual,custom_ppob_core.group_ppob_ops,1,1,1,0
+access_ppob_commission_accrual_manager,ppob commission accrual manager,model_custom_ppob_commission_accrual,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_commission_settlement_wizard,ppob commission settlement wizard,model_custom_ppob_commission_settlement_wizard,custom_ppob_core.group_ppob_manager,1,1,1,1

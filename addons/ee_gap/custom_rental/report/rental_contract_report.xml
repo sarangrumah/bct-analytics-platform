@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_rental_contract" model="ir.actions.report">
+        <field name="name">Rental Contract</field>
+        <field name="model">rental.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_rental.report_rental_contract_document</field>
+        <field name="report_file">custom_rental.report_rental_contract_document</field>
+        <field name="binding_model_id" ref="model_rental_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Indonesian long date, e.g. "9 Juni 2026" (accepts date or datetime in `d`). -->
+    <template id="id_date">
+        <t t-set="_bulan" t-value="['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']"/>
+        <t t-if="d"><t t-out="d.day"/> <t t-out="_bulan[d.month]"/> <t t-out="d.year"/></t>
+    </template>
+
+    <template id="report_rental_contract_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Rental Contract</h2>
+                        <h3 t-out="o.name"/>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 32px;">
+                            <tr>
+                                <td style="width: 50%; vertical-align: top; padding-right: 10px;">
+                                    <strong>Lessor:</strong>
+                                    <div t-out="o.company_id.name"/>
+                                    <div t-out="o.company_id.partner_id.contact_address"/>
+                                </td>
+                                <td style="width: 50%; vertical-align: top;">
+                                    <strong>Lessee:</strong>
+                                    <div t-out="o.partner_id.name"/>
+                                    <div t-out="o.partner_id.contact_address"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <h4 class="mt32">Asset</h4>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr><th>Code</th><th>Name</th><th>Serial</th><th class="text-end">Daily Rate</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td t-out="o.asset_id.code"/>
+                                    <td t-out="o.asset_id.name"/>
+                                    <td t-out="o.asset_id.serial_number"/>
+                                    <td class="text-end">
+                                        <t t-out="o.daily_rate"
+                                           t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h4 class="mt32">Period &amp; Pricing</h4>
+                        <table class="table table-sm">
+                            <tr><td>Pickup</td><td><t t-call="custom_rental.id_date"><t t-set="d" t-value="o.pickup_dt"/></t></td></tr>
+                            <tr><td>Expected Return</td><td><t t-call="custom_rental.id_date"><t t-set="d" t-value="o.return_dt_expected"/></t></td></tr>
+                            <tr><td>Planned Days</td><td t-out="o.days_planned"/></tr>
+                            <tr><td>Rental Fee</td>
+                                <td><t t-out="o.rental_fee"
+                                       t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                            </tr>
+                            <tr><td>Deposit</td>
+                                <td><t t-out="o.deposit_amount"
+                                       t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                            </tr>
+                            <tr><td>Late Fee Rate</td><td><t t-out="o.late_fee_rate"/>% / day</td></tr>
+                            <tr><th>Total Due</th>
+                                <th><t t-out="o.total_due"
+                                       t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></th>
+                            </tr>
+                        </table>
+                        <h4 class="mt32">Terms &amp; Conditions</h4>
+                        <p class="text-muted">
+                            [Terms and conditions placeholder. Configure the
+                            company-level T&amp;C and embed here.]
+                        </p>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 64px;">
+                            <tr>
+                                <td style="width: 50%; vertical-align: top; padding-right: 10px;">
+                                    <strong>Lessor signature</strong>
+                                    <br/>____________________
+                                </td>
+                                <td style="width: 50%; vertical-align: top;">
+                                    <strong>Lessee signature</strong>
+                                    <br/>
+                                    <img t-if="o.customer_signature"
+                                         t-att-src="'data:image/png;base64,' + (o.customer_signature.decode() if isinstance(o.customer_signature, bytes) else o.customer_signature)"
+                                         style="max-height:80px;"/>
+                                    <span t-else=""> ____________________ </span>
+                                    <div><small t-out="o.customer_signed_by"/></div>
+                                    <div><small><t t-call="custom_rental.id_date"><t t-set="d" t-value="o.customer_signed_at"/></t></small></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

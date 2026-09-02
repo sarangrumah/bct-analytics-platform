@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============ Vertical / Division ============ -->
+    <record id="view_finance_vertical_list" model="ir.ui.view">
+        <field name="name">finance.vertical.list</field>
+        <field name="model">finance.vertical</field>
+        <field name="arch" type="xml">
+            <list string="Verticals / Divisions" editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="cost_center_code"/>
+                <field name="pic_finance_user_id"/>
+                <field name="x_sap_external_id" optional="hide"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_finance_vertical" model="ir.actions.act_window">
+        <field name="name">Verticals / Divisions</field>
+        <field name="res_model">finance.vertical</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- ============ Submission Type ============ -->
+    <record id="view_finance_submission_type_list" model="ir.ui.view">
+        <field name="name">finance.submission.type.list</field>
+        <field name="model">finance.submission.type</field>
+        <field name="arch" type="xml">
+            <list string="Submission Types" editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_finance_submission_type" model="ir.actions.act_window">
+        <field name="name">Submission Types</field>
+        <field name="res_model">finance.submission.type</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- ============ Invoice Type ============ -->
+    <record id="view_finance_invoice_type_list" model="ir.ui.view">
+        <field name="name">finance.invoice.type.list</field>
+        <field name="model">finance.invoice.type</field>
+        <field name="arch" type="xml">
+            <list string="Invoice Types" editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="is_po_based"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_finance_invoice_type" model="ir.actions.act_window">
+        <field name="name">Invoice Types</field>
+        <field name="res_model">finance.invoice.type</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- ============ Invoice Routine Type ============ -->
+    <record id="view_finance_invoice_routine_type_list" model="ir.ui.view">
+        <field name="name">finance.invoice.routine.type.list</field>
+        <field name="model">finance.invoice.routine.type</field>
+        <field name="arch" type="xml">
+            <list string="Invoice Routine Types" editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="is_routine"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_finance_invoice_routine_type" model="ir.actions.act_window">
+        <field name="name">Invoice Routine Types</field>
+        <field name="res_model">finance.invoice.routine.type</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- ============ Item of Submission ============ -->
+    <record id="view_finance_item_submission_list" model="ir.ui.view">
+        <field name="name">finance.item.submission.list</field>
+        <field name="model">finance.item.submission</field>
+        <field name="arch" type="xml">
+            <list string="Items of Submission" editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="product_category_id"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_finance_item_submission" model="ir.actions.act_window">
+        <field name="name">Items of Submission</field>
+        <field name="res_model">finance.item.submission</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- ============ Limitation for Submission ============ -->
+    <record id="view_finance_limitation_list" model="ir.ui.view">
+        <field name="name">finance.limitation.list</field>
+        <field name="model">finance.limitation</field>
+        <field name="arch" type="xml">
+            <list string="Limitation for Submission" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="submission_type_id"/>
+                <field name="division_id"/>
+                <field name="pr_required_above"/>
+                <field name="max_amount"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_finance_limitation" model="ir.actions.act_window">
+        <field name="name">Limitation for Submission</field>
+        <field name="res_model">finance.limitation</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

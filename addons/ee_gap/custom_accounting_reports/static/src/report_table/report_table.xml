@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="custom_accounting_reports.ReportTable">
+        <div class="o_report_table_action o_action p-3">
+            <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+                <h4 class="me-auto mb-0" t-esc="state.title"/>
+                <input type="text" class="form-control o_report_filter"
+                       style="max-width: 220px"
+                       placeholder="Filter..."
+                       t-model="state.filter"/>
+                <button class="btn btn-secondary" t-on-click="onExportPdf">
+                    <i class="fa fa-file-pdf-o me-1"/>PDF
+                </button>
+                <button class="btn btn-secondary" t-on-click="onExportXlsx">
+                    <i class="fa fa-file-excel-o me-1"/>Excel
+                </button>
+            </div>
+            <div class="text-muted small mb-2">
+                <span t-esc="state.companyNames"/>
+                <t t-if="state.period.date_from">
+                    <span> — </span>
+                    <t t-esc="state.period.date_from"/>
+                    <span> s/d </span>
+                    <t t-esc="state.period.date_to"/>
+                </t>
+            </div>
+            <div t-if="state.loading" class="text-center p-4 text-muted">
+                <i class="fa fa-spin fa-circle-o-notch fa-2x"/>
+            </div>
+            <div t-else="" class="table-responsive">
+                <table class="table table-sm table-hover o_report_table">
+                    <thead>
+                        <tr>
+                            <th t-foreach="state.columns" t-as="col" t-key="col.field"
+                                class="o_report_th"
+                                t-att-class="{ 'text-end': col.kind === 'number' }"
+                                style="cursor: pointer"
+                                t-on-click="() => this.onSort(col)">
+                                <t t-esc="col.header"/>
+                                <i t-if="state.sortField === col.field"
+                                   t-att-class="state.sortDir === 1 ? 'fa fa-caret-up ms-1' : 'fa fa-caret-down ms-1'"/>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="displayLines" t-as="row" t-key="row_index"
+                            t-att-class="rowClass(row)"
+                            t-att-title="canDrilldown(row) ? 'Lihat General Ledger akun ini' : undefined"
+                            t-on-click="() => this.onRowClick(row)">
+                            <td t-foreach="state.columns" t-as="col" t-key="col.field"
+                                t-att-style="cellStyle(col, row)"
+                                t-att-class="{ 'o_report_cell_drilldown': canDrilldownCell(col, row) }"
+                                t-att-title="canDrilldownCell(col, row) ? 'Lihat GL awal tahun s/d sebelum periode ini' : undefined"
+                                t-on-click="(ev) => this.onCellClick(col, row, ev)">
+                                <t t-esc="formatCell(col, row)"/>
+                            </td>
+                        </tr>
+                        <tr t-if="!displayLines.length">
+                            <td t-att-colspan="state.columns.length" class="text-center text-muted p-3">
+                                No data for the selected filters.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </t>
+</templates>

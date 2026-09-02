@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_email_ab_test_list" model="ir.ui.view">
+        <field name="name">custom.email.ab.test.list</field>
+        <field name="model">custom.email.ab.test</field>
+        <field name="arch" type="xml">
+            <list string="A/B Tests">
+                <field name="name"/>
+                <field name="mailing_id"/>
+                <field name="split_pct"/>
+                <field name="winner_metric"/>
+                <field name="state"/>
+                <field name="winner"/>
+                <field name="variant_a_score"/>
+                <field name="variant_b_score"/>
+                <field name="sent_at"/>
+                <field name="evaluate_after"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_email_ab_test_form" model="ir.ui.view">
+        <field name="name">custom.email.ab.test.form</field>
+        <field name="model">custom.email.ab.test</field>
+        <field name="arch" type="xml">
+            <form string="A/B Test">
+                <header>
+                    <button name="action_split_send"
+                            type="object"
+                            string="Split Send"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_evaluate_winner"
+                            type="object"
+                            string="Evaluate Winner Now"
+                            class="btn-secondary"
+                            invisible="state != 'running'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,running,concluded"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="A/B test name..."/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="mailing_id"
+                                   options="{'no_create': True}"
+                                   readonly="state != 'draft'"/>
+                            <field name="split_pct" readonly="state != 'draft'"/>
+                            <field name="winner_metric" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="winner" readonly="1"/>
+                            <field name="sent_at" readonly="1"/>
+                            <field name="evaluate_after" readonly="1"/>
+                            <field name="variant_a_score" readonly="1"/>
+                            <field name="variant_b_score" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Variant A">
+                            <group>
+                                <field name="variant_a_subject"
+                                       readonly="state != 'draft'"/>
+                                <field name="variant_a_mailing_id" readonly="1"/>
+                            </group>
+                            <field name="variant_a_body" widget="html"
+                                   readonly="state != 'draft'"/>
+                        </page>
+                        <page string="Variant B">
+                            <group>
+                                <field name="variant_b_subject"
+                                       readonly="state != 'draft'"/>
+                                <field name="variant_b_mailing_id" readonly="1"/>
+                            </group>
+                            <field name="variant_b_body" widget="html"
+                                   readonly="state != 'draft'"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_email_ab_test_search" model="ir.ui.view">
+        <field name="name">custom.email.ab.test.search</field>
+        <field name="model">custom.email.ab.test</field>
+        <field name="arch" type="xml">
+            <search string="A/B Tests">
+                <field name="name"/>
+                <field name="mailing_id"/>
+                <filter name="draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="running" string="Running" domain="[('state','=','running')]"/>
+                <filter name="concluded" string="Concluded" domain="[('state','=','concluded')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_email_ab_test" model="ir.actions.act_window">
+        <field name="name">A/B Tests</field>
+        <field name="res_model">custom.email.ab.test</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_email_ab_test_search"/>
+    </record>
+</odoo>

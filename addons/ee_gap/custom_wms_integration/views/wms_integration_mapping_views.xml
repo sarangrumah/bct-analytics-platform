@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_wms_integration_mapping_list" model="ir.ui.view">
+        <field name="name">wms.integration.mapping.list</field>
+        <field name="model">wms.integration.mapping</field>
+        <field name="arch" type="xml">
+            <list string="WMS Code Mappings" editable="bottom">
+                <field name="external_code"/>
+                <field name="internal_model"/>
+                <field name="internal_res_id"/>
+                <field name="internal_display" readonly="1"/>
+                <field name="direction"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_wms_integration_mapping_form" model="ir.ui.view">
+        <field name="name">wms.integration.mapping.form</field>
+        <field name="model">wms.integration.mapping</field>
+        <field name="arch" type="xml">
+            <form string="WMS Code Mapping">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="external_code"/>
+                            <field name="internal_model"/>
+                            <field name="internal_res_id"/>
+                            <field name="internal_display" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="direction"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1" placeholder="Why this override exists."/>
+                    </group>
+                    <div class="text-muted">
+                        No row is needed when the host code already equals the Odoo natural key:
+                        <code>product.default_code</code> / <code>barcode</code>,
+                        <code>stock.location.barcode</code> / <code>complete_name</code>,
+                        <code>res.partner.ref</code>.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_wms_integration_mapping_search" model="ir.ui.view">
+        <field name="name">wms.integration.mapping.search</field>
+        <field name="model">wms.integration.mapping</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="external_code"/>
+                <filter name="products" string="Products" domain="[('internal_model', '=', 'product.product')]"/>
+                <filter name="locations" string="Locations" domain="[('internal_model', '=', 'stock.location')]"/>
+                <filter name="partners" string="Partners" domain="[('internal_model', '=', 'res.partner')]"/>
+                <separator/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="group_model" string="Model" context="{'group_by': 'internal_model'}"/>
+                    <filter name="group_direction" string="Direction" context="{'group_by': 'direction'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_wms_integration_mapping" model="ir.actions.act_window">
+        <field name="name">WMS Code Mappings</field>
+        <field name="res_model">wms.integration.mapping</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No code overrides yet</p>
+            <p>Add a row only when the host code differs from the Odoo natural key.</p>
+        </field>
+    </record>
+</odoo>

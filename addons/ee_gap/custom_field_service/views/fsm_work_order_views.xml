@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fsm_wo_list" model="ir.ui.view">
+        <field name="name">fsm.work.order.list</field>
+        <field name="model">fsm.work.order</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'done'"
+                  decoration-info="state in ('scheduled','in_progress')"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="site_id"/>
+                <field name="technician_id"/>
+                <field name="scheduled_start"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fsm_wo_kanban" model="ir.ui.view">
+        <field name="name">fsm.work.order.kanban</field>
+        <field name="model">fsm.work.order</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name"/>
+                <field name="site_id"/>
+                <field name="technician_id"/>
+                <field name="scheduled_start"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <strong><field name="name"/></strong>
+                        <div><field name="site_id"/></div>
+                        <div class="text-muted">👷 <field name="technician_id"/></div>
+                        <div class="text-muted">🗓 <field name="scheduled_start"/></div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_fsm_wo_form" model="ir.ui.view">
+        <field name="name">fsm.work.order.form</field>
+        <field name="model">fsm.work.order</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_schedule" string="Schedule" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_start" string="Start" type="object"
+                            class="btn-primary" invisible="state not in ('scheduled','on_hold')"/>
+                    <button name="action_hold" string="Hold" type="object"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_complete" string="Complete" type="object"
+                            class="btn-success" invisible="state not in ('in_progress','on_hold')"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('done','cancelled')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="site_id"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="technician_id"/>
+                            <field name="required_skill_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="scheduled_start"/>
+                            <field name="scheduled_end"/>
+                            <field name="started_at" readonly="1"/>
+                            <field name="completed_at" readonly="1"/>
+                            <field name="duration_hours" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Work Description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Materials">
+                            <field name="material_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_cost"/>
+                                    <field name="subtotal"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Completion">
+                            <field name="notes_completion"/>
+                            <group>
+                                <field name="customer_signature" widget="image"/>
+                                <field name="signed_by_name"/>
+                                <field name="signed_at" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fsm_wo" model="ir.actions.act_window">
+        <field name="name">Work Orders</field>
+        <field name="res_model">fsm.work.order</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+</odoo>

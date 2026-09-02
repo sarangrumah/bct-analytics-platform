@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ============ Rekonsiliasi PPh Terutang vs Disetor ============ -->
+        <template id="report_pph_reconciliation">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Akun Hutang PPh</th>
+                        <th class="text-end">Saldo Awal</th>
+                        <th class="text-end">Terutang (masa)</th>
+                        <th class="text-end">Disetor (masa)</th>
+                        <th class="text-end">Saldo Akhir (Belum Disetor)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'note'">
+                            <td colspan="5" class="text-muted fst-italic" t-esc="line.get('account')"/>
+                        </tr>
+                        <tr t-elif="line.get('type') == 'grand_total'" class="table-dark fw-bold">
+                            <td t-esc="line.get('account') or 'TOTAL'"/>
+                            <td class="text-end"><span t-esc="line.get('saldo_awal')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('terutang')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('disetor')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('saldo_akhir')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                        </tr>
+                        <tr t-else="">
+                            <td t-esc="line.get('account')"/>
+                            <td class="text-end"><span t-esc="line.get('saldo_awal')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('terutang')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('disetor')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('saldo_akhir')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+
+        <!-- ============ Monitoring Angsuran PPh 25 ============ -->
+        <template id="report_pph25">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tanggal</th><th>No. Dokumen</th><th>Keterangan</th>
+                        <th class="text-end">Angsuran Dibayar</th>
+                        <th class="text-end">Kompensasi/Kredit</th>
+                        <th class="text-end">Saldo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'note'">
+                            <td colspan="6" class="text-muted fst-italic" t-esc="line.get('doc_no')"/>
+                        </tr>
+                        <tr t-elif="line.get('type') == 'grand_total'" class="table-dark fw-bold">
+                            <td colspan="3" t-esc="line.get('doc_no') or 'TOTAL'"/>
+                            <td class="text-end"><span t-esc="line.get('debit')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('credit')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('saldo')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                        </tr>
+                        <tr t-else="">
+                            <td t-esc="line.get('date')" t-options="{'widget':'date'}"/>
+                            <td t-esc="line.get('doc_no')"/>
+                            <td t-esc="line.get('label')"/>
+                            <td class="text-end"><span t-esc="line.get('debit')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('credit')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                            <td class="text-end"><span t-esc="line.get('saldo')" t-options="{'widget':'monetary','display_currency':currency}"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+
+        <!-- ============ Jejak Audit Pajak (PDP Audit Log) ============ -->
+        <template id="report_tax_audit">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Waktu (UTC)</th><th>User</th><th>Model</th>
+                        <th class="text-end">Res ID</th><th>Aksi</th><th>Klasifikasi</th><th>Alasan / Catatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'note'">
+                            <td colspan="7" class="text-muted fst-italic" t-esc="line.get('user')"/>
+                        </tr>
+                        <tr t-elif="line.get('type') == 'grand_total'" class="table-dark fw-bold">
+                            <td colspan="7" t-esc="line.get('user') or 'TOTAL'"/>
+                        </tr>
+                        <tr t-else="">
+                            <td t-esc="line.get('ts')"/>
+                            <td t-esc="line.get('user')"/>
+                            <td t-esc="line.get('model')"/>
+                            <td class="text-end" t-esc="line.get('res_id')"/>
+                            <td t-esc="line.get('action')"/>
+                            <td t-esc="line.get('classification')"/>
+                            <td t-esc="line.get('reason')"/>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+    </data>
+</odoo>

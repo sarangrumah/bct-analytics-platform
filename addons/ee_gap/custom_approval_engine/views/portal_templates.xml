@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_approvals" name="My Approvals">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">My Approvals</t>
+            <div class="container">
+                <h2>Pending For You</h2>
+                <table class="table table-striped" t-if="pending">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Matrix</th>
+                            <th>Record</th>
+                            <th>Tier</th>
+                            <th>Due</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="pending" t-as="req">
+                            <td><span t-field="req.create_date"/></td>
+                            <td><span t-field="req.matrix_id.name"/></td>
+                            <td><span t-field="req.res_name"/></td>
+                            <td><span t-field="req.current_tier_id.name"/></td>
+                            <td><span t-field="req.due_at"/></td>
+                            <td>
+                                <a t-attf-href="/my/approvals/#{req.id}"
+                                   class="btn btn-sm btn-primary">Review</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div t-if="not pending" class="alert alert-info">
+                    Nothing pending for you. 🎉
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_approval_detail" name="Approval Detail">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Approval Request</t>
+            <div class="container">
+                <h2>
+                    <span t-field="req.matrix_id.name"/> —
+                    <span t-field="req.res_name"/>
+                </h2>
+                <dl class="row">
+                    <dt class="col-sm-3">State</dt><dd class="col-sm-9"><span t-field="req.state"/></dd>
+                    <dt class="col-sm-3">Tier</dt><dd class="col-sm-9"><span t-field="req.current_tier_id.name"/></dd>
+                    <dt class="col-sm-3">Due</dt><dd class="col-sm-9"><span t-field="req.due_at"/></dd>
+                    <dt class="col-sm-3">Requested By</dt><dd class="col-sm-9"><span t-field="req.requested_by_id"/></dd>
+                </dl>
+
+                <form t-attf-action="/my/approvals/#{req.id}/decide" method="POST"
+                      t-if="req.state == 'pending'">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="mb-2">
+                        <label for="comment">Comment</label>
+                        <textarea name="comment" class="form-control" rows="3"/>
+                    </div>
+                    <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
+                </form>
+
+                <h3 class="mt-4">History</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>When</th><th>Tier</th><th>User</th><th>Action</th><th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="req.history_ids" t-as="line">
+                            <td><span t-field="line.action_at"/></td>
+                            <td><span t-field="line.tier_name"/></td>
+                            <td><span t-field="line.action_user_id"/></td>
+                            <td><span t-field="line.action"/></td>
+                            <td><span t-field="line.comment"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <a href="/my/approvals" class="btn btn-secondary">← Back</a>
+            </div>
+        </t>
+    </template>
+
+</odoo>

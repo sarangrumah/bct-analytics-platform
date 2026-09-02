@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_studio_automation_rule_list" model="ir.ui.view">
+        <field name="name">studio.automation.rule.list</field>
+        <field name="model">studio.automation.rule</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'applied'"
+                  decoration-danger="state == 'error'"
+                  decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="trigger"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="state" widget="badge"/>
+                <field name="last_run"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_studio_automation_rule_form" model="ir.ui.view">
+        <field name="name">studio.automation.rule.form</field>
+        <field name="model">studio.automation.rule</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_apply" string="Apply" type="object" class="btn-primary"/>
+                    <button name="action_revert" string="Revert" type="object" class="btn-secondary"
+                            invisible="state != 'applied'"
+                            confirm="Deactivate the materialised base.automation? The rule will stop firing."/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Notify ops when invoice posted"/></h1>
+                    </div>
+                    <!-- model_name must be in fieldNames so the domain widget can
+                         resolve options.model to the record's actual model. -->
+                    <field name="model_name" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="model_id" options="{'no_create': True}"/>
+                            <field name="active"/>
+                            <field name="trigger"/>
+                        </group>
+                        <group>
+                            <field name="filter_domain" widget="domain"
+                                   options="{'model': 'model_name'}"
+                                   invisible="not model_name"/>
+                            <field name="last_run" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Trigger options"
+                           invisible="trigger not in ('on_write', 'on_create_or_write', 'on_time', 'on_state_set')">
+                        <field name="trigger_field_ids"
+                               widget="many2many_tags"
+                               invisible="trigger not in ('on_write', 'on_create_or_write')"/>
+                        <field name="trg_date_id"
+                               invisible="trigger != 'on_time'"
+                               required="trigger == 'on_time'"/>
+                        <field name="delay_minutes"
+                               invisible="trigger != 'on_time'"/>
+                        <field name="state_value"
+                               invisible="trigger != 'on_state_set'"
+                               required="trigger == 'on_state_set'"
+                               placeholder="e.g. done, posted"/>
+                    </group>
+                    <separator string="Actions to run (in order)"/>
+                    <field name="action_ids" domain="[('parent_action_id','=',False)]">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                            <field name="template"/>
+                            <field name="condition" optional="show"/>
+                            <field name="target_relation_field_id" optional="hide"/>
+                        </list>
+                        <form>
+                            <group>
+                                <group>
+                                    <field name="name"/>
+                                    <field name="template"/>
+                                    <field name="condition" placeholder="record.state == 'done'"/>
+                                </group>
+                                <group>
+                                    <field name="target_relation_field_id"
+                                           options="{'no_create': True}"/>
+                                    <field name="parent_action_id" readonly="1"
+                                           invisible="not parent_action_id"/>
+                                    <field name="branch_type"
+                                           invisible="not parent_action_id"/>
+                                </group>
+                            </group>
+                            <group string="Post note inputs" invisible="template != 'post_note'">
+                                <field name="body" nolabel="1"/>
+                            </group>
+                            <group string="Email inputs" invisible="template != 'send_email'">
+                                <field name="email_template_id"/>
+                            </group>
+                            <group string="WhatsApp inputs" invisible="template != 'send_whatsapp'">
+                                <field name="whatsapp_account_id"/>
+                                <field name="whatsapp_template_id"/>
+                                <field name="phone_field_id"/>
+                                <field name="body" string="Fallback body"/>
+                            </group>
+                            <group string="Set field" invisible="template != 'set_field'">
+                                <field name="target_field_id"/>
+                                <field name="target_value"/>
+                            </group>
+                            <group string="Webhook" invisible="template != 'call_webhook'">
+                                <field name="webhook_url"/>
+                                <field name="body" string="JSON Body"/>
+                            </group>
+                            <group string="Python code" invisible="template != 'python_code'">
+                                <field name="python_code" widget="ace" options="{'mode': 'python'}" nolabel="1"/>
+                            </group>
+                            <separator string="Nested actions (then / else branches)"/>
+                            <p class="text-muted">
+                                Children with <i>branch_type=then</i> run when this action's
+                                <b>When</b> expression is true; <i>else</i> children run otherwise;
+                                <i>always</i> children run unconditionally after the parent.
+                            </p>
+                            <field name="child_action_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="branch_type"/>
+                                    <field name="template"/>
+                                    <field name="condition" optional="show"/>
+                                </list>
+                            </field>
+                        </form>
+                    </field>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" nolabel="1" placeholder="Plain-language description of what this rule does..."/>
+                        </page>
+                        <page string="Last error" invisible="not last_error">
+                            <field name="last_error" readonly="1" nolabel="1"/>
+                        </page>
+                        <page string="Linked base.automation" invisible="not base_automation_id">
+                            <field name="base_automation_id" readonly="1" nolabel="1"
+                                   options="{'no_create': True, 'no_open': False}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_studio_automation_rule" model="ir.actions.act_window">
+        <field name="name">Automation Rules</field>
+        <field name="res_model">studio.automation.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

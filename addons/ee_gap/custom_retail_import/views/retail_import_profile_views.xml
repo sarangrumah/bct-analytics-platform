@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_retail_import_profile_list" model="ir.ui.view">
+        <field name="name">retail.import.profile.list</field>
+        <field name="model">retail.import.profile</field>
+        <field name="arch" type="xml">
+            <list string="Import Profiles">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="file_type"/>
+                <field name="file_format"/>
+                <field name="namespace"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_retail_import_profile_form" model="ir.ui.view">
+        <field name="name">retail.import.profile.form</field>
+        <field name="model">retail.import.profile</field>
+        <field name="arch" type="xml">
+            <form string="Import Profile">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="file_type"/>
+                            <field name="namespace"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="file_format"/>
+                            <field name="sheet_name"/>
+                            <field name="data_start_row"/>
+                            <field name="encoding"/>
+                            <field name="delimiter"/>
+                        </group>
+                    </group>
+                    <group string="Parsing">
+                        <field name="date_format"/>
+                        <field name="decimal_separator"/>
+                        <field name="thousand_separator"/>
+                        <field name="fix_encoding"/>
+                    </group>
+                    <group string="Column Map (logical field → 1-based column index)">
+                        <field name="column_map_json" nolabel="1" widget="text"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_retail_import_profile" model="ir.actions.act_window">
+        <field name="name">Import Profiles</field>
+        <field name="res_model">retail.import.profile</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

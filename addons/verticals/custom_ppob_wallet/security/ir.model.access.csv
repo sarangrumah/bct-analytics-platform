@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ppob_wallet_user,ppob wallet user,model_custom_ppob_wallet,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_wallet_ops,ppob wallet ops,model_custom_ppob_wallet,custom_ppob_core.group_ppob_ops,1,1,1,0
+access_ppob_wallet_manager,ppob wallet manager,model_custom_ppob_wallet,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_wallet_move_user,ppob wallet move user,model_custom_ppob_wallet_move,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_wallet_move_ops,ppob wallet move ops,model_custom_ppob_wallet_move,custom_ppob_core.group_ppob_ops,1,0,1,0
+access_ppob_wallet_move_manager,ppob wallet move manager,model_custom_ppob_wallet_move,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_wallet_adjust_wizard,ppob wallet adjust wizard,model_custom_ppob_wallet_adjust_wizard,custom_ppob_core.group_ppob_ops,1,1,1,1

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_custom_batch_payment_list" model="ir.ui.view">
+        <field name="name">custom.account.batch.payment.list</field>
+        <field name="model">custom.account.batch.payment</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="date"/>
+                <field name="journal_id"/>
+                <field name="batch_type"/>
+                <field name="payment_count"/>
+                <field name="amount_total" sum="Total"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'validated'"
+                       decoration-primary="state == 'sent'"
+                       decoration-success="state == 'reconciled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_batch_payment_form" model="ir.ui.view">
+        <field name="name">custom.account.batch.payment.form</field>
+        <field name="model">custom.account.batch.payment</field>
+        <field name="arch" type="xml">
+            <form string="Batch Payment">
+                <header>
+                    <button name="action_validate" type="object" string="Validate"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_generate_export_file" type="object"
+                            string="Generate Export File" class="btn-primary"
+                            invisible="state not in ('validated', 'sent')"/>
+                    <button name="action_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,validated,sent,reconciled"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_payments" type="object"
+                                class="oe_stat_button" icon="fa-money">
+                            <field name="payment_count" widget="statinfo" string="Payments"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="journal_id" readonly="state != 'draft'"/>
+                            <field name="batch_type" readonly="state != 'draft'"/>
+                            <field name="date" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="export_format_id"/>
+                            <field name="export_filename" invisible="not export_file"/>
+                            <field name="export_file" filename="export_filename"
+                                   invisible="not export_file"/>
+                            <field name="amount_total"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="payment_ids" readonly="state != 'draft'"
+                           domain="[('journal_id', '=', journal_id), ('payment_type', '=', batch_type), ('state', 'in', ('in_process', 'paid')), ('batch_payment_id', '=', False)]">
+                        <list>
+                            <field name="name"/>
+                            <field name="date"/>
+                            <field name="partner_id"/>
+                            <field name="partner_bank_id"/>
+                            <field name="amount"/>
+                            <field name="state"/>
+                            <field name="is_matched"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_custom_batch_payment" model="ir.actions.act_window">
+        <field name="name">Batch Payments</field>
+        <field name="res_model">custom.account.batch.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No batch payments yet</p>
+            <p>Group posted payments of one bank journal and export the
+               bank's bulk-transfer file.</p>
+        </field>
+    </record>
+
+    <record id="action_custom_batch_payment_format" model="ir.actions.act_window">
+        <field name="name">Batch Export Formats</field>
+        <field name="res_model">custom.batch.payment.format</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_custom_batch_format_list" model="ir.ui.view">
+        <field name="name">custom.batch.payment.format.list</field>
+        <field name="model">custom.batch.payment.format</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="bank_label"/>
+                <field name="file_extension"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_batch_format_form" model="ir.ui.view">
+        <field name="name">custom.batch.payment.format.form</field>
+        <field name="model">custom.batch.payment.format</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="bank_label"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="encoding"/>
+                            <field name="delimiter"/>
+                            <field name="date_format"/>
+                            <field name="file_extension"/>
+                            <field name="include_header"/>
+                            <field name="corporate_id"/>
+                            <field name="debit_account"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Layout notes…"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <menuitem id="menu_custom_batch_payment"
+              name="Batch Payments"
+              action="action_custom_batch_payment"
+              parent="account.menu_finance_entries"
+              sequence="12"
+              groups="account.group_account_user"/>
+    <menuitem id="menu_custom_batch_payment_format"
+              action="action_custom_batch_payment_format"
+              parent="account.account_account_menu"
+              sequence="20"
+              groups="account.group_account_manager"/>
+
+</odoo>

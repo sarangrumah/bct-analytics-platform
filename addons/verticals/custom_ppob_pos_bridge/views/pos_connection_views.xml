@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_pos_connection_list" model="ir.ui.view">
+        <field name="name">custom.ppob.pos.connection.list</field>
+        <field name="model">custom.ppob.pos.connection</field>
+        <field name="arch" type="xml">
+            <list string="POS Feed Connections" editable="bottom">
+                <field name="feed"/>
+                <field name="credential_ref"/>
+                <field name="ip_whitelist"/>
+                <field name="max_clock_skew_s"/>
+                <field name="status"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pos_connection_form" model="ir.ui.view">
+        <field name="name">custom.ppob.pos.connection.form</field>
+        <field name="model">custom.ppob.pos.connection</field>
+        <field name="arch" type="xml">
+            <form string="POS Feed Connection">
+                <sheet>
+                    <group>
+                        <field name="feed"/>
+                        <field name="credential_ref"/>
+                        <field name="ip_whitelist"/>
+                        <field name="max_clock_skew_s"/>
+                        <field name="status"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pos_connection" model="ir.actions.act_window">
+        <field name="name">POS Feed Connections</field>
+        <field name="res_model">custom.ppob.pos.connection</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_print_queue_list" model="ir.ui.view">
+        <field name="name">custom.print.queue.list</field>
+        <field name="model">custom.print.queue</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'queued'"
+                  decoration-success="state == 'done'"
+                  decoration-danger="state == 'failed'">
+                <field name="create_date"/>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="label_template_id"/>
+                <field name="printer_id"/>
+                <field name="res_model"/>
+                <field name="copies"/>
+                <field name="state" widget="badge"/>
+                <field name="sent_at"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_custom_print_queue_form" model="ir.ui.view">
+        <field name="name">custom.print.queue.form</field>
+        <field name="model">custom.print.queue</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_process" type="object" string="Process Now"
+                            class="btn-primary"
+                            invisible="state not in ('queued','failed')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="user_id"/>
+                            <field name="label_template_id"/>
+                            <field name="printer_id"/>
+                            <field name="copies"/>
+                        </group>
+                        <group>
+                            <field name="res_model"/>
+                            <field name="res_ids"/>
+                            <field name="sent_at" readonly="1"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+                    <separator string="Error"/>
+                    <field name="error" readonly="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_custom_print_queue" model="ir.actions.act_window">
+        <field name="name">Print Queue</field>
+        <field name="res_model">custom.print.queue</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,17 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_qp_user,point user,model_quality_point,group_quality_user,1,0,0,0
+access_qp_mgr,point mgr,model_quality_point,group_quality_manager,1,1,1,1
+access_qc_user,check user,model_quality_check,group_quality_user,1,1,1,0
+access_qc_mgr,check mgr,model_quality_check,group_quality_manager,1,1,1,1
+access_qa_user,alert user,model_quality_alert,group_quality_user,1,1,1,0
+access_qa_mgr,alert mgr,model_quality_alert,group_quality_manager,1,1,1,1
+access_qit_user,test user,model_custom_quality_test,group_quality_user,1,0,0,0
+access_qit_mgr,test mgr,model_custom_quality_test,group_quality_manager,1,1,1,1
+access_qitl_user,test line user,model_custom_quality_test_line,group_quality_user,1,0,0,0
+access_qitl_mgr,test line mgr,model_custom_quality_test_line,group_quality_manager,1,1,1,1
+access_qil_user,inspection line user,model_custom_quality_inspection_line,group_quality_user,1,1,1,0
+access_qil_mgr,inspection line mgr,model_custom_quality_inspection_line,group_quality_manager,1,1,1,1
+access_qsig_user,signature user,model_custom_quality_signature,group_quality_user,1,1,1,0
+access_qsig_mgr,signature mgr,model_custom_quality_signature,group_quality_manager,1,1,1,1
+access_qcapa_user,capa user,model_custom_quality_capa,group_quality_user,1,1,1,0
+access_qcapa_mgr,capa mgr,model_custom_quality_capa,group_quality_manager,1,1,1,1

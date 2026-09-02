@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_tenant_fx_header" model="ir.ui.view">
+        <field name="name">account.move.form.tenant.fx.header</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!--
+                Foreign-currency summary directly under the document number.
+                Deliberately NOT behind base.group_multi_currency: the whole
+                point is that ordinary accounting users, who do not have that
+                group, can still see the amount they are approving and the rate
+                it was converted at.
+            -->
+            <xpath expr="//div[hasclass('oe_title')]" position="after">
+                <field name="x_fx_is_foreign" invisible="1"/>
+                <div name="tenant_fx_header"
+                     class="alert alert-info d-flex flex-wrap align-items-center gap-5 py-2 px-3 mb-3"
+                     role="status"
+                     invisible="not x_fx_is_foreign">
+                    <div>
+                        <span class="text-muted small d-block">Total (Foreign Currency)</span>
+                        <span class="fs-5 fw-bold">
+                            <field name="amount_total" widget="monetary" readonly="1" class="oe_inline w-auto"/>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-muted small d-block">Exchange Rate</span>
+                        <span class="fw-bold d-flex align-items-center gap-1">
+                            <span>1</span>
+                            <field name="currency_id" readonly="1" options="{'no_open': True}" class="oe_inline w-auto"/>
+                            <span>=</span>
+                            <field name="x_fx_rate_company_per_unit" readonly="1" digits="[16,4]" class="oe_inline w-auto"/>
+                            <field name="company_currency_id" readonly="1" options="{'no_open': True}" class="oe_inline w-auto"/>
+                        </span>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

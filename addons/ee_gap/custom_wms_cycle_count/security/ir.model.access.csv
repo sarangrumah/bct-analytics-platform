@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_plan_user,plan.user,model_custom_cycle_count_plan,group_cycle_count_user,1,0,0,0
+access_plan_supervisor,plan.sup,model_custom_cycle_count_plan,group_cycle_count_supervisor,1,1,0,0
+access_plan_admin,plan.admin,model_custom_cycle_count_plan,group_cycle_count_admin,1,1,1,1
+access_session_user,session.user,model_custom_cycle_count_session,group_cycle_count_user,1,1,0,0
+access_session_supervisor,session.sup,model_custom_cycle_count_session,group_cycle_count_supervisor,1,1,1,0
+access_session_admin,session.admin,model_custom_cycle_count_session,group_cycle_count_admin,1,1,1,1
+access_line_user,line.user,model_custom_cycle_count_line,group_cycle_count_user,1,1,1,0
+access_line_supervisor,line.sup,model_custom_cycle_count_line,group_cycle_count_supervisor,1,1,1,0
+access_line_admin,line.admin,model_custom_cycle_count_line,group_cycle_count_admin,1,1,1,1
+access_adj_user,adj.user,model_custom_cycle_count_adjustment,group_cycle_count_user,1,0,0,0
+access_adj_supervisor,adj.sup,model_custom_cycle_count_adjustment,group_cycle_count_supervisor,1,1,1,0
+access_adj_admin,adj.admin,model_custom_cycle_count_adjustment,group_cycle_count_admin,1,1,1,1

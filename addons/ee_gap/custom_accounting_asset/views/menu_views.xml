@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_assets_root" name="Assets"
+              parent="account.menu_finance" sequence="40"
+              groups="group_asset_user"/>
+
+    <menuitem id="menu_assets_register" name="Fixed Assets"
+              parent="menu_assets_root" sequence="10"
+              action="action_fixed_asset"/>
+
+    <menuitem id="menu_assets_post_depreciation" name="Post Depreciation"
+              parent="menu_assets_root" sequence="15"
+              action="action_asset_post_wizard"/>
+
+    <menuitem id="menu_assets_revaluations" name="Revaluations"
+              parent="menu_assets_root" sequence="18"
+              action="action_fixed_asset_revaluation"/>
+
+    <menuitem id="menu_assets_register_report" name="Asset Register"
+              parent="menu_assets_root" sequence="20"
+              action="action_asset_register_wizard"/>
+
+    <menuitem id="menu_assets_config" name="Configuration"
+              parent="menu_assets_root" sequence="90"
+              groups="group_asset_manager"/>
+
+    <menuitem id="menu_assets_groups" name="Groups"
+              parent="menu_assets_config" sequence="10"
+              action="action_fixed_asset_group"/>
+
+    <menuitem id="menu_assets_locations" name="Locations"
+              parent="menu_assets_config" sequence="20"
+              action="action_fixed_asset_location"/>
+
+</odoo>

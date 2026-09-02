@@ -1,0 +1,9 @@
+# Build output and installed packages only. Nothing that a fresh clone needs to build is listed
+# here — see docs/agents/PLAN.md, "verify from a clone": an unanchored ignore rule silently
+# excluded three install-critical files earlier in this build. `next-env.d.ts` is deliberately
+# NOT ignored so a clean clone type-checks before `next build` has ever run.
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+.env.local

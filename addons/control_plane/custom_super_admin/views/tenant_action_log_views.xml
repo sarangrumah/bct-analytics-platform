@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_tenant_action_log_list" model="ir.ui.view">
+        <field name="name">tenant.action.log.list</field>
+        <field name="model">tenant.action.log</field>
+        <field name="arch" type="xml">
+            <list string="Action Log"
+                  decoration-success="outcome == 'success'"
+                  decoration-danger="outcome == 'failure'"
+                  decoration-warning="outcome == 'partial'"
+                  create="false" delete="false" edit="false">
+                <field name="ts"/>
+                <field name="tenant_slug"/>
+                <field name="action"/>
+                <field name="actor"/>
+                <field name="outcome" widget="badge"/>
+                <field name="error" optional="show"/>
+                <field name="hash_hex" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_tenant_action_log_search" model="ir.ui.view">
+        <field name="name">tenant.action.log.search</field>
+        <field name="model">tenant.action.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="tenant_slug"/>
+                <field name="action"/>
+                <field name="actor"/>
+                <filter name="failures" string="Failures only" domain="[('outcome','=','failure')]"/>
+                <group>
+                    <filter name="by_tenant" string="Tenant" context="{'group_by': 'tenant_slug'}"/>
+                    <filter name="by_action" string="Action" context="{'group_by': 'action'}"/>
+                    <filter name="by_outcome" string="Outcome" context="{'group_by': 'outcome'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_tenant_action_log" model="ir.actions.act_window">
+        <field name="name">Action Log</field>
+        <field name="res_model">tenant.action.log</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_tenant_action_log_search"/>
+    </record>
+
+    <record id="action_verify_chain" model="ir.actions.server">
+        <field name="name">Verify Chain Integrity</field>
+        <field name="model_id" ref="model_tenant_action_log"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_verify_chain()</field>
+    </record>
+
+</odoo>

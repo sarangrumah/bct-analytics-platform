@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Parent menu under Super Admin root (Hub Console mounts on top of it) -->
+    <menuitem id="menu_tenant_infra_root"
+              name="Tenant Infra"
+              parent="custom_super_admin.menu_super_admin_root"
+              sequence="60"
+              groups="custom_tenant_infra.group_tenant_infra_user"/>
+
+    <menuitem id="menu_tenant_vps"
+              name="VPS Fleet"
+              parent="menu_tenant_infra_root"
+              action="action_tenant_vps"
+              sequence="10"/>
+
+    <menuitem id="menu_tenant_environment"
+              name="Environments"
+              parent="menu_tenant_infra_root"
+              action="action_tenant_environment"
+              sequence="20"/>
+
+    <menuitem id="menu_tenant_vps_bootstrap_template"
+              name="Bootstrap Templates"
+              parent="menu_tenant_infra_root"
+              action="action_tenant_vps_bootstrap_template"
+              sequence="30"
+              groups="custom_tenant_infra.group_tenant_infra_manager"/>
+
+</odoo>

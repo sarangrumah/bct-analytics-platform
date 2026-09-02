@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_social_root" name="Social" sequence="68"
+              groups="custom_social.group_social_user"/>
+    <menuitem id="menu_social_posts" name="Posts" parent="menu_social_root"
+              action="action_social_post" sequence="10"/>
+    <menuitem id="menu_social_accounts" name="Accounts" parent="menu_social_root"
+              action="action_social_account" sequence="20"
+              groups="custom_social.group_social_admin"/>
+</odoo>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_dashboard_tile_wizard_form" model="ir.ui.view">
+        <field name="name">custom.dashboard.tile.wizard.form</field>
+        <field name="model">custom.dashboard.tile.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Dashboard Tile">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="dashboard_id"/>
+                            <field name="name"/>
+                            <field name="tile_type"/>
+                            <field name="refresh_interval_seconds"/>
+                            <field name="color"/>
+                        </group>
+                        <group>
+                            <field name="ir_model_id"/>
+                            <field name="model_name" readonly="1"/>
+                            <field name="measure_field_id"
+                                   invisible="tile_type not in ('sum','avg','last_value','chart_bar','chart_pie')"
+                                   required="tile_type in ('sum','avg','last_value','chart_bar','chart_pie')"/>
+                            <field name="groupby_field_id"
+                                   invisible="tile_type not in ('chart_bar','chart_pie')"
+                                   required="tile_type in ('chart_bar','chart_pie')"/>
+                            <field name="domain"/>
+                        </group>
+                    </group>
+                    <group string="Formula" invisible="tile_type != 'formula'">
+                        <field name="formula_expression" nolabel="1"
+                               placeholder="env['sale.order'].search_count(domain)"/>
+                    </group>
+                    <group string="Preview">
+                        <field name="preview_result" readonly="1" widget="text"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_preview" type="object" string="Preview"
+                            icon="fa-eye"/>
+                    <button name="action_create_tile" type="object" string="Create Tile"
+                            class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_custom_dashboard_tile_wizard" model="ir.actions.act_window">
+        <field name="name">New Tile</field>
+        <field name="res_model">custom.dashboard.tile.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

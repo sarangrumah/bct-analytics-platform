@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Same two-rule shape as custom_operating_unit: group rules OR together, so an
+      "All Operating Units" holder sees every transaction while a plain PPOB user sees only their
+      own units. Fail-closed for a user with no units.
+    -->
+    <data noupdate="0">
+
+        <record id="rule_ppob_transaction_operating_unit" model="ir.rule">
+            <field name="name">PPOB Transaction: own Operating Units</field>
+            <field name="model_id" ref="model_ppob_transaction"/>
+            <field name="groups" eval="[(4, ref('custom_ppob.group_ppob_user'))]"/>
+            <field name="domain_force">
+                ['|', ('operating_unit_id', '=', False),
+                      ('operating_unit_id', 'in', user.allowed_operating_unit_ids.ids)]
+            </field>
+        </record>
+
+        <record id="rule_ppob_transaction_operating_unit_admin" model="ir.rule">
+            <field name="name">PPOB Transaction: Operating Unit administrator bypass</field>
+            <field name="model_id" ref="model_ppob_transaction"/>
+            <field name="groups" eval="[(4, ref('custom_operating_unit.group_operating_unit_all'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+        <record id="rule_ppob_transaction_company" model="ir.rule">
+            <field name="name">PPOB Transaction: multi-company</field>
+            <field name="model_id" ref="model_ppob_transaction"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_ppob_biller_company" model="ir.rule">
+            <field name="name">PPOB Biller: multi-company</field>
+            <field name="model_id" ref="model_ppob_biller"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">
+                ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+            </field>
+        </record>
+
+    </data>
+</odoo>

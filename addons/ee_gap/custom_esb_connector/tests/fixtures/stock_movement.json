@@ -1,0 +1,34 @@
+{
+  "path": "https://stg7.esb.co.id/core-stg/report/stock-movement",
+  "timestamp": "2026-07-21 09:00:05",
+  "status": "ok",
+  "code": "EC03100000",
+  "message": "OK",
+  "result": {
+    "page": 1, "limit": 100, "count": 4,
+    "data": [
+      {"branchID": 373, "branchCode": "WRB", "branchName": "Wijaya Resto Barokah", "location": "Kitchen SF WRB",
+       "documentDate": "2026-07-18", "createdDate": "2026-07-18 08:00:00", "productDetailID": 2112,
+       "productCode": "AYM-001", "productName": "Ayam Utuh", "UOM": "GR", "transactionType": "Goods Receipt",
+       "referenceNumber": "GR202607180001", "documentCode": "GR202607180001", "valuePerUnit": 45,
+       "qtyIn": 10000, "amountIn": 450000, "qtyOut": 0, "amountOut": 0, "qtyBalance": 10000, "amountBalance": 450000},
+      {"branchID": 373, "branchCode": "WRB", "branchName": "Wijaya Resto Barokah", "location": "Kitchen SF WRB",
+       "documentDate": "2026-07-20", "createdDate": "2026-07-20 21:00:00", "productDetailID": 2112,
+       "productCode": "AYM-001", "productName": "Ayam Utuh", "UOM": "GR", "transactionType": "Sales Usage",
+       "referenceNumber": "SU202607200001", "documentCode": "SU202607200001", "valuePerUnit": 45,
+       "qtyIn": 0, "amountIn": 0, "qtyOut": 2500, "amountOut": 112500, "qtyBalance": 7500, "amountBalance": 337500},
+      {"branchID": 373, "branchCode": "WRB", "branchName": "Wijaya Resto Barokah", "location": "Kitchen SF WRB",
+       "documentDate": "2026-07-19", "createdDate": "2026-07-19 21:00:00", "productDetailID": 2112,
+       "productCode": "AYM-001", "productName": "Ayam Utuh", "UOM": "GR", "transactionType": "Sales Usage",
+       "referenceNumber": "SU202607190001", "documentCode": "SU202607190001", "valuePerUnit": 45,
+       "qtyIn": 0, "amountIn": 0, "qtyOut": 1500, "amountOut": 67500, "qtyBalance": 8500, "amountBalance": 382500},
+      {"branchID": 373, "branchCode": "WRB", "branchName": "Wijaya Resto Barokah", "location": "Chiller",
+       "documentDate": "2026-07-20", "createdDate": "2026-07-20 10:00:00", "productDetailID": 2058,
+       "productCode": "BRS-001", "productName": "Beras Premium", "UOM": "KG", "transactionType": "Goods Receipt",
+       "referenceNumber": "GR202607200002", "documentCode": "GR202607200002", "valuePerUnit": 14000,
+       "qtyIn": 50, "amountIn": 700000, "qtyOut": 0, "amountOut": 0, "qtyBalance": 50, "amountBalance": 700000}
+    ],
+    "prev": "", "next": ""
+  },
+  "errors": null
+}

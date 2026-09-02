@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_onboarding_root" name="Onboarding" sequence="20"
+              web_icon="custom_onboarding_journey,static/description/icon.png"/>
+
+    <menuitem id="menu_onboarding_pipeline" parent="menu_onboarding_root"
+              name="Pipeline" sequence="10"
+              action="action_onboarding_journey"/>
+
+    <menuitem id="menu_onboarding_new_intake" parent="menu_onboarding_root"
+              name="New Intake" sequence="15"
+              action="action_onboarding_intake_wizard"/>
+
+    <menuitem id="menu_onboarding_public_inbox" parent="menu_onboarding_root"
+              name="Public Inbox" sequence="20"
+              action="action_onboarding_public_submission"/>
+
+    <menuitem id="menu_onboarding_transitions" parent="menu_onboarding_root"
+              name="Stage Transitions" sequence="30"
+              action="action_onboarding_stage_transition"/>
+
+    <menuitem id="menu_onboarding_configuration" parent="menu_onboarding_root"
+              name="Configuration" sequence="90"/>
+
+</odoo>

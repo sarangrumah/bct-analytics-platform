@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_sms_account_user,custom.sms.account user,model_custom_sms_account,custom_sms_id.group_user,1,0,0,0
+access_custom_sms_account_manager,custom.sms.account manager,model_custom_sms_account,custom_sms_id.group_manager,1,1,1,1
+access_custom_sms_message_user,custom.sms.message user,model_custom_sms_message,custom_sms_id.group_user,1,1,1,0
+access_custom_sms_message_manager,custom.sms.message manager,model_custom_sms_message,custom_sms_id.group_manager,1,1,1,1

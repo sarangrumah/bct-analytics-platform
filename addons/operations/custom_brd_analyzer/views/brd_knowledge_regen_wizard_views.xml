@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_brd_knowledge_regen_wizard_form" model="ir.ui.view">
+            <field name="name">brd.knowledge.regen.wizard.form</field>
+            <field name="model">brd.knowledge.regen.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Regenerate MODULE_KNOWLEDGE.md">
+                    <sheet>
+                        <group>
+                            <field name="entry_id" readonly="1"/>
+                            <field name="module_name" readonly="1"/>
+                            <field name="module_path" readonly="1"/>
+                            <field name="knowledge_status" readonly="1"/>
+                            <field name="mode"/>
+                        </group>
+                        <group string="Result" invisible="not result_message">
+                            <field name="result_message" nolabel="1" readonly="1"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Execute" name="action_execute" type="object" class="btn-primary"/>
+                        <button string="Close" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_brd_knowledge_regen_wizard" model="ir.actions.act_window">
+            <field name="name">Regenerate Knowledge</field>
+            <field name="res_model">brd.knowledge.regen.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="model_custom_module_capability_entry"/>
+            <field name="binding_view_types">form</field>
+        </record>
+
+    </data>
+</odoo>

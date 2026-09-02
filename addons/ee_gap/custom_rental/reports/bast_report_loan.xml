@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Split the BAST line table into "Unit Utama (Diinvoice)" and
+        "Unit Cadangan / Loan (tidak diinvoice — wajib kembali)" sections
+        based on the is_loan flag added by custom_rental to custom.bast.line.
+        Inherited here (not in core custom_bast) so the core report stays
+        standalone-safe when custom_rental is absent.
+    -->
+    <template id="report_bast_document_loan_sections"
+              inherit_id="custom_bast.report_bast_document">
+        <xpath expr="//t[@t-foreach='doc.line_ids']" position="replace">
+            <t t-set="idx" t-value="0"/>
+            <t t-set="primary_lines" t-value="doc.line_ids.filtered(lambda l: not l.is_loan)"/>
+            <t t-set="loan_lines" t-value="doc.line_ids.filtered(lambda l: l.is_loan)"/>
+
+            <tr t-if="loan_lines" class="table-light">
+                <td colspan="7"><strong>Unit Utama (Diinvoice)</strong></td>
+            </tr>
+            <t t-foreach="primary_lines" t-as="line">
+                <t t-set="idx" t-value="idx + 1"/>
+                <tr>
+                    <td t-out="idx"/>
+                    <td t-out="line.item_description"/>
+                    <td t-out="line.lot_id.name or ''"/>
+                    <td class="text-end" t-out="line.qty"/>
+                    <td t-out="line.uom_id.name or ''"/>
+                    <td t-out="dict(line._fields['condition'].selection).get(line.condition, line.condition)"/>
+                    <td t-out="line.note or ''"/>
+                </tr>
+            </t>
+
+            <t t-if="loan_lines">
+                <tr class="table-warning">
+                    <td colspan="7">
+                        <strong>Unit Cadangan / Loan</strong>
+                        <span class="text-muted"> — tidak diinvoice, wajib kembali penuh</span>
+                    </td>
+                </tr>
+                <t t-foreach="loan_lines" t-as="line">
+                    <t t-set="idx" t-value="idx + 1"/>
+                    <tr>
+                        <td t-out="idx"/>
+                        <td t-out="line.item_description"/>
+                        <td t-out="line.lot_id.name or ''"/>
+                        <td class="text-end" t-out="line.qty"/>
+                        <td t-out="line.uom_id.name or ''"/>
+                        <td t-out="dict(line._fields['condition'].selection).get(line.condition, line.condition)"/>
+                        <td t-out="line.note or ''"/>
+                    </tr>
+                </t>
+            </t>
+        </xpath>
+    </template>
+</odoo>

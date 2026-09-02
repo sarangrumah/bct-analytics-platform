@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_report_financial_list" model="ir.ui.view">
+        <field name="name">custom.report.financial.list</field>
+        <field name="model">custom.report.financial</field>
+        <field name="arch" type="xml">
+            <list string="Financial Report Tree">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="type"/>
+                <field name="parent_id"/>
+                <field name="level"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_report_financial_form" model="ir.ui.view">
+        <field name="name">custom.report.financial.form</field>
+        <field name="model">custom.report.financial</field>
+        <field name="arch" type="xml">
+            <form string="Financial Report Tree">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="name"/>
+                            <field name="category"/>
+                            <field name="parent_id"/>
+                        </group>
+                        <group>
+                            <field name="type"/>
+                            <field name="sign"/>
+                            <field name="style"/>
+                            <field name="level"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Aggregation">
+                        <field name="account_ids" widget="many2many_tags"
+                               invisible="type != 'accounts'"/>
+                        <field name="account_type_ids"
+                               invisible="type != 'account_type'"/>
+                        <field name="company_id"
+                               groups="base.group_multi_company"/>
+                    </group>
+                    <field name="children_ids" mode="list" nolabel="1">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="code"/>
+                            <field name="name"/>
+                            <field name="type"/>
+                            <field name="sign"/>
+                            <field name="style"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_custom_report_financial" model="ir.actions.act_window">
+        <field name="name">Financial Report Trees</field>
+        <field name="res_model">custom.report.financial</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('parent_id', '=', False)]</field>
+    </record>
+</odoo>

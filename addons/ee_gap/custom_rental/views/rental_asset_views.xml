@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rental_asset_list" model="ir.ui.view">
+        <field name="name">rental.asset.list</field>
+        <field name="model">rental.asset</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'available'"
+                  decoration-info="state == 'on_rent'"
+                  decoration-warning="state == 'maintenance'"
+                  decoration-muted="state == 'retired'">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="serial_number"/>
+                <field name="daily_rate"/>
+                <field name="state" widget="badge"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_rental_asset_form" model="ir.ui.view">
+        <field name="name">rental.asset.form</field>
+        <field name="model">rental.asset</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="product_id"/>
+                            <field name="serial_number"/>
+                        </group>
+                        <group>
+                            <field name="daily_rate"/>
+                            <field name="deposit_amount"/>
+                            <field name="currency_id"/>
+                            <field name="state"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_rental_asset" model="ir.actions.act_window">
+        <field name="name">Rental Assets</field>
+        <field name="res_model">rental.asset</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

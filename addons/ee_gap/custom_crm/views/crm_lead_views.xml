@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form inherit: add AI Insights tab + WhatsApp + AI Score / Enrich buttons -->
+    <record id="view_crm_lead_form_inherit_custom_crm" model="ir.ui.view">
+        <field name="name">crm.lead.form.inherit.custom_crm</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ai_score_lead"
+                        type="object"
+                        string="AI Score Lead"
+                        icon="fa-magic"
+                        groups="custom_crm.group_user"/>
+                <button name="action_enrich_lead"
+                        type="object"
+                        string="Enrich Lead"
+                        icon="fa-database"
+                        groups="custom_crm.group_user"/>
+            </xpath>
+
+            <xpath expr="//field[@name='phone']" position="after">
+                <field name="x_whatsapp_number"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="AI Insights" name="ai_insights">
+                    <group>
+                        <group string="Scores">
+                            <field name="x_predictive_score" widget="float"/>
+                            <field name="x_ai_score" widget="float"/>
+                            <field name="x_ai_scored_date" readonly="1"/>
+                        </group>
+                        <group string="Enrichment">
+                            <field name="x_enriched_at" readonly="1"/>
+                            <field name="x_lead_mining_request_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="AI Reasoning"/>
+                    <field name="x_ai_reasoning" widget="text" nolabel="1"/>
+                    <separator string="Enrichment Data"/>
+                    <field name="x_enrichment_data" widget="text" nolabel="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- List inherit: surface predictive + AI scores on the leads list -->
+    <record id="view_crm_lead_list_inherit_custom_crm" model="ir.ui.view">
+        <field name="name">crm.lead.list.inherit.custom_crm</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_oppor"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="x_predictive_score" optional="show"/>
+                <field name="x_ai_score" optional="show"/>
+                <field name="x_whatsapp_number" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

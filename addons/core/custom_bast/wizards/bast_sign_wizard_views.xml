@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bast_sign_wizard_form" model="ir.ui.view">
+        <field name="name">custom.bast.sign.wizard.form</field>
+        <field name="model">custom.bast.sign.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sign BAST">
+                <group>
+                    <field name="bast_id" readonly="1"/>
+                    <field name="party"/>
+                    <field name="signed_by"/>
+                    <field name="signature" widget="signature"/>
+                </group>
+                <group string="GPS (optional)">
+                    <field name="gps_latitude"/>
+                    <field name="gps_longitude"/>
+                </group>
+                <footer>
+                    <button name="action_apply" type="object" string="Apply Signature" class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

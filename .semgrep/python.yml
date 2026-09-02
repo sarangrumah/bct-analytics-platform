@@ -1,0 +1,208 @@
+# Semgrep - Python rules for Odoo addons, the CDC loader and the analytics scripts.
+# Owner: Security agent. Run by the `sast` CI job over the whole tree.
+#
+# These sit on top of Semgrep's registry rules; they are the ones that know something
+# about *this* stack - Odoo's ORM escape hatches and the PDP masking contract - which no
+# generic ruleset can know.
+
+rules:
+  - id: bct-python-subprocess-shell-true
+    languages: [python]
+    severity: ERROR
+    message: >-
+      subprocess called with shell=True. Any interpolated value becomes shell syntax.
+      Pass a list of arguments instead: subprocess.run(["psql", "-c", query]).
+    metadata:
+      category: security
+      cwe: "CWE-78: OS Command Injection"
+      owner: Security
+    patterns:
+      - pattern-either:
+          - pattern: subprocess.run(..., shell=True, ...)
+          - pattern: subprocess.call(..., shell=True, ...)
+          - pattern: subprocess.check_call(..., shell=True, ...)
+          - pattern: subprocess.check_output(..., shell=True, ...)
+          - pattern: subprocess.Popen(..., shell=True, ...)
+
+  - id: bct-python-os-system
+    languages: [python]
+    severity: ERROR
+    message: >-
+      os.system() runs a shell. Use subprocess with an argument list.
+    metadata:
+      category: security
+      cwe: "CWE-78: OS Command Injection"
+      owner: Security
+    pattern: os.system(...)
+
+  - id: bct-python-yaml-unsafe-load
+    languages: [python]
+    severity: ERROR
+    message: >-
+      yaml.load() without SafeLoader constructs arbitrary Python objects from the
+      document. Use yaml.safe_load().
+    metadata:
+      category: security
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+      owner: Security
+    patterns:
+      - pattern: yaml.load($X)
+      - pattern-not: yaml.load($X, Loader=yaml.SafeLoader)
+      - pattern-not: yaml.load($X, yaml.SafeLoader)
+
+  - id: bct-python-pickle-load
+    languages: [python]
+    severity: ERROR
+    message: >-
+      pickle deserialisation executes arbitrary code. Use JSON for anything that crosses
+      a trust boundary, including the CDC queue.
+    metadata:
+      category: security
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+      owner: Security
+    pattern-either:
+      - pattern: pickle.load(...)
+      - pattern: pickle.loads(...)
+
+  - id: bct-python-requests-verify-disabled
+    languages: [python]
+    severity: ERROR
+    message: >-
+      TLS verification disabled. The login-gateway JWKS fetch and every PPOB biller call
+      run over this; verify=False turns them into unauthenticated channels.
+    metadata:
+      category: security
+      cwe: "CWE-295: Improper Certificate Validation"
+      owner: Security
+    pattern-either:
+      - pattern: requests.$M(..., verify=False, ...)
+      - pattern: httpx.$M(..., verify=False, ...)
+
+  - id: bct-python-eval-exec
+    languages: [python]
+    severity: WARNING
+    message: >-
+      eval/exec on a non-literal. Odoo's safe_eval exists precisely for this; use it, and
+      only over data you control.
+    metadata:
+      category: security
+      cwe: "CWE-95: Eval Injection"
+      owner: Security
+    patterns:
+      - pattern-either:
+          - pattern: eval($X, ...)
+          - pattern: exec($X, ...)
+      - pattern-not: eval("...", ...)
+      - pattern-not: exec("...", ...)
+
+  - id: bct-python-weak-hash-for-security
+    languages: [python]
+    severity: WARNING
+    message: >-
+      MD5/SHA-1 used for what looks like a security purpose. Contract 01 mandates
+      HMAC-SHA256 for PDP masking; a plain digest is also not a substitute for an HMAC,
+      because an unkeyed hash of a known-format identifier (NIK, phone) is trivially
+      reversed by enumeration.
+    metadata:
+      category: security
+      cwe: "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"
+      contract: docs/agents/contracts/01-classification.md
+      owner: Security
+    pattern-either:
+      - pattern: hashlib.md5(...)
+      - pattern: hashlib.sha1(...)
+
+  - id: bct-python-sql-string-interpolation
+    languages: [python]
+    severity: ERROR
+    message: >-
+      SQL built by string interpolation. In Odoo use `self.env.cr.execute(query, params)`
+      with %s placeholders; psycopg adapts the parameters. This is also how a tenant_id
+      filter gets bypassed, which is the primary confidentiality risk in the threat model.
+    metadata:
+      category: security
+      cwe: "CWE-89: SQL Injection"
+      owner: Security
+    pattern-either:
+      - pattern: $CR.execute(f"...".format(...), ...)
+      - pattern: $CR.execute("..." % $X, ...)
+      - pattern: $CR.execute("..." + $X, ...)
+      - patterns:
+          - pattern: $CR.execute($Q, ...)
+          - pattern-inside: |
+              $Q = f"...{...}..."
+              ...
+
+  - id: bct-odoo-sudo-on-tenant-scoped-model
+    languages: [python]
+    severity: ERROR
+    message: >-
+      .sudo() on a tenant-scoped business model bypasses every ACL and record rule,
+      including the Operating Unit rules in custom_operating_unit. That is the single most
+      likely route to a cross-tenant read - the primary confidentiality risk in
+      security/THREAT-MODEL.md. Read as the user, or narrow the recordset first and say
+      why the caller is already authorised.
+    metadata:
+      category: security
+      cwe: "CWE-863: Incorrect Authorization"
+      contract: docs/agents/contracts/02-session.md
+      owner: Security
+      # Deliberately NOT a blanket ban on .sudo(). `ir.config_parameter.sudo().get_param()`
+      # is the documented Odoo way to read a system parameter and appears in correct code
+      # on every project; flagging it trains people to ignore this rule, and a rule that is
+      # ignored protects nothing. The risk is elevation over *records a tenant owns*, so
+      # that is exactly what this matches.
+      exception: >-
+        Justified calls are suppressed line-by-line with
+        `# nosemgrep: bct-odoo-sudo-on-tenant-scoped-model - <which rule is bypassed, and
+        why the caller is already authorised>`, so the reason sits next to the code. A
+        .semgrepignore entry is not an alternative: it exempts a path from every rule.
+    patterns:
+      - pattern: self.env[$MODEL].sudo()
+      - metavariable-regex:
+          metavariable: $MODEL
+          regex: >-
+            (?i)^["'](res\.partner|res\.users|res\.company|sale\.order|sale\.order\.line|account\.move|account\.move\.line|stock\.move|stock\.picking|pos\.order|pos\.order\.line|product\.template|product\.product|ppob\.transaction|ppob\.biller|operating\.unit)["']$
+
+  - id: bct-odoo-with-user-superuser
+    languages: [python]
+    severity: WARNING
+    message: >-
+      Running as SUPERUSER_ID / uid 1 disables record rules entirely. In a multi-tenant
+      warehouse pipeline this is how one tenant's rows end up in another tenant's extract.
+    metadata:
+      category: security
+      cwe: "CWE-269: Improper Privilege Management"
+      owner: Security
+    pattern-either:
+      - pattern: $X.with_user(SUPERUSER_ID)
+      - pattern: $X.with_user(1)
+
+  - id: bct-python-hardcoded-tmp-path
+    languages: [python]
+    severity: WARNING
+    message: >-
+      Predictable path under /tmp. Use tempfile.mkstemp/TemporaryDirectory; a fixed name
+      in a world-writable directory is a symlink-swap waiting to happen, and the Odoo
+      container shares /tmp across workers.
+    metadata:
+      category: security
+      cwe: "CWE-377: Insecure Temporary File"
+      owner: Security
+    pattern-either:
+      - pattern: open("=~/^\\/tmp\\//", ...)
+      - pattern: tempfile.mktemp(...)
+
+  - id: bct-python-flask-debug-true
+    languages: [python]
+    severity: ERROR
+    message: >-
+      Debug mode exposes an interactive console on an exception. Never in a container that
+      can reach the warehouse.
+    metadata:
+      category: security
+      cwe: "CWE-489: Active Debug Code"
+      owner: Security
+    pattern-either:
+      - pattern: $APP.run(..., debug=True, ...)
+      - pattern: uvicorn.run(..., reload=True, ...)

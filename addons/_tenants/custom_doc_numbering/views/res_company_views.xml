@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_company_form_tenant_numbering" model="ir.ui.view">
+        <field name="name">res.company.form.tenant.numbering</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Document Numbering" name="tenant_numbering">
+                    <group>
+                        <field name="x_doc_code"/>
+                    </group>
+                    <div class="text-muted">
+                        Short company code used in document numbers
+                        (SQ/&lt;CODE&gt;/YYYY/MM/NNN). Leave empty to keep
+                        standard Odoo numbering for this company.
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

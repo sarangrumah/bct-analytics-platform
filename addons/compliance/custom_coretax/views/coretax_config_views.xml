@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_coretax_config_form" model="ir.ui.view">
+        <field name="name">custom.coretax.config.form</field>
+        <field name="model">custom.coretax.config</field>
+        <field name="arch" type="xml">
+            <form string="Coretax Configuration">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Taxpayer">
+                            <field name="active"/>
+                            <field name="npwp"/>
+                            <field name="taxpayer_name"/>
+                            <field name="kpp_code"/>
+                        </group>
+                        <group string="Adapter">
+                            <field name="adapter_type"/>
+                            <field name="aspp_endpoint"
+                                   invisible="adapter_type != 'h2h_aspp'"/>
+                            <field name="aspp_credential_key"
+                                   invisible="adapter_type != 'h2h_aspp'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="taxpayer_address"/>
+                    </group>
+                    <group string="Sertifikat Elektronik">
+                        <field name="sertel_uploaded" readonly="1"/>
+                        <field name="sertel_filename" readonly="1"/>
+                        <field name="sertel_expiry"/>
+                        <button name="%(action_coretax_sertel_upload_wizard)d"
+                                type="action"
+                                string="Upload Sertel (.p12)"
+                                class="btn-primary"
+                                groups="custom_coretax.group_admin"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coretax_config_list" model="ir.ui.view">
+        <field name="name">custom.coretax.config.list</field>
+        <field name="model">custom.coretax.config</field>
+        <field name="arch" type="xml">
+            <list string="Coretax Configurations">
+                <field name="name"/>
+                <field name="npwp"/>
+                <field name="taxpayer_name"/>
+                <field name="kpp_code"/>
+                <field name="adapter_type"/>
+                <field name="sertel_uploaded"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_coretax_config" model="ir.actions.act_window">
+        <field name="name">Coretax Configuration</field>
+        <field name="res_model">custom.coretax.config</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

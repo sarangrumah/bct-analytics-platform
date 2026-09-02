@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_todo_template_list" model="ir.ui.view">
+        <field name="name">custom.todo.template.list</field>
+        <field name="model">custom.todo.template</field>
+        <field name="arch" type="xml">
+            <list string="Todo Templates" decoration-muted="not is_active">
+                <field name="name"/>
+                <field name="default_user_id"/>
+                <field name="default_project_id"/>
+                <field name="recurrence_rule"/>
+                <field name="is_active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_todo_template_form" model="ir.ui.view">
+        <field name="name">custom.todo.template.form</field>
+        <field name="model">custom.todo.template</field>
+        <field name="arch" type="xml">
+            <form string="Todo Template">
+                <header>
+                    <button name="action_create_task" type="object"
+                            string="Create Task" class="oe_highlight"
+                            icon="fa-plus"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Template name..."/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="default_user_id"/>
+                            <field name="default_project_id"/>
+                        </group>
+                        <group>
+                            <field name="recurrence_rule"/>
+                            <field name="is_active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_todo_template_search" model="ir.ui.view">
+        <field name="name">custom.todo.template.search</field>
+        <field name="model">custom.todo.template</field>
+        <field name="arch" type="xml">
+            <search string="Todo Templates">
+                <field name="name"/>
+                <field name="default_user_id"/>
+                <field name="default_project_id"/>
+                <filter name="active" string="Active"
+                        domain="[('is_active','=',True)]"/>
+                <filter name="recurring" string="Recurring"
+                        domain="[('recurrence_rule','!=','none')]"/>
+                <separator/>
+                <filter name="group_recurrence" string="Recurrence"
+                        context="{'group_by':'recurrence_rule'}"/>
+                <filter name="group_user" string="Assignee"
+                        context="{'group_by':'default_user_id'}"/>
+                <filter name="group_project" string="Project"
+                        context="{'group_by':'default_project_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_todo_template" model="ir.actions.act_window">
+        <field name="name">Todo Templates</field>
+        <field name="res_model">custom.todo.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_todo_template_search"/>
+    </record>
+</odoo>

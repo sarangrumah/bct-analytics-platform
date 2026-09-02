@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_witholding_rate_form" model="ir.ui.view">
+        <field name="name">custom.witholding.rate.form</field>
+        <field name="model">custom.witholding.rate</field>
+        <field name="arch" type="xml">
+            <form string="PPh Witholding Rate">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="pph_type"/>
+                            <field name="service_category"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="with_npwp_rate"/>
+                            <field name="without_npwp_rate"/>
+                            <field name="effective_date_from"/>
+                            <field name="effective_date_to"/>
+                        </group>
+                    </group>
+                    <group string="Legal Basis">
+                        <field name="legal_basis" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_witholding_rate_list" model="ir.ui.view">
+        <field name="name">custom.witholding.rate.list</field>
+        <field name="model">custom.witholding.rate</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="pph_type"/>
+                <field name="service_category"/>
+                <field name="with_npwp_rate"/>
+                <field name="without_npwp_rate"/>
+                <field name="effective_date_from"/>
+                <field name="effective_date_to"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_witholding_rate" model="ir.actions.act_window">
+        <field name="name">Witholding Rates</field>
+        <field name="res_model">custom.witholding.rate</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

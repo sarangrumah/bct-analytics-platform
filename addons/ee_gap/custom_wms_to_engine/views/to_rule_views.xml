@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_to_rule_list" model="ir.ui.view">
+        <field name="name">custom.to.rule.list</field>
+        <field name="model">custom.to.rule</field>
+        <field name="arch" type="xml">
+            <list default_order="priority,sequence,id">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="trigger"/>
+                <field name="warehouse_id"/>
+                <field name="priority"/>
+                <field name="last_run_at"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_to_rule_form" model="ir.ui.view">
+        <field name="name">custom.to.rule.form</field>
+        <field name="model">custom.to.rule</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="trigger"/>
+                        <field name="warehouse_id"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="priority"/>
+                        <field name="sequence"/>
+                        <field name="schedule_interval_minutes"/>
+                        <field name="active"/>
+                    </group>
+                    <group string="Targeting">
+                        <field name="source_location_domain"/>
+                        <field name="target_location_domain"/>
+                        <field name="product_filter_json"/>
+                        <field name="low_water_qty"/>
+                        <field name="expiry_days_ahead"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_to_rule_search" model="ir.ui.view">
+        <field name="name">custom.to.rule.search</field>
+        <field name="model">custom.to.rule</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="trigger"/>
+                <filter name="active" string="Active" domain="[('active','=',True)]"/>
+
+                    <filter name="grp_trigger" string="Trigger" context="{'group_by':'trigger'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_to_rule" model="ir.actions.act_window">
+        <field name="name">Transfer Order Rules</field>
+        <field name="res_model">custom.to.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

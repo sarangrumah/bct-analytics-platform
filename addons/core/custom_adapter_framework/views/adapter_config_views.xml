@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_adapter_config_list" model="ir.ui.view">
+        <field name="name">custom.adapter.config.list</field>
+        <field name="model">custom.adapter.config</field>
+        <field name="arch" type="xml">
+            <list string="Adapters">
+                <field name="name"/>
+                <field name="adapter_type"/>
+                <field name="base_url"/>
+                <field name="auth_method"/>
+                <field name="status" decoration-success="status == 'active'" decoration-danger="status == 'circuit_open'" decoration-muted="status == 'disabled'"/>
+                <field name="last_health_check"/>
+                <field name="last_health_ok"/>
+                <field name="consecutive_failures"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_adapter_config_form" model="ir.ui.view">
+        <field name="name">custom.adapter.config.form</field>
+        <field name="model">custom.adapter.config</field>
+        <field name="arch" type="xml">
+            <form string="Adapter">
+                <header>
+                    <button name="action_health_check" type="object" string="Health Check" class="btn-primary"/>
+                    <button name="action_reset_circuit" type="object" string="Reset Circuit" groups="custom_adapter_framework.group_adapter_admin"/>
+                    <button name="action_disable" type="object" string="Disable" groups="custom_adapter_framework.group_adapter_admin"/>
+                    <button name="action_enable" type="object" string="Enable" groups="custom_adapter_framework.group_adapter_admin"/>
+                    <field name="status" widget="statusbar" statusbar_visible="active,circuit_open,disabled"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="adapter_type"/>
+                            <field name="base_url"/>
+                            <field name="auth_method"/>
+                            <field name="credential_ref"/>
+                        </group>
+                        <group>
+                            <field name="timeout_s"/>
+                            <field name="retry_count"/>
+                            <field name="circuit_breaker_threshold"/>
+                            <field name="circuit_breaker_cooldown_s"/>
+                            <field name="consecutive_failures"/>
+                            <field name="circuit_opened_at"/>
+                            <field name="last_health_check"/>
+                            <field name="last_health_ok"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_adapter_config_search" model="ir.ui.view">
+        <field name="name">custom.adapter.config.search</field>
+        <field name="model">custom.adapter.config</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="adapter_type"/>
+                <field name="base_url"/>
+                <filter name="filter_active" string="Active" domain="[('status','=','active')]"/>
+                <filter name="filter_circuit_open" string="Circuit Open" domain="[('status','=','circuit_open')]"/>
+                <filter name="filter_disabled" string="Disabled" domain="[('status','=','disabled')]"/>
+
+                    <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                    <filter name="group_type" string="Type" context="{'group_by': 'adapter_type'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_adapter_config" model="ir.actions.act_window">
+        <field name="name">Adapters</field>
+        <field name="res_model">custom.adapter.config</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_adapter_call_log_list" model="ir.ui.view">
+        <field name="name">custom.adapter.call.log.list</field>
+        <field name="model">custom.adapter.call.log</field>
+        <field name="arch" type="xml">
+            <list string="Adapter Calls" create="false" edit="false">
+                <field name="called_at"/>
+                <field name="config_id"/>
+                <field name="endpoint"/>
+                <field name="response_status"/>
+                <field name="ok"/>
+                <field name="latency_ms"/>
+                <field name="error"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_adapter_call_log" model="ir.actions.act_window">
+        <field name="name">Adapter Calls</field>
+        <field name="res_model">custom.adapter.call.log</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- Top-level Integrations app menu (distinct from custom_hub_console's "Hub" aggregator) -->
+    <menuitem id="menu_hub_root" name="Integrations" sequence="10"/>
+    <menuitem id="menu_hub_config" name="Configuration" parent="menu_hub_root" sequence="10"/>
+    <menuitem id="menu_hub_adapters" name="Adapters" parent="menu_hub_config" action="action_adapter_config" sequence="10"/>
+    <menuitem id="menu_hub_adapter_logs" name="Adapter Calls" parent="menu_hub_config" action="action_adapter_call_log" sequence="20"/>
+
+</odoo>

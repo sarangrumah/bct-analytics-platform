@@ -1,0 +1,275 @@
+# ===========================================================================
+# postgres_exporter custom queries for the WAREHOUSE database.
+#
+# Namespace: every series here is bct_warehouse_*. Backend owns bct_cdc_* and
+# bct_semantic_* / bct_gateway_*; neither side emits into the other's
+# namespace (agreed with the Lead, GATE 3 thread).
+#
+# The metric name postgres_exporter produces is <namespace>_<column>, so the
+# keys below are chosen so that, for example, namespace bct_warehouse_mart
+# with a column `age_seconds` yields bct_warehouse_mart_age_seconds.
+#
+# CONNECTION IDENTITY. The exporter connects as warehouse_rls, which is
+# SELECT-only and RLS-constrained. Every query below reads warehouse.* pipeline
+# metadata — timestamps, row counts, test outcomes — and NOT a single monetary
+# or personal value. A Grafana datasource is reachable by every user with
+# Editor rights (contract 04 §7 makes exactly this point about postgres-oltp),
+# so the exporter gets the narrowest identity that still answers the
+# operational question.
+#
+# WHY RECONCILIATION IS READ FROM dbt_run_result RATHER THAN FROM THE
+# RECONCILIATION MART. The mart carries per-tenant revenue and stock totals and
+# is RLS-protected. Exposing it to an operational exporter would either defeat
+# that or require a fourth role. The *outcome* of a reconciliation test — did
+# it pass, how many rows failed — is fully contained in the dbt run result, and
+# that is all an alert needs.
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# Reconciliation and every other dbt test, from the most recent invocation.
+#
+# `failures` is the number of rows a test returned. dbt's convention is that a
+# test passes when it returns zero rows, so this gauge is 0 on a healthy
+# warehouse and is the series analytics-alerts.yml alerts on.
+#
+# Restricting to the latest invocation matters: without it, one historical
+# failure would keep the alert firing forever after the problem was fixed.
+# ---------------------------------------------------------------------------
+bct_warehouse_dbt_test:
+  query: |
+    -- THE MOST RECENT INVOCATION THAT ACTUALLY CONTAINED TESTS, not simply the
+    -- most recent invocation. `make dbt-run` is
+    -- `dbt build --exclude-resource-type test`, so its invocation carries ZERO
+    -- test rows. Scoping to the newest invocation of any kind lands on one of
+    -- those, the join yields nothing, and every series below VANISHES - so in
+    -- the normal operating loop (build often, test less often) the
+    -- reconciliation alert is dark almost all of the time while Prometheus
+    -- still reports the rule health as ok. The test results are sitting in the
+    -- table; the exporter simply could not see them.
+    WITH latest AS (
+      SELECT invocation_id
+      FROM warehouse.dbt_run_result
+      WHERE resource_type = 'test'
+      GROUP BY invocation_id, run_started_at
+      ORDER BY run_started_at DESC
+      LIMIT 1
+    )
+    SELECT
+      r.resource_type                                          AS resource_type,
+      -- lower(): dbt reports the same severity as both 'ERROR' and 'error'
+      -- depending on where it was configured, which would split one alert
+      -- into two time series that each look half as bad as they are.
+      lower(coalesce(r.severity, 'none'))                       AS severity,
+      r.status                                                 AS status,
+      count(*)::bigint                                         AS nodes,
+      coalesce(sum(r.failures), 0)::bigint                     AS failures,
+      coalesce(max(extract(epoch FROM (now() - r.run_started_at))), 0)::bigint AS age_seconds
+    FROM warehouse.dbt_run_result r
+    JOIN latest l ON l.invocation_id = r.invocation_id
+    GROUP BY 1, 2, 3
+  metrics:
+    - resource_type:
+        usage: "LABEL"
+        description: "dbt resource type: model, test, snapshot or seed"
+    - severity:
+        usage: "LABEL"
+        description: "Configured severity of the node - error or warn"
+    - status:
+        usage: "LABEL"
+        description: "dbt node status: success, pass, fail, error, skipped"
+    - nodes:
+        usage: "GAUGE"
+        description: "Number of dbt nodes in this state in the most recent run"
+    - failures:
+        usage: "GAUGE"
+        description: "Rows returned by failing tests in the most recent run - zero when healthy"
+    - age_seconds:
+        usage: "GAUGE"
+        description: "Seconds since the most recent dbt run started"
+
+# ---------------------------------------------------------------------------
+# The most recent invocation OF ANY KIND. Deliberately a separate series from
+# bct_warehouse_dbt_test_*, because after the fix above those two answer
+# different questions and conflating them is what made the reconciliation
+# alert dark:
+#
+#   bct_warehouse_dbt_run_age_seconds   how long since ANYTHING ran
+#   bct_warehouse_dbt_test_age_seconds  how long since TESTS ran
+#
+# A pipeline where builds run every few minutes and tests never run has a
+# healthy first number and an unbounded second one. That is precisely the state
+# in which reconciliation stops being checked while every dashboard still looks
+# alive, so it gets its own alert rather than being inferred.
+# ---------------------------------------------------------------------------
+bct_warehouse_dbt_run:
+  query: |
+    WITH latest AS (
+      SELECT invocation_id
+      FROM warehouse.dbt_run_result
+      GROUP BY invocation_id, run_started_at
+      ORDER BY run_started_at DESC
+      LIMIT 1
+    )
+    SELECT
+      r.resource_type                                          AS resource_type,
+      r.status                                                 AS status,
+      count(*)::bigint                                         AS nodes,
+      coalesce(max(extract(epoch FROM (now() - r.run_started_at))), 0)::bigint AS age_seconds
+    FROM warehouse.dbt_run_result r
+    JOIN latest l ON l.invocation_id = r.invocation_id
+    GROUP BY 1, 2
+  metrics:
+    - resource_type:
+        usage: "LABEL"
+        description: "dbt resource type: model, test, snapshot or seed"
+    - status:
+        usage: "LABEL"
+        description: "dbt node status"
+    - nodes:
+        usage: "GAUGE"
+        description: "Nodes in this state in the most recent invocation of any kind"
+    - age_seconds:
+        usage: "GAUGE"
+        description: "Seconds since the most recent dbt invocation of any kind started"
+
+# ---------------------------------------------------------------------------
+# Reconciliation specifically, labelled per check and per tenant-agnostic node
+# name, so the alert can say WHICH reconciliation broke rather than "a test
+# failed". The naming convention `recon_*` is enforced by the dbt project.
+# ---------------------------------------------------------------------------
+bct_warehouse_reconciliation:
+  query: |
+    -- THE MOST RECENT INVOCATION THAT ACTUALLY CONTAINED TESTS, not simply the
+    -- most recent invocation. `make dbt-run` is
+    -- `dbt build --exclude-resource-type test`, so its invocation carries ZERO
+    -- test rows. Scoping to the newest invocation of any kind lands on one of
+    -- those, the join yields nothing, and every series below VANISHES - so in
+    -- the normal operating loop (build often, test less often) the
+    -- reconciliation alert is dark almost all of the time while Prometheus
+    -- still reports the rule health as ok. The test results are sitting in the
+    -- table; the exporter simply could not see them.
+    WITH latest AS (
+      SELECT invocation_id
+      FROM warehouse.dbt_run_result
+      WHERE resource_type = 'test'
+      GROUP BY invocation_id, run_started_at
+      ORDER BY run_started_at DESC
+      LIMIT 1
+    )
+    SELECT
+      r.node_name                                                AS check,
+      CASE WHEN r.status IN ('pass', 'success') THEN 0 ELSE 1 END::bigint AS failed,
+      coalesce(r.failures, 0)::bigint                            AS failing_rows
+    FROM warehouse.dbt_run_result r
+    JOIN latest l ON l.invocation_id = r.invocation_id
+    WHERE r.resource_type = 'test'
+      AND r.node_name LIKE '%recon%'
+  metrics:
+    - check:
+        usage: "LABEL"
+        description: "Name of the reconciliation test"
+    - failed:
+        usage: "GAUGE"
+        description: "1 when this reconciliation check failed in the most recent run, else 0"
+    - failing_rows:
+        usage: "GAUGE"
+        description: "Number of tenant-days that disagreed with the Odoo source"
+
+# ---------------------------------------------------------------------------
+# Per-mart freshness against the GATE 2 SLA table. This is the warehouse-side
+# view of the same fact the dashboard shows as meta.is_stale, so an operator
+# alerted here and a user seeing a stale badge are looking at one number.
+# ---------------------------------------------------------------------------
+bct_warehouse_mart:
+  query: |
+    SELECT
+      mart_name                        AS mart,
+      tenant_id                        AS tenant,
+      -- Carried as a LABEL so Alertmanager can route by the ADR's own
+      -- page/alert distinction instead of the rules re-deciding it. ADR 0001
+      -- deliberately made the SLAs non-uniform (PPOB 60 s pages, finance
+      -- 60 min alerts) and rejected uniform-strict as wasting VPS headroom;
+      -- an alert file that flattened that back out would undo a GATE 2
+      -- decision by accident.
+      on_breach                        AS on_breach,
+      sla_seconds::bigint              AS sla_seconds,
+      coalesce(age_seconds, 0)::bigint AS age_seconds,
+      CASE WHEN is_stale THEN 1 ELSE 0 END::bigint AS stale
+    FROM warehouse.mart_freshness
+  metrics:
+    - mart:
+        usage: "LABEL"
+        description: "Mart name as registered in warehouse.mart_sla"
+    - tenant:
+        usage: "LABEL"
+        description: "Tenant slug"
+    - on_breach:
+        usage: "LABEL"
+        description: "page or alert, from ADR 0001's freshness table"
+    - sla_seconds:
+        usage: "GAUGE"
+        description: "Freshness SLA for this mart, from ADR 0001"
+    - age_seconds:
+        usage: "GAUGE"
+        description: "Seconds since the last successful load of this mart's sources"
+    - stale:
+        usage: "GAUGE"
+        description: "1 when age exceeds the SLA, or when the mart has never loaded"
+
+# ---------------------------------------------------------------------------
+# Pipeline progress straight from warehouse.pipeline_state — the same table
+# Backend's loader writes and the semantic-api serves freshness from.
+#
+# This is deliberately a SECOND view of what Backend's own bct_cdc_* metrics
+# report. They are produced by different processes reading different things:
+# Backend's come from the consumer, these come from what the consumer actually
+# committed. Divergence between them is a fault signal in itself.
+# ---------------------------------------------------------------------------
+bct_warehouse_pipeline:
+  query: |
+    SELECT
+      tenant_id      AS tenant,
+      source_table   AS source_table,
+      rows_loaded::bigint    AS rows_loaded,
+      failure_count::bigint  AS failure_count,
+      coalesce(extract(epoch FROM (now() - last_success_at)), -1)::bigint AS last_success_age_seconds
+    FROM warehouse.pipeline_state
+  metrics:
+    - tenant:
+        usage: "LABEL"
+        description: "Tenant slug"
+    - source_table:
+        usage: "LABEL"
+        description: "Physical source table name, e.g. sale_order_line"
+    - rows_loaded:
+        usage: "COUNTER"
+        description: "Rows the loader has committed for this tenant and table"
+    - failure_count:
+        usage: "GAUGE"
+        description: "Consecutive failures recorded by the loader"
+    - last_success_age_seconds:
+        usage: "GAUGE"
+        description: "Seconds since the last successful load, or -1 if it has never succeeded"
+
+# ---------------------------------------------------------------------------
+# Landing-zone shape. Not a health metric on its own, but it is the first
+# thing worth looking at when a mart is empty and nothing has alerted: it
+# separates "the loader is not delivering" from "the transformation is wrong".
+# ---------------------------------------------------------------------------
+bct_warehouse_tenant:
+  query: |
+    SELECT
+      tenant_id                                      AS tenant,
+      CASE WHEN is_test_tenant THEN 1 ELSE 0 END::bigint AS is_test,
+      CASE WHEN active THEN 1 ELSE 0 END::bigint      AS active
+    FROM warehouse.tenant_registry
+  metrics:
+    - tenant:
+        usage: "LABEL"
+        description: "Tenant slug"
+    - is_test:
+        usage: "GAUGE"
+        description: "1 for a tenant that exists to exercise isolation rather than serve a customer"
+    - active:
+        usage: "GAUGE"
+        description: "1 while the tenant is being replicated"

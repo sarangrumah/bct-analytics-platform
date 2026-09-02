@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pdp_audit_log_viewer,pdp.audit.log viewer,model_pdp_audit_log,group_audit_viewer,1,0,0,0
+access_pdp_audit_log_dpo,pdp.audit.log dpo,model_pdp_audit_log,custom_pdp_taxonomy.group_dpo,1,0,0,0

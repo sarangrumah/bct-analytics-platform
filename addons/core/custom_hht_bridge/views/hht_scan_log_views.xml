@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- License: LGPL-3 -->
+<odoo>
+
+    <record id="view_hht_scan_log_list" model="ir.ui.view">
+        <field name="name">hht.scan.log.list</field>
+        <field name="model">hht.scan.log</field>
+        <field name="arch" type="xml">
+            <list string="Scan Logs" create="false" delete="false"
+                  decoration-success="result == 'ok'"
+                  decoration-danger="result == 'error'"
+                  decoration-warning="result == 'pending_sync'">
+                <field name="scanned_at"/>
+                <field name="device_id"/>
+                <field name="action"/>
+                <field name="barcode"/>
+                <field name="location_id"/>
+                <field name="qty"/>
+                <field name="result"/>
+                <field name="error_message" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hht_scan_log_form" model="ir.ui.view">
+        <field name="name">hht.scan.log.form</field>
+        <field name="model">hht.scan.log</field>
+        <field name="arch" type="xml">
+            <form string="Scan Log" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="device_id"/>
+                            <field name="scanned_at"/>
+                            <field name="action"/>
+                            <field name="result"/>
+                            <field name="client_ip"/>
+                        </group>
+                        <group>
+                            <field name="barcode"/>
+                            <field name="location_id"/>
+                            <field name="qty"/>
+                            <field name="lot_id"/>
+                            <field name="picking_id"/>
+                        </group>
+                    </group>
+                    <group string="Diagnostics">
+                        <field name="error_message"/>
+                        <field name="payload" widget="ace" options="{'mode': 'javascript'}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hht_scan_log_search" model="ir.ui.view">
+        <field name="name">hht.scan.log.search</field>
+        <field name="model">hht.scan.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="barcode"/>
+                <field name="device_id"/>
+                <field name="action"/>
+                <filter string="OK" name="f_ok" domain="[('result', '=', 'ok')]"/>
+                <filter string="Errors" name="f_err" domain="[('result', '=', 'error')]"/>
+                <filter string="Today" name="f_today"
+                        domain="[('scanned_at', '&gt;=', (context_today()).strftime('%Y-%m-%d'))]"/>
+
+                    <filter string="Device" name="g_device" context="{'group_by': 'device_id'}"/>
+                    <filter string="Action" name="g_action" context="{'group_by': 'action'}"/>
+                    <filter string="Date" name="g_date" context="{'group_by': 'scanned_at:day'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hht_scan_log" model="ir.actions.act_window">
+        <field name="name">Scan Logs</field>
+        <field name="res_model">hht.scan.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_hht_scan_log_search"/>
+    </record>
+
+</odoo>

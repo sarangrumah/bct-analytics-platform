@@ -1,0 +1,11 @@
+id,code,name,sequence,is_general
+ssec_bb1,BB1,Basketball,10,0
+ssec_gf1,GF1,Global Football,20,0
+ssec_go1,GO1,Golf,30,0
+ssec_ls1,LS1,Lifestyle,40,0
+ssec_od1,OD1,Outdoor,50,0
+ssec_ru1,RU1,Run,60,0
+ssec_sl1,SL1,Sideline,70,0
+ssec_ss1,SS1,Sportstyle,80,0
+ssec_tr1,TR1,Train,90,0
+ssec_ga2,GA2,General,100,1

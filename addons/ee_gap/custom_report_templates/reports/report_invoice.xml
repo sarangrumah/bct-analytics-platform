@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_document">
+        <t t-set="company" t-value="o.company_id"/>
+        <t t-set="accent" t-value="company.brand_accent_color or '#714B67'"/>
+        <t t-set="currency" t-value="o.currency_id"/>
+        <div t-attf-class="page o_company_#{company.id}_layout" style="font-size: 12px;">
+
+            <!-- Header: logo + address (left), INVOICE + meta table (right) -->
+            <t t-call="custom_report_templates.brand_header">
+                <t t-set="doc_title" t-value="{'out_invoice': 'INVOICE', 'out_refund': 'CREDIT NOTE', 'in_invoice': 'VENDOR BILL', 'in_refund': 'VENDOR CREDIT NOTE'}.get(o.move_type, 'INVOICE')"/>
+                <tr>
+                    <td style="width: 45%; font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">DATE</td>
+                    <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">
+                        <t t-call="custom_report_templates.id_date"><t t-set="d" t-value="o.invoice_date"/></t>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">INVOICE #</td>
+                    <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;" t-out="o.name or 'Draft'"/>
+                </tr>
+                <tr t-if="o.ref or o.invoice_origin">
+                    <td style="font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">CUSTOMER REF</td>
+                    <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;" t-out="o.ref or o.invoice_origin"/>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">DUE DATE</td>
+                    <td style="text-align: right; background-color: #e8edf5; border: 1px solid #b0b0b0; padding: 3px 5px;">
+                        <t t-call="custom_report_templates.id_date"><t t-set="d" t-value="o.invoice_date_due"/></t>
+                    </td>
+                </tr>
+            </t>
+
+            <!-- Bill to -->
+            <t t-call="custom_report_templates.party_band">
+                <t t-set="band_label">BILL TO</t>
+                <t t-set="partner" t-value="o.partner_id"/>
+            </t>
+
+            <!-- Items -->
+            <t t-call="custom_report_templates.items_table">
+                <t t-set="lines" t-value="o.invoice_line_ids"/>
+                <t t-set="qty_field" t-value="'quantity'"/>
+            </t>
+
+            <!-- Comments + totals (side-by-side via table, not Bootstrap grid) -->
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 55%; vertical-align: top; padding-right: 10px;">
+                        <t t-call="custom_report_templates.comments_box">
+                            <!-- Per-invoice recipient bank wins; the company-wide text is the
+                                 fallback for invoices that don't nominate one. -->
+                            <div t-if="o.partner_bank_id">
+                                <div t-out="o.partner_bank_id.bank_id.name or 'Bank'"/>
+                                <div>A/C: <span t-out="o.partner_bank_id.acc_number"/></div>
+                                <div t-if="o.partner_bank_id.acc_holder_name"
+                                     t-out="o.partner_bank_id.acc_holder_name"/>
+                            </div>
+                            <span t-if="not o.partner_bank_id and company.report_bank_details"
+                                  t-out="company.report_bank_details"/>
+                            <div t-if="o.narration" style="margin-top: 4px;" t-out="o.narration"/>
+                        </t>
+                    </td>
+                    <td style="width: 45%; vertical-align: top;">
+                        <t t-call="custom_report_templates.totals_block">
+                            <t t-set="show_balance" t-value="True"/>
+                        </t>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Signature + footer -->
+            <t t-call="custom_report_templates.signature_block">
+                <t t-set="signer" t-value="o.invoice_user_id.name"/>
+                <t t-set="doc_noun">invoice</t>
+            </t>
+        </div>
+    </template>
+
+    <!-- Self-contained wrapper: no web.html_container → no external asset (report.url)
+         callback that stalls wkhtmltopdf. <main> required by _prepare_html. -->
+    <template id="report_invoice">
+        <html>
+            <body>
+                <main>
+                    <!-- _prepare_html keeps only the children of <main>: anything left in
+                         <head> never reaches wkhtmltopdf, which then falls back to latin-1
+                         and prints "Â¥" for ¥. Charset and CSS therefore live in here. -->
+                    <meta charset="utf-8"/>
+                    <style>
+                        @page { margin: 15mm; }
+                        * { box-sizing: border-box; }
+                        body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; margin: 0; padding: 0; }
+                    </style>
+                    <t t-foreach="docs" t-as="o">
+                        <div t-if="not o_first" style="page-break-before: always;"></div>
+                        <t t-call="custom_report_templates.report_invoice_document" t-lang="o.partner_id.lang"/>
+                    </t>
+                </main>
+            </body>
+        </html>
+    </template>
+</odoo>

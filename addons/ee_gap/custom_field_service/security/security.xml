@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="module_category_fsm" model="ir.module.category">
+            <field name="name">Field Service</field>
+            <field name="sequence">96</field>
+        </record>
+
+        <record id="group_fsm_technician" model="res.groups">
+            <field name="name">FSM Technician</field>
+        </record>
+
+        <record id="group_fsm_dispatcher" model="res.groups">
+            <field name="name">FSM Dispatcher</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_fsm_technician'))]"/>
+        </record>
+    </data>
+</odoo>

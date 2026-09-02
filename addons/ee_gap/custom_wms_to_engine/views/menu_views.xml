@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_to_root"
+              name="Transfer Orders"
+              parent="stock.menu_stock_warehouse_mgmt"
+              sequence="70"
+              groups="group_to_operator"/>
+
+    <menuitem id="menu_to_list"
+              name="Orders"
+              parent="menu_to_root"
+              action="action_transfer_order"
+              sequence="10"/>
+
+    <menuitem id="menu_to_manual"
+              name="Create Manual TO"
+              parent="menu_to_root"
+              action="action_manual_to_wizard"
+              sequence="20"/>
+
+    <menuitem id="menu_to_rules"
+              name="Rules"
+              parent="stock.menu_stock_config_settings"
+              action="action_to_rule"
+              sequence="60"
+              groups="group_to_admin"/>
+</odoo>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_reconcile_rule_form_ppob_va" model="ir.ui.view">
+        <field name="name">custom.reconcile.rule.form.ppob.va</field>
+        <field name="model">custom.reconcile.rule</field>
+        <field name="inherit_id" ref="custom_accounting_full.view_reconcile_rule_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="VA Matching" name="ppob_va">
+                    <field name="rule_type"/>
+                    <field name="va_bank_code" invisible="rule_type != 'va_match'"/>
+                    <field name="va_extract_regex" invisible="rule_type != 'va_match'"
+                           placeholder="^VA\s+(?P&lt;va&gt;\d+)"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Mount the Indonesia Lunch extension under the native Lunch app -->
+    <menuitem id="menu_lunch_in_custom"
+              name="Lunch (ID)"
+              parent="lunch.menu_lunch"
+              action="lunch.lunch_product_action_order"
+              sequence="60"
+              groups="custom_lunch.group_user"/>
+</odoo>

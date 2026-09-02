@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="custom_home_console.HomeConsole">
+        <div class="o_hc_root" t-att-class="{ 'o_hc_compact': isCompact }"
+             t-att-style="headerStyle">
+
+            <!-- Header: brand + greeting + spotlight -->
+            <header class="o_hc_header">
+                <div class="o_hc_brand">
+                    <img class="o_hc_logo" t-att-src="logoUrl" alt="Logo"/>
+                    <div class="o_hc_greeting">
+                        <div class="o_hc_hello">
+                            <t t-esc="greeting"/>,
+                            <span class="o_hc_user_name">
+                                <t t-esc="state.bootstrap and state.bootstrap.user.name or ''"/>
+                            </span>
+                        </div>
+                        <div class="o_hc_subline">
+                            <t t-esc="state.bootstrap and state.bootstrap.company.name or ''"/>
+                        </div>
+                    </div>
+                </div>
+                <SpotlightSearch apps="state.apps" onAppClick="(app) => this.onClickApp(app)"/>
+            </header>
+
+            <!-- Announcement -->
+            <t t-if="announcement">
+                <section class="o_hc_announcement">
+                    <div class="o_hc_announcement_body" t-out="announcement"/>
+                    <button class="btn btn-sm btn-light o_hc_announcement_close"
+                            t-on-click="onDismissAnnouncement">
+                        <i class="fa fa-times"/>
+                    </button>
+                </section>
+            </t>
+
+            <!-- Loading -->
+            <t t-if="state.loading">
+                <div class="o_hc_loading">
+                    <i class="fa fa-spinner fa-pulse fa-2x"/>
+                </div>
+            </t>
+
+            <t t-else="">
+                <!-- Pinned shortcuts -->
+                <t t-if="pinned.length">
+                    <section class="o_hc_section">
+                        <header class="o_hc_section_head">
+                            <h3>Pinned</h3>
+                        </header>
+                        <div class="o_hc_chip_row">
+                            <t t-foreach="pinned" t-as="sc" t-key="sc.id">
+                                <button class="o_hc_chip"
+                                        t-on-click="() => this.onClickShortcut(sc)">
+                                    <i class="fa fa-thumb-tack"/>
+                                    <span><t t-esc="sc.name"/></span>
+                                </button>
+                            </t>
+                        </div>
+                    </section>
+                </t>
+
+                <!-- Recent apps -->
+                <t t-if="recentApps.length">
+                    <section class="o_hc_section">
+                        <header class="o_hc_section_head">
+                            <h3>Recent</h3>
+                        </header>
+                        <div class="o_hc_chip_row">
+                            <t t-foreach="recentApps" t-as="app" t-key="app.id">
+                                <button class="o_hc_chip"
+                                        t-on-click="() => this.onClickApp(app)">
+                                    <i class="fa fa-clock-o"/>
+                                    <span><t t-esc="app.name"/></span>
+                                </button>
+                            </t>
+                        </div>
+                    </section>
+                </t>
+
+                <!-- Grouped app cards -->
+                <t t-foreach="state.grouped" t-as="group" t-key="group.key">
+                    <section class="o_hc_section">
+                        <header class="o_hc_section_head">
+                            <h3><t t-esc="group.label"/></h3>
+                            <span class="o_hc_count"><t t-esc="group.apps.length"/></span>
+                        </header>
+                        <div class="o_hc_cards">
+                            <t t-foreach="group.apps" t-as="app" t-key="app.id">
+                                <button class="o_hc_card"
+                                        t-on-click="() => this.onClickApp(app)"
+                                        t-att-title="app.name">
+                                    <div class="o_hc_card_icon">
+                                        <t t-set="iconSrc" t-value="appIconSrc(app)"/>
+                                        <t t-if="iconSrc">
+                                            <img t-att-src="iconSrc"
+                                                 t-att-data-fallback="appIconFallback(app)"
+                                                 alt=""
+                                                 t-on-error="onIconError"/>
+                                            <i class="fa fa-cube" style="display:none"/>
+                                        </t>
+                                        <t t-else="">
+                                            <i class="fa fa-cube"/>
+                                        </t>
+                                    </div>
+                                    <div class="o_hc_card_name">
+                                        <t t-esc="app.name"/>
+                                    </div>
+                                </button>
+                            </t>
+                        </div>
+                    </section>
+                </t>
+
+                <!-- Recent activities -->
+                <t t-if="activities.length">
+                    <section class="o_hc_section">
+                        <header class="o_hc_section_head">
+                            <h3>Your activities</h3>
+                        </header>
+                        <ul class="o_hc_activities">
+                            <t t-foreach="activities" t-as="act" t-key="act.id">
+                                <li>
+                                    <button class="o_hc_activity"
+                                            t-on-click="() => this.onClickActivity(act)">
+                                        <span class="o_hc_activity_date">
+                                            <t t-esc="act.date_deadline or ''"/>
+                                        </span>
+                                        <span class="o_hc_activity_summary">
+                                            <t t-esc="act.summary or '(no summary)'"/>
+                                        </span>
+                                    </button>
+                                </li>
+                            </t>
+                        </ul>
+                    </section>
+                </t>
+            </t>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ppob_product_class_user,ppob product class user,model_custom_ppob_product_class,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_product_class_manager,ppob product class manager,model_custom_ppob_product_class,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_product_user,ppob product user,model_custom_ppob_product,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_product_ops,ppob product ops,model_custom_ppob_product,custom_ppob_core.group_ppob_ops,1,0,0,0
+access_ppob_product_manager,ppob product manager,model_custom_ppob_product,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_price_tier_user,ppob price tier user,model_custom_ppob_price_tier,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_price_tier_manager,ppob price tier manager,model_custom_ppob_price_tier,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_price_tier_line_user,ppob price tier line user,model_custom_ppob_price_tier_line,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_price_tier_line_manager,ppob price tier line manager,model_custom_ppob_price_tier_line,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_account_mapping_user,ppob account mapping user,model_custom_ppob_account_mapping,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_account_mapping_manager,ppob account mapping manager,model_custom_ppob_account_mapping,custom_ppob_core.group_ppob_manager,1,1,1,1

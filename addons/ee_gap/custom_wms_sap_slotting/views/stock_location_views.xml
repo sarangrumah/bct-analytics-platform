@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_stock_location_form_inherit_sap_slotting" model="ir.ui.view">
+        <field name="name">stock.location.form.inherit.sap.slotting</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="SAP Storage Search">
+                    <group string="Classification">
+                        <field name="wms_storage_type_id"/>
+                        <field name="wms_storage_section_id"/>
+                        <field name="wms_bin_type"/>
+                    </group>
+                    <group string="Bin Master">
+                        <field name="wms_warehouse_number"/>
+                        <field name="wms_sap_bin_code"/>
+                        <field name="wms_volume_ccm"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stock_location_list_inherit_sap_slotting" model="ir.ui.view">
+        <field name="name">stock.location.list.inherit.sap.slotting</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_tree2"/>
+        <field name="arch" type="xml">
+            <field name="usage" position="after">
+                <field name="wms_sap_bin_code" optional="hide"/>
+                <field name="wms_storage_type_id" optional="hide"/>
+                <field name="wms_storage_section_id" optional="hide"/>
+                <field name="wms_volume_ccm" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_stock_location_search_inherit_sap_slotting" model="ir.ui.view">
+        <field name="name">stock.location.search.inherit.sap.slotting</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_search"/>
+        <field name="arch" type="xml">
+            <field name="complete_name" position="after">
+                <field name="wms_sap_bin_code"/>
+                <field name="wms_storage_type_id"/>
+                <field name="wms_storage_section_id"/>
+            </field>
+            <filter name="empty_location" position="after">
+                <separator/>
+                <filter name="sap_slotted"
+                        string="SAP Slotted Bins"
+                        domain="[('wms_storage_type_id','!=',False),('wms_storage_section_id','!=',False)]"/>
+            </filter>
+            <xpath expr="//search/group" position="inside">
+                <filter name="group_storage_type" string="Storage Type" context="{'group_by': 'wms_storage_type_id'}"/>
+                <filter name="group_storage_section" string="Storage Section" context="{'group_by': 'wms_storage_section_id'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

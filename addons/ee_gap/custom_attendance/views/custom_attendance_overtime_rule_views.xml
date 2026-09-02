@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_attendance_overtime_rule_list" model="ir.ui.view">
+        <field name="name">custom.attendance.overtime.rule.list</field>
+        <field name="model">custom.attendance.overtime.rule</field>
+        <field name="arch" type="xml">
+            <list string="Overtime Rules">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="differential"/>
+                <field name="threshold_hours"/>
+                <field name="multiplier"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="is_active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_attendance_overtime_rule_form" model="ir.ui.view">
+        <field name="name">custom.attendance.overtime.rule.form</field>
+        <field name="model">custom.attendance.overtime.rule</field>
+        <field name="arch" type="xml">
+            <form string="Overtime Rule">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Weekday OT 1.5x"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="threshold_hours"/>
+                            <field name="multiplier"/>
+                            <field name="differential"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="is_active"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="note" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_attendance_overtime_rule_search" model="ir.ui.view">
+        <field name="name">custom.attendance.overtime.rule.search</field>
+        <field name="model">custom.attendance.overtime.rule</field>
+        <field name="arch" type="xml">
+            <search string="Overtime Rules">
+                <field name="name"/>
+                <field name="differential"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('is_active','=',True)]"/>
+                <filter string="Weekday" name="weekday" domain="[('differential','=','weekday')]"/>
+                <filter string="Weekend" name="weekend" domain="[('differential','=','weekend')]"/>
+                <filter string="Holiday" name="holiday" domain="[('differential','=','holiday')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_attendance_overtime_rule" model="ir.actions.act_window">
+        <field name="name">Overtime Rules</field>
+        <field name="res_model">custom.attendance.overtime.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_attendance_overtime_rule_search"/>
+    </record>
+</odoo>

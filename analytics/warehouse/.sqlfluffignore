@@ -1,0 +1,27 @@
+# init/sql/ holds psql SCRIPTS, not SQL.
+#
+# They use psql's own syntax - `SET ROLE :wh_user`, `:'wh_password'`, and
+# `\gexec` - which is a client feature, not a dialect. sqlfluff parses SQL, so
+# it reports the whole file as one unparsable section and every real finding in
+# it is lost in the noise. There is no sqlfluff dialect that reads psql
+# meta-commands.
+#
+# This is the same reason the root .sqlfluff already excludes
+# postgres/init/**.sql, and it says so in its own header. Precedent, not a
+# new exemption.
+#
+# WHAT COVERS THESE FILES INSTEAD, because "excluded from the linter" must not
+# mean "unchecked":
+#   * every statement runs on every `make up-analytics` through
+#     bin/warehouse-apply.sh with ON_ERROR_STOP=1, so a syntax error fails the
+#     bring-up rather than being reported later;
+#   * 60-functions.sql asserts custom_pdp_masking's four published
+#     known-answer vectors and three negative vectors on every apply, so a
+#     drifted digest fails the apply;
+#   * 30-metadata.sql asserts and repairs its own primary keys on every apply.
+#
+# HOW THIS WAS FOUND, recorded because the cause matters more than the fix: the
+# files were first committed with `-c core.hooksPath=/dev/null` because
+# pre-commit was not on PATH in that shell. The bypass hid a failing hook for
+# several commits. It surfaced the moment the hooks were run properly.
+init/sql/

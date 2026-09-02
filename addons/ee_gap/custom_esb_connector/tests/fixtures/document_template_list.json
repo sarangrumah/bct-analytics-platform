@@ -1,0 +1,13 @@
+{
+  "path": "https://stg7.esb.co.id/core-stg/document-template",
+  "timestamp": "2026-07-21 09:00:03",
+  "status": "ok",
+  "code": "EC03100000",
+  "message": "OK",
+  "result": {
+    "page": 1, "limit": 100, "count": 1,
+    "data": [{"requestTemplateID": 5, "requestTemplateName": "Opname Kitchen Harian", "branchNames": "Wijaya Resto Barokah", "flagActive": 1}],
+    "prev": "", "next": ""
+  },
+  "errors": null
+}

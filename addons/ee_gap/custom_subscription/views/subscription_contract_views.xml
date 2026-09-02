@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_subscription_contract_list" model="ir.ui.view">
+        <field name="name">subscription.contract.list</field>
+        <field name="model">subscription.contract</field>
+        <field name="arch" type="xml">
+            <list string="Contracts" decoration-success="state == 'active'"
+                  decoration-warning="state == 'paused'"
+                  decoration-danger="state == 'churned'"
+                  decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="plan_id"/>
+                <field name="start_date"/>
+                <field name="next_billing_date"/>
+                <field name="mrr"/>
+                <field name="lifetime_value"/>
+                <field name="state" widget="badge"/>
+                <field name="ai_churn_priority" widget="badge"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_subscription_contract_form" model="ir.ui.view">
+        <field name="name">subscription.contract.form</field>
+        <field name="model">subscription.contract</field>
+        <field name="arch" type="xml">
+            <form string="Subscription">
+                <header>
+                    <button name="action_activate" type="object" string="Activate"
+                            class="oe_highlight" invisible="state not in ('draft','paused')"/>
+                    <button name="action_pause" type="object" string="Pause"
+                            invisible="state != 'active'"/>
+                    <button name="action_invoice_now" type="object" string="Invoice Now"
+                            invisible="state != 'active'"/>
+                    <button name="action_churn_predict" type="object" string="Predict Churn"
+                            icon="fa-magic"/>
+                    <button name="action_churn" type="object" string="Churn"
+                            invisible="state in ('churned','closed')"/>
+                    <button name="action_close" type="object" string="Close"
+                            invisible="state == 'closed'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,paused,churned,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="plan_id"/>
+                            <field name="start_date"/>
+                            <field name="next_billing_date"/>
+                        </group>
+                        <group>
+                            <field name="payment_term_id"/>
+                            <field name="company_id"/>
+                            <field name="currency_id"/>
+                        </group>
+                    </group>
+                    <group string="Metrics">
+                        <group>
+                            <field name="mrr"/>
+                            <field name="lifetime_value"/>
+                        </group>
+                        <group>
+                            <field name="invoice_count"/>
+                            <field name="last_invoice_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Invoices">
+                            <field name="invoice_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="invoice_date"/>
+                                    <field name="amount_total"/>
+                                    <field name="payment_state"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="AI Churn">
+                            <group>
+                                <field name="ai_churn_priority"/>
+                            </group>
+                            <field name="ai_churn_summary" widget="text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_subscription_contract_kanban" model="ir.ui.view">
+        <field name="name">subscription.contract.kanban</field>
+        <field name="model">subscription.contract</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="mrr"/>
+                <field name="currency_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="name"/></strong>
+                            <div><field name="partner_id"/></div>
+                            <div>MRR: <field name="mrr" widget="monetary"/></div>
+                            <div><field name="ai_churn_priority" widget="badge"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_subscription_contract_search" model="ir.ui.view">
+        <field name="name">subscription.contract.search</field>
+        <field name="model">subscription.contract</field>
+        <field name="arch" type="xml">
+            <search string="Contracts">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="plan_id"/>
+                <filter name="active" string="Active" domain="[('state','=','active')]"/>
+                <filter name="churned" string="Churned" domain="[('state','=','churned')]"/>
+                <filter name="risk" string="Churn Risk"
+                        domain="[('ai_churn_priority','in',('warn','critical'))]"/>
+                <separator/>
+                <filter name="group_state" string="State" context="{'group_by':'state'}"/>
+                <filter name="group_plan" string="Plan" context="{'group_by':'plan_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_subscription_contract" model="ir.actions.act_window">
+        <field name="name">Subscriptions</field>
+        <field name="res_model">subscription.contract</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_subscription_contract_search"/>
+    </record>
+</odoo>

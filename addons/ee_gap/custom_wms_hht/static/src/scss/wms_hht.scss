@@ -1,0 +1,401 @@
+/* License: LGPL-3
+ * WMS Handheld — touch-first dark theme, sidebar layout.
+ * Hit areas >= 44px; readable at arm's length under warehouse lighting.
+ */
+
+$wms-bg: #0f172a;
+$wms-panel: #1e293b;
+$wms-panel-2: #273449;
+$wms-border: #334155;
+$wms-text: #f1f5f9;
+$wms-muted: #94a3b8;
+$wms-accent: #22c55e;
+$wms-accent-dim: #16a34a;
+$wms-danger: #ef4444;
+$wms-warn: #f59e0b;
+$wms-sidebar-w: 208px;
+
+.hht-shell.wms-hht {
+    min-height: 100vh;
+    background: $wms-bg;
+    color: $wms-text;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+    display: flex;
+
+    * { box-sizing: border-box; }
+
+    /* ---------------- sidebar ---------------- */
+    .wms-sidebar {
+        width: $wms-sidebar-w;
+        flex: 0 0 $wms-sidebar-w;
+        background: $wms-panel;
+        border-right: 1px solid $wms-border;
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+    }
+    .wms-sidebar-head {
+        padding: 14px 16px;
+        border-bottom: 1px solid $wms-border;
+        .wms-logo { font-weight: 800; font-size: 20px; letter-spacing: 1px; display: block; }
+        .wms-wh { font-size: 12px; color: $wms-muted; display: block; margin-top: 2px; }
+        .wms-wh-select {
+            width: 100%; margin-top: 6px; min-height: 36px; padding: 0 6px;
+            border-radius: 6px; border: 1px solid $wms-border;
+            background: $wms-bg; color: $wms-text; font-size: 12px;
+        }
+    }
+    .wms-nav { flex: 1; overflow-y: auto; padding: 8px 0; }
+    .wms-nav-item {
+        width: 100%;
+        min-height: 52px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 16px;
+        background: transparent;
+        border: 0;
+        border-left: 3px solid transparent;
+        color: $wms-muted;
+        font-size: 15px;
+        text-align: left;
+        cursor: pointer;
+
+        i { width: 18px; text-align: center; font-size: 16px; }
+        .wms-nav-label { flex: 1; }
+        &.active { color: $wms-text; background: $wms-panel-2; border-left-color: $wms-accent; }
+        &:active { background: $wms-panel-2; }
+    }
+    .wms-badge {
+        min-width: 22px;
+        padding: 1px 6px;
+        border-radius: 11px;
+        background: $wms-accent-dim;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+    }
+    .wms-sidebar-foot {
+        padding: 10px 16px;
+        border-top: 1px solid $wms-border;
+        font-size: 12px;
+        color: $wms-muted;
+        .wms-conn { margin-top: 4px; font-weight: 700; letter-spacing: 0.5px; }
+        .wms-conn.online { color: $wms-accent; }
+        .wms-conn.offline { color: $wms-danger; }
+    }
+    .wms-backdrop { display: none; }
+
+    /* ---------------- main column ---------------- */
+    .wms-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .wms-topbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 52px;
+        padding: 0 14px;
+        background: $wms-panel;
+        border-bottom: 1px solid $wms-border;
+        .wms-burger {
+            display: none;
+            background: transparent; border: 0; color: $wms-text;
+            font-size: 20px; min-width: 44px; min-height: 44px;
+        }
+        .wms-title { font-weight: 700; font-size: 17px; flex: 1; }
+    }
+    .wms-dot {
+        width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+        &.online { background: $wms-accent; }
+        &.offline { background: $wms-danger; }
+    }
+
+    .wms-scanbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: $wms-panel-2;
+        border-bottom: 1px solid $wms-border;
+        i { color: $wms-accent; font-size: 18px; }
+    }
+    .wms-scan-input {
+        flex: 1;
+        min-height: 46px;
+        padding: 0 12px;
+        border-radius: 8px;
+        border: 1px solid $wms-border;
+        background: $wms-bg;
+        color: $wms-text;
+        font-size: 17px;
+        &:focus { outline: 2px solid $wms-accent; border-color: transparent; }
+    }
+    .wms-scan-go {
+        min-width: 58px;
+        min-height: 46px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        background: $wms-accent-dim;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        &:active { background: $wms-accent; }
+    }
+
+    .wms-banner {
+        padding: 10px 14px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        &.ok { background: rgba(34, 197, 94, 0.15); color: #bbf7d0; border-bottom: 1px solid $wms-accent-dim; }
+        &.error { background: rgba(239, 68, 68, 0.15); color: #fecaca; border-bottom: 1px solid $wms-danger; }
+        .wms-banner-x {
+            margin-left: auto; background: transparent; border: 0; color: inherit;
+            font-size: 20px; line-height: 1; min-width: 40px; min-height: 40px;
+        }
+    }
+
+    .wms-content { flex: 1; overflow-y: auto; padding: 12px 14px 40px; }
+
+    /* ---------------- shared page bits ---------------- */
+    .wms-hint, .wms-empty { color: $wms-muted; padding: 16px 4px; }
+    .wms-hint.inline { padding: 0 8px; }
+    .wms-empty.small { padding: 8px 4px; font-size: 13px; }
+    /* A scan that narrowed the list must say so — an operator who cannot see
+     * why the list is short will assume the work went missing. */
+    .wms-filter {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 10px;
+        padding: 8px 10px;
+        border: 1px solid $wms-accent-dim;
+        border-radius: 8px;
+        background: rgba(34, 197, 94, 0.10);
+        font-size: 13px;
+        color: $wms-text;
+
+        .wms-filter-clear {
+            min-height: 36px;
+            padding: 0 12px;
+            border: 1px solid $wms-border;
+            border-radius: 6px;
+            background: $wms-panel-2;
+            color: $wms-text;
+            font-size: 13px;
+        }
+    }
+
+    .wms-section-title {
+        margin: 16px 0 6px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: $wms-muted;
+    }
+
+    .wms-card {
+        display: block;
+        width: 100%;
+        text-align: left;
+        background: $wms-panel;
+        border: 1px solid $wms-border;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        color: $wms-text;
+        min-height: 64px;
+        &:active { background: $wms-panel-2; }
+    }
+    .wms-card-head { display: flex; justify-content: space-between; align-items: center; }
+    .wms-card-title { font-weight: 700; font-size: 16px; }
+    .wms-card-sub { color: $wms-muted; font-size: 13px; margin-top: 2px; }
+    .wms-card-meta {
+        display: flex; gap: 14px; margin-top: 6px; font-size: 12px; color: $wms-muted;
+    }
+    .wms-chip {
+        background: $wms-panel-2; border: 1px solid $wms-border; border-radius: 999px;
+        padding: 2px 10px; font-size: 11px; text-transform: uppercase; color: $wms-muted;
+    }
+
+    .wms-detail-head {
+        display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+        .wms-back {
+            background: $wms-panel; border: 1px solid $wms-border; border-radius: 8px;
+            color: $wms-text; min-width: 44px; min-height: 44px; font-size: 16px;
+        }
+    }
+    .wms-detail-title { font-weight: 700; font-size: 18px; }
+    .wms-detail-sub { color: $wms-muted; font-size: 13px; }
+
+    .wms-inputs {
+        display: flex; gap: 10px; margin-bottom: 10px;
+        label { flex: 1; font-size: 12px; color: $wms-muted; display: block; }
+    }
+    .wms-input {
+        width: 100%; min-height: 44px; margin-top: 4px; padding: 0 10px;
+        border-radius: 8px; border: 1px solid $wms-border;
+        background: $wms-bg; color: $wms-text; font-size: 16px;
+        &.big { font-size: 22px; min-height: 56px; text-align: center; margin: 10px 0; }
+    }
+
+    .wms-table {
+        width: 100%; border-collapse: collapse; margin-top: 6px;
+        th {
+            text-align: left; font-size: 11px; text-transform: uppercase;
+            color: $wms-muted; padding: 6px 8px; border-bottom: 1px solid $wms-border;
+        }
+        td { padding: 8px; border-bottom: 1px solid rgba(51, 65, 85, 0.5); vertical-align: top; }
+        .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        tr.complete td { color: $wms-accent; }
+    }
+    .wms-sku { font-weight: 700; font-size: 15px; }
+    .wms-sku.big { font-size: 22px; }
+    .wms-name { color: $wms-muted; font-size: 13px; }
+
+    .wms-lastscan {
+        background: rgba(34, 197, 94, 0.12); border: 1px solid $wms-accent-dim;
+        border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; font-size: 14px;
+        i { color: $wms-accent; margin-right: 6px; }
+    }
+    .wms-lot-row {
+        display: flex; gap: 10px; align-items: baseline; padding: 6px 8px;
+        border-bottom: 1px solid rgba(51, 65, 85, 0.5); font-size: 13px;
+        .wms-lot-name { font-weight: 700; }
+        .wms-lot-exp { color: $wms-warn; }
+        .wms-lot-batch { color: $wms-muted; }
+        .num { margin-left: auto; }
+    }
+
+    .wms-slot {
+        background: $wms-panel; border: 1px solid $wms-border; border-radius: 10px;
+        padding: 12px; margin-bottom: 10px;
+        &.armed { border-color: $wms-accent; box-shadow: 0 0 0 1px $wms-accent inset; }
+    }
+    .wms-slot-head { display: flex; justify-content: space-between; align-items: flex-start; }
+    .wms-slot-qty { font-size: 20px; font-weight: 700; }
+    .wms-dest { margin: 8px 0; color: $wms-accent; font-size: 14px; }
+    .wms-proposal {
+        display: flex; align-items: center; gap: 10px; padding: 6px 8px;
+        border-radius: 6px; font-size: 13px; color: $wms-muted;
+        &.top { background: $wms-panel-2; color: $wms-text; }
+        .wms-score {
+            min-width: 34px; text-align: center; font-weight: 700;
+            background: $wms-accent-dim; color: #fff; border-radius: 4px; padding: 1px 4px;
+        }
+        .wms-proposal-loc { font-weight: 600; }
+        .wms-proposal-why { margin-left: auto; font-size: 11px; text-align: right; }
+    }
+
+    // Stock-check header: four figures side by side on a 4" display, so the
+    // labels have to be tiny and the numbers big — the operator reads these
+    // at arm's length while holding a carton.
+    .wms-stats {
+        display: flex; gap: 6px; margin-bottom: 10px;
+        .wms-stat {
+            flex: 1; min-width: 0; text-align: center;
+            background: $wms-panel; border: 1px solid $wms-border; border-radius: 8px;
+            padding: 8px 4px;
+            &.accent .wms-stat-value { color: $wms-accent; }
+            &.warn .wms-stat-value { color: $wms-warn; }
+        }
+        .wms-stat-value {
+            display: block; font-size: 19px; font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+        .wms-stat-label {
+            display: block; font-size: 10px; text-transform: uppercase;
+            letter-spacing: 0.5px; color: $wms-muted; margin-top: 2px;
+        }
+    }
+
+    .wms-meta-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px;
+        font-size: 13px; margin-bottom: 12px;
+        .wms-name { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    }
+
+    .wms-resv { color: $wms-warn; font-size: 12px; }
+
+    .wms-nextpick {
+        background: $wms-panel; border: 1px solid $wms-accent-dim; border-radius: 10px;
+        padding: 16px; margin-bottom: 12px; text-align: center;
+        .wms-nextpick-bin { font-size: 18px; color: $wms-accent; font-weight: 700; margin-bottom: 8px; }
+        .wms-nextpick-qty { font-size: 16px; margin: 10px 0; }
+    }
+
+    .wms-line {
+        display: flex; align-items: center; gap: 10px; width: 100%;
+        padding: 10px 8px; border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+        background: transparent; border-left: 0; border-right: 0; border-top: 0;
+        color: $wms-text; text-align: left; min-height: 44px;
+        .wms-line-bin { color: $wms-accent; font-size: 13px; min-width: 96px; }
+        .num { margin-left: auto; font-variant-numeric: tabular-nums; }
+        .wms-pack { font-size: 11px; color: $wms-muted; }
+        &.tappable:active { background: $wms-panel-2; }
+        &.done { color: $wms-muted; i { color: $wms-accent; } }
+        &.done.variance { color: $wms-warn; }
+    }
+
+    .wms-countbox {
+        background: $wms-panel; border: 1px solid $wms-accent-dim; border-radius: 10px;
+        padding: 16px; margin-bottom: 12px; text-align: center;
+        .wms-countbox-loc { color: $wms-accent; font-weight: 700; margin-bottom: 8px; }
+    }
+
+    .wms-steps { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .wms-step {
+        display: flex; gap: 12px; align-items: center;
+        background: $wms-panel; border: 1px solid $wms-border; border-radius: 10px; padding: 12px;
+        opacity: 0.55;
+        &.active { opacity: 1; border-color: $wms-accent; }
+        &.done { opacity: 0.8; }
+        .wms-step-no {
+            width: 28px; height: 28px; border-radius: 50%; background: $wms-panel-2;
+            display: flex; align-items: center; justify-content: center; font-weight: 700;
+        }
+        .wms-step-title { font-size: 12px; color: $wms-muted; text-transform: uppercase; }
+        .wms-step-body { font-size: 15px; font-weight: 600; }
+    }
+
+    .wms-package-card {
+        background: $wms-panel; border: 1px solid $wms-border;
+        border-radius: 10px; padding: 12px; margin-top: 12px;
+    }
+
+    .wms-actions {
+        display: flex; gap: 10px; margin-top: 16px;
+        &.tight { margin-top: 8px; }
+    }
+    .wms-btn {
+        flex: 1; min-height: 50px; border-radius: 10px;
+        border: 1px solid $wms-border; background: $wms-panel-2; color: $wms-text;
+        font-size: 16px; font-weight: 600;
+        &.primary { background: $wms-accent-dim; border-color: $wms-accent-dim; color: #fff; }
+        &.danger { background: $wms-danger; border-color: $wms-danger; color: #fff; }
+        &:disabled { opacity: 0.5; }
+        &:active { filter: brightness(1.15); }
+    }
+
+    /* ---------------- narrow handhelds: sidebar becomes a drawer ------- */
+    @media (max-width: 640px) {
+        .wms-sidebar {
+            position: fixed; z-index: 30; left: 0; top: 0;
+            transform: translateX(-100%); transition: transform 0.18s ease-out;
+        }
+        .wms-topbar .wms-burger { display: block; }
+        &.sidebar-open {
+            .wms-sidebar { transform: translateX(0); }
+            .wms-backdrop {
+                display: block; position: fixed; inset: 0; z-index: 20;
+                background: rgba(0, 0, 0, 0.55);
+            }
+        }
+    }
+}

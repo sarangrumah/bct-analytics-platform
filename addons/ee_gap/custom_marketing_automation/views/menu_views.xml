@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_marketing_root" name="Marketing Automation" sequence="58"
+              groups="custom_marketing_automation.group_marketing_user"/>
+    <menuitem id="menu_marketing_campaigns" name="Campaigns" parent="menu_marketing_root"
+              action="action_marketing_campaign" sequence="10"/>
+    <menuitem id="menu_marketing_segments" name="Segments" parent="menu_marketing_root"
+              action="action_marketing_segment" sequence="20"/>
+    <menuitem id="menu_marketing_participants" name="Participants" parent="menu_marketing_root"
+              action="action_marketing_participant" sequence="30"
+              groups="custom_marketing_automation.group_marketing_manager"/>
+</odoo>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_pos_txn_list" model="ir.ui.view">
+        <field name="name">custom.ppob.pos.txn.list</field>
+        <field name="model">custom.ppob.pos.txn</field>
+        <field name="arch" type="xml">
+            <list string="POS Transactions" decoration-danger="match_state == 'mismatch'"
+                  decoration-warning="recon_flagged" decoration-muted="match_state in ('pos_only','h2h_only')">
+                <field name="name"/>
+                <field name="pos_trx_ref"/>
+                <field name="mitra_id"/>
+                <field name="product_id"/>
+                <field name="match_state"/>
+                <field name="sell_price"/>
+                <field name="cost_price"/>
+                <field name="margin"/>
+                <field name="pos_status"/>
+                <field name="h2h_status"/>
+                <field name="recon_flagged"/>
+                <field name="create_date"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pos_txn_form" model="ir.ui.view">
+        <field name="name">custom.ppob.pos.txn.form</field>
+        <field name="model">custom.ppob.pos.txn</field>
+        <field name="arch" type="xml">
+            <form string="POS Transaction">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="pos_trx_ref"/>
+                            <field name="match_state"/>
+                            <field name="mitra_id"/>
+                            <field name="product_id"/>
+                            <field name="provider_id"/>
+                            <field name="transaction_id"/>
+                        </group>
+                        <group>
+                            <field name="margin"/>
+                            <field name="recon_flagged"/>
+                            <field name="recon_note"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="POS Feed">
+                            <group>
+                                <field name="pos_ingested"/>
+                                <field name="pos_posted"/>
+                                <field name="pos_ref"/>
+                                <field name="pos_event_type"/>
+                                <field name="pos_status"/>
+                                <field name="sell_price"/>
+                                <field name="wallet_balance_after"/>
+                                <field name="outlet_ref"/>
+                                <field name="customer_no"/>
+                                <field name="pos_txn_time"/>
+                                <field name="pos_wallet_move_id"/>
+                            </group>
+                            <field name="raw_pos"/>
+                        </page>
+                        <page string="H2H Feed">
+                            <group>
+                                <field name="h2h_ingested"/>
+                                <field name="h2h_posted"/>
+                                <field name="h2h_ref"/>
+                                <field name="h2h_trx_id"/>
+                                <field name="biller_code"/>
+                                <field name="h2h_status"/>
+                                <field name="cost_price"/>
+                                <field name="serial_token"/>
+                                <field name="deposit_balance_after"/>
+                                <field name="h2h_txn_time"/>
+                                <field name="h2h_move_id"/>
+                            </group>
+                            <field name="raw_h2h"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_pos_txn_search" model="ir.ui.view">
+        <field name="name">custom.ppob.pos.txn.search</field>
+        <field name="model">custom.ppob.pos.txn</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="pos_trx_ref"/>
+                <field name="mitra_id"/>
+                <field name="product_id"/>
+                <filter name="f_matched" string="Matched" domain="[('match_state','=','matched')]"/>
+                <filter name="f_mismatch" string="Mismatch" domain="[('match_state','=','mismatch')]"/>
+                <filter name="f_pos_only" string="POS only" domain="[('match_state','=','pos_only')]"/>
+                <filter name="f_h2h_only" string="H2H only" domain="[('match_state','=','h2h_only')]"/>
+                <filter name="f_flagged" string="Recon flagged" domain="[('recon_flagged','=',True)]"/>
+                <separator/>
+                <filter name="g_match" string="Match State" context="{'group_by':'match_state'}"/>
+                <filter name="g_mitra" string="Mitra" context="{'group_by':'mitra_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_pos_txn" model="ir.actions.act_window">
+        <field name="name">POS Transactions</field>
+        <field name="res_model">custom.ppob.pos.txn</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_pos_txn_search"/>
+    </record>
+
+</odoo>

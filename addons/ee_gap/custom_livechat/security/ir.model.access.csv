@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_livechat_canned_response_user,custom.livechat.canned.response user,model_custom_livechat_canned_response,custom_livechat.group_user,1,0,0,0
+access_livechat_canned_response_manager,custom.livechat.canned.response manager,model_custom_livechat_canned_response,custom_livechat.group_manager,1,1,1,1
+access_livechat_chatbot_script_user,custom.livechat.chatbot.script user,model_custom_livechat_chatbot_script,custom_livechat.group_user,1,0,0,0
+access_livechat_chatbot_script_manager,custom.livechat.chatbot.script manager,model_custom_livechat_chatbot_script,custom_livechat.group_manager,1,1,1,1
+access_livechat_chatbot_step_user,custom.livechat.chatbot.step user,model_custom_livechat_chatbot_step,custom_livechat.group_user,1,0,0,0
+access_livechat_chatbot_step_manager,custom.livechat.chatbot.step manager,model_custom_livechat_chatbot_step,custom_livechat.group_manager,1,1,1,1

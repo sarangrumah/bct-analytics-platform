@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mrp_eco_list" model="ir.ui.view">
+        <field name="name">mrp.eco.list</field>
+        <field name="model">mrp.eco</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'approved'"
+                  decoration-info="state == 'in_review'"
+                  decoration-danger="state == 'rejected'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="title"/>
+                <field name="product_tmpl_id"/>
+                <field name="kind"/>
+                <field name="revision"/>
+                <field name="stage_id"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_mrp_eco_kanban" model="ir.ui.view">
+        <field name="name">mrp.eco.kanban</field>
+        <field name="model">mrp.eco</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage_id">
+                <field name="title"/>
+                <field name="product_tmpl_id"/>
+                <field name="revision"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <strong><field name="title"/></strong>
+                        <div><field name="product_tmpl_id"/></div>
+                        <div class="text-muted">Rev: <field name="revision"/></div>
+                        <span class="badge text-bg-info"><field name="state"/></span>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="view_mrp_eco_form" model="ir.ui.view">
+        <field name="name">mrp.eco.form</field>
+        <field name="model">mrp.eco</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object" class="btn-success"
+                            invisible="state != 'in_review'"/>
+                    <button name="action_reject" string="Reject" type="object"
+                            invisible="state != 'in_review'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('approved','cancelled')"/>
+                    <field name="stage_id" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="title"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="kind"/>
+                            <field name="revision"/>
+                        </group>
+                        <group>
+                            <field name="product_tmpl_id"/>
+                            <field name="current_bom_id"/>
+                            <field name="proposed_bom_id"/>
+                            <field name="requested_by_id" readonly="1"/>
+                            <field name="approved_by_id" readonly="1"/>
+                            <field name="approved_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Reason"/>
+                    <field name="reason"/>
+                    <separator string="Impact Assessment"/>
+                    <field name="impact_assessment"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_mrp_eco" model="ir.actions.act_window">
+        <field name="name">ECOs</field>
+        <field name="res_model">mrp.eco</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+</odoo>

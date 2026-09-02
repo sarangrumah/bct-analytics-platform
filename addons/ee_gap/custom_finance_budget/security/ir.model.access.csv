@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_finance_budget_user,finance.budget user,model_finance_budget,custom_finance_portal.group_finance_user,1,0,0,0
+access_finance_budget_manager,finance.budget manager,model_finance_budget,custom_finance_portal.group_finance_manager,1,1,1,1

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_deploy_module_wizard_form" model="ir.ui.view">
+        <field name="name">custom.hub.deploy.module.wizard.form</field>
+        <field name="model">custom.hub.deploy.module.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Deploy Module">
+                <sheet>
+                    <group>
+                        <field name="catalog_id" options="{'no_create': True}"/>
+                        <field name="deploy_mode"/>
+                        <field name="schedule_at"/>
+                    </group>
+                    <group string="Targets">
+                        <field name="tenant_ids" widget="many2many_tags"
+                               options="{'no_create': True}"/>
+                    </group>
+                    <group string="Canary Rollout">
+                        <field name="enable_canary"/>
+                        <!-- target_environment_id injected by custom_tenant_infra -->
+                    </group>
+                    <group>
+                        <field name="note" placeholder="Optional notes / change ticket reference"/>
+                        <field name="confirmed"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm" type="object"
+                            string="Deploy" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_deploy_module_wizard" model="ir.actions.act_window">
+        <field name="name">Deploy Module</field>
+        <field name="res_model">custom.hub.deploy.module.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_rescan_catalog_wizard_form" model="ir.ui.view">
+        <field name="name">custom.hub.rescan.catalog.wizard.form</field>
+        <field name="model">custom.hub.rescan.catalog.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Rescan Module Catalog">
+                <p>
+                    This walks every <code>addons/</code> bucket and refreshes
+                    catalog entries. Existing rows are updated; nothing is deleted.
+                </p>
+                <field name="result_summary" readonly="1"/>
+                <footer>
+                    <button name="action_run" type="object"
+                            string="Run Scan" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rescan_catalog_wizard" model="ir.actions.act_window">
+        <field name="name">Rescan Catalog</field>
+        <field name="res_model">custom.hub.rescan.catalog.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_deploy_pack_wizard_form" model="ir.ui.view">
+        <field name="name">custom.hub.deploy.pack.wizard.form</field>
+        <field name="model">custom.hub.deploy.pack.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Deploy Industry Pack">
+                <sheet>
+                    <group>
+                        <field name="pack_id" options="{'no_create': True}"/>
+                        <field name="deploy_mode"/>
+                    </group>
+                    <group string="Targets">
+                        <field name="tenant_ids" widget="many2many_tags"
+                               options="{'no_create': True}"/>
+                    </group>
+                    <group string="Options">
+                        <field name="enable_canary"/>
+                        <field name="skip_installed"/>
+                        <field name="confirmed"/>
+                    </group>
+                    <group string="Modules (resolved, deps-first)">
+                        <field name="module_preview" nolabel="1" readonly="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm" type="object"
+                            string="Deploy Pack" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_deploy_pack_wizard" model="ir.actions.act_window">
+        <field name="name">Deploy Pack</field>
+        <field name="res_model">custom.hub.deploy.pack.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

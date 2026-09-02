@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_payment_id_log_list" model="ir.ui.view">
+        <field name="name">custom.payment.id.log.list</field>
+        <field name="model">custom.payment.id.log</field>
+        <field name="arch" type="xml">
+            <list string="Payment Gateway Calls"
+                  decoration-success="state == 'ok'"
+                  decoration-danger="state in ('failed', 'timeout')"
+                  decoration-muted="state == 'queued'">
+                <field name="create_date"/>
+                <field name="provider_id"/>
+                <field name="transaction_id"/>
+                <field name="state" widget="badge"/>
+                <field name="http_status"/>
+                <field name="latency_ms"/>
+                <field name="attempt"/>
+                <field name="error_message"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_payment_id_log_form" model="ir.ui.view">
+        <field name="name">custom.payment.id.log.form</field>
+        <field name="model">custom.payment.id.log</field>
+        <field name="arch" type="xml">
+            <form string="Payment Gateway Call">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="provider_id"/>
+                            <field name="transaction_id"/>
+                            <field name="state" widget="badge"/>
+                            <field name="attempt"/>
+                        </group>
+                        <group>
+                            <field name="http_status"/>
+                            <field name="latency_ms"/>
+                            <field name="create_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Request">
+                            <field name="request_payload" widget="text"/>
+                        </page>
+                        <page string="Response">
+                            <field name="response_payload" widget="text"/>
+                        </page>
+                        <page string="Error">
+                            <field name="error_message" widget="text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_payment_id_log_search" model="ir.ui.view">
+        <field name="name">custom.payment.id.log.search</field>
+        <field name="model">custom.payment.id.log</field>
+        <field name="arch" type="xml">
+            <search string="Payment Gateway Calls">
+                <field name="provider_id"/>
+                <field name="transaction_id"/>
+                <field name="http_status"/>
+                <filter name="filter_ok" string="Ok"
+                        domain="[('state', '=', 'ok')]"/>
+                <filter name="filter_failed" string="Failed"
+                        domain="[('state', 'in', ('failed', 'timeout'))]"/>
+                <filter name="filter_queued" string="Queued / Sent"
+                        domain="[('state', 'in', ('queued', 'sent'))]"/>
+                <separator/>
+                <filter name="group_provider" string="Provider"
+                        context="{'group_by': 'provider_id'}"/>
+                <filter name="group_state" string="State"
+                        context="{'group_by': 'state'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_payment_id_log" model="ir.actions.act_window">
+        <field name="name">Gateway Call Log</field>
+        <field name="res_model">custom.payment.id.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_payment_id_log_search"/>
+    </record>
+</odoo>

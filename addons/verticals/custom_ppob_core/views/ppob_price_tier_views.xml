@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_price_tier_list" model="ir.ui.view">
+        <field name="name">custom.ppob.price.tier.list</field>
+        <field name="model">custom.ppob.price.tier</field>
+        <field name="arch" type="xml">
+            <list string="Price Tiers">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ppob_price_tier_form" model="ir.ui.view">
+        <field name="name">custom.ppob.price.tier.form</field>
+        <field name="model">custom.ppob.price.tier</field>
+        <field name="arch" type="xml">
+            <form string="Price Tier">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Silver / Gold / Platinum"/></h1>
+                    </div>
+                    <group>
+                        <field name="sequence"/>
+                        <field name="currency_id"/>
+                        <field name="active"/>
+                    </group>
+                    <notebook>
+                        <page string="Prices">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="sell_price"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ppob_price_tier" model="ir.actions.act_window">
+        <field name="name">Price Tiers</field>
+        <field name="res_model">custom.ppob.price.tier</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

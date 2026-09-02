@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  PMK-131/2024 seed fiscal positions.
+  Five canonical scenarios for Indonesian VAT/PPh routing.
+-->
+<odoo noupdate="1">
+
+    <record id="fp_domestik_pkp" model="account.fiscal.position">
+        <field name="name">Domestik PKP</field>
+        <field name="auto_apply" eval="False"/>
+        <field name="note">Default fiscal position for PKP-to-PKP domestic transactions. Uses PPN 12% DPP Nilai Lain.</field>
+    </record>
+
+    <record id="fp_domestik_non_pkp" model="account.fiscal.position">
+        <field name="name">Domestik Non-PKP</field>
+        <field name="auto_apply" eval="False"/>
+        <field name="note">Counter-party is non-PKP: PPN not charged/collected.</field>
+    </record>
+
+    <record id="fp_impor_pkp" model="account.fiscal.position">
+        <field name="name">Impor PKP</field>
+        <field name="auto_apply" eval="False"/>
+        <field name="note">Importir PKP. Routes purchases to PPN Impor + PPh 22 Impor (2.5% API).</field>
+    </record>
+
+    <record id="fp_impor_non_pkp" model="account.fiscal.position">
+        <field name="name">Impor Non-PKP</field>
+        <field name="auto_apply" eval="False"/>
+        <field name="note">Importir Non-PKP. PPN Impor + PPh 22 Impor (rate non-API berlaku).</field>
+    </record>
+
+    <record id="fp_wapu" model="account.fiscal.position">
+        <field name="name">WAPU (Wajib Pungut)</field>
+        <field name="auto_apply" eval="False"/>
+        <field name="note">Customer is designated as WAPU (BUMN, bendaharawan pemerintah). PPN dipungut oleh pembeli; invoice transaction code 02/03.</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- The root keeps the `hht-shell` class: the bridge layout's ES5 boot
+         trap looks for `#hht-app .hht-shell` to decide whether the app
+         mounted, and would otherwise report a false failure after 12s. -->
+    <t t-name="custom_wms_hht.WmsHhtShell">
+        <div class="hht-shell wms-hht" t-att-class="state.sidebarOpen ? 'sidebar-open' : ''">
+
+            <aside class="wms-sidebar">
+                <div class="wms-sidebar-head">
+                    <span class="wms-logo">WMS</span>
+                    <select t-if="state.warehouses.length > 1"
+                            class="wms-wh-select"
+                            t-on-change="(ev) => this.onWarehouseChange(ev)">
+                        <t t-foreach="state.warehouses" t-as="w" t-key="w.id">
+                            <option t-att-value="w.id"
+                                    t-att-selected="w.id === state.warehouseId ? 'selected' : false"
+                                    t-esc="w.name"/>
+                        </t>
+                    </select>
+                    <span t-else="" class="wms-wh" t-esc="state.warehouse"/>
+                </div>
+                <nav class="wms-nav">
+                    <t t-foreach="menu" t-as="item" t-key="item.id">
+                        <button class="wms-nav-item"
+                                t-att-class="state.active === item.id ? 'active' : ''"
+                                t-on-click="() => this.select(item.id)">
+                            <i class="fa" t-att-class="item.icon"/>
+                            <span class="wms-nav-label" t-esc="item.label"/>
+                            <span class="wms-badge" t-if="badge(item)" t-esc="badge(item)"/>
+                        </button>
+                    </t>
+                </nav>
+                <div class="wms-sidebar-foot">
+                    <div class="wms-user"><i class="fa fa-user"/> <t t-esc="state.user"/></div>
+                    <div class="wms-conn" t-att-class="state.online ? 'online' : 'offline'">
+                        <t t-if="state.online">ONLINE</t>
+                        <t t-else="">OFFLINE</t>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="wms-backdrop" t-on-click="() => this.toggleSidebar()"/>
+
+            <div class="wms-main">
+                <header class="wms-topbar">
+                    <button class="wms-burger" t-on-click="() => this.toggleSidebar()">
+                        <i class="fa fa-bars"/>
+                    </button>
+                    <div class="wms-title" t-esc="current.label"/>
+                    <div class="wms-topbar-right">
+                        <span class="wms-dot" t-att-class="state.online ? 'online' : 'offline'"/>
+                    </div>
+                </header>
+
+                <section class="wms-scanbar">
+                    <i class="fa fa-barcode"/>
+                    <input type="text"
+                           class="wms-scan-input"
+                           t-ref="scanInput"
+                           autocomplete="off"
+                           autocorrect="off"
+                           autocapitalize="off"
+                           spellcheck="false"
+                           enterkeyhint="go"
+                           autofocus="autofocus"
+                           t-att-placeholder="state.scanPrompt"
+                           t-on-input="() => this.onScanInput()"
+                           t-on-keydown="(ev) => this.onScanKeydown(ev)"/>
+                    <!-- Not decoration: a scanner configured with no suffix,
+                         or a code read off a damaged label and typed by hand,
+                         has no other way to submit. -->
+                    <button class="wms-scan-go" t-on-click="() => this.onScanGo()">Go</button>
+                </section>
+
+                <div class="wms-banner" t-if="state.banner"
+                     t-att-class="state.banner.kind">
+                    <t t-esc="state.banner.text"/>
+                    <button class="wms-banner-x" t-on-click="() => (state.banner = null)">×</button>
+                </div>
+
+                <main class="wms-content">
+                    <t t-component="current.Comp" t-props="pageProps" t-key="pageKey"/>
+                </main>
+            </div>
+        </div>
+    </t>
+</templates>

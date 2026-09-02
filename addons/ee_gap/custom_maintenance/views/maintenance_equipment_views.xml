@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_maintenance_equipment_form_iot" model="ir.ui.view">
+        <field name="name">maintenance.equipment.form.iot</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="IoT Threshold" name="iot_threshold">
+                    <group>
+                        <field name="x_iot_threshold_metric"/>
+                        <field name="x_iot_threshold_op"/>
+                        <field name="x_iot_threshold_value"/>
+                    </group>
+                    <group>
+                        <field name="x_auto_request_on_breach"/>
+                        <field name="x_last_iot_breach"/>
+                    </group>
+                </group>
+                <group string="Reliability (MTBF / MTTR)" name="reliability">
+                    <group>
+                        <field name="x_total_failures"/>
+                        <field name="x_last_failure_at"/>
+                    </group>
+                    <group>
+                        <field name="x_mtbf_hours" widget="float_time"/>
+                        <field name="x_mttr_hours" widget="float_time"/>
+                    </group>
+                </group>
+                <group string="Predictive Maintenance" name="predictive">
+                    <group>
+                        <field name="x_predicted_via"/>
+                        <field name="x_predicted_next_maintenance"/>
+                    </group>
+                    <group>
+                        <button name="action_schedule_predicted_maintenance"
+                                type="object"
+                                string="Schedule Predicted Maintenance"
+                                class="btn-primary"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

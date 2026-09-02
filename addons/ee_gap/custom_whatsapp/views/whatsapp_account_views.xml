@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_whatsapp_account_list" model="ir.ui.view">
+        <field name="name">whatsapp.account.list</field>
+        <field name="model">whatsapp.account</field>
+        <field name="arch" type="xml">
+            <list string="WhatsApp Accounts">
+                <field name="name"/>
+                <field name="provider"/>
+                <field name="phone_number_id"/>
+                <field name="business_account_id"/>
+                <field name="baileys_status" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="sandbox_mode" widget="boolean_toggle"/>
+                <field name="is_active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_whatsapp_account_form" model="ir.ui.view">
+        <field name="name">whatsapp.account.form</field>
+        <field name="model">whatsapp.account</field>
+        <field name="arch" type="xml">
+            <form string="WhatsApp Account">
+                <header>
+                    <button name="action_test_connection" type="object"
+                            string="Test Connection" class="btn-secondary"
+                            invisible="provider == 'baileys'"/>
+                    <button name="action_baileys_start_session" type="object"
+                            string="Start Session" class="btn-primary"
+                            invisible="provider != 'baileys'"/>
+                    <button name="action_baileys_refresh_qr" type="object"
+                            string="Refresh QR / Status" class="btn-secondary"
+                            invisible="provider != 'baileys'"/>
+                    <button name="action_baileys_logout" type="object"
+                            string="Logout Session" class="btn-secondary"
+                            invisible="provider != 'baileys'"
+                            confirm="Logout will wipe the WhatsApp session credentials and require a fresh QR pairing. Continue?"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Main Sales Number"/></h1>
+                    </div>
+                    <group>
+                        <group string="Provider">
+                            <field name="provider"/>
+                            <field name="is_active"/>
+                            <field name="sandbox_mode"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Meta Cloud / Twilio Credentials"
+                               invisible="provider == 'baileys'">
+                            <field name="phone_number_id"/>
+                            <field name="business_account_id"/>
+                            <field name="access_token" groups="custom_whatsapp.group_manager"/>
+                            <field name="webhook_verify_token" groups="custom_whatsapp.group_manager"/>
+                        </group>
+                    </group>
+                    <notebook invisible="provider != 'baileys'">
+                        <page string="Baileys Sidecar">
+                            <div class="alert alert-info" role="alert">
+                                <p class="mb-1"><b>How to fill these fields:</b></p>
+                                <ul class="mb-0">
+                                    <li><b>Sidecar URL</b>: internal docker hostname, default <code>http://baileys:8088</code>. Auto-prefilled from <code>BAILEYS_INTERNAL_URL</code>.</li>
+                                    <li><b>Session ID</b>: leave blank to auto-assign <code>acct-{id}</code>, or set a stable name like <code>acct-1</code>.</li>
+                                    <li><b>Shared Secret</b>: must match <code>BAILEYS_SHARED_SECRET</code> on the baileys service. Auto-prefilled from env on create.</li>
+                                    <li><b>Status</b> and <b>Phone</b> are read-only — populated automatically after QR pairing.</li>
+                                </ul>
+                            </div>
+                            <group>
+                                <group string="Connection">
+                                    <field name="baileys_sidecar_url" placeholder="http://baileys:8088"/>
+                                    <field name="baileys_session_id" placeholder="acct-1 (blank = auto)"/>
+                                    <field name="baileys_shared_secret" password="True"
+                                           groups="custom_whatsapp.group_manager"/>
+                                </group>
+                                <group string="Session State">
+                                    <field name="baileys_status" widget="badge"
+                                           decoration-success="baileys_status == 'connected'"
+                                           decoration-warning="baileys_status == 'qr_pending'"
+                                           decoration-danger="baileys_status in ('error', 'disconnected')"/>
+                                    <field name="baileys_phone" readonly="1"/>
+                                </group>
+                            </group>
+                            <group string="Pairing QR" invisible="baileys_status not in ('qr_pending', 'unknown')">
+                                <field name="baileys_last_qr" widget="image"
+                                       options="{'size': [320, 320]}" nolabel="1"/>
+                                <p class="text-muted">
+                                    Scan the QR code from WhatsApp mobile (Settings → Linked Devices → Link a Device).
+                                    Click <b>Refresh QR / Status</b> if the QR doesn't appear within ~10s.
+                                </p>
+                            </group>
+                            <group string="Last Error" invisible="not baileys_last_error">
+                                <field name="baileys_last_error" readonly="1" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page string="AI Prompt">
+                            <group>
+                                <field name="ai_auto_draft"/>
+                                <field name="ai_max_history"/>
+                            </group>
+                            <separator string="System Prompt"/>
+                            <field name="ai_system_prompt" nolabel="1"
+                                   placeholder="e.g. Kamu adalah customer service Sarang Rumah yang ramah. Jawab singkat dalam Bahasa Indonesia. Kalau pelanggan tanya produk, arahkan ke katalog. Jangan janjikan diskon tanpa konfirmasi tim sales."/>
+                            <p class="text-muted">
+                                When <b>Auto-Draft AI Reply</b> is on, every inbound WhatsApp message
+                                triggers an AI draft reply stored on the message. Nothing is sent
+                                automatically — an agent must review the draft and click <b>Send</b>.
+                            </p>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_whatsapp_account_search" model="ir.ui.view">
+        <field name="name">whatsapp.account.search</field>
+        <field name="model">whatsapp.account</field>
+        <field name="arch" type="xml">
+            <search string="WhatsApp Accounts">
+                <field name="name"/>
+                <field name="phone_number_id"/>
+                <field name="business_account_id"/>
+                <filter name="active" string="Active" domain="[('is_active','=',True)]"/>
+                <filter name="sandbox" string="Sandbox" domain="[('sandbox_mode','=',True)]"/>
+                <separator/>
+                <filter name="group_provider" string="Provider" context="{'group_by':'provider'}"/>
+                <filter name="group_company" string="Company" context="{'group_by':'company_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_whatsapp_account" model="ir.actions.act_window">
+        <field name="name">WhatsApp Accounts</field>
+        <field name="res_model">whatsapp.account</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_whatsapp_account_search"/>
+    </record>
+</odoo>

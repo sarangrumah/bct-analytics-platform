@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_ppob_root"
+              name="PPOB"
+              sequence="86"
+              groups="custom_ppob.group_ppob_user"/>
+
+    <menuitem id="menu_ppob_operations"
+              name="Operations"
+              parent="menu_ppob_root"
+              sequence="10"/>
+
+    <menuitem id="menu_ppob_transaction"
+              name="Transactions"
+              parent="menu_ppob_operations"
+              action="action_ppob_transaction"
+              sequence="10"/>
+
+    <menuitem id="menu_ppob_configuration"
+              name="Configuration"
+              parent="menu_ppob_root"
+              sequence="90"
+              groups="custom_ppob.group_ppob_manager"/>
+
+    <menuitem id="menu_ppob_biller"
+              name="Billers"
+              parent="menu_ppob_configuration"
+              action="action_ppob_biller"
+              sequence="10"/>
+
+</odoo>

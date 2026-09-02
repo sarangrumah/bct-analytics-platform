@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_va_account_list" model="ir.ui.view">
+        <field name="name">custom.ppob.va.account.list</field>
+        <field name="model">custom.ppob.va.account</field>
+        <field name="arch" type="xml">
+            <list string="Virtual Accounts">
+                <field name="bank_code"/>
+                <field name="va_number"/>
+                <field name="mitra_id"/>
+                <field name="wallet_id"/>
+                <field name="mode"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ppob_va_account_form" model="ir.ui.view">
+        <field name="name">custom.ppob.va.account.form</field>
+        <field name="model">custom.ppob.va.account</field>
+        <field name="arch" type="xml">
+            <form string="Virtual Account">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="mitra_id"/>
+                            <field name="wallet_id"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="bank_code"/>
+                            <field name="va_number"/>
+                            <field name="mode"/>
+                            <field name="transit_account_id"/>
+                            <field name="output_tax_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ppob_va_account" model="ir.actions.act_window">
+        <field name="name">Virtual Accounts</field>
+        <field name="res_model">custom.ppob.va.account</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_appointments_root" name="Appointments" sequence="48"
+              groups="custom_appointments.group_appointment_user"/>
+    <menuitem id="menu_appt_bookings" name="Bookings" parent="menu_appointments_root"
+              action="action_appointment_booking" sequence="10"/>
+    <menuitem id="menu_appt_config" name="Configuration" parent="menu_appointments_root"
+              sequence="100" groups="custom_appointments.group_appointment_manager"/>
+    <menuitem id="menu_appt_types" name="Types" parent="menu_appt_config"
+              action="action_appointment_type" sequence="10"/>
+    <menuitem id="menu_appt_resources" name="Resources" parent="menu_appt_config"
+              action="action_appointment_resource" sequence="20"/>
+</odoo>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_fnb_root" name="F&amp;B Planning" parent="custom_core.menu_custom_root"
+              groups="group_fnb_user" sequence="75"/>
+
+    <menuitem id="menu_fnb_replenishment" name="Replenishment" parent="menu_fnb_root" sequence="10"/>
+    <menuitem id="menu_fnb_proposals" name="Proposals" parent="menu_fnb_replenishment"
+              action="action_fnb_proposal" sequence="10"/>
+    <menuitem id="menu_fnb_rules" name="Rules" parent="menu_fnb_replenishment"
+              action="action_fnb_replenishment_rule" sequence="20"
+              groups="group_fnb_planner"/>
+    <menuitem id="menu_fnb_generate" name="Generate Proposals Now" parent="menu_fnb_replenishment"
+              action="action_fnb_generate_proposals" sequence="30"
+              groups="group_fnb_planner"/>
+
+    <menuitem id="menu_fnb_demand" name="Demand" parent="menu_fnb_root" sequence="20"/>
+    <menuitem id="menu_fnb_forecast" name="Forecast" parent="menu_fnb_demand"
+              action="action_fnb_demand_forecast" sequence="10"/>
+    <menuitem id="menu_fnb_history" name="History" parent="menu_fnb_demand"
+              action="action_fnb_demand_history" sequence="20"/>
+</odoo>

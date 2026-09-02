@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_frontdesk_station_user,custom.frontdesk.station user,model_custom_frontdesk_station,custom_frontdesk.group_user,1,0,0,0
+access_frontdesk_station_manager,custom.frontdesk.station manager,model_custom_frontdesk_station,custom_frontdesk.group_manager,1,1,1,1
+access_frontdesk_visitor_user,custom.frontdesk.visitor user,model_custom_frontdesk_visitor,custom_frontdesk.group_user,1,1,1,0
+access_frontdesk_visitor_manager,custom.frontdesk.visitor manager,model_custom_frontdesk_visitor,custom_frontdesk.group_manager,1,1,1,1

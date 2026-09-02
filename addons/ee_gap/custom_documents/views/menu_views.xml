@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_documents_root" name="Documents" sequence="63"
+              groups="custom_documents.group_doc_user"/>
+    <menuitem id="menu_documents" name="All Documents" parent="menu_documents_root"
+              action="action_document" sequence="10"/>
+    <menuitem id="menu_doc_workspaces" name="Workspaces" parent="menu_documents_root"
+              action="action_doc_workspace" sequence="20"
+              groups="custom_documents.group_doc_admin"/>
+</odoo>

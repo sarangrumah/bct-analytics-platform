@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rule_op,rule.op,model_custom_to_rule,group_to_operator,1,0,0,0
+access_rule_sup,rule.sup,model_custom_to_rule,group_to_supervisor,1,1,0,0
+access_rule_admin,rule.admin,model_custom_to_rule,group_to_admin,1,1,1,1
+access_to_op,to.op,model_custom_transfer_order,group_to_operator,1,1,0,0
+access_to_sup,to.sup,model_custom_transfer_order,group_to_supervisor,1,1,1,0
+access_to_admin,to.admin,model_custom_transfer_order,group_to_admin,1,1,1,1

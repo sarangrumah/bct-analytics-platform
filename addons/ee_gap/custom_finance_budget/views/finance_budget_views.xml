@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_finance_budget_list" model="ir.ui.view">
+        <field name="name">finance.budget.list</field>
+        <field name="model">finance.budget</field>
+        <field name="arch" type="xml">
+            <list string="Cost Budget"
+                  decoration-danger="remaining_amount &lt; 0"
+                  decoration-warning="remaining_amount &gt;= 0 and remaining_amount &lt; budget_amount * 0.1">
+                <field name="budget_year"/>
+                <field name="division_id"/>
+                <field name="cost_center_code" optional="show"/>
+                <field name="budget_amount" sum="Budget"/>
+                <field name="committed_amount" sum="Committed"/>
+                <field name="pipeline_amount" optional="show"/>
+                <field name="remaining_amount" sum="Remaining"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="x_sap_external_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_finance_budget_form" model="ir.ui.view">
+        <field name="name">finance.budget.form</field>
+        <field name="model">finance.budget</field>
+        <field name="arch" type="xml">
+            <form string="Cost Budget">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="division_id"/>
+                            <field name="cost_center_code"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="budget_year"/>
+                            <field name="budget_amount"/>
+                            <field name="committed_amount"/>
+                            <field name="pipeline_amount"/>
+                            <field name="remaining_amount"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="x_sap_external_id" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_finance_budget" model="ir.actions.act_window">
+        <field name="name">Cost Budget</field>
+        <field name="res_model">finance.budget</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_finance_budget"
+              name="Cost Budget"
+              parent="custom_finance_portal.menu_finance_master"
+              action="action_finance_budget"
+              sequence="55"/>
+
+</odoo>

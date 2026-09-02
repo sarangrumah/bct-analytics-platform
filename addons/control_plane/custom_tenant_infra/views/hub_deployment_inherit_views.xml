@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_hub_deployment_list_inherit_env" model="ir.ui.view">
+            <field name="name">custom.hub.module.deployment.list.inherit.env</field>
+            <field name="model">custom.hub.module.deployment</field>
+            <field name="inherit_id" ref="custom_hub_console.view_module_deployment_list"/>
+            <field name="arch" type="xml">
+                <field name="tenant_id" position="after">
+                    <field name="environment_id" optional="show"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_hub_deployment_form_inherit_env" model="ir.ui.view">
+            <field name="name">custom.hub.module.deployment.form.inherit.env</field>
+            <field name="model">custom.hub.module.deployment</field>
+            <field name="inherit_id" ref="custom_hub_console.view_module_deployment_form"/>
+            <field name="arch" type="xml">
+                <field name="canary_phase" position="before">
+                    <field name="environment_id"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_hub_deploy_wizard_form_inherit_env" model="ir.ui.view">
+            <field name="name">custom.hub.deploy.module.wizard.form.inherit.env</field>
+            <field name="model">custom.hub.deploy.module.wizard</field>
+            <field name="inherit_id" ref="custom_hub_console.view_deploy_module_wizard_form"/>
+            <field name="arch" type="xml">
+                <field name="enable_canary" position="after">
+                    <field name="target_environment_id"
+                           options="{'no_create': True}"
+                           invisible="not enable_canary"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

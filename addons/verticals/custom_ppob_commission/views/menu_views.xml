@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_ppob_commission_rules"
+              name="Commission Rules"
+              parent="custom_ppob_core.menu_ppob_configuration"
+              action="action_ppob_commission_rule"
+              sequence="50"/>
+
+    <menuitem id="menu_ppob_commission_accruals"
+              name="Commission Accruals"
+              parent="custom_ppob_core.menu_ppob_operations"
+              action="action_ppob_commission_accrual"
+              sequence="50"/>
+
+    <menuitem id="menu_ppob_commission_settlement"
+              name="Settle Commissions"
+              parent="custom_ppob_core.menu_ppob_operations"
+              action="action_ppob_commission_settlement_wizard"
+              sequence="55"
+              groups="custom_ppob_core.group_ppob_manager"/>
+
+</odoo>

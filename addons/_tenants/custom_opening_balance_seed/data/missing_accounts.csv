@@ -1,0 +1,6 @@
+company_name,code,name,account_type,reconcile
+PT Aero Inovasi Media,1103019270,BCA - IDR-268.695.5777 - Main Bank,asset_cash,True
+PT Aero Inovasi Media,1103019280,BCA - IDR-268.150.7878 - Main Bank,asset_cash,True
+PT Aero Reksa Kreasi Angkasa,1103019290,BCA - IDR-268.262.6268 - Main Bank,asset_cash,True
+PT Aero Reksa Kreasi Angkasa,1103019300,BCA - IDR-268.222.9595 - Main Bank,asset_cash,True
+PT Aero Reksa Kreasi Angkasa,1105020007,Time Deposit-IDR-PT Bank Rakyat Indonesia Tbk,asset_cash,False

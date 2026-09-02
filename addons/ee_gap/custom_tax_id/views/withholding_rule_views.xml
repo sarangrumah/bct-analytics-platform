@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Category list/form -->
+    <record id="view_wh_category_list" model="ir.ui.view">
+        <field name="name">tax.withholding.category.list</field>
+        <field name="model">tax.withholding.category</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="pph_kind"/>
+                <field name="bupot_object_code"/>
+                <field name="legal_basis"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_wh_category_form" model="ir.ui.view">
+        <field name="name">tax.withholding.category.form</field>
+        <field name="model">tax.withholding.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="name"/>
+                            <field name="pph_kind"/>
+                        </group>
+                        <group>
+                            <field name="bupot_object_code"/>
+                            <field name="legal_basis"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_wh_category" model="ir.actions.act_window">
+        <field name="name">PPh Categories</field>
+        <field name="res_model">tax.withholding.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Rule list/form -->
+    <record id="view_wh_rule_list" model="ir.ui.view">
+        <field name="name">tax.withholding.rule.list</field>
+        <field name="model">tax.withholding.rule</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active">
+                <field name="name"/>
+                <field name="category_id"/>
+                <field name="pph_kind"/>
+                <field name="tarif"/>
+                <field name="tarif_no_npwp"/>
+                <field name="account_id"/>
+                <field name="priority"/>
+                <field name="foreign_only"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_wh_rule_form" model="ir.ui.view">
+        <field name="name">tax.withholding.rule.form</field>
+        <field name="model">tax.withholding.rule</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="category_id"/>
+                            <field name="pph_kind" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="priority"/>
+                        </group>
+                        <group>
+                            <field name="tarif"/>
+                            <field name="tarif_no_npwp"/>
+                            <field name="account_id"/>
+                            <field name="foreign_only"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Resolution Filters">
+                            <group>
+                                <field name="product_category_ids" widget="many2many_tags"/>
+                                <field name="partner_category_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_wh_rule" model="ir.actions.act_window">
+        <field name="name">PPh Withholding Rules</field>
+        <field name="res_model">tax.withholding.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_helpdesk_ticket_form_whatsapp" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form.whatsapp</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="custom_helpdesk.view_helpdesk_ticket_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_whatsapp_notify"
+                        type="object"
+                        string="Notify Customer via WhatsApp"
+                        groups="custom_whatsapp.group_user"
+                        invisible="not partner_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

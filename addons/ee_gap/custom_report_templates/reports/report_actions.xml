@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Re-point the native Print actions to the branded templates so the
+      standard Print > Invoice / Quotation / Purchase Order buttons render
+      the new layout. Both invoice actions ("with" and "without" payment)
+      are re-pointed to the single branded invoice template.
+    -->
+
+    <!-- Customer Invoice (and vendor bill) -->
+    <record id="account.account_invoices" model="ir.actions.report">
+        <field name="report_name">custom_report_templates.report_invoice</field>
+        <field name="report_file">custom_report_templates.report_invoice</field>
+        <field name="paperformat_id" ref="custom_report_templates.paperformat_branded_a4"/>
+    </record>
+    <record id="account.account_invoices_without_payment" model="ir.actions.report">
+        <field name="report_name">custom_report_templates.report_invoice</field>
+        <field name="report_file">custom_report_templates.report_invoice</field>
+        <field name="paperformat_id" ref="custom_report_templates.paperformat_branded_a4"/>
+    </record>
+
+    <!-- Sales Quotation / Order -->
+    <record id="sale.action_report_saleorder" model="ir.actions.report">
+        <field name="report_name">custom_report_templates.report_saleorder</field>
+        <field name="report_file">custom_report_templates.report_saleorder</field>
+        <field name="paperformat_id" ref="custom_report_templates.paperformat_branded_a4"/>
+    </record>
+
+    <!-- Purchase Order / RFQ -->
+    <record id="purchase.action_report_purchase_order" model="ir.actions.report">
+        <field name="report_name">custom_report_templates.report_purchaseorder</field>
+        <field name="report_file">custom_report_templates.report_purchaseorder</field>
+        <field name="paperformat_id" ref="custom_report_templates.paperformat_branded_a4"/>
+    </record>
+</odoo>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- NPS Summaries under the standard Surveys menu -->
+    <menuitem id="menu_custom_survey_nps_summary"
+              name="NPS Summaries"
+              parent="survey.menu_surveys"
+              action="action_custom_survey_nps_summary"
+              sequence="50"
+              groups="custom_survey.group_user"/>
+</odoo>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_retail_mdm_request_list" model="ir.ui.view">
+        <field name="name">retail.mdm.request.list</field>
+        <field name="model">retail.mdm.request</field>
+        <field name="arch" type="xml">
+            <list string="MDM Requests" decoration-danger="state == 'failed'"
+                  decoration-warning="state == 'partial'" decoration-muted="state == 'cancelled'">
+                <field name="received_at"/>
+                <field name="request_id"/>
+                <field name="item_count" sum="Items"/>
+                <field name="ok_count" sum="OK"/>
+                <field name="dup_count" sum="Duplicate"/>
+                <field name="review_count" sum="Review"/>
+                <field name="error_count" sum="Error"/>
+                <field name="dry_run" optional="show"/>
+                <field name="source_ip" optional="hide"/>
+                <field name="attempt_count" optional="hide"/>
+                <field name="last_error" optional="hide"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_retail_mdm_request_form" model="ir.ui.view">
+        <field name="name">retail.mdm.request.form</field>
+        <field name="model">retail.mdm.request</field>
+        <field name="arch" type="xml">
+            <form string="MDM Request">
+                <header>
+                    <button name="action_replay" type="object" string="Replay"
+                            class="btn-primary" invisible="state in ('done', 'cancelled')"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('done', 'cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="received,queued,processing,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Receipt">
+                            <field name="request_id"/>
+                            <field name="dedupe_key"/>
+                            <field name="received_at"/>
+                            <field name="source_ip"/>
+                            <field name="dry_run"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Outcome">
+                            <field name="item_count"/>
+                            <field name="ok_count"/>
+                            <field name="dup_count"/>
+                            <field name="review_count"/>
+                            <field name="error_count"/>
+                            <field name="attempt_count"/>
+                            <field name="job_uuid"/>
+                            <field name="processed_at"/>
+                            <field name="last_error"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Items" name="items">
+                            <field name="item_ids" readonly="1">
+                                <list decoration-danger="state in ('error', 'conflict')"
+                                      decoration-warning="state == 'needs_review'"
+                                      decoration-muted="state in ('duplicate', 'skipped')">
+                                    <field name="sequence"/>
+                                    <field name="sku_code"/>
+                                    <field name="prod_sku"/>
+                                    <field name="template_code"/>
+                                    <field name="ean"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="error"/>
+                                    <field name="template_id" optional="hide"/>
+                                    <field name="product_id" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Raw Payload" name="payload">
+                            <field name="payload" widget="json"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_retail_mdm_request_search" model="ir.ui.view">
+        <field name="name">retail.mdm.request.search</field>
+        <field name="model">retail.mdm.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="request_id"/>
+                <field name="dedupe_key"/>
+                <field name="source_ip"/>
+                <filter name="filter_failed" string="Failed" domain="[('state', '=', 'failed')]"/>
+                <filter name="filter_partial" string="Partial" domain="[('state', '=', 'partial')]"/>
+                <filter name="filter_needs_attention" string="Needs Attention"
+                        domain="['|', ('error_count', '&gt;', 0), ('review_count', '&gt;', 0)]"/>
+                <filter name="filter_dry_run" string="Dry Run" domain="[('dry_run', '=', True)]"/>
+                <filter name="filter_today" string="Today"
+                        domain="[('received_at', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_received" string="Received"
+                            context="{'group_by': 'received_at:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_retail_mdm_request" model="ir.actions.act_window">
+        <field name="name">MDM Requests</field>
+        <field name="res_model">retail.mdm.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_retail_mdm_request_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No MDM requests yet.</p>
+            <p>Product-master messages pushed to <code>POST /api/mdm/products</code> land here.</p>
+        </field>
+    </record>
+</odoo>

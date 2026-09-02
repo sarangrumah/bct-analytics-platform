@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_custom_root"
+              name="Custom"
+              sequence="90"
+              groups="custom_core.group_custom_user"
+              web_icon="custom_core,static/description/icon.png"/>
+</odoo>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_template_form_categ_request" model="ir.ui.view">
+        <field name="name">product.template.form.categ.request</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <!--
+              Editing categ_id here is refused once the product has been sold and
+              the change would move the ledger. This button is the way through:
+              it opens a reclassification with the product already filled in.
+            -->
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <button name="action_retail_request_categ_change" type="object"
+                        string="Request category change"
+                        class="btn-link ps-0"
+                        icon="fa-exchange"
+                        invisible="not id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_retail_request_categ_change_multi" model="ir.actions.server">
+        <field name="name">Request Category Change</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_retail_request_categ_change()</field>
+    </record>
+</odoo>

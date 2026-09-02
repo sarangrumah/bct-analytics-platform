@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="custom_hht_bridge.HhtShell">
+        <div class="hht-shell">
+            <header class="hht-topbar">
+                <div class="hht-brand">Hub HHT</div>
+                <div class="hht-meta">
+                    <span class="hht-tenant" t-if="state.me and state.me.tenant">
+                        <t t-esc="state.me.tenant.name"/>
+                    </span>
+                    <span class="hht-user" t-if="state.me and state.me.user">
+                        <t t-esc="state.me.user.name"/>
+                    </span>
+                    <span class="hht-indicator"
+                          t-att-class="state.online ? 'hht-online' : 'hht-offline'">
+                        <t t-if="state.online">ONLINE</t>
+                        <t t-else="">OFFLINE</t>
+                    </span>
+                    <span class="hht-pending" t-if="state.pending_count">
+                        Pending: <t t-esc="state.pending_count"/>
+                    </span>
+                </div>
+            </header>
+
+            <nav class="hht-tabs">
+                <t t-foreach="tabs" t-as="tab" t-key="tab.id">
+                    <button class="hht-tab"
+                            t-att-class="state.active_tab === tab.id ? 'active' : ''"
+                            t-on-click="() => this.setTab(tab.id)">
+                        <t t-esc="tab.label"/>
+                    </button>
+                </t>
+            </nav>
+
+            <section class="hht-scan-row">
+                <input type="text"
+                       class="hht-scan-input"
+                       t-ref="scanInput"
+                       autocomplete="off"
+                       autofocus="autofocus"
+                       inputmode="none"
+                       placeholder="Scan or type barcode..."
+                       t-on-keydown="(ev) => this.onScanKeydown(ev)"/>
+            </section>
+
+            <main class="hht-page">
+                <t t-if="state.error">
+                    <div class="hht-error"><t t-esc="state.error"/></div>
+                </t>
+                <t t-if="state.last_scan">
+                    <div class="hht-last-scan">Last: <t t-esc="state.last_scan"/></div>
+                </t>
+                <t t-component="currentTab.Comp"
+                   onScan.bind="onScan"
+                   lastScan="state.last_scan"
+                   online="state.online"/>
+            </main>
+        </div>
+    </t>
+
+    <t t-name="custom_hht_bridge.PageFormShell">
+        <div class="hht-form">
+            <div class="hht-form-row">
+                <label>Location</label>
+                <select t-model="state.location_id" class="hht-input">
+                    <option value="">— select —</option>
+                </select>
+            </div>
+            <div class="hht-form-row">
+                <label>Quantity</label>
+                <input type="number" min="0" step="any" class="hht-input hht-num"
+                       t-model.number="state.qty"/>
+            </div>
+            <div class="hht-form-row">
+                <label>Lot</label>
+                <input type="text" class="hht-input" t-model="state.lot"/>
+            </div>
+            <button class="hht-submit" t-on-click="() => this.submit()">
+                Submit
+            </button>
+        </div>
+    </t>
+</templates>

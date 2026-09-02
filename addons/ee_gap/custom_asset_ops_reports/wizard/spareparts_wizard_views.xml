@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_spareparts_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.spareparts.wizard.form</field>
+        <field name="model">custom.report.spareparts.wizard</field>
+        <field name="arch" type="xml">
+            <form string="List Sparepart">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                        <field name="company_ids" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <div class="text-muted">
+                    "Used (period)" counts maintenance requests in the period that
+                    consumed each part. On-hand is the current stock snapshot.
+                </div>
+                <footer>
+                    <button string="View" name="action_view" type="object" class="btn-primary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_spareparts_wizard" model="ir.actions.act_window">
+        <field name="name">List Sparepart</field>
+        <field name="res_model">custom.report.spareparts.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

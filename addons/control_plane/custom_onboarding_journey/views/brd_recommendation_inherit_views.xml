@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_brd_recommendation_form_inherit_journey" model="ir.ui.view">
+            <field name="name">brd.recommendation.form.inherit.journey</field>
+            <field name="model">brd.recommendation</field>
+            <field name="inherit_id" ref="custom_brd_analyzer.view_brd_recommendation_form"/>
+            <field name="arch" type="xml">
+                <field name="cross_vertical_impact_json" position="before">
+                    <separator string="Affected Hub Modules"/>
+                    <field name="affects_existing_module_ids" widget="many2many_tags"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

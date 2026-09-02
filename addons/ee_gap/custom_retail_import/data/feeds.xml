@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Local FTPS-drop feeds for the apparel brand (SES) tenant.
+
+     Partners push source files over the bundled FTPS server into the shared
+     ./data/data_retail/data folder (mounted at /mnt/data_retail inside Odoo).
+     Each feed binds a filename glob to a retail.import.profile; on a successful
+     import the file is moved to /mnt/data_retail/archive with a YYYYMMDD_HHMMSS_
+     prefix (see retail.import.feed._poll_one_local).
+
+     noupdate="1": these are operational records — admin edits (enabling a feed,
+     tweaking a glob, repointing a directory) survive module upgrades.
+
+     Globs follow the real the apparel brand report filenames (docs/retail/), e.g.
+     X20_Current_Onhand_Inventory_Report-*.csv, X24DN_Retail_Sales_Detail_*.xlsx,
+     X70D_Tender_Detail_Report.xlsx.
+
+     Activation policy:
+       * Daily transaction drops (X24/X70D/X31) -> active, ready for "Poll Now"
+         and the cron_poll_retail_feeds scheduler.
+       * Master data + staged/reference-gated types -> inactive; review the glob
+         and load path before enabling.
+
+     `sequence` fixes the poll order, which matters once the posting flags are on:
+     X24 books the POS entries that X70D's tender reconciliation settles against, so
+     X24 must import before X70D. X31's discount reclass follows both. -->
+<odoo noupdate="1">
+
+    <!-- ===== Daily transaction drops (active) ===== -->
+    <record id="feed_retail_x24" model="retail.import.feed">
+        <field name="sequence">10</field>
+        <field name="name">the apparel brand X24 — Retail Sales Detail (FTPS drop)</field>
+        <field name="profile_id" ref="profile_retail_x24"/>
+        <field name="source_type">local</field>
+        <field name="local_dir">/mnt/data_retail/data</field>
+        <field name="archive_dir">/mnt/data_retail/archive</field>
+        <field name="file_glob">X24*.xlsx</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="feed_retail_x70d" model="retail.import.feed">
+        <field name="sequence">20</field>
+        <field name="name">the apparel brand X70D — Tender Detail (FTPS drop)</field>
+        <field name="profile_id" ref="profile_retail_x70d"/>
+        <field name="source_type">local</field>
+        <field name="local_dir">/mnt/data_retail/data</field>
+        <field name="archive_dir">/mnt/data_retail/archive</field>
+        <field name="file_glob">X70D*.xlsx</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- ===== Master data + staged types (inactive: review before enabling) ===== -->
+
+    <!-- X20 is inactive on purpose. _load_x20 seeds opening on-hand once (it is guarded),
+         so it must never run on a daily drop. The nightly mail also delivers X20 as .xlsx
+         with a 14-column layout, which this CSV profile's column map (16..29) cannot read.
+         Enabling it needs a new xlsx profile first. -->
+    <record id="feed_retail_x20" model="retail.import.feed">
+        <field name="sequence">90</field>
+        <field name="name">the apparel brand X20 — On-hand Inventory (FTPS drop)</field>
+        <field name="profile_id" ref="profile_retail_x20"/>
+        <field name="source_type">local</field>
+        <field name="local_dir">/mnt/data_retail/data</field>
+        <field name="archive_dir">/mnt/data_retail/archive</field>
+        <field name="file_glob">X20*.csv</field>
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="feed_retail_x101" model="retail.import.feed">
+        <field name="sequence">90</field>
+        <field name="name">the apparel brand X101 — Material Master (FTPS drop)</field>
+        <field name="profile_id" ref="profile_retail_x101"/>
+        <field name="source_type">local</field>
+        <field name="local_dir">/mnt/data_retail/data</field>
+        <field name="archive_dir">/mnt/data_retail/archive</field>
+        <field name="file_glob">X101*.xlsx</field>
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="feed_retail_coa" model="retail.import.feed">
+        <field name="sequence">90</field>
+        <field name="name">the apparel brand CoA — Chart of Accounts (FTPS drop)</field>
+        <field name="profile_id" ref="profile_retail_coa"/>
+        <field name="source_type">local</field>
+        <field name="local_dir">/mnt/data_retail/data</field>
+        <field name="archive_dir">/mnt/data_retail/archive</field>
+        <field name="file_glob">CoA*.xlsx</field>
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="feed_retail_x31" model="retail.import.feed">
+        <field name="sequence">30</field>
+        <field name="name">the apparel brand X31 — Discount Journal (FTPS drop)</field>
+        <field name="profile_id" ref="profile_retail_x31"/>
+        <field name="source_type">local</field>
+        <field name="local_dir">/mnt/data_retail/data</field>
+        <field name="archive_dir">/mnt/data_retail/archive</field>
+        <field name="file_glob">X31*.xlsx</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="feed_retail_x32p" model="retail.import.feed">
+        <field name="sequence">90</field>
+        <field name="name">the apparel brand X32P — Stock Movement w/ Price (FTPS drop)</field>
+        <field name="profile_id" ref="profile_retail_x32p"/>
+        <field name="source_type">local</field>
+        <field name="local_dir">/mnt/data_retail/data</field>
+        <field name="archive_dir">/mnt/data_retail/archive</field>
+        <field name="file_glob">X32P*.xlsx</field>
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="feed_retail_x70" model="retail.import.feed">
+        <field name="sequence">90</field>
+        <field name="name">the apparel brand X70T — Tender Settlement (FTPS drop)</field>
+        <field name="profile_id" ref="profile_retail_x70"/>
+        <field name="source_type">local</field>
+        <field name="local_dir">/mnt/data_retail/data</field>
+        <field name="archive_dir">/mnt/data_retail/archive</field>
+        <field name="file_glob">X70T*.xlsx</field>
+        <field name="active" eval="False"/>
+    </record>
+
+</odoo>

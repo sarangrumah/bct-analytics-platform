@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_recurring_tpl_user,recurring template user,model_custom_recurring_journal_template,group_recurring_user,1,0,0,0
+access_recurring_tpl_admin,recurring template admin,model_custom_recurring_journal_template,group_recurring_admin,1,1,1,1
+access_recurring_tpl_line_user,recurring tpl line user,model_custom_recurring_journal_template_line,group_recurring_user,1,0,0,0
+access_recurring_tpl_line_admin,recurring tpl line admin,model_custom_recurring_journal_template_line,group_recurring_admin,1,1,1,1
+access_recurring_pay_user,recurring payment user,model_custom_recurring_payment_template,group_recurring_user,1,0,0,0
+access_recurring_pay_admin,recurring payment admin,model_custom_recurring_payment_template,group_recurring_admin,1,1,1,1

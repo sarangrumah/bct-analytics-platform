@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_vas_project_list" model="ir.ui.view">
+        <field name="name">project.project.pmo.list</field>
+        <field name="model">project.project</field>
+        <field name="arch" type="xml">
+            <list string="Projects">
+                <field name="custom_code" optional="show"/>
+                <field name="name"/>
+                <field name="custom_vertical_id"/>
+                <field name="custom_portfolio_id" optional="show"/>
+                <field name="custom_po_id" optional="show"/>
+                <field name="custom_ba_id" optional="show"/>
+                <field name="custom_progress" widget="progressbar"/>
+                <field name="custom_task_overdue_count" string="Overdue"/>
+                <field name="custom_task_hold_count" string="Hold"/>
+                <field name="custom_task_waiting_user_count" string="Awaiting user"/>
+                <field name="custom_health" widget="badge"
+                       decoration-success="custom_health == 'on_track'"
+                       decoration-warning="custom_health == 'at_risk'"
+                       decoration-danger="custom_health == 'blocked'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vas_project_form" model="ir.ui.view">
+        <field name="name">project.project.pmo.form</field>
+        <field name="model">project.project</field>
+        <field name="arch" type="xml">
+            <form string="Project">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Ownership">
+                            <field name="custom_code"/>
+                            <field name="custom_vertical_id"/>
+                            <field name="custom_portfolio_id"/>
+                            <field name="custom_po_id"/>
+                            <field name="custom_ba_id"/>
+                            <field name="user_id" string="Project Manager"/>
+                        </group>
+                        <group string="Health &amp; flow">
+                            <field name="custom_health"/>
+                            <field name="custom_wip_limit"/>
+                            <field name="custom_progress" widget="progressbar"/>
+                            <field name="custom_task_overdue_count"/>
+                            <field name="custom_task_hold_count"/>
+                            <field name="custom_task_waiting_user_count"/>
+                            <field name="date_start"/>
+                            <field name="date"/>
+                        </group>
+                    </group>
+                    <group string="Health note"
+                           invisible="custom_health == 'on_track'">
+                        <field name="custom_health_note" nolabel="1"
+                               placeholder="Why is this not on track, and who has to act?"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vas_project_search" model="ir.ui.view">
+        <field name="name">project.project.pmo.search</field>
+        <field name="model">project.project</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="custom_vertical_id"/>
+                <field name="custom_portfolio_id"/>
+                <filter name="f_at_risk" string="Needs attention"
+                        domain="[('custom_health','in',['at_risk','blocked'])]"/>
+                <filter name="f_overdue" string="Has overdue work"
+                        domain="[('custom_task_overdue_count','&gt;',0)]"/>
+                <filter name="f_hold" string="Has work on hold"
+                        domain="[('custom_task_hold_count','&gt;',0)]"/>
+                <group>
+                    <filter name="g_vertical" string="Vertical"
+                            context="{'group_by':'custom_vertical_id'}"/>
+                    <filter name="g_portfolio" string="Portfolio"
+                            context="{'group_by':'custom_portfolio_id'}"/>
+                    <filter name="g_health" string="Health" context="{'group_by':'custom_health'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_vas_project" model="ir.actions.act_window">
+        <field name="name">Projects</field>
+        <field name="res_model">project.project</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_vas_project_search"/>
+        <field name="view_ids" eval="[
+            Command.clear(),
+            Command.create({'view_mode': 'list', 'view_id': ref('view_vas_project_list')}),
+            Command.create({'view_mode': 'form', 'view_id': ref('view_vas_project_form')}),
+        ]"/>
+    </record>
+
+</odoo>

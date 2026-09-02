@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cycle_count_session_list" model="ir.ui.view">
+        <field name="name">custom.cycle.count.session.list</field>
+        <field name="model">custom.cycle.count.session</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="plan_id"/>
+                <field name="scheduled_date"/>
+                <field name="line_count"/>
+                <field name="variance_count"/>
+                <field name="variance_value"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cycle_count_session_form" model="ir.ui.view">
+        <field name="name">custom.cycle.count.session.form</field>
+        <field name="model">custom.cycle.count.session</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" type="object" string="Start" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_review" type="object" string="Review"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_close" type="object" string="Close"
+                            invisible="state != 'reviewing'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('closed','canceled')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <notebook>
+                        <page string="Info">
+                            <group>
+                                <field name="name"/>
+                                <field name="plan_id"/>
+                                <field name="warehouse_id"/>
+                                <field name="scheduled_date"/>
+                                <field name="started_at"/>
+                                <field name="completed_at"/>
+                                <field name="assigned_user_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page string="Lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="location_id"/>
+                                    <field name="product_id"/>
+                                    <field name="lot_id"/>
+                                    <field name="expected_qty"/>
+                                    <field name="counted_qty"/>
+                                    <field name="variance_qty"/>
+                                    <field name="status"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Variances">
+                            <field name="line_ids" domain="[('variance_qty','!=',0)]" readonly="1">
+                                <list>
+                                    <field name="location_id"/>
+                                    <field name="product_id"/>
+                                    <field name="expected_qty"/>
+                                    <field name="counted_qty"/>
+                                    <field name="variance_qty"/>
+                                    <field name="variance_pct"/>
+                                    <field name="status"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cycle_count_session_kanban" model="ir.ui.view">
+        <field name="name">custom.cycle.count.session.kanban</field>
+        <field name="model">custom.cycle.count.session</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name"/>
+                <field name="variance_count"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card">
+                            <strong><field name="name"/></strong>
+                            <div>Lines: <field name="line_count"/></div>
+                            <div>Variances: <field name="variance_count"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_cycle_count_session" model="ir.actions.act_window">
+        <field name="name">Cycle Count Sessions</field>
+        <field name="res_model">custom.cycle.count.session</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="custom_hub_console.HubDashboard">
+        <div class="o_hub_dashboard">
+            <div class="o_hub_header">
+                <h1>Platform Hub Control Center</h1>
+                <p class="text-muted">
+                    Unified operational console — tenants, modules,
+                    monitoring, BRD, HHT, AI, and audit.
+                </p>
+            </div>
+            <div t-if="state.loading" class="o_hub_loading">
+                <i class="fa fa-spinner fa-spin"/> Loading dashboard…
+            </div>
+            <div t-else="" class="o_hub_tile_grid">
+                <div class="o_hub_tile o_hub_tile_tenants"
+                     t-on-click="onClickTenants">
+                    <div class="o_hub_tile_label">Tenants Active / Total</div>
+                    <div class="o_hub_tile_value">
+                        <t t-esc="_fmt(state.tenantsActive)"/>
+                        <span class="o_hub_tile_sub">
+                            / <t t-esc="_fmt(state.tenantsTotal)"/>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="o_hub_tile o_hub_tile_modules"
+                     t-on-click="onClickModules">
+                    <div class="o_hub_tile_label">Modules in Catalog</div>
+                    <div class="o_hub_tile_value">
+                        <t t-esc="_fmt(state.modulesTotal)"/>
+                        <span class="o_hub_tile_sub">
+                            (<t t-esc="_fmt(state.modulesProduction)"/> prod)
+                        </span>
+                    </div>
+                </div>
+
+                <div class="o_hub_tile o_hub_tile_brd"
+                     t-on-click="onClickBrd">
+                    <div class="o_hub_tile_label">BRD Pending Review</div>
+                    <div class="o_hub_tile_value">
+                        <t t-esc="_fmt(state.brdPending)"/>
+                    </div>
+                </div>
+
+                <div class="o_hub_tile o_hub_tile_incidents"
+                     t-on-click="onClickIncidents">
+                    <div class="o_hub_tile_label">Incidents Firing</div>
+                    <div class="o_hub_tile_value">
+                        <t t-esc="_fmt(state.incidentsFiring)"/>
+                    </div>
+                </div>
+
+                <div class="o_hub_tile o_hub_tile_ai"
+                     t-on-click="onClickAi">
+                    <div class="o_hub_tile_label">AI Cost (7d)</div>
+                    <div class="o_hub_tile_value">
+                        $<t t-esc="_fmt(state.aiCost7d)"/>
+                    </div>
+                </div>
+
+                <div class="o_hub_tile o_hub_tile_hht"
+                     t-on-click="onClickHht">
+                    <div class="o_hub_tile_label">HHT Devices Online</div>
+                    <div class="o_hub_tile_value">
+                        <t t-esc="_fmt(state.hhtOnline)"/>
+                    </div>
+                </div>
+
+                <div class="o_hub_tile o_hub_tile_audit"
+                     t-on-click="onClickAudit">
+                    <div class="o_hub_tile_label">Audit Log</div>
+                    <div class="o_hub_tile_value">Open →</div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,172 @@
+# promtool unit tests for the replication-slot alerts.
+#
+# Run by tests/test_09_slot_lag_alert.py, and runnable by hand:
+#
+#   docker run --rm --entrypoint /bin/promtool \
+#     -v "//e/Projects/Odoo/bct:/repo:ro" prom/prometheus:v2.55.1 \
+#     test rules /repo/tests/prometheus/slot_lag_alerts_test.yml
+#
+# WHY THIS EXISTS AND NOT A LIVE FIRING TEST.
+#
+# The §6 definition of done asks for the slot-lag alert to fire. Making it fire for real means
+# generating more than 512 MiB of WAL on the source and holding it for ten minutes -- on a host that
+# is also running three unrelated production-shaped stacks, against a `max_slot_wal_keep_size` of
+# 2 GiB whose entire purpose is to sacrifice the warehouse rather than Odoo. Getting that wrong
+# takes Odoo down, which is the one outcome ADR 0001 is written to prevent.
+#
+# A rule unit test proves the same property more precisely and at no risk: given a series that
+# crosses the threshold, the alert fires, at the right severity, after the right `for:` duration,
+# and -- the part a manual test almost never checks -- does NOT fire just below the threshold.
+# The thresholds themselves are asserted against ADR 0001's numbers by the accompanying Python
+# test, so a change to the cap cannot silently invalidate these.
+#
+# The one thing this does not prove is that postgres_exporter really exports these series under
+# these names. tests/test_09_slot_lag_alert.py asserts that separately, against the running
+# exporter, so the two halves together cover the claim.
+
+rule_files:
+  - ../../observability/prometheus/rules/platform.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  # -------------------------------------------------------------------------
+  # 512 MiB warning. ADR 0001: warn at 25% of the 2 GiB cap, with 75% in hand.
+  # -------------------------------------------------------------------------
+  - interval: 1m
+    name: warning fires above 512 MiB and not below it
+    input_series:
+      # 600 MiB, flat, for 20 minutes. Above the 512 MiB (536870912 B) threshold.
+      - series: 'pg_replication_slots_pg_wal_lsn_diff{slot_name="bct_slot_bct",slot_type="logical"}'
+        values: '629145600+0x20'
+      # 500 MiB, flat. Below the threshold: must never fire.
+      - series: 'pg_replication_slots_pg_wal_lsn_diff{slot_name="quiet_slot",slot_type="logical"}'
+        values: '524288000+0x20'
+    alert_rule_test:
+      # `for: 10m` -- nothing at 9 minutes.
+      - eval_time: 9m
+        alertname: ReplicationSlotWalRetentionWarning
+        exp_alerts: []
+      - eval_time: 11m
+        alertname: ReplicationSlotWalRetentionWarning
+        exp_alerts:
+          - exp_labels:
+              alertname: ReplicationSlotWalRetentionWarning
+              slot_name: bct_slot_bct
+              slot_type: logical
+              severity: warning
+              component: postgres
+            exp_annotations:
+              summary: "Replication slot bct_slot_bct is retaining over 512 MiB of WAL"
+              description: "The slot has held back 600MiB of WAL for 10 minutes. max_slot_wal_keep_size is 2GB; at that point Postgres invalidates the slot and the warehouse needs a full resync. Check that the CDC consumer is running and advancing its confirmed_flush_lsn."
+
+  # -------------------------------------------------------------------------
+  # 1 GiB critical. Half the cap gone; 5 minutes rather than 10.
+  # -------------------------------------------------------------------------
+  - interval: 1m
+    name: critical fires above 1 GiB
+    input_series:
+      # 1.5 GiB, flat.
+      - series: 'pg_replication_slots_pg_wal_lsn_diff{slot_name="bct_slot_bct",slot_type="logical"}'
+        values: '1610612736+0x20'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: ReplicationSlotWalRetentionCritical
+        exp_alerts: []
+      - eval_time: 6m
+        alertname: ReplicationSlotWalRetentionCritical
+        exp_alerts:
+          - exp_labels:
+              alertname: ReplicationSlotWalRetentionCritical
+              slot_name: bct_slot_bct
+              slot_type: logical
+              severity: critical
+              component: postgres
+            exp_annotations:
+              summary: "Replication slot bct_slot_bct is retaining over 1 GiB of WAL"
+              description: "Half the 2GB cap is gone. Either restart the CDC consumer now, or drop the slot deliberately and plan a resync. Doing nothing means Postgres decides, and it will drop the slot."
+      # The warning must also still be firing -- a critical that silences the warning would
+      # make an operator who filtered on `severity=warning` see the problem disappear.
+      - eval_time: 12m
+        alertname: ReplicationSlotWalRetentionWarning
+        exp_alerts:
+          - exp_labels:
+              alertname: ReplicationSlotWalRetentionWarning
+              slot_name: bct_slot_bct
+              slot_type: logical
+              severity: warning
+              component: postgres
+            exp_annotations:
+              summary: "Replication slot bct_slot_bct is retaining over 512 MiB of WAL"
+              description: "The slot has held back 1.5GiB of WAL for 10 minutes. max_slot_wal_keep_size is 2GB; at that point Postgres invalidates the slot and the warehouse needs a full resync. Check that the CDC consumer is running and advancing its confirmed_flush_lsn."
+
+  # -------------------------------------------------------------------------
+  # The cap actually firing: Postgres has invalidated the slot.
+  # This is the alert that must never be missed -- past this point the warehouse
+  # has a hole and only a resync fixes it.
+  # -------------------------------------------------------------------------
+  - interval: 1m
+    name: invalidation is reported within a minute
+    input_series:
+      - series: 'pg_replication_slot_wal_status{slot_name="bct_slot_bct",wal_status="lost"}'
+        values: '1+0x10'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: ReplicationSlotInvalidated
+        exp_alerts:
+          - exp_labels:
+              alertname: ReplicationSlotInvalidated
+              slot_name: bct_slot_bct
+              wal_status: lost
+              severity: critical
+              component: postgres
+            exp_annotations:
+              summary: "Replication slot bct_slot_bct was INVALIDATED by Postgres"
+              description: "The slot exceeded max_slot_wal_keep_size (2GB) and its WAL has been released. This protected Odoo from a full disk, as designed. The warehouse has lost its position: drop the slot, recreate it, and run a full resync."
+
+  # A healthy slot must not trip the invalidation alert.
+  - interval: 1m
+    name: a reserved slot does not trip the invalidation alert
+    input_series:
+      - series: 'pg_replication_slot_wal_status{slot_name="bct_slot_bct",wal_status="reserved"}'
+        values: '1+0x10'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: ReplicationSlotInvalidated
+        exp_alerts: []
+
+  # -------------------------------------------------------------------------
+  # No consumer. An inactive slot retains WAL and buys nothing -- this is the
+  # alert that catches a stopped CDC loader before the retention alerts do.
+  # -------------------------------------------------------------------------
+  - interval: 1m
+    name: an inactive slot is reported after 15 minutes
+    input_series:
+      - series: 'pg_replication_slots_active{slot_name="bct_slot_bct",slot_type="logical"}'
+        values: '0+0x20'
+    alert_rule_test:
+      - eval_time: 14m
+        alertname: ReplicationSlotInactive
+        exp_alerts: []
+      - eval_time: 16m
+        alertname: ReplicationSlotInactive
+        exp_alerts:
+          - exp_labels:
+              alertname: ReplicationSlotInactive
+              slot_name: bct_slot_bct
+              slot_type: logical
+              severity: warning
+              component: postgres
+            exp_annotations:
+              summary: "Replication slot bct_slot_bct has had no consumer for 15m"
+              description: "An inactive slot retains WAL and buys nothing. Either the consumer is down, or the slot is an orphan left behind by a removed tenant and should be dropped."
+
+  - interval: 1m
+    name: an active slot never trips the inactive alert
+    input_series:
+      - series: 'pg_replication_slots_active{slot_name="bct_slot_bct",slot_type="logical"}'
+        values: '1+0x30'
+    alert_rule_test:
+      - eval_time: 25m
+        alertname: ReplicationSlotInactive
+        exp_alerts: []

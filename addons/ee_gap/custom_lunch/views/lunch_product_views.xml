@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="lunch_product_view_form_inherit_id" model="ir.ui.view">
+        <field name="name">lunch.product.form.inherit.custom_lunch</field>
+        <field name="model">lunch.product</field>
+        <field name="inherit_id" ref="lunch.lunch_product_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Indonesia">
+                    <group>
+                        <field name="x_id_halal"/>
+                        <field name="x_id_vegetarian"/>
+                    </group>
+                    <group>
+                        <field name="x_id_spice_level"/>
+                        <field name="x_id_calories"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="lunch_product_view_tree_inherit_id" model="ir.ui.view">
+        <field name="name">lunch.product.list.inherit.custom_lunch</field>
+        <field name="model">lunch.product</field>
+        <field name="inherit_id" ref="lunch.lunch_product_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_id_halal" optional="show"/>
+                <field name="x_id_vegetarian" optional="hide"/>
+                <field name="x_id_spice_level" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="lunch_product_view_search_inherit_id" model="ir.ui.view">
+        <field name="name">lunch.product.search.inherit.custom_lunch</field>
+        <field name="model">lunch.product</field>
+        <field name="inherit_id" ref="lunch.lunch_product_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter name="filter_product_halal"
+                        string="Halal"
+                        domain="[('x_id_halal', '=', True)]"/>
+                <filter name="filter_product_vegetarian"
+                        string="Vegetarian"
+                        domain="[('x_id_vegetarian', '=', True)]"/>
+                <filter name="filter_product_not_spicy"
+                        string="Not Spicy"
+                        domain="[('x_id_spice_level', 'in', ['none', 'mild'])]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

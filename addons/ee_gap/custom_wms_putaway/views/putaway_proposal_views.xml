@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_putaway_suggestion_list" model="ir.ui.view">
+        <field name="name">custom.wms.putaway.suggestion.list</field>
+        <field name="model">custom.wms.putaway.suggestion</field>
+        <field name="arch" type="xml">
+            <list decoration-success="confidence_score &gt;= 90" decoration-warning="confidence_score &lt; 90 and confidence_score &gt;= 70" decoration-danger="confidence_score &lt; 70">
+                <field name="create_date"/>
+                <field name="picking_id"/>
+                <field name="move_line_id"/>
+                <field name="suggested_location_id"/>
+                <field name="overridden_location_id"/>
+                <field name="rule_id"/>
+                <field name="confidence_score"/>
+                <field name="status"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_putaway_suggestion_form" model="ir.ui.view">
+        <field name="name">custom.wms.putaway.suggestion.form</field>
+        <field name="model">custom.wms.putaway.suggestion</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_apply" type="object" string="Apply" class="btn-primary"
+                            invisible="status in ('applied','rejected')"/>
+                    <button name="action_accept" type="object" string="Accept"
+                            invisible="status != 'pending'"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="status in ('applied','rejected')"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="picking_id"/>
+                        <field name="move_line_id"/>
+                        <field name="rule_id"/>
+                        <field name="strategy_id"/>
+                    </group>
+                    <group>
+                        <field name="original_dest_location_id"/>
+                        <field name="suggested_location_id"/>
+                        <field name="overridden_location_id"/>
+                        <field name="confidence_score"/>
+                        <field name="reason"/>
+                        <field name="applied_at"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_putaway_suggestion_kanban" model="ir.ui.view">
+        <field name="name">custom.wms.putaway.suggestion.kanban</field>
+        <field name="model">custom.wms.putaway.suggestion</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status">
+                <field name="confidence_score"/>
+                <field name="suggested_location_id"/>
+                <field name="status"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_card #{record.confidence_score.raw_value &gt;= 90 ? 'o_kanban_color_10' : record.confidence_score.raw_value &gt;= 70 ? 'o_kanban_color_3' : 'o_kanban_color_1'}">
+                            <strong><field name="suggested_location_id"/></strong>
+                            <div>Score: <field name="confidence_score"/></div>
+                            <div><field name="reason"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_putaway_suggestion" model="ir.actions.act_window">
+        <field name="name">Putaway Suggestions</field>
+        <field name="res_model">custom.wms.putaway.suggestion</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+</odoo>

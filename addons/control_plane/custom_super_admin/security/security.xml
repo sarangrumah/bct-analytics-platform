@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Module category -->
+        <record id="module_category_super_admin" model="ir.module.category">
+            <field name="name">Platform Operations</field>
+            <field name="description">Multi-tenant operations control plane</field>
+            <field name="sequence">100</field>
+        </record>
+
+        <!-- Group: Super Admin (write) -->
+        <record id="group_super_admin" model="res.groups">
+            <field name="name">Super Admin</field>
+            <field name="comment">Full lifecycle control: provision, suspend, archive, restore tenants.</field>
+        </record>
+
+        <!-- Group: CSM (read + trigger backup only) -->
+        <record id="group_csm" model="res.groups">
+            <field name="name">Customer Success Manager</field>
+            <field name="implied_ids" eval="[]"/>
+            <field name="comment">Read tenant info, see backups/action-log, trigger on-demand backups.</field>
+        </record>
+
+        <!-- Super Admin inherits everything CSM can do -->
+        <record id="group_super_admin" model="res.groups">
+            <field name="implied_ids" eval="[Command.link(ref('group_csm'))]"/>
+        </record>
+
+    </data>
+</odoo>

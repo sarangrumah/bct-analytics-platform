@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Payment Receipt: customer / inbound payments. Reuses the shared
+         document body defined in payment_voucher_templates.xml.
+         Self-contained wrapper: no web.html_container → no external asset (report.url)
+         callback that stalls wkhtmltopdf. <main> required by _prepare_html. -->
+    <template id="report_payment_receipt">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <style>
+                    @page { margin: 15mm; }
+                    * { box-sizing: border-box; }
+                    body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; margin: 0; padding: 0; }
+                </style>
+            </head>
+            <body>
+                <main>
+                    <t t-foreach="docs" t-as="o">
+                        <div t-if="not o_first" style="page-break-before: always;"></div>
+                        <t t-set="doc_title">PAYMENT RECEIPT</t>
+                        <t t-call="custom_retail_localization.report_payment_document"/>
+                    </t>
+                </main>
+            </body>
+        </html>
+    </template>
+</odoo>

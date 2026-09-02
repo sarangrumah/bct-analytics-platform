@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_pdp_masking_rule_list" model="ir.ui.view">
+        <field name="name">pdp.masking.rule.list</field>
+        <field name="model">pdp.masking.rule</field>
+        <field name="arch" type="xml">
+            <list string="PDP Masking Rules" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="pdp_class"/>
+                <field name="transform"/>
+                <field name="ui_masked"/>
+                <field name="description" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pdp_masking_rule_form" model="ir.ui.view">
+        <field name="name">pdp.masking.rule.form</field>
+        <field name="model">pdp.masking.rule</field>
+        <field name="arch" type="xml">
+            <form string="PDP Masking Rule">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="pdp_class"/>
+                            <field name="transform"/>
+                        </group>
+                        <group>
+                            <field name="ui_masked"/>
+                            <field name="sequence"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Rationale">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pdp_masking_rule" model="ir.actions.act_window">
+        <field name="name">Masking Rules</field>
+        <field name="res_model">pdp.masking.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_pdp_masking_rule"
+              name="Masking Rules"
+              parent="custom_pdp_core.menu_pdp_configuration"
+              action="action_pdp_masking_rule"
+              sequence="20"/>
+
+</odoo>

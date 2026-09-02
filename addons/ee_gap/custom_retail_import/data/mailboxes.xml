@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- IMAP mailbox that receives the nightly the apparel brand X-center reports.
+
+     Ships INACTIVE with purge disabled and dry_run on. Four switches must be thrown
+     by hand, in this order, and only in the ONE database that owns this mailbox:
+
+       1. active         -> start fetching (backup + drop dir). Nothing is deleted,
+                            and nothing is imported until step 4.
+       2. purge_enabled  -> arm retention; with dry_run still on it only reports.
+       3. dry_run = off  -> messages older than retention_days are really expunged.
+       4. ir.cron `cron_poll_retail_feeds` -> active. THIS is the one that imports and,
+                            where retail_import.x24_post_enabled is set, posts journal
+                            entries. Do it only after the X70D-vs-pos.payment Rp 0
+                            reconciliation.
+
+     Two databases polling the same INBOX would race to delete each other's messages;
+     the advisory lock in _lock() only guards workers within one database.
+
+     No password here. The Odoo container reads RETAIL_MAIL_PASSWORD from its environment
+     (see docker-compose.yml); password_param is a fallback that stores the secret in
+     clear text in the database.
+
+     noupdate="1": operational record — admin edits survive module upgrades. -->
+<odoo noupdate="1">
+
+    <record id="mailbox_retail_xcenter" model="retail.import.mailbox">
+        <field name="name">the apparel brand X-center — nightly reports</field>
+        <field name="host">mail.example.invalid</field>
+        <field name="port">993</field>
+        <field name="use_ssl" eval="True"/>
+        <field name="username">retail.data@example.invalid</field>
+        <field name="password_env">RETAIL_MAIL_PASSWORD</field>
+        <field name="folder">INBOX</field>
+        <field name="sender_filter">XcenterAdmin@levi.com</field>
+
+        <!-- Back up all six nightly reports... -->
+        <field name="attachment_glob">*.xlsx</field>
+        <!-- ...but only hand X24 / X70D / X31 to the import feeds. X20 is a one-shot
+             opening-balance loader whose profile expects a different CSV layout, and
+             X32P / X70T are staged-only today. -->
+        <field name="ingest_glob">X24*.xlsx,X70D*.xlsx,X31*.xlsx</field>
+
+        <field name="drop_dir">/mnt/data_retail/data</field>
+        <field name="backup_dir">/mnt/data_retail/mailbox</field>
+
+        <field name="retention_days">30</field>
+        <field name="max_messages">400</field>
+        <field name="max_bytes_mb">600</field>
+
+        <field name="active" eval="False"/>
+        <field name="purge_enabled" eval="False"/>
+        <field name="dry_run" eval="True"/>
+    </record>
+
+</odoo>

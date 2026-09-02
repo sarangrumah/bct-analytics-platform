@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_spreadsheet_import_wizard_form" model="ir.ui.view">
+        <field name="name">custom.spreadsheet.import.wizard.form</field>
+        <field name="model">custom.spreadsheet.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import CSV">
+                <sheet>
+                    <group>
+                        <field name="workbook_id"/>
+                        <field name="csv_file" filename="csv_filename"/>
+                        <field name="csv_filename" invisible="1"/>
+                        <field name="sheet_name"/>
+                        <field name="delimiter"/>
+                        <field name="has_header"/>
+                    </group>
+                    <p class="text-muted">
+                        Maximum 10,000 rows. UTF-8 or Latin-1 encoded files are accepted.
+                    </p>
+                </sheet>
+                <footer>
+                    <button name="action_import"
+                            type="object"
+                            string="Import"
+                            class="oe_highlight"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_custom_spreadsheet_import_wizard" model="ir.actions.act_window">
+        <field name="name">Import CSV</field>
+        <field name="res_model">custom.spreadsheet.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

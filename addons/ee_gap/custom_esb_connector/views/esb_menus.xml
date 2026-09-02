@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_esb_root" name="ESB" parent="custom_core.menu_custom_root"
+              groups="group_esb_user" sequence="70"/>
+
+    <menuitem id="menu_esb_operations" name="Operations" parent="menu_esb_root" sequence="10"/>
+    <menuitem id="menu_esb_stock_snapshot" name="Stock Snapshot" parent="menu_esb_operations"
+              action="action_esb_stock_snapshot" sequence="10"/>
+    <menuitem id="menu_esb_outbox" name="Outbound Documents" parent="menu_esb_operations"
+              action="action_esb_outbox" sequence="20"/>
+
+    <menuitem id="menu_esb_master" name="Master Data" parent="menu_esb_root" sequence="20"/>
+    <menuitem id="menu_esb_branch" name="Branches" parent="menu_esb_master"
+              action="action_esb_branch" sequence="10"/>
+    <menuitem id="menu_esb_location" name="Locations" parent="menu_esb_master"
+              action="action_esb_location" sequence="20"/>
+    <menuitem id="menu_esb_purpose" name="Purposes" parent="menu_esb_master"
+              action="action_esb_purpose" sequence="30"/>
+
+    <menuitem id="menu_esb_config" name="Configuration" parent="menu_esb_root"
+              groups="group_esb_admin" sequence="90"/>
+    <menuitem id="menu_esb_session" name="Connections" parent="menu_esb_config"
+              action="action_esb_session" sequence="10"/>
+    <menuitem id="menu_esb_sync_now" name="Sync Master Data Now" parent="menu_esb_config"
+              action="action_esb_sync_now" sequence="20"/>
+    <menuitem id="menu_esb_sync_log" name="Sync Log" parent="menu_esb_config"
+              action="action_esb_sync_log" sequence="30"/>
+</odoo>

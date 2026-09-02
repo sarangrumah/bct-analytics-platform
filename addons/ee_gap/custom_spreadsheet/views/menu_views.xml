@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top-level app menu -->
+    <menuitem id="menu_spreadsheet_root"
+              name="Spreadsheets"
+              sequence="60"
+              web_icon="custom_spreadsheet,static/description/icon.png"
+              groups="custom_spreadsheet.group_user"/>
+
+    <menuitem id="menu_spreadsheet_workbooks"
+              name="Workbooks"
+              parent="menu_spreadsheet_root"
+              action="action_custom_spreadsheet_workbook"
+              sequence="10"/>
+
+    <menuitem id="menu_spreadsheet_versions"
+              name="Versions"
+              parent="menu_spreadsheet_root"
+              action="action_custom_spreadsheet_version"
+              sequence="20"
+              groups="custom_spreadsheet.group_manager"/>
+
+    <menuitem id="menu_spreadsheet_config"
+              name="Configuration"
+              parent="menu_spreadsheet_root"
+              sequence="90"
+              groups="custom_spreadsheet.group_manager"/>
+
+    <menuitem id="menu_spreadsheet_tags"
+              name="Tags"
+              parent="menu_spreadsheet_config"
+              action="action_custom_spreadsheet_tag"
+              sequence="10"/>
+</odoo>

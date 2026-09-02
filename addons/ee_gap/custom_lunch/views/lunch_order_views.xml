@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="lunch_order_view_form_inherit_id" model="ir.ui.view">
+        <field name="name">lunch.order.form.inherit.custom_lunch</field>
+        <field name="model">lunch.order</field>
+        <field name="inherit_id" ref="lunch.lunch_order_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//footer" position="before">
+                <group string="Payroll">
+                    <field name="x_payroll_deduction"/>
+                    <field name="x_payslip_id"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="lunch_order_view_tree_inherit_id" model="ir.ui.view">
+        <field name="name">lunch.order.list.inherit.custom_lunch</field>
+        <field name="model">lunch.order</field>
+        <field name="inherit_id" ref="lunch.lunch_order_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_payroll_deduction" optional="show"/>
+                <field name="x_payslip_id" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="lunch_order_view_search_inherit_id" model="ir.ui.view">
+        <field name="name">lunch.order.search.inherit.custom_lunch</field>
+        <field name="model">lunch.order</field>
+        <field name="inherit_id" ref="lunch.lunch_order_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter name="filter_payroll_deduction"
+                        string="Payroll Deduction"
+                        domain="[('x_payroll_deduction', '=', True)]"/>
+                <filter name="filter_payroll_not_billed"
+                        string="Not Yet Billed"
+                        domain="[('x_payroll_deduction', '=', True), ('x_payslip_id', '=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_dev_cycle_root"
+              name="Dev Cycle"
+              sequence="65"
+              groups="custom_dev_cycle.group_dev_cycle_user"/>
+
+    <menuitem id="menu_dev_cycle_cycles"
+              name="Cycles"
+              parent="menu_dev_cycle_root"
+              action="action_dev_cycle"
+              sequence="10"/>
+
+    <menuitem id="menu_dev_cycle_prs"
+              name="Pull Requests"
+              parent="menu_dev_cycle_root"
+              action="action_dev_cycle_pr"
+              sequence="20"/>
+
+    <menuitem id="menu_dev_cycle_deployments"
+              name="Deployments"
+              parent="menu_dev_cycle_root"
+              action="action_dev_cycle_deployment"
+              sequence="30"/>
+
+</odoo>

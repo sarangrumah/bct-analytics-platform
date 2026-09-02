@@ -1,0 +1,192 @@
+/* License: LGPL-3
+ * Hub HHT — touch-first dark theme. Targets >= 44px hit areas.
+ */
+
+$hht-bg: #111827;
+$hht-panel: #1f2937;
+$hht-border: #374151;
+$hht-text: #f9fafb;
+$hht-muted: #9ca3af;
+$hht-accent: #10b981;
+$hht-danger: #ef4444;
+$hht-warning: #f59e0b;
+
+.hht-shell {
+    min-height: 100vh;
+    background: $hht-bg;
+    color: $hht-text;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+
+    .hht-topbar {
+        background: $hht-panel;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid $hht-border;
+        min-height: 56px;
+
+        .hht-brand {
+            font-weight: 700;
+            font-size: 18px;
+        }
+        .hht-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            font-size: 13px;
+        }
+        .hht-indicator {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            &.hht-online {
+                background: rgba($hht-accent, 0.15);
+                color: $hht-accent;
+            }
+            &.hht-offline {
+                background: rgba($hht-danger, 0.15);
+                color: $hht-danger;
+            }
+        }
+        .hht-pending {
+            color: $hht-warning;
+            font-weight: 600;
+        }
+        .hht-tenant, .hht-user {
+            color: $hht-muted;
+        }
+    }
+
+    .hht-tabs {
+        display: flex;
+        background: $hht-panel;
+        border-bottom: 1px solid $hht-border;
+        overflow-x: auto;
+
+        .hht-tab {
+            flex: 1 0 auto;
+            min-height: 48px;
+            min-width: 88px;
+            background: transparent;
+            color: $hht-muted;
+            border: 0;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 16px;
+            cursor: pointer;
+
+            &.active {
+                color: $hht-text;
+                border-bottom: 3px solid $hht-accent;
+            }
+        }
+    }
+
+    .hht-scan-row {
+        padding: 16px;
+        background: rgba(0, 0, 0, 0.2);
+
+        .hht-scan-input {
+            width: 100%;
+            min-height: 56px;
+            font-size: 22px;
+            font-family: "SF Mono", Menlo, Consolas, monospace;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid $hht-accent;
+            background: $hht-panel;
+            color: $hht-text;
+            letter-spacing: 0.05em;
+
+            &:focus {
+                outline: none;
+                border-color: lighten($hht-accent, 10%);
+                box-shadow: 0 0 0 3px rgba($hht-accent, 0.3);
+            }
+        }
+    }
+
+    .hht-page {
+        flex: 1;
+        padding: 16px;
+
+        .hht-error {
+            background: rgba($hht-danger, 0.15);
+            border: 1px solid $hht-danger;
+            color: $hht-danger;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .hht-last-scan {
+            color: $hht-muted;
+            margin-bottom: 12px;
+            font-family: "SF Mono", Menlo, Consolas, monospace;
+        }
+    }
+
+    .hht-form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 540px;
+
+        h2 {
+            font-size: 20px;
+            margin: 0 0 8px 0;
+        }
+
+        .hht-form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            label {
+                font-size: 13px;
+                color: $hht-muted;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+        }
+
+        .hht-input {
+            min-height: 48px;
+            font-size: 17px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid $hht-border;
+            background: $hht-panel;
+            color: $hht-text;
+
+            &.hht-num {
+                font-family: "SF Mono", Menlo, Consolas, monospace;
+                text-align: right;
+                font-variant-numeric: tabular-nums;
+            }
+        }
+
+        .hht-submit {
+            min-height: 56px;
+            background: $hht-accent;
+            color: #ffffff;
+            border: 0;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            margin-top: 8px;
+
+            &:active {
+                background: darken($hht-accent, 8%);
+            }
+        }
+    }
+}

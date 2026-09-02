@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_anomaly_finding_user,anomaly finding user,model_ai_anomaly_finding,group_ai_user,1,0,0,0
+access_anomaly_finding_admin,anomaly finding admin,model_ai_anomaly_finding,group_ai_admin,1,1,1,1
+access_anomaly_scan_user,anomaly scan user,model_ai_anomaly_scan,group_ai_user,1,0,0,0
+access_anomaly_scan_admin,anomaly scan admin,model_ai_anomaly_scan,group_ai_admin,1,1,1,1
+access_nlq_session_user,nlq session user,model_ai_nlq_session,group_ai_user,1,1,1,0
+access_nlq_session_admin,nlq session admin,model_ai_nlq_session,group_ai_admin,1,1,1,1
+access_nlq_message_user,nlq message user,model_ai_nlq_message,group_ai_user,1,1,1,0
+access_nlq_message_admin,nlq message admin,model_ai_nlq_message,group_ai_admin,1,1,1,1

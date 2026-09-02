@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Own channel so MDM pushes do not queue behind a bulk file import.
+
+         Serialisation does NOT depend on this channel's capacity: queue.job.channel
+         carries no capacity field (it is set in odoo.conf via
+         ``queue_job.channels = root.retail_import.mdm:1``), and even capacity 1 would
+         say nothing about the X101 file importer running concurrently. The guarantee
+         comes from the pg_advisory_xact_lock taken in
+         ``retail.mdm.request._job_process``, which both paths contend for. Setting
+         the conf capacity is a throughput choice, not a correctness one. -->
+    <record id="channel_retail_import_mdm" model="queue.job.channel">
+        <field name="name">mdm</field>
+        <field name="parent_id" ref="queue_job.channel_root"/>
+    </record>
+
+    <record id="job_function_mdm_process" model="queue.job.function">
+        <field name="model_id" ref="model_retail_mdm_request"/>
+        <field name="method">_job_process</field>
+        <field name="channel_id" ref="channel_retail_import_mdm"/>
+    </record>
+
+    <record id="cron_mdm_retry_failed" model="ir.cron">
+        <field name="name">MDM: retry failed product requests</field>
+        <field name="model_id" ref="model_retail_mdm_request"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_retry_failed()</field>
+        <field name="interval_number">30</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="cron_mdm_gc" model="ir.cron">
+        <field name="name">MDM: purge old request payloads</field>
+        <field name="model_id" ref="model_retail_mdm_request"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_gc()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

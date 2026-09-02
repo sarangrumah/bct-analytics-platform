@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_wh_cat_admin,tax.withholding.category admin,model_tax_withholding_category,group_tax_id_admin,1,1,1,1
+access_wh_cat_user,tax.withholding.category user read,model_tax_withholding_category,group_tax_id_user,1,0,0,0
+access_wh_rule_admin,tax.withholding.rule admin,model_tax_withholding_rule,group_tax_id_admin,1,1,1,1
+access_wh_rule_user,tax.withholding.rule user read,model_tax_withholding_rule,group_tax_id_user,1,0,0,0
+access_wh_line_user,account.move.withholding.line user,model_account_move_withholding_line,group_tax_id_user,1,0,0,0
+access_wh_line_admin,account.move.withholding.line admin,model_account_move_withholding_line,group_tax_id_admin,1,1,1,1
+access_pengganti_wizard,tax.faktur.pengganti.wizard admin,model_tax_faktur_pengganti_wizard,group_tax_id_admin,1,1,1,1
+access_bulk_val_wizard,tax.bulk.validation.wizard user,model_tax_bulk_validation_wizard,group_tax_id_user,1,1,1,1

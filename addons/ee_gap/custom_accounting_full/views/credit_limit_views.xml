@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_partner_form_credit_limit" model="ir.ui.view">
+        <field name="name">res.partner.form.custom.credit.limit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Custom Credit Limit" name="custom_credit_limit">
+                    <field name="custom_credit_limit"/>
+                    <field name="custom_credit_limit_check_method"/>
+                    <field name="custom_outstanding_amount"/>
+                    <field name="custom_credit_available"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_credit_check_log_list" model="ir.ui.view">
+        <field name="name">custom.credit.check.log.list</field>
+        <field name="model">custom.credit.check.log</field>
+        <field name="arch" type="xml">
+            <list create="false">
+                <field name="check_date"/>
+                <field name="partner_id"/>
+                <field name="sale_order_id"/>
+                <field name="limit_at_check"/>
+                <field name="outstanding_at_check"/>
+                <field name="order_amount"/>
+                <field name="decision"/>
+                <field name="checked_by"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_credit_check_log_form" model="ir.ui.view">
+        <field name="name">custom.credit.check.log.form</field>
+        <field name="model">custom.credit.check.log</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="check_date"/>
+                            <field name="partner_id"/>
+                            <field name="sale_order_id"/>
+                            <field name="checked_by"/>
+                        </group>
+                        <group>
+                            <field name="limit_at_check"/>
+                            <field name="outstanding_at_check"/>
+                            <field name="order_amount"/>
+                            <field name="decision"/>
+                        </group>
+                    </group>
+                    <field name="note"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_credit_check_log" model="ir.actions.act_window">
+        <field name="name">Credit Check Logs</field>
+        <field name="res_model">custom.credit.check.log</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_coretax_template_export_form" model="ir.ui.view">
+        <field name="name">custom.coretax.template.export.wizard.form</field>
+        <field name="model">custom.coretax.template.export.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Export File Import Coretax">
+                <group invisible="file_data">
+                    <group>
+                        <field name="template"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                    <group invisible="template == 'taxlist'">
+                        <field name="masa_pajak"/>
+                        <field name="tahun_pajak"/>
+                        <field name="tanggal_pemotongan"
+                               placeholder="Kosongkan = akhir masa pajak"
+                               invisible="template in ('fk', 'retur')"/>
+                    </group>
+                </group>
+                <div invisible="not file_data">
+                    <p>
+                        <field name="line_count" readonly="1" class="oe_inline"/> baris berhasil diekspor.
+                        Unduh berkas di bawah, lalu unggah ke Coretax.
+                    </p>
+                    <group>
+                        <field name="file_data" filename="file_name" readonly="1"/>
+                        <field name="file_name" invisible="1"/>
+                    </group>
+                </div>
+                <footer>
+                    <button name="action_export" type="object" string="Export"
+                            class="btn-primary" invisible="file_data"/>
+                    <button special="cancel" string="Tutup" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_coretax_template_export" model="ir.actions.act_window">
+        <field name="name">Export File Import Coretax</field>
+        <field name="res_model">custom.coretax.template.export.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

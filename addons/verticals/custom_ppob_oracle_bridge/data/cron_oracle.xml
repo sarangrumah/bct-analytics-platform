@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="cron_oracle_status_sync" model="ir.cron">
+            <field name="name">Oracle Bridge: Sync Transaction Status (MSG016T)</field>
+            <field name="model_id" ref="custom_ppob_sale.model_custom_ppob_transaction"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_oracle_sync_status(batch_size=200)</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="cron_oracle_inbound_ingest" model="ir.cron">
+            <field name="name">Oracle Bridge: Ingest New MSG016T Rows</field>
+            <field name="model_id" ref="custom_ppob_sale.model_custom_ppob_transaction"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_oracle_inbound_ingest(batch_size=500)</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="cron_oracle_balance_mirror" model="ir.cron">
+            <field name="name">Oracle Bridge: Mirror Member Balances (MSG019T)</field>
+            <field name="model_id" ref="custom_ppob_sale.model_custom_ppob_transaction"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_oracle_balance_mirror()</field>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="active" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

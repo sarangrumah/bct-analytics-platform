@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--
+      A dedicated channel for provisioning.
+
+      Capacity is NOT set here: queue.job.channel in this queue_job version has
+      no `capacity` field (it carries name, parent_id, job_function_ids and
+      removal_interval). The runner reads capacities from the
+      ODOO_QUEUE_JOB_CHANNELS environment variable instead, which
+      compose/odoo.yml sets to `root:2,root.athera_provision:1`.
+
+      One at a time, deliberately. A provisioning job holds a registry open on a
+      database that is still being built, and two concurrent runs compete for
+      the same Postgres connection budget while each takes minutes. Tenants are
+      not created in bursts, so serialising costs nothing and removes a class of
+      "it worked when I tested it alone" failure.
+    -->
+    <record id="channel_athera_provision" model="queue.job.channel">
+        <field name="name">athera_provision</field>
+        <field name="parent_id" ref="queue_job.channel_root"/>
+    </record>
+</odoo>

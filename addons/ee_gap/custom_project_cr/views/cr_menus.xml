@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_pmo_cr_root" name="Change Requests"
+              parent="custom_project_portfolio.menu_pmo_root" sequence="15"/>
+
+    <menuitem id="menu_pmo_cr_intake" name="Intake" parent="menu_pmo_cr_root"
+              action="action_cr_intake" sequence="10"/>
+    <menuitem id="menu_pmo_cr_all" name="All Change Requests" parent="menu_pmo_cr_root"
+              action="action_cr" sequence="20"/>
+
+</odoo>

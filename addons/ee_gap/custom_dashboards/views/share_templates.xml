@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="share_page" name="Custom Dashboard Share">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <title t-esc="dashboard.name"/>
+                <style>
+                    body { font-family: sans-serif; margin: 2rem; background: #f7f7f9; }
+                    h1 { margin-bottom: 0.25rem; }
+                    .meta { color: #666; margin-bottom: 1.5rem; }
+                    .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+                    .tile { background: white; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+                    .tile h3 { margin-top: 0; font-size: 0.9rem; color: #444; text-transform: uppercase; }
+                    .tile .value { font-size: 2rem; font-weight: bold; }
+                    .tile .ts { color: #999; font-size: 0.75rem; margin-top: 0.5rem; }
+                    .tile.chart pre { white-space: pre-wrap; font-size: 0.75rem; color: #333; background: #f3f3f3; padding: 0.5rem; border-radius: 0.25rem; }
+                </style>
+            </head>
+            <body>
+                <h1 t-esc="dashboard.name"/>
+                <div class="meta">
+                    <span t-esc="dashboard.description or ''"/>
+                </div>
+                <div class="tiles">
+                    <t t-foreach="tiles" t-as="tile">
+                        <div class="tile" t-att-style="'border-top: 4px solid ' + (tile['color'] or '#1f77b4')">
+                            <h3 t-esc="tile['name']"/>
+                            <t t-if="tile['tile_type'] in ('chart_bar','chart_pie')">
+                                <div class="chart">
+                                    <pre t-esc="tile['payload']"/>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="value">
+                                    <t t-esc="tile['payload'].get('value') if tile['payload'] else '-'"/>
+                                </div>
+                            </t>
+                            <div class="ts">Updated: <t t-esc="tile['cached_at'] or 'never'"/></div>
+                        </div>
+                    </t>
+                </div>
+            </body>
+        </html>
+    </template>
+</odoo>

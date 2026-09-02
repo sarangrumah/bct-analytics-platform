@@ -1,0 +1,63 @@
+# ---------------------------------------------------------------------------
+# Grafana datasources, provisioned as code.
+#
+# NO PASSWORD IS WRITTEN HERE. `secureJsonData` values use $ENV_VAR expansion,
+# which Grafana resolves from the container environment at load time, so the
+# credential lives in .env (dev) or SOPS (anything above dev) and never in a
+# tracked file.
+#
+# The Data Warehouse agent will add the `warehouse` Postgres datasource in a
+# file named analytics-datasources.yml alongside this one; Grafana merges every
+# *.yml in this directory, so neither agent edits the other's file.
+# ---------------------------------------------------------------------------
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      # Must match `global.scrape_interval` in prometheus.yml, or Grafana picks
+      # step sizes that produce gaps in every graph.
+      timeInterval: 30s
+      httpMethod: POST
+
+  - name: Loki
+    type: loki
+    uid: loki
+    access: proxy
+    url: http://loki:3100
+    editable: false
+    jsonData:
+      maxLines: 2000
+      derivedFields:
+        # Turns an Odoo database name in a log line into a filter link.
+        - name: database
+          matcherRegex: 'INFO (\S+) odoo'
+          url: '/explore?left={"datasource":"loki","queries":[{"expr":"{service=\"odoo\", db=\"$${__value.raw}\"}"}]}'
+
+  # Odoo's OLTP Postgres, read-only.
+  #
+  # Connects as metrics_exporter, which holds pg_monitor and nothing else. It
+  # is deliberately NOT the odoo superuser and NOT warehouse_reader: a Grafana
+  # datasource is reachable by every Grafana user with Editor rights, so it
+  # gets the narrowest identity that still answers operational questions.
+  # Business data belongs in the warehouse datasource with RLS, not here.
+  - name: Postgres (OLTP, metrics only)
+    type: postgres
+    uid: postgres-oltp
+    access: proxy
+    url: postgres:5432
+    database: postgres
+    user: metrics_exporter
+    editable: false
+    secureJsonData:
+      password: $POSTGRES_EXPORTER_PASSWORD
+    jsonData:
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false

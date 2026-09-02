@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ESB session -->
+    <record id="view_esb_session_form" model="ir.ui.view">
+        <field name="name">custom.esb.session.form</field>
+        <field name="model">custom.esb.session</field>
+        <field name="arch" type="xml">
+            <form string="ESB Session">
+                <header>
+                    <button name="action_test_connection" type="object" string="Test Connection" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Connection">
+                            <field name="adapter_config_id"/>
+                            <field name="auth_mode"/>
+                            <field name="username" invisible="auth_mode != 'jwt'"/>
+                            <field name="credential_ref" placeholder="custom_esb_connector.esb_password"/>
+                        </group>
+                        <group string="Status">
+                            <field name="company_code"/>
+                            <field name="company_id_esb"/>
+                            <field name="last_login_at"/>
+                            <field name="login_count"/>
+                            <field name="access_expires_at" invisible="auth_mode != 'jwt'"/>
+                            <field name="refresh_expires_at" invisible="auth_mode != 'jwt'"/>
+                            <field name="last_error" class="text-danger"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        The secret is never stored here. Put the ESB password (or static API key)
+                        in <b>Settings → Technical → System Parameters</b> under the key named above.
+                        ESB permits only one live session per user, so this account must be dedicated
+                        to the integration — never a human's login.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_esb_session_list" model="ir.ui.view">
+        <field name="name">custom.esb.session.list</field>
+        <field name="model">custom.esb.session</field>
+        <field name="arch" type="xml">
+            <list string="ESB Sessions">
+                <field name="name"/>
+                <field name="adapter_config_id"/>
+                <field name="auth_mode"/>
+                <field name="username"/>
+                <field name="last_login_at"/>
+                <field name="access_expires_at"/>
+                <field name="last_error" class="text-danger"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_esb_session" model="ir.actions.act_window">
+        <field name="name">ESB Sessions</field>
+        <field name="res_model">custom.esb.session</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Sync log -->
+    <record id="view_esb_sync_log_list" model="ir.ui.view">
+        <field name="name">custom.esb.sync.log.list</field>
+        <field name="model">custom.esb.sync.log</field>
+        <field name="arch" type="xml">
+            <list string="ESB Sync Log" create="false" default_order="create_date desc"
+                  decoration-danger="status == 'error'" decoration-muted="status == 'skipped'">
+                <field name="create_date" string="When"/>
+                <field name="direction"/>
+                <field name="operation"/>
+                <field name="status"/>
+                <field name="record_count" string="Received"/>
+                <field name="created_count" string="Created"/>
+                <field name="updated_count" string="Updated"/>
+                <field name="duration_ms" string="ms"/>
+                <field name="message"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_esb_sync_log" model="ir.actions.act_window">
+        <field name="name">ESB Sync Log</field>
+        <field name="res_model">custom.esb.sync.log</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- Manual sync trigger -->
+    <record id="action_esb_sync_now" model="ir.actions.server">
+        <field name="name">Sync ESB Master Data Now</field>
+        <field name="model_id" ref="model_custom_esb_master_sync"/>
+        <field name="state">code</field>
+        <field name="code">model.action_sync_now()</field>
+    </record>
+</odoo>

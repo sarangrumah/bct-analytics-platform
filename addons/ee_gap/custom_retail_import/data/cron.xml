@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Mailbox fetch (IMAP -> SFTP-share backup + drop dir). Safe to enable globally:
+         the retail.import.mailbox records themselves ship inactive, so this is a no-op
+         until an admin activates a mailbox in exactly one database. Hourly because the
+         X-center mails land at ~03:30 +0800 and the run is cheap (a UID SEARCH plus
+         whatever is new); both fetch and purge are idempotent. -->
+    <record id="cron_fetch_retail_mailboxes" model="ir.cron">
+        <field name="name">Retail Import: fetch mailboxes</field>
+        <field name="model_id" ref="model_retail_import_mailbox"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_fetch_mailboxes()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- Feed poller (SFTP pull + local FTPS-drop feeds). Hourly, right behind the mailbox
+         fetch, so attachments dropped this hour are imported this hour. Feeds are polled in
+         `sequence` order (X24 -> X70D -> X31), which matters once posting is enabled.
+         Files already imported are skipped by the SHA256 dedup in retail.import.log.
+
+         DISABLED by default, and deliberately left alone by the 19.0.0.9.0 migration: on a
+         tenant with `retail_import.x24_post_enabled` this cron posts POS orders and journal
+         entries every hour with no human in the loop. Enable it only after reconciling the
+         X70D tender totals against the created pos.payment records to Rp 0. -->
+    <record id="cron_poll_retail_feeds" model="ir.cron">
+        <field name="name">Retail Import: poll feeds</field>
+        <field name="model_id" ref="model_retail_import_feed"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_poll_feeds()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

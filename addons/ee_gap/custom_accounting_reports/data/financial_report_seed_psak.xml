@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--
+        Minimal PSAK financial report tree.
+        Top-level nodes only — children/account mappings should be configured
+        per-tenant via Configuration → Financial Report Trees.
+        Aligned with PSAK (Pernyataan Standar Akuntansi Keuangan).
+    -->
+
+    <!-- ===== Balance Sheet (Laporan Posisi Keuangan) ===== -->
+    <record id="report_psak_bs_root" model="custom.report.financial">
+        <field name="name">Laporan Posisi Keuangan (Neraca)</field>
+        <field name="code">PSAK_BS</field>
+        <field name="category">balance_sheet</field>
+        <field name="type">computed</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="report_psak_bs_assets" model="custom.report.financial">
+        <field name="name">Aset</field>
+        <field name="code">PSAK_BS_ASSETS</field>
+        <field name="category">balance_sheet</field>
+        <field name="type">computed</field>
+        <field name="parent_id" ref="report_psak_bs_root"/>
+        <field name="sequence">10</field>
+    </record>
+    <record id="report_psak_bs_liab" model="custom.report.financial">
+        <field name="name">Liabilitas</field>
+        <field name="code">PSAK_BS_LIAB</field>
+        <field name="category">balance_sheet</field>
+        <field name="type">computed</field>
+        <field name="parent_id" ref="report_psak_bs_root"/>
+        <field name="sequence">20</field>
+    </record>
+    <record id="report_psak_bs_equity" model="custom.report.financial">
+        <field name="name">Ekuitas</field>
+        <field name="code">PSAK_BS_EQUITY</field>
+        <field name="category">balance_sheet</field>
+        <field name="type">computed</field>
+        <field name="parent_id" ref="report_psak_bs_root"/>
+        <field name="sequence">30</field>
+    </record>
+
+    <!-- ===== Profit & Loss (Laporan Laba Rugi) ===== -->
+    <record id="report_psak_pl_root" model="custom.report.financial">
+        <field name="name">Laporan Laba Rugi</field>
+        <field name="code">PSAK_PL</field>
+        <field name="category">profit_loss</field>
+        <field name="type">computed</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="report_psak_pl_revenue" model="custom.report.financial">
+        <field name="name">Pendapatan</field>
+        <field name="code">PSAK_PL_REVENUE</field>
+        <field name="category">profit_loss</field>
+        <field name="type">computed</field>
+        <field name="parent_id" ref="report_psak_pl_root"/>
+        <field name="sequence">10</field>
+    </record>
+    <record id="report_psak_pl_cogs" model="custom.report.financial">
+        <field name="name">Harga Pokok Penjualan</field>
+        <field name="code">PSAK_PL_COGS</field>
+        <field name="category">profit_loss</field>
+        <field name="type">computed</field>
+        <field name="parent_id" ref="report_psak_pl_root"/>
+        <field name="sequence">20</field>
+    </record>
+    <record id="report_psak_pl_opex" model="custom.report.financial">
+        <field name="name">Beban Operasional</field>
+        <field name="code">PSAK_PL_OPEX</field>
+        <field name="category">profit_loss</field>
+        <field name="type">computed</field>
+        <field name="parent_id" ref="report_psak_pl_root"/>
+        <field name="sequence">30</field>
+    </record>
+    <record id="report_psak_pl_other" model="custom.report.financial">
+        <field name="name">Pendapatan/Beban Lain-lain</field>
+        <field name="code">PSAK_PL_OTHER</field>
+        <field name="category">profit_loss</field>
+        <field name="type">computed</field>
+        <field name="parent_id" ref="report_psak_pl_root"/>
+        <field name="sequence">40</field>
+    </record>
+
+    <!-- ===== Cash Flow (Laporan Arus Kas) ===== -->
+    <record id="report_psak_cf_root" model="custom.report.financial">
+        <field name="name">Laporan Arus Kas</field>
+        <field name="code">PSAK_CF</field>
+        <field name="category">cash_flow</field>
+        <field name="type">computed</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="report_psak_cf_op" model="custom.report.financial">
+        <field name="name">Arus Kas dari Aktivitas Operasi</field>
+        <field name="code">PSAK_CF_OP</field>
+        <field name="category">cash_flow</field>
+        <field name="type">computed</field>
+        <field name="parent_id" ref="report_psak_cf_root"/>
+        <field name="sequence">10</field>
+    </record>
+    <record id="report_psak_cf_inv" model="custom.report.financial">
+        <field name="name">Arus Kas dari Aktivitas Investasi</field>
+        <field name="code">PSAK_CF_INV</field>
+        <field name="category">cash_flow</field>
+        <field name="type">computed</field>
+        <field name="parent_id" ref="report_psak_cf_root"/>
+        <field name="sequence">20</field>
+    </record>
+    <record id="report_psak_cf_fin" model="custom.report.financial">
+        <field name="name">Arus Kas dari Aktivitas Pendanaan</field>
+        <field name="code">PSAK_CF_FIN</field>
+        <field name="category">cash_flow</field>
+        <field name="type">computed</field>
+        <field name="parent_id" ref="report_psak_cf_root"/>
+        <field name="sequence">30</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_retail_import_root" name="Retail Import"
+              groups="group_retail_import_user" sequence="95"/>
+
+    <menuitem id="menu_retail_import_logs" name="Imports"
+              parent="menu_retail_import_root"
+              action="action_retail_import_log" sequence="1"/>
+
+    <menuitem id="menu_retail_import_sync" name="Sync from FTP"
+              parent="menu_retail_import_root"
+              action="action_server_sync_feeds" sequence="10"/>
+
+    <menuitem id="menu_retail_import_pending_sku" name="Unregistered SKUs"
+              parent="menu_retail_import_root"
+              action="action_retail_mdm_pending_sku" sequence="15"/>
+
+    <menuitem id="menu_retail_import_run" name="Import Data"
+              parent="menu_retail_import_root"
+              action="action_retail_import_wizard" sequence="20"/>
+
+    <menuitem id="menu_retail_import_config" name="Configuration"
+              parent="menu_retail_import_root" sequence="90"
+              groups="group_retail_import_manager"/>
+
+    <menuitem id="menu_retail_import_profiles" name="Import Profiles"
+              parent="menu_retail_import_config"
+              action="action_retail_import_profile" sequence="10"/>
+
+    <menuitem id="menu_retail_import_feeds" name="Import Feeds"
+              parent="menu_retail_import_config"
+              action="action_retail_import_feed" sequence="20"/>
+
+    <menuitem id="menu_retail_import_mailboxes" name="Mailboxes"
+              parent="menu_retail_import_config"
+              action="action_retail_import_mailbox" sequence="30"/>
+</odoo>

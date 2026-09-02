@@ -1,0 +1,147 @@
+# ---------------------------------------------------------------------------
+# Platform alert rules.
+#
+# The replication-slot rules implement docs/adr/0001-analytics-warehouse.md,
+# "Replication slot safety", item 3: alert well before disk pressure, with 50%
+# of the max_slot_wal_keep_size cap still in hand.
+#
+#   cap      2 GiB   (postgres/postgresql.conf: max_slot_wal_keep_size)
+#   warn   512 MiB   25% of cap
+#   page     1 GiB   50% of cap
+#
+# Crossing the cap does not damage Odoo - that is the entire point of the cap -
+# but it does invalidate the slot and force a warehouse resync, so it must
+# never be discovered from a dashboard after the fact.
+#
+# NOTE for the Data Warehouse agent: analytics-specific rules belong in
+# observability/prometheus/rules/analytics-*.yml, which is yours. This file is
+# platform-owned.
+# ---------------------------------------------------------------------------
+groups:
+
+  - name: postgres-replication-slots
+    rules:
+      - alert: ReplicationSlotWalRetentionWarning
+        expr: pg_replication_slots_pg_wal_lsn_diff > 536870912
+        for: 10m
+        labels:
+          severity: warning
+          component: postgres
+        annotations:
+          summary: "Replication slot {{ $labels.slot_name }} is retaining over 512 MiB of WAL"
+          description: >-
+            The slot has held back {{ $value | humanize1024 }}B of WAL for 10 minutes.
+            max_slot_wal_keep_size is 2GB; at that point Postgres invalidates the slot
+            and the warehouse needs a full resync. Check that the CDC consumer is
+            running and advancing its confirmed_flush_lsn.
+
+      - alert: ReplicationSlotWalRetentionCritical
+        expr: pg_replication_slots_pg_wal_lsn_diff > 1073741824
+        for: 5m
+        labels:
+          severity: critical
+          component: postgres
+        annotations:
+          summary: "Replication slot {{ $labels.slot_name }} is retaining over 1 GiB of WAL"
+          description: >-
+            Half the 2GB cap is gone. Either restart the CDC consumer now, or drop the
+            slot deliberately and plan a resync. Doing nothing means Postgres decides,
+            and it will drop the slot.
+
+      # The cap actually firing. postgres_exporter reports wal_status per slot;
+      # "lost" means Postgres passed max_slot_wal_keep_size and invalidated the
+      # slot. Odoo is fine - that is the trade docs/adr/0001 chose - but the
+      # warehouse is now silently behind and needs a full resync. Nobody should
+      # learn this from a stale dashboard.
+      - alert: ReplicationSlotInvalidated
+        expr: pg_replication_slot_wal_status{wal_status="lost"} == 1
+        for: 1m
+        labels:
+          severity: critical
+          component: postgres
+        annotations:
+          summary: "Replication slot {{ $labels.slot_name }} was INVALIDATED by Postgres"
+          description: >-
+            The slot exceeded max_slot_wal_keep_size (2GB) and its WAL has been
+            released. This protected Odoo from a full disk, as designed. The warehouse
+            has lost its position: drop the slot, recreate it, and run a full resync.
+
+      - alert: ReplicationSlotInactive
+        expr: pg_replication_slots_active == 0
+        for: 15m
+        labels:
+          severity: warning
+          component: postgres
+        annotations:
+          summary: "Replication slot {{ $labels.slot_name }} has had no consumer for 15m"
+          description: >-
+            An inactive slot retains WAL and buys nothing. Either the consumer is down,
+            or the slot is an orphan left behind by a removed tenant and should be
+            dropped.
+
+  - name: postgres-availability
+    rules:
+      - alert: PostgresDown
+        expr: pg_up == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: postgres
+        annotations:
+          summary: "Postgres is not answering the exporter"
+
+      - alert: PostgresConnectionsNearLimit
+        expr: >-
+          sum(pg_stat_database_numbackends) /
+          on() group_left() max(pg_settings_max_connections) > 0.85
+        for: 10m
+        labels:
+          severity: warning
+          component: postgres
+        annotations:
+          summary: "Postgres is above 85 percent of max_connections"
+          description: >-
+            superuser_reserved_connections is 3, so a DBA can still get in, but Odoo
+            workers will start failing to acquire a connection.
+
+  - name: host
+    rules:
+      # WAL retention is capped by max_slot_wal_keep_size; the Odoo filestore
+      # and the Prometheus TSDB are not. These are the alerts that catch those.
+      - alert: HostDiskSpaceLow
+        expr: >-
+          node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"} /
+          node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"} < 0.15
+        for: 15m
+        labels:
+          severity: warning
+          component: host
+        annotations:
+          summary: "Less than 15 percent free on {{ $labels.mountpoint }}"
+
+      - alert: HostDiskSpaceCritical
+        expr: >-
+          node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"} /
+          node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"} < 0.05
+        for: 5m
+        labels:
+          severity: critical
+          component: host
+        annotations:
+          summary: "Less than 5 percent free on {{ $labels.mountpoint }}"
+          description: >-
+            Postgres stops accepting writes when it cannot extend WAL. This is the
+            failure the whole slot-retention design exists to avoid arriving at.
+
+      - alert: HostMemoryPressure
+        expr: >-
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 0.92
+        for: 10m
+        labels:
+          severity: warning
+          component: host
+        annotations:
+          summary: "Host memory above 92 percent used"
+          description: >-
+            The single-VPS budget in docs/adr/0001 assumes headroom. Check Odoo worker
+            RSS against ODOO_LIMIT_MEMORY_HARD before adding services.

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_dev_cycle_deployment_list" model="ir.ui.view">
+            <field name="name">dev.cycle.deployment.list</field>
+            <field name="model">dev.cycle.deployment</field>
+            <field name="arch" type="xml">
+                <list decoration-success="outcome == 'success'"
+                      decoration-danger="outcome == 'failure'"
+                      decoration-muted="outcome == 'rolled_back'">
+                    <field name="cycle_id"/>
+                    <field name="environment_id"/>
+                    <field name="module_deployment_id"/>
+                    <field name="deployed_at"/>
+                    <field name="outcome" widget="badge"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="action_dev_cycle_deployment" model="ir.actions.act_window">
+            <field name="name">Deployments</field>
+            <field name="res_model">dev.cycle.deployment</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+    </data>
+</odoo>

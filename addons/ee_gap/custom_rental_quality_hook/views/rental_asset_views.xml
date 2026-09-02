@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rental_asset_form_inherit_quality" model="ir.ui.view">
+        <field name="name">rental.asset.form.quality</field>
+        <field name="model">rental.asset</field>
+        <field name="inherit_id" ref="custom_rental.view_rental_asset_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="condition_grade"/>
+                <field name="default_quality_point_id"/>
+                <field name="equipment_id"/>
+                <field name="failure_count" readonly="1"/>
+                <field name="last_failure_at" readonly="1"/>
+                <field name="mtbf_hours" readonly="1"/>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_recompute_condition_grade" string="Recompute Grade"
+                            type="object" class="btn-secondary"/>
+                    <button name="action_create_equipment" string="Create Maintenance Equipment"
+                            type="object" class="btn-secondary"
+                            invisible="equipment_id"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+</odoo>

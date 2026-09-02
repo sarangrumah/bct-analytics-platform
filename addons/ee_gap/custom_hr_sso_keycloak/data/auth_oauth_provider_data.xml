@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Keycloak OIDC provider, seeded DISABLED. Per tenant: replace the realm
+         host, set the client_id, then tick "Allowed". The validation/userinfo
+         endpoint must expose the email + nik/dept claims (see MODULE_KNOWLEDGE.md).
+         Redirect URI to register in Keycloak: https://<tenant-host>/auth_oauth/signin -->
+    <record id="provider_keycloak_hr" model="auth.oauth.provider">
+        <field name="name">Keycloak SSO</field>
+        <field name="client_id">hr-portal</field>
+        <field name="auth_endpoint">https://keycloak.example.com/realms/erp/protocol/openid-connect/auth</field>
+        <field name="scope">openid email profile</field>
+        <field name="validation_endpoint">https://keycloak.example.com/realms/erp/protocol/openid-connect/userinfo</field>
+        <field name="data_endpoint">https://keycloak.example.com/realms/erp/protocol/openid-connect/userinfo</field>
+        <field name="css_class">fa fa-key</field>
+        <field name="body">Login with SSO</field>
+        <field name="enabled" eval="False"/>
+    </record>
+</odoo>

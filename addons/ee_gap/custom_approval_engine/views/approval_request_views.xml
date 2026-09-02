@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_approval_request_list" model="ir.ui.view">
+        <field name="name">approval.request.list</field>
+        <field name="model">approval.request</field>
+        <field name="arch" type="xml">
+            <list string="Approval Requests"
+                  decoration-success="state == 'approved'"
+                  decoration-danger="state == 'rejected'"
+                  decoration-warning="state == 'pending' and overdue"
+                  decoration-info="state == 'pending' and not overdue"
+                  decoration-muted="state in ('cancelled', 'draft')">
+                <field name="create_date"/>
+                <field name="matrix_id"/>
+                <field name="res_model"/>
+                <field name="res_name"/>
+                <field name="requested_by_id"/>
+                <field name="current_tier_id"/>
+                <field name="due_at"/>
+                <field name="overdue" invisible="1"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_approval_request_kanban" model="ir.ui.view">
+        <field name="name">approval.request.kanban</field>
+        <field name="model">approval.request</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_dashboard">
+                <field name="matrix_id"/>
+                <field name="res_name"/>
+                <field name="requested_by_id"/>
+                <field name="current_tier_id"/>
+                <field name="due_at"/>
+                <field name="overdue"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card" t-attf-class="#{record.overdue.raw_value ? 'border-danger' : ''}">
+                        <div class="o_kanban_record_top">
+                            <strong><field name="res_name"/></strong>
+                        </div>
+                        <div>
+                            <field name="matrix_id"/>
+                        </div>
+                        <div class="text-muted">
+                            Tier: <field name="current_tier_id"/>
+                        </div>
+                        <div class="text-muted">
+                            Due: <field name="due_at"/>
+                        </div>
+                        <div>By <field name="requested_by_id"/></div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_approval_request_form" model="ir.ui.view">
+        <field name="name">approval.request.form</field>
+        <field name="model">approval.request</field>
+        <field name="arch" type="xml">
+            <form string="Approval Request">
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object"
+                            class="btn-success" invisible="state != 'pending'"/>
+                    <button name="action_reject" string="Reject" type="object"
+                            class="btn-danger" invisible="state != 'pending'"
+                            confirm="Reject this request? Requestor must revise and resubmit."/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('approved','rejected','cancelled')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,pending,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="display_name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="matrix_id" readonly="state != 'draft'"/>
+                            <field name="res_model" readonly="1"/>
+                            <field name="res_id" readonly="1"/>
+                            <field name="res_ref" readonly="1"/>
+                            <field name="requested_by_id" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="current_tier_id" readonly="1"/>
+                            <field name="due_at" readonly="1"/>
+                            <field name="overdue" readonly="1" widget="boolean_toggle"/>
+                            <field name="pending_approver_ids" widget="many2many_tags" readonly="1"/>
+                            <field name="final_decision_user_id" readonly="1"
+                                   invisible="state not in ('approved','rejected')"/>
+                            <field name="decided_at" readonly="1"
+                                   invisible="state not in ('approved','rejected','cancelled')"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="History">
+                            <field name="history_ids" readonly="1">
+                                <list create="0" edit="0" delete="0">
+                                    <field name="action_at"/>
+                                    <field name="tier_name"/>
+                                    <field name="action_user_id"/>
+                                    <field name="action" widget="badge"/>
+                                    <field name="delegated_from_id"/>
+                                    <field name="comment"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_approval_request_search" model="ir.ui.view">
+        <field name="name">approval.request.search</field>
+        <field name="model">approval.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="matrix_id"/>
+                <field name="res_name"/>
+                <field name="requested_by_id"/>
+                <field name="current_tier_id"/>
+                <filter name="my_pending" string="Pending For Me"
+                        domain="[('pending_approver_ids','in',[uid]),('state','=','pending')]"/>
+                <filter name="my_requests" string="My Requests"
+                        domain="[('requested_by_id','=',uid)]"/>
+                <separator/>
+                <filter name="draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="pending" string="Pending" domain="[('state','=','pending')]"/>
+                <filter name="overdue" string="Overdue" domain="[('overdue','=',True)]"/>
+                <filter name="approved" string="Approved" domain="[('state','=','approved')]"/>
+                <filter name="rejected" string="Rejected" domain="[('state','=','rejected')]"/>
+                <group>
+                    <filter name="by_state" string="State" context="{'group_by': 'state'}"/>
+                    <filter name="by_matrix" string="Matrix" context="{'group_by': 'matrix_id'}"/>
+                    <filter name="by_model" string="Model" context="{'group_by': 'res_model'}"/>
+                    <filter name="by_tier" string="Tier" context="{'group_by': 'current_tier_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_approval_request_all" model="ir.actions.act_window">
+        <field name="name">All Requests</field>
+        <field name="res_model">approval.request</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_approval_request_search"/>
+    </record>
+
+    <record id="action_approval_request_inbox" model="ir.actions.act_window">
+        <field name="name">My Inbox</field>
+        <field name="res_model">approval.request</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_approval_request_search"/>
+        <field name="context">{"search_default_my_pending": 1}</field>
+    </record>
+
+</odoo>

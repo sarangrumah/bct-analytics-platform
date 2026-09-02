@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bulk_validation_wizard" model="ir.ui.view">
+        <field name="name">tax.bulk.validation.wizard.form</field>
+        <field name="model">tax.bulk.validation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Validasi Bulk Pre-Export">
+                <sheet>
+                    <group invisible="run_done">
+                        <field name="company_id"/>
+                        <field name="move_type"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group invisible="not run_done">
+                        <field name="result_count_total" readonly="1"/>
+                        <field name="result_count_invalid" readonly="1"/>
+                    </group>
+                    <field name="result_html" invisible="not run_done" widget="html"/>
+                </sheet>
+                <footer>
+                    <button name="action_run" string="Run Validation" type="object"
+                            class="btn-primary" invisible="run_done"/>
+                    <button string="Close" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bulk_validation_wizard" model="ir.actions.act_window">
+        <field name="name">Validasi Pre-Export</field>
+        <field name="res_model">tax.bulk.validation.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

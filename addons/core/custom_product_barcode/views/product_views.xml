@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Variant form: barcode_ids are per-variant, so the tab lives on the
+         product.product (variant) form, which inherits the template notebook. -->
+    <record id="product_product_form_alt_barcodes" model="ir.ui.view">
+        <field name="name">product.product.form.alt.barcodes</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Alternate Barcodes" name="alt_barcodes">
+                    <div class="text-muted oe_edit_only">
+                        Extra barcodes (e.g. historical or packaging GTINs) that scan to
+                        this same variant and share its inventory. The primary barcode
+                        stays on the General tab.
+                    </div>
+                    <field name="barcode_ids">
+                        <list editable="bottom">
+                            <field name="barcode"/>
+                            <field name="note"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

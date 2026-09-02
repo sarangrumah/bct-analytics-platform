@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_marketing_campaign_list" model="ir.ui.view">
+        <field name="name">marketing.campaign.list</field>
+        <field name="model">marketing.campaign</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'running'"
+                  decoration-muted="state in ('paused', 'completed')">
+                <field name="name"/>
+                <field name="segment_id"/>
+                <field name="participant_count"/>
+                <field name="completed_count"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_marketing_campaign_form" model="ir.ui.view">
+        <field name="name">marketing.campaign.form</field>
+        <field name="model">marketing.campaign</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" string="Start" type="object" class="btn-primary"
+                            invisible="state == 'running'"/>
+                    <button name="action_pause" string="Pause" type="object"
+                            invisible="state != 'running'"/>
+                    <button name="action_resume" string="Resume" type="object" class="btn-primary"
+                            invisible="state != 'paused'"/>
+                    <button name="action_complete" string="Complete" type="object"
+                            invisible="state == 'completed'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="segment_id"/>
+                            <field name="require_marketing_consent"/>
+                        </group>
+                        <group>
+                            <field name="participant_count" readonly="1"/>
+                            <field name="completed_count" readonly="1"/>
+                            <field name="started_at" readonly="1"/>
+                            <field name="completed_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Steps">
+                            <field name="step_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="kind"/>
+                                    <field name="mail_template_id"/>
+                                    <field name="wait_hours"/>
+                                    <field name="partner_category_id"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Participants">
+                            <field name="participant_ids" readonly="1">
+                                <list create="0" edit="0">
+                                    <field name="partner_id"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="current_step_id"/>
+                                    <field name="next_action_at"/>
+                                    <field name="completed_at"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_marketing_campaign" model="ir.actions.act_window">
+        <field name="name">Campaigns</field>
+        <field name="res_model">marketing.campaign</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

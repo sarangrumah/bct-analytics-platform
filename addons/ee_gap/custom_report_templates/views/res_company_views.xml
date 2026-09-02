@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_company_form_report_branding" model="ir.ui.view">
+        <field name="name">res.company.form.report.branding</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Report Templates" name="report_templates">
+                    <div class="text-muted o_form_label mb-2">
+                        Branded Invoice / Quotation / Purchase Order PDFs read the
+                        company logo and the <b>Home Accent Color</b> (Home Console tab),
+                        plus the fields below. Each company prints its own look.
+                    </div>
+                    <group>
+                        <group string="Invoice — Bank / Tax Details">
+                            <field name="report_bank_details" nolabel="1" colspan="2"
+                                   placeholder="Bank Central Asia (BCA)&#10;A/C: 4072221617&#10;NPWP: 00.000.000.0-000.000"/>
+                        </group>
+                        <group string="Lines">
+                            <field name="report_show_product_name"/>
+                        </group>
+                        <group string="Footer">
+                            <field name="report_footer_note"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

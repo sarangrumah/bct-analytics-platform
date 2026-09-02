@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_cycle_count_root"
+              name="Cycle Counting"
+              parent="stock.menu_stock_warehouse_mgmt"
+              sequence="60"
+              groups="group_cycle_count_user"/>
+
+    <menuitem id="menu_cycle_count_plans"
+              name="Plans"
+              parent="menu_cycle_count_root"
+              action="action_cycle_count_plan"
+              sequence="10"/>
+
+    <menuitem id="menu_cycle_count_sessions"
+              name="Sessions"
+              parent="menu_cycle_count_root"
+              action="action_cycle_count_session"
+              sequence="20"/>
+
+    <menuitem id="menu_cycle_count_lines"
+              name="Lines"
+              parent="menu_cycle_count_root"
+              action="action_cycle_count_line"
+              sequence="30"/>
+
+    <menuitem id="menu_cycle_count_start"
+              name="Start Count"
+              parent="menu_cycle_count_root"
+              action="action_cycle_count_start_wizard"
+              sequence="40"/>
+</odoo>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pdp_tag_fields_wizard_form" model="ir.ui.view">
+        <field name="name">pdp.tag.fields.wizard.form</field>
+        <field name="model">pdp.tag.fields.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Tag PII Fields">
+                <group>
+                    <field name="model_id"/>
+                    <field name="classification_id"/>
+                </group>
+                <field name="field_ids">
+                    <list string="Fields">
+                        <field name="name"/>
+                        <field name="field_description"/>
+                        <field name="ttype"/>
+                        <field name="x_pdp_classification_id"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_apply" type="object" string="Apply Tag" class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pdp_tag_fields_wizard" model="ir.actions.act_window">
+        <field name="name">Tag PII Fields</field>
+        <field name="res_model">pdp.tag.fields.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

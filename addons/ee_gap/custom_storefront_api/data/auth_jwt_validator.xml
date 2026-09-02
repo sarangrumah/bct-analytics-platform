@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+          JWT validator for storefront customers. The signing secret_key is
+          minted in the post_init_hook (never hardcoded). Customers are
+          resolved from the `email` claim (partner_id_required so a route with
+          auth="jwt_storefront" always has request.jwt_partner_id).
+        -->
+        <record id="jwt_validator_storefront" model="auth.jwt.validator">
+            <field name="name">storefront</field>
+            <field name="signature_type">secret</field>
+            <field name="secret_algorithm">HS256</field>
+            <field name="audience">storefront</field>
+            <field name="issuer">custom_storefront_api</field>
+            <field name="user_id_strategy">static</field>
+            <field name="static_user_id" ref="base.user_admin"/>
+            <field name="partner_id_strategy">email</field>
+            <field name="partner_id_required" eval="True"/>
+        </record>
+    </data>
+</odoo>

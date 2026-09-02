@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Trade / Non-Trade purchase type on the PO (feature #9) -->
+    <record id="view_purchase_order_form_retail_type" model="ir.ui.view">
+        <field name="name">purchase.order.form.retail.type</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="l10n_purchase_type" widget="radio" options="{'horizontal': True}"/>
+                <field name="l10n_ou_analytic_display" readonly="1"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_purchase_order_tree_retail_type" model="ir.ui.view">
+        <field name="name">purchase.order.list.retail.type</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="l10n_purchase_type" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_purchase_order_search_retail_type" model="ir.ui.view">
+        <field name="name">purchase.order.search.retail.type</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+        <field name="arch" type="xml">
+            <filter name="my_purchases" position="before">
+                <filter string="Trade" name="retail_trade"
+                        domain="[('l10n_purchase_type', '=', 'trade')]"/>
+                <filter string="Non-Trade" name="retail_non_trade"
+                        domain="[('l10n_purchase_type', '=', 'non_trade')]"/>
+                <separator/>
+            </filter>
+            <group position="inside">
+                <filter string="Purchase Type" name="group_retail_type"
+                        context="{'group_by': 'l10n_purchase_type'}"/>
+            </group>
+        </field>
+    </record>
+</odoo>

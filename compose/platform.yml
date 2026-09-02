@@ -1,0 +1,362 @@
+# ===========================================================================
+# ATHERA platform — the layer that belongs to no single product.
+#
+#   make up-platform       (adds these on top of the odoo stack)
+#   make down-platform     (removes only these)
+#
+# One of four product stacks (compose/odoo.yml, compose/insight.yml,
+# compose/platform.yml, compose/agent.yml). This one holds what all three
+# products share, which is why it is separate from every one of them:
+#
+#   login-gateway     the diagram's Login node. Insight, Odoo and Agent all
+#                     authenticate through it. A product stack that owned the
+#                     identity provider could not be moved to its own VPS
+#                     without dragging the other two products with it.
+#
+# ARRIVING IN LATER PHASES, and named here so the shape is visible:
+#   tenant-orchestrator   Phase 2 — the REST API that custom_super_admin,
+#                         custom_hub_console and custom_tenant_infra already
+#                         call at http://tenant-orchestrator:8080 today, and
+#                         which does not exist yet.
+#   hub-portal            Phase 2 — Super Admin CMS.
+#   caddy                 end of Phase 2 — single entry point, per-host
+#                         dbfilter. Deliberately NOT earlier: before a second
+#                         tenant exists, hostname routing solves nothing and
+#                         widening ODOO_DBFILTER without a proxy in front
+#                         would make every database reachable on 38069.
+#   marketing-site        Phase 4 — the public ATHERA site.
+#
+# PORTS. 127.0.0.1 only, never 0.0.0.0. This host also runs odoo19-platform-*,
+# odoo19-analytics-* and smart-warga-*; publishing on 0.0.0.0 would expose
+# services to the LAN. Contract 04 §4.
+# ===========================================================================
+
+x-restart-policy: &restart-policy
+  restart: unless-stopped
+
+x-default-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-hardening: &hardening
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+services:
+
+  # =========================================================================
+  # login-gateway — authenticates against Odoo over JSON-RPC, issues RS256
+  # JWTs, publishes JWKS with two keys so a rotation never needs an outage.
+  #
+  # Promoted from scripts/analytics/gateway-run.sh on 2026-09-01. Its code and
+  # Dockerfile were complete and its port was reserved in .env.example, but it
+  # appeared in no compose file, so `make up` never started it and the portal
+  # pointed at a host that did not exist.
+  #
+  # KEYS ARE MOUNTED, NEVER BAKED. A key in an image layer is a key in every
+  # registry copy and every `docker save` tarball. `make up-platform` runs
+  # gen-jwt-keys.sh first, which refuses to overwrite an existing key.
+  #
+  # read_only: the gateway writes nothing to disk. Its refresh store and rate
+  # limiter are in-process dicts, which also means it is single-replica by
+  # construction — scaling it horizontally needs a shared store first.
+  # =========================================================================
+  login-gateway:
+    build:
+      context: ../login-gateway
+      dockerfile: Dockerfile
+    image: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-login-gateway:local
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-login-gateway
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    read_only: true
+    mem_limit: 256m
+    environment:
+      LOGIN_GATEWAY_JWT_ALGORITHM: ${LOGIN_GATEWAY_JWT_ALGORITHM:-RS256}
+      LOGIN_GATEWAY_JWT_KID: ${LOGIN_GATEWAY_JWT_KID:?LOGIN_GATEWAY_JWT_KID is required - run `make dev-bootstrap`}
+      LOGIN_GATEWAY_JWT_NEXT_KID: ${LOGIN_GATEWAY_JWT_NEXT_KID:?LOGIN_GATEWAY_JWT_NEXT_KID is required - run `make dev-bootstrap`}
+      LOGIN_GATEWAY_JWT_PRIVATE_KEY_PATH: ${LOGIN_GATEWAY_JWT_PRIVATE_KEY_PATH:-/run/secrets/jwt-private.pem}
+      LOGIN_GATEWAY_JWT_PUBLIC_KEY_PATH: ${LOGIN_GATEWAY_JWT_PUBLIC_KEY_PATH:-/run/secrets/jwt-public.pem}
+      LOGIN_GATEWAY_JWT_NEXT_PRIVATE_KEY_PATH: ${LOGIN_GATEWAY_JWT_NEXT_PRIVATE_KEY_PATH:-/run/secrets/jwt-next-private.pem}
+      LOGIN_GATEWAY_JWT_NEXT_PUBLIC_KEY_PATH: ${LOGIN_GATEWAY_JWT_NEXT_PUBLIC_KEY_PATH:-/run/secrets/jwt-next-public.pem}
+      LOGIN_GATEWAY_JWT_ISSUER: ${LOGIN_GATEWAY_JWT_ISSUER:-https://login-gateway.local/}
+      LOGIN_GATEWAY_JWT_AUDIENCE: ${LOGIN_GATEWAY_JWT_AUDIENCE:-insight-portal}
+      LOGIN_GATEWAY_ACCESS_TOKEN_TTL: ${LOGIN_GATEWAY_ACCESS_TOKEN_TTL:-3600}
+      LOGIN_GATEWAY_REFRESH_TOKEN_TTL: ${LOGIN_GATEWAY_REFRESH_TOKEN_TTL:-1209600}
+      LOGIN_GATEWAY_REFRESH_COOKIE_NAME: ${LOGIN_GATEWAY_REFRESH_COOKIE_NAME:-bct_refresh}
+      LOGIN_GATEWAY_COOKIE_SECURE: ${LOGIN_GATEWAY_COOKIE_SECURE:-0}
+      # Service name, not container name. Both resolve on this network, but the
+      # service name is what survives a move to another host with only an .env
+      # change. The same reasoning applies to every inter-service URL here.
+      LOGIN_GATEWAY_ODOO_URL: ${LOGIN_GATEWAY_ODOO_URL:-http://odoo:8069}
+      # The gateway's entire tenant allow-list. Widening it admits a database
+      # to the login surface, so it is a reviewed edit — the same posture
+      # ODOO_DBFILTER has in contract 04 §8.
+      LOGIN_GATEWAY_ALLOWED_DATABASES: ${LOGIN_GATEWAY_ALLOWED_DATABASES:-bct}
+      LOGIN_GATEWAY_RATE_LIMIT_MAX_ATTEMPTS: ${LOGIN_GATEWAY_RATE_LIMIT_MAX_ATTEMPTS:-5}
+      LOGIN_GATEWAY_RATE_LIMIT_WINDOW_SECONDS: ${LOGIN_GATEWAY_RATE_LIMIT_WINDOW_SECONDS:-300}
+      LOGIN_GATEWAY_RATE_LIMIT_LOCKOUT_SECONDS: ${LOGIN_GATEWAY_RATE_LIMIT_LOCKOUT_SECONDS:-900}
+      # The control-plane read behind the diagram's "Active?" decision. Empty
+      # disables entitlement enforcement entirely and the gateway says so at
+      # WARNING on every boot — it is not a silent default.
+      LOGIN_GATEWAY_REGISTRY_DSN: ${LOGIN_GATEWAY_REGISTRY_DSN:-}
+      LOGIN_GATEWAY_REGISTRY_CACHE_TTL: ${LOGIN_GATEWAY_REGISTRY_CACHE_TTL:-30}
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ../login-gateway/secrets:/run/secrets:ro
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${LOGIN_GATEWAY_HOST_PORT:-38120}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/healthz',timeout=3).status==200 else 1)\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - bct
+
+  # =========================================================================
+  # tenant-orchestrator — the control-plane API.
+  #
+  # custom_super_admin, custom_hub_console and custom_tenant_infra have been
+  # calling http://tenant-orchestrator:8080 since ADR 0002 imported them, into
+  # nothing. This is the thing they were calling.
+  #
+  # ITS ENTIRE PRIVILEGE IS A POSTGRES ROLE. No docker socket: building a tenant
+  # database needs the Odoo CLI, and rather than make a network-facing service
+  # root on the host, it asks custom_athera_provisioner to spawn that CLI inside
+  # the Odoo container. See tenant-orchestrator/app/odoo_rpc.py.
+  # =========================================================================
+  tenant-orchestrator:
+    build:
+      context: ../tenant-orchestrator
+      dockerfile: Dockerfile
+    image: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-tenant-orchestrator:local
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-tenant-orchestrator
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    read_only: true
+    mem_limit: 256m
+    environment:
+      ORCHESTRATOR_REGISTRY_DSN: ${ORCHESTRATOR_REGISTRY_DSN:?ORCHESTRATOR_REGISTRY_DSN is required - run `make dev-bootstrap`}
+      ORCHESTRATOR_SHARED_SECRET: ${ORCHESTRATOR_SHARED_SECRET:?ORCHESTRATOR_SHARED_SECRET is required - run `make dev-bootstrap`}
+      ORCHESTRATOR_HMAC_WINDOW_SECONDS: ${ORCHESTRATOR_HMAC_WINDOW_SECONDS:-300}
+      # The ADMIN database's hostname, not the service name. dbfilter is ^%d$$,
+      # so a URL whose first label is not a database name reaches no database.
+      ORCHESTRATOR_ODOO_URL: ${ORCHESTRATOR_ODOO_URL:-http://athera_admin.athera.localhost:8069}
+      ATHERA_ADMIN_DB: ${ATHERA_ADMIN_DB:-athera_admin}
+      ORCHESTRATOR_ODOO_LOGIN: ${ORCHESTRATOR_ODOO_LOGIN:-admin}
+      ORCHESTRATOR_ODOO_PASSWORD: ${ORCHESTRATOR_ODOO_PASSWORD:-}
+      ORCHESTRATOR_PROVISION_MODULES: ${ODOO_INIT_MODULES:-}
+      TZ: ${TZ:-UTC}
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${ORCHESTRATOR_HOST_PORT:-38300}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/healthz',timeout=3).status==200 else 1)\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - bct
+
+  # =========================================================================
+  # marketing-site — the public ATHERA site.
+  #
+  # The diagram's top-left: ATHERA Company Profile, with Company Profile,
+  # Product and ETC. hanging off it. Those are ROWS in cms.page, not routes in
+  # code, so adding a page is an edit in the console rather than a deploy.
+  #
+  # It holds ONE credential, and it is a read-only role scoped to two VIEWS
+  # (cms.published_page, cms.published_block). It has no grant on cms.page at
+  # all, so "the public site cannot serve a draft" is a property of what the
+  # role can reach rather than of a WHERE clause somebody has to remember.
+  # =========================================================================
+  marketing-site:
+    build:
+      context: ../marketing-site
+      dockerfile: Dockerfile
+    image: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-marketing-site:local
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-marketing-site
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    read_only: true
+    user: "10007:10007"
+    mem_limit: 512m
+    environment:
+      MARKETING_SITE_DSN: ${MARKETING_SITE_DSN:?MARKETING_SITE_DSN is required - run `make dev-bootstrap`}
+      MARKETING_SITE_POOL_MAX: ${MARKETING_SITE_POOL_MAX:-4}
+      # Where the diagram's Login node points. It leaves this site entirely:
+      # the gateway owns credentials, and a form here would be a second place
+      # that could ask for them.
+      # Default derived from ATHERA_DOMAIN rather than spelled out, for the
+      # same reason caddy/Caddyfile stopped spelling its hostnames out: a second
+      # place holding the domain is a second place to forget.
+      MARKETING_SITE_LOGIN_URL: ${MARKETING_SITE_LOGIN_URL:-https://app.${ATHERA_DOMAIN:-athera.localhost}}
+      TZ: ${TZ:-Asia/Jakarta}
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${MARKETING_SITE_HOST_PORT:-33002}:3000"
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
+    networks:
+      - bct
+
+  # =========================================================================
+  # hub-portal — Super Admin CMS.
+  #
+  # The diagram's console: Client Management and Subscription Management over
+  # tenant_registry, and the content half over cms.
+  #
+  # ITS GATE IS is_super_admin, NOT subscription_active. A super admin is
+  # staff, not a client: they have no registry row, so their token carries
+  # subscription_active=false and no products. Gating on the subscription claim
+  # would lock the operators out of the tool they use to fix subscriptions.
+  #
+  # It signs to the orchestrator SERVER-SIDE. The shared secret is that
+  # service's whole authentication boundary, so a console that signed in the
+  # browser would ship it to every visitor; src/lib/orchestrator.ts is
+  # `server-only` and importing it from a client component is a build error.
+  # =========================================================================
+  hub-portal:
+    build:
+      context: ../hub-portal
+      dockerfile: Dockerfile
+    image: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-hub-portal:local
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-hub-portal
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    read_only: true
+    user: "10008:10008"
+    mem_limit: 512m
+    environment:
+      HUB_PORTAL_ORCHESTRATOR_URL: ${HUB_PORTAL_ORCHESTRATOR_URL:-http://tenant-orchestrator:8080}
+      ORCHESTRATOR_SHARED_SECRET: ${ORCHESTRATOR_SHARED_SECRET:?ORCHESTRATOR_SHARED_SECRET is required - run `make dev-bootstrap`}
+      HUB_PORTAL_LOGIN_GATEWAY_URL: ${HUB_PORTAL_LOGIN_GATEWAY_URL:-http://login-gateway:8080}
+      HUB_PORTAL_JWKS_URL: ${HUB_PORTAL_JWKS_URL:-http://login-gateway:8080/.well-known/jwks.json}
+      HUB_PORTAL_JWT_ISSUER: ${LOGIN_GATEWAY_JWT_ISSUER:-https://login-gateway.local/}
+      HUB_PORTAL_JWT_AUDIENCE: ${LOGIN_GATEWAY_JWT_AUDIENCE:-insight-portal}
+      HUB_PORTAL_COOKIE_SECURE: ${HUB_PORTAL_COOKIE_SECURE:-false}
+      ATHERA_ADMIN_DB: ${ATHERA_ADMIN_DB:-athera_admin}
+      # The console edits drafts, so it reads the tables rather than the
+      # published-only views. It uses the orchestrator's role, which already
+      # owns the writes.
+      HUB_PORTAL_CMS_DSN: ${HUB_PORTAL_CMS_DSN:?HUB_PORTAL_CMS_DSN is required - run `make dev-bootstrap`}
+      TZ: ${TZ:-Asia/Jakarta}
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${HUB_PORTAL_HOST_PORT:-33003}:3000"
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
+    networks:
+      - bct
+
+  # =========================================================================
+  # caddy — the single entry point, and the thing that makes more than one
+  # Odoo database reachable at all.
+  #
+  # Not a convenience. Odoo picks a database with `dbfilter`, and a filter
+  # naming two databases was measured to serve NEITHER — /web/login answers
+  # 303 -> /web/database/selector and list_db=False disables that selector.
+  # The Host header is the only per-request way to say which database is meant,
+  # so multi-tenancy needs a proxy that sets it. See caddy/Caddyfile.
+  #
+  # ODOO_PROXY_MODE=True has been on since before anything sat in front of
+  # Odoo, which meant X-Forwarded-* was trusted while a client could forge it.
+  # That setting is correct only now, and only because this service sets those
+  # headers on every proxied route.
+  # =========================================================================
+  caddy:
+    image: caddy:2.8-alpine@sha256:af32e97399febea808609119bb21544d0265c58a02836576e32a2d082c262c17
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-caddy
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    mem_limit: 256m
+    environment:
+      # Read by the Caddyfile so the admin route's Host rewrite tracks the
+      # database name instead of hard-coding it in two places.
+      ATHERA_ADMIN_DB: ${ATHERA_ADMIN_DB:-athera_admin}
+      # Every site address in the Caddyfile is built from this. It is the SAME
+      # variable compose/odoo.yml builds its network aliases from, which is the
+      # point: the browser-facing hostname and the in-network RPC name for a
+      # database cannot drift apart if there is only one place to change them.
+      ATHERA_DOMAIN: ${ATHERA_DOMAIN:-athera.localhost}
+      # `internal` issues from the local CA. An EMAIL ADDRESS here turns on
+      # ACME with that address as the account - `tls <email>` is Caddy's own
+      # syntax, so production differs by this one value.
+      #
+      # Do not set an email before the DNS records exist and have propagated.
+      # Let's Encrypt rate-limits FAILED validations at 5 per hostname per
+      # hour, so a Caddy that starts early spends that budget and is locked out
+      # at the moment DNS becomes correct.
+      ATHERA_TLS: ${ATHERA_TLS:-internal}
+      # The public site proxies /onboarding/* into Odoo, which needs a Host
+      # whose first label is a real database.
+      ODOO_DB_NAME: ${ODOO_DB_NAME:-bct}
+      TZ: ${TZ:-UTC}
+    cap_add:
+      # Caddy binds 80 and 443 INSIDE the container. Both are below 1024, and
+      # the image runs as root only long enough to bind them; without this the
+      # bind fails outright. It is the one capability added back here, and it
+      # is added for that reason alone.
+      - NET_BIND_SERVICE
+    volumes:
+      - ../caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+      - caddyconfig:/config
+    ports:
+      # CADDY_BIND_ADDRESS, deliberately NOT ${BIND_ADDRESS}. That one variable
+      # is shared by every published port in this project - postgres 35432,
+      # redis 36379, warehouse-db 35433, grafana, prometheus, loki. Setting it
+      # to 0.0.0.0 to put Caddy on the internet would put all of those there
+      # too, which is the opposite of what a reverse proxy in front is for.
+      #
+      # So Caddy gets its own, defaulting to ${BIND_ADDRESS} so a workstation
+      # behaves exactly as before. Production sets CADDY_BIND_ADDRESS=0.0.0.0
+      # with CADDY_HTTP_PORT=80 / CADDY_HTTPS_PORT=443, and leaves
+      # BIND_ADDRESS at 127.0.0.1.
+      - "${CADDY_BIND_ADDRESS:-${BIND_ADDRESS:-127.0.0.1}}:${CADDY_HTTP_PORT:-38080}:80"
+      - "${CADDY_BIND_ADDRESS:-${BIND_ADDRESS:-127.0.0.1}}:${CADDY_HTTPS_PORT:-38443}:443"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:2019/config/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - bct
+
+networks:
+  bct:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_bct
+    driver: bridge
+
+volumes:
+  # The local CA lives here. Losing it means every browser that trusted the
+  # root has to trust a new one, so it is a named volume rather than a tmpfs.
+  caddydata:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_caddydata
+  caddyconfig:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_caddyconfig

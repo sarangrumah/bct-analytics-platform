@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_weekly_list" model="ir.ui.view">
+        <field name="name">custom.weekly.progress.list</field>
+        <field name="model">custom.weekly.progress</field>
+        <field name="arch" type="xml">
+            <list string="Weekly Progress">
+                <field name="week_code"/>
+                <field name="vertical_id"/>
+                <field name="project_id"/>
+                <field name="author_id"/>
+                <field name="done_count" string="Done"/>
+                <field name="done_points" string="Points"/>
+                <field name="carry_over_count" string="Carry-over"/>
+                <field name="hours_spent" string="Hours"/>
+                <field name="cycle_time_team" string="Cycle — team (h)"/>
+                <field name="health" widget="badge"
+                       decoration-success="health == 'on_track'"
+                       decoration-warning="health == 'at_risk'"
+                       decoration-danger="health == 'blocked'"/>
+                <field name="state" widget="badge"
+                       decoration-muted="state == 'draft'"
+                       decoration-success="state == 'submitted'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_weekly_form" model="ir.ui.view">
+        <field name="name">custom.weekly.progress.form</field>
+        <field name="model">custom.weekly.progress</field>
+        <field name="arch" type="xml">
+            <form string="Weekly Progress">
+                <header>
+                    <button name="action_refresh_automatic" type="object"
+                            string="Refresh automatic half"/>
+                    <button name="action_submit" type="object" string="Submit"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Context">
+                            <field name="sprint_id"/>
+                            <field name="vertical_id"/>
+                            <field name="project_id"/>
+                            <field name="author_id"/>
+                            <field name="health"/>
+                            <field name="progress_pct" widget="progressbar"/>
+                        </group>
+                        <group string="Written by the system">
+                            <field name="done_count"/>
+                            <field name="done_points"/>
+                            <field name="carry_over_count"/>
+                            <field name="hours_spent"/>
+                            <field name="cycle_time_team"/>
+                            <field name="lead_time_total"/>
+                            <field name="hold_count"/>
+                            <field name="waiting_user_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Narrative" name="narrative">
+                            <group>
+                                <field name="plan_this_week"
+                                       placeholder="What was agreed on Monday"/>
+                                <field name="blocker"
+                                       placeholder="What is in the way, and who has to act"/>
+                                <field name="next_week"
+                                       placeholder="Required before submitting"/>
+                            </group>
+                        </page>
+                        <page string="Closed this week" name="done">
+                            <field name="done_task_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="custom_vertical_id"/>
+                                    <field name="custom_story_points"/>
+                                    <field name="custom_cycle_time_team"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_weekly_search" model="ir.ui.view">
+        <field name="name">custom.weekly.progress.search</field>
+        <field name="model">custom.weekly.progress</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="week_code"/>
+                <field name="vertical_id"/>
+                <field name="project_id"/>
+                <field name="author_id"/>
+                <filter name="f_draft" string="Not submitted" domain="[('state','=','draft')]"/>
+                <filter name="f_blocked" string="Blocked" domain="[('health','=','blocked')]"/>
+                <group>
+                    <filter name="g_week" string="Week" context="{'group_by':'week_code'}"/>
+                    <filter name="g_vertical" string="Vertical" context="{'group_by':'vertical_id'}"/>
+                    <filter name="g_author" string="Business Analyst"
+                            context="{'group_by':'author_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_weekly" model="ir.actions.act_window">
+        <field name="name">Weekly Progress</field>
+        <field name="res_model">custom.weekly.progress</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_weekly_search"/>
+    </record>
+
+    <!-- Business-Analyst summary: the BA screen from the plan, expressed as a grouped
+         list rather than a new table. Every number here is an aggregate. -->
+    <record id="action_ba_summary" model="ir.actions.act_window">
+        <field name="name">Business Analyst Summary</field>
+        <field name="res_model">custom.weekly.progress</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'group_by': ['author_id', 'vertical_id']}</field>
+    </record>
+
+</odoo>

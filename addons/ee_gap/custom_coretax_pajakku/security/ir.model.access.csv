@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pajakku_tx_user,custom.coretax.transaction user,model_custom_coretax_transaction,group_pajakku_user,1,1,1,0
+access_pajakku_tx_admin,custom.coretax.transaction admin,model_custom_coretax_transaction,group_pajakku_admin,1,1,1,1
+access_pajakku_usage_user,custom.coretax.pajakku.usage user,model_custom_coretax_pajakku_usage,group_pajakku_user,1,0,0,0
+access_pajakku_usage_admin,custom.coretax.pajakku.usage admin,model_custom_coretax_pajakku_usage,group_pajakku_admin,1,1,1,1
+access_pajakku_secret_wiz,secret wizard admin,model_custom_coretax_pajakku_secret_wizard,group_pajakku_admin,1,1,1,1

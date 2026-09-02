@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="sign_page" name="Sign Page">
+        <t t-call="website.layout">
+            <div class="container py-4">
+                <h2>Signature requested: <t t-out="request.name"/></h2>
+                <p>Hi <b t-out="signer.name"/>, please review and sign.</p>
+                <hr/>
+                <form t-attf-action="/sign/#{signer.access_token}/submit" method="POST">
+                    <input type="hidden" name="csrf_token" t-att-value="request.env['ir.http'].get_csrf_token()"/>
+                    <div class="mb-3">
+                        <label>Type your full name to sign</label>
+                        <input name="signature_text" class="form-control" required="required"/>
+                    </div>
+                    <input type="hidden" name="signature_data" value=""/>
+                    <button type="submit" class="btn btn-primary">Sign</button>
+                </form>
+            </div>
+        </t>
+    </template>
+    <template id="sign_done" name="Sign Done">
+        <t t-call="website.layout">
+            <div class="container py-4 text-center">
+                <h2>✅ Signature recorded</h2>
+                <p>Thank you, <span t-out="signer.name"/>.</p>
+            </div>
+        </t>
+    </template>
+</odoo>

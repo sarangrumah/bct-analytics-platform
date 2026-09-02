@@ -1,0 +1,9 @@
+node_modules
+.next
+out
+evidence
+tests
+scripts/measure-p95.mjs
+.env.local
+*.tsbuildinfo
+README.md

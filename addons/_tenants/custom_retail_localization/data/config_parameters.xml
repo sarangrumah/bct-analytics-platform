@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Goods-Receipt GL switch.
+
+        "0" (default) -> Automated valuation: the GR journal IS posted at
+                         receipt confirm (Dr Inventory / Cr Stock Input / GRIR).
+        "1"           -> Periodic behaviour: the GR journal is suppressed and
+                         the GL is kept in sync via Inventory Reconciliation.
+
+      noupdate="1" so a value changed by an administrator survives module
+      upgrades. Editable at Settings > Technical > System Parameters.
+    -->
+    <data noupdate="1">
+        <record id="param_suppress_gr_journal" model="ir.config_parameter">
+            <field name="key">custom_retail_localization.suppress_gr_journal</field>
+            <field name="value">0</field>
+        </record>
+        <!--
+          Scrap-loss P&L account CODE used by the Scrap Batch valuation journal
+          (Dr Scrap Loss / Cr Stock Valuation). Resolved per company by code, so
+          the same code must exist in each 10-digit chart company. Empty by
+          default — set the account code before validating a scrap batch.
+        -->
+        <record id="param_scrap_loss_account_code" model="ir.config_parameter">
+            <field name="key">custom_retail_localization.scrap_loss_account_code</field>
+            <field name="value"></field>
+        </record>
+        <!--
+          Clearing account CODE used by Product Category Reclassification when a
+          correction falls in a period that is already closed. Such a correction
+          is booked in the current month as a REVERSAL (Dr account-was / Cr
+          clearing) plus a RE-BOOKING (Dr clearing / Cr account-should-be), so
+          the closed month is never reopened and the clearing account always
+          nets to zero. Empty by default — only required once a closed period is
+          actually involved.
+        -->
+        <record id="param_categ_reclass_clearing_account_code" model="ir.config_parameter">
+            <field name="key">custom_retail_localization.categ_reclass_clearing_account_code</field>
+            <field name="value"></field>
+        </record>
+    </data>
+</odoo>

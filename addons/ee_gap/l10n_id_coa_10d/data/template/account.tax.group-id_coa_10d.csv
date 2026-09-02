@@ -1,0 +1,8 @@
+"id","country_id","name","tax_payable_account_id","tax_receivable_account_id"
+"id_coa_10d_tg_luxury_good_taxes","base.id","Luxury Good Taxes","",""
+"id_coa_10d_tg_non_luxury_good_taxes","base.id","Non-luxury Good Taxes","",""
+"id_coa_10d_tg_pph_22_impor","base.id","PPh 22 Impor","",""
+"id_coa_10d_tg_pph_23","base.id","PPh 23","",""
+"id_coa_10d_tg_sltg","base.id","SLTG","",""
+"id_coa_10d_tg_tax_exempted","base.id","Tax Exempted","",""
+"id_coa_10d_tg_zero_rated_taxes","base.id","Zero-rated Taxes","",""

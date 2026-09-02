@@ -1,0 +1,20 @@
+{
+  "path": "https://stg7.esb.co.id/core-stg/supplier",
+  "timestamp": "2026-07-21 09:00:07",
+  "status": "ok",
+  "code": "EC03100000",
+  "message": "OK",
+  "result": {
+    "page": 1, "limit": 100, "count": 2,
+    "data": [
+      {"supplierID": 41, "supplierCode": "SUP-AYM", "supplierName": "CV Ayam Segar Nusantara",
+       "address": "Jl. Raya Bogor No. 12", "dueDate": 30, "flagActive": 1,
+       "contactPerson": "Budi", "cellPhone": "081200000001", "category": "Bahan Baku", "supplierCategoryID": 2},
+      {"supplierID": 42, "supplierCode": "SUP-BRS", "supplierName": "PT Beras Makmur",
+       "address": "Jl. Industri No. 8", "dueDate": 14, "flagActive": 1,
+       "contactPerson": "Sari", "cellPhone": "081200000002", "category": "Bahan Baku", "supplierCategoryID": 2}
+    ],
+    "prev": "", "next": ""
+  },
+  "errors": null
+}

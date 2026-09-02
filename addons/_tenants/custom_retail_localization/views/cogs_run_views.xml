@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_retail_cogs_run_form" model="ir.ui.view">
+        <field name="name">retail.cogs.run.form</field>
+        <field name="model">retail.cogs.run</field>
+        <field name="arch" type="xml">
+            <form string="Periodic COGS">
+                <header>
+                    <button name="action_compute" type="object" string="Compute"
+                            class="btn-primary"
+                            invisible="state == 'generated'"/>
+                    <button name="action_generate_move" type="object"
+                            string="Generate Journal Entry" class="btn-primary"
+                            invisible="state == 'generated'"/>
+                    <button name="action_view_move" type="object"
+                            string="View Journal Entry"
+                            invisible="not move_id"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,computed,generated"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group>
+                            <field name="journal_id"/>
+                            <field name="move_id" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="zero_cost_qty == 0">
+                        <field name="zero_cost_qty" readonly="1" nolabel="1"
+                               class="oe_inline"/>
+                        units were sold with no cost on the product, so the COGS
+                        below is understated. Load the purchases for those
+                        products and press Compute again.
+                    </div>
+                    <field name="line_ids">
+                        <list create="false" editable="bottom">
+                            <field name="warehouse_id"/>
+                            <field name="analytic_account_id"/>
+                            <field name="product_categ_id"/>
+                            <field name="expense_account_id"/>
+                            <field name="valuation_account_id"/>
+                            <field name="quantity" sum="Qty"/>
+                            <field name="zero_cost_qty" sum="Qty w/o cost"/>
+                            <field name="amount" sum="COGS"/>
+                            <field name="currency_id" column_invisible="1"/>
+                        </list>
+                    </field>
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="total_cogs" widget="monetary"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_retail_cogs_run_list" model="ir.ui.view">
+        <field name="name">retail.cogs.run.list</field>
+        <field name="model">retail.cogs.run</field>
+        <field name="arch" type="xml">
+            <list string="Periodic COGS">
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="total_cogs" sum="COGS"/>
+                <field name="state"
+                       decoration-success="state == 'generated'"
+                       decoration-info="state == 'computed'"
+                       widget="badge"/>
+                <field name="move_id"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_retail_cogs_run" model="ir.actions.act_window">
+        <field name="name">Periodic COGS</field>
+        <field name="res_model">retail.cogs.run</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Recognise COGS for a period</p>
+            <p>Multiplies the quantity sold at each store by the product cost that
+               the goods receipts established, and books a draft
+               Dr COGS / Cr Inventory entry carrying the store's Operating Unit,
+               so the P&amp;L splits per store.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_retail_cogs_run"
+              name="Periodic COGS"
+              parent="account.menu_finance_entries"
+              action="action_retail_cogs_run"
+              sequence="91"/>
+</odoo>

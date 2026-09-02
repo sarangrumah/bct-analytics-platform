@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="seq_affiliate_code" model="ir.sequence">
+        <field name="name">Affiliate Code</field>
+        <field name="code">custom.affiliate.code</field>
+        <field name="prefix">AFF</field>
+        <field name="padding">5</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_affiliate_payout" model="ir.sequence">
+        <field name="name">Affiliate Payout</field>
+        <field name="code">custom.affiliate.payout</field>
+        <field name="prefix">AFP/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="number_increment">1</field>
+    </record>
+</odoo>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_stock_lot_form_supplier_batch" model="ir.ui.view">
+        <field name="name">stock.lot.form.supplier.batch</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <field name="ref" position="after">
+                <field name="supplier_batch_ref"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_stock_lot_list_supplier_batch" model="ir.ui.view">
+        <field name="name">stock.lot.list.supplier.batch</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_tree"/>
+        <field name="arch" type="xml">
+            <field name="ref" position="after">
+                <field name="supplier_batch_ref" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

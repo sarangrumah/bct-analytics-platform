@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_fixed_asset_location_list" model="ir.ui.view">
+        <field name="name">custom.fixed.asset.location.list</field>
+        <field name="model">custom.fixed.asset.location</field>
+        <field name="arch" type="xml">
+            <list string="Asset Locations">
+                <field name="complete_name"/>
+                <field name="code"/>
+                <field name="parent_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fixed_asset_location_form" model="ir.ui.view">
+        <field name="name">custom.fixed.asset.location.form</field>
+        <field name="model">custom.fixed.asset.location</field>
+        <field name="arch" type="xml">
+            <form string="Asset Location">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="parent_id"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="address"/>
+                            <field name="note"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Sub-locations">
+                            <field name="child_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fixed_asset_location" model="ir.actions.act_window">
+        <field name="name">Asset Locations</field>
+        <field name="res_model">custom.fixed.asset.location</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

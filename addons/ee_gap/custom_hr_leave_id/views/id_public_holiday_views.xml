@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_id_public_holiday_list" model="ir.ui.view">
+        <field name="name">id.public.holiday.list</field>
+        <field name="model">id.public.holiday</field>
+        <field name="arch" type="xml">
+            <list string="Public Holidays">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="type_code"/>
+                <field name="year"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_id_public_holiday_form" model="ir.ui.view">
+        <field name="name">id.public.holiday.form</field>
+        <field name="model">id.public.holiday</field>
+        <field name="arch" type="xml">
+            <form string="Public Holiday">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Hari Kemerdekaan"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="type_code"/>
+                        </group>
+                        <group>
+                            <field name="year"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_id_public_holiday_search" model="ir.ui.view">
+        <field name="name">id.public.holiday.search</field>
+        <field name="model">id.public.holiday</field>
+        <field name="arch" type="xml">
+            <search string="Public Holidays">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="year"/>
+                <filter name="national" string="National"
+                        domain="[('type_code','=','national')]"/>
+                <filter name="regional" string="Regional"
+                        domain="[('type_code','=','regional')]"/>
+                <filter name="religious" string="Religious"
+                        domain="[('type_code','=','religious')]"/>
+                <separator/>
+                <filter name="group_year" string="Year" context="{'group_by':'year'}"/>
+                <filter name="group_type" string="Type" context="{'group_by':'type_code'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_id_public_holiday" model="ir.actions.act_window">
+        <field name="name">Public Holidays ID</field>
+        <field name="res_model">id.public.holiday</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_id_public_holiday_search"/>
+    </record>
+</odoo>

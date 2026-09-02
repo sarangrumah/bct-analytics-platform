@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_notify_log_list" model="ir.ui.view">
+        <field name="name">custom.project.notify.log.list</field>
+        <field name="model">custom.project.notify.log</field>
+        <field name="arch" type="xml">
+            <list string="Delivery Log" create="false"
+                  decoration-danger="success == False and not skipped_reason"
+                  decoration-warning="skipped_reason != False">
+                <field name="sent_at"/>
+                <field name="event"/>
+                <field name="res_label"/>
+                <field name="vertical_id"/>
+                <field name="channel"/>
+                <field name="transport"/>
+                <field name="recipient_kind"/>
+                <field name="recipient_name"/>
+                <field name="recipient_phone_masked" string="Phone"/>
+                <field name="success" widget="boolean_toggle" readonly="1"/>
+                <field name="skipped_reason"/>
+                <field name="error_message"/>
+                <field name="attempt"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_notify_log_search" model="ir.ui.view">
+        <field name="name">custom.project.notify.log.search</field>
+        <field name="model">custom.project.notify.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="event"/>
+                <field name="res_label"/>
+                <field name="recipient_name"/>
+                <filter name="f_failed" string="Failed" domain="[('success','=',False)]"/>
+                <filter name="f_skipped" string="Skipped" domain="[('skipped_reason','!=',False)]"/>
+                <filter name="f_wa" string="WhatsApp" domain="[('channel','=','wa')]"/>
+                <filter name="f_email" string="E-mail" domain="[('channel','=','email')]"/>
+                <group>
+                    <filter name="g_event" string="Event" context="{'group_by':'event'}"/>
+                    <filter name="g_channel" string="Channel" context="{'group_by':'channel'}"/>
+                    <filter name="g_vertical" string="Vertical" context="{'group_by':'vertical_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_notify_log" model="ir.actions.act_window">
+        <field name="name">Delivery Log</field>
+        <field name="res_model">custom.project.notify.log</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_notify_log_search"/>
+    </record>
+
+</odoo>

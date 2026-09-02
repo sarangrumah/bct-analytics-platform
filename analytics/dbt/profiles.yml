@@ -1,0 +1,38 @@
+# ===========================================================================
+# dbt profile. DBT_PROFILES_DIR=/dbt, so this file is found beside the project.
+#
+# Every value is an env_var with NO default for the credentials: a missing
+# password must fail loudly at connection time rather than silently fall back
+# to a local socket or a wrong database. Security's DSN scanner covers eight
+# schemes and a literal password here would fail the commit hook — correctly.
+#
+# THE ROLE MATTERS. dbt connects as `warehouse`, which is NOSUPERUSER and
+# NOBYPASSRLS. It is not the container's POSTGRES_USER. If dbt connected as a
+# superuser, row security would never be evaluated for it and every
+# tenant-isolation test in this project would pass while proving nothing.
+# See docs/agents/contracts/05-warehouse.md §A.
+# ===========================================================================
+bct_warehouse:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('WAREHOUSE_HOST', 'warehouse-db') }}"
+      port: "{{ env_var('WAREHOUSE_PORT', '5432') | int }}"
+      user: "{{ env_var('WAREHOUSE_DB_USER') }}"
+      password: "{{ env_var('WAREHOUSE_DB_PASSWORD') }}"
+      dbname: "{{ env_var('WAREHOUSE_DB') }}"
+      # The default schema. generate_schema_name() overrides it per folder with
+      # the CUSTOM schema verbatim, so a model configured `+schema: staging`
+      # lands in `staging` and not in dbt's default `marts_staging`.
+      schema: marts
+      threads: "{{ env_var('DBT_THREADS', '4') | int }}"
+      sslmode: disable
+      # A dbt model that has not returned in ten minutes is not going to. The
+      # container has a 1 GiB hard limit and a runaway hash join reaches it
+      # before the query finishes.
+      keepalives_idle: 30
+      connect_timeout: 10
+      # Every session dbt opens is attributable in the warehouse log, which
+      # carries %u@%d/%a in log_line_prefix.
+      application_name: dbt

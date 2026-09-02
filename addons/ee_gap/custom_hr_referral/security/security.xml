@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="module_category_referral" model="ir.module.category">
+            <field name="name">Referral</field>
+            <field name="sequence">106</field>
+        </record>
+        <record id="group_referral_user" model="res.groups">
+            <field name="name">Referral User</field>
+        </record>
+        <record id="group_referral_hr" model="res.groups">
+            <field name="name">Referral HR</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_referral_user'))]"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_plm_root" name="PLM" sequence="72"
+              groups="custom_mrp_plm.group_plm_user"/>
+    <menuitem id="menu_plm_eco" name="ECOs" parent="menu_plm_root"
+              action="action_mrp_eco" sequence="10"/>
+    <menuitem id="menu_plm_config" name="Configuration" parent="menu_plm_root"
+              sequence="100" groups="custom_mrp_plm.group_plm_manager"/>
+    <menuitem id="menu_plm_stages" name="Stages" parent="menu_plm_config"
+              action="action_eco_stage" sequence="10"/>
+</odoo>

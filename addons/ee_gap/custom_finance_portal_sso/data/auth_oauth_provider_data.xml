@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Keycloak OIDC provider, seeded DISABLED. Per tenant: replace the realm
+         host, set the client_id, then tick "enabled". The validation/userinfo
+         endpoint must return the role claims referenced by the SSO role map. -->
+    <record id="provider_keycloak" model="auth.oauth.provider">
+        <field name="name">Keycloak SSO</field>
+        <field name="client_id">finance-portal</field>
+        <field name="auth_endpoint">https://keycloak.example.com/realms/erp/protocol/openid-connect/auth</field>
+        <field name="scope">openid email profile roles</field>
+        <field name="validation_endpoint">https://keycloak.example.com/realms/erp/protocol/openid-connect/userinfo</field>
+        <field name="data_endpoint">https://keycloak.example.com/realms/erp/protocol/openid-connect/userinfo</field>
+        <field name="css_class">fa fa-key</field>
+        <field name="body">Login with SSO</field>
+        <field name="enabled" eval="False"/>
+    </record>
+</odoo>

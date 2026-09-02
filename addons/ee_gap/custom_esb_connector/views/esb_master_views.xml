@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Branches -->
+    <record id="view_esb_branch_list" model="ir.ui.view">
+        <field name="name">custom.esb.branch.list</field>
+        <field name="model">custom.esb.branch</field>
+        <field name="arch" type="xml">
+            <list string="ESB Branches">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="esb_branch_id"/>
+                <field name="location_count" string="Locations"/>
+                <field name="warehouse_id"/>
+                <field name="last_synced_at"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_esb_branch_form" model="ir.ui.view">
+        <field name="name">custom.esb.branch.form</field>
+        <field name="model">custom.esb.branch</field>
+        <field name="arch" type="xml">
+            <form string="ESB Branch">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h3><field name="code" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="ESB">
+                            <field name="esb_branch_id" readonly="1"/>
+                            <field name="last_synced_at" readonly="1"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="Odoo">
+                            <field name="company_id"/>
+                            <field name="warehouse_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Locations">
+                            <field name="location_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="esb_location_id"/>
+                                    <field name="countable"/>
+                                    <field name="location_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_esb_branch" model="ir.actions.act_window">
+        <field name="name">ESB Branches</field>
+        <field name="res_model">custom.esb.branch</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Locations -->
+    <record id="view_esb_location_list" model="ir.ui.view">
+        <field name="name">custom.esb.location.list</field>
+        <field name="model">custom.esb.location</field>
+        <field name="arch" type="xml">
+            <list string="ESB Locations" editable="bottom">
+                <field name="branch_id" readonly="1"/>
+                <field name="name" readonly="1"/>
+                <field name="esb_location_id" readonly="1"/>
+                <field name="countable"/>
+                <field name="location_id"/>
+                <field name="last_synced_at" readonly="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_esb_location" model="ir.actions.act_window">
+        <field name="name">ESB Locations</field>
+        <field name="res_model">custom.esb.location</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- Purposes -->
+    <record id="view_esb_purpose_list" model="ir.ui.view">
+        <field name="name">custom.esb.purpose.list</field>
+        <field name="model">custom.esb.purpose</field>
+        <field name="arch" type="xml">
+            <list string="ESB Purposes" editable="bottom">
+                <field name="name" readonly="1"/>
+                <field name="esb_purpose_id" readonly="1"/>
+                <field name="account_code" readonly="1"/>
+                <field name="applied_to" readonly="1"/>
+                <field name="is_default_gain"/>
+                <field name="is_default_loss"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_esb_purpose" model="ir.actions.act_window">
+        <field name="name">ESB Purposes</field>
+        <field name="res_model">custom.esb.purpose</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No ESB purposes yet</p>
+            <p>Purposes are ESB's adjustment reasons and each one carries a chart-of-accounts
+            code, so the purpose chosen on a stock adjustment is what routes the variance in
+            ESB's general ledger. Run the master sync, then tick which purpose should be the
+            default for stock gains and for stock losses.</p>
+        </field>
+    </record>
+
+    <!-- Stock snapshot -->
+    <record id="view_esb_stock_snapshot_list" model="ir.ui.view">
+        <field name="name">custom.esb.stock.snapshot.list</field>
+        <field name="model">custom.esb.stock.snapshot</field>
+        <field name="arch" type="xml">
+            <list string="ESB Stock Snapshot" create="false">
+                <field name="branch_id"/>
+                <field name="location_id"/>
+                <field name="product_id"/>
+                <field name="qty" sum="Qty"/>
+                <field name="uom_name"/>
+                <field name="unit_value"/>
+                <field name="value" sum="Value"/>
+                <field name="last_movement_date"/>
+                <field name="as_of"/>
+                <field name="source"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_esb_stock_snapshot_search" model="ir.ui.view">
+        <field name="name">custom.esb.stock.snapshot.search</field>
+        <field name="model">custom.esb.stock.snapshot</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+                <field name="branch_id"/>
+                <field name="location_id"/>
+                <filter name="negative" string="Negative Stock" domain="[('qty', '&lt;', 0)]"/>
+                <group>
+                    <filter name="group_branch" string="Branch" context="{'group_by': 'branch_id'}"/>
+                    <filter name="group_location" string="Location" context="{'group_by': 'location_id'}"/>
+                    <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_esb_stock_snapshot" model="ir.actions.act_window">
+        <field name="name">ESB Stock Snapshot</field>
+        <field name="res_model">custom.esb.stock.snapshot</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No snapshot rows yet</p>
+            <p>ESB exposes no bulk stock-on-hand endpoint, so balances are derived from the
+            stock movement report. A product with no movement inside the lookback window has
+            no row here — that means <b>unknown</b>, not zero.</p>
+        </field>
+    </record>
+</odoo>

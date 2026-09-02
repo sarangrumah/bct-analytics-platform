@@ -1,0 +1,50 @@
+.o_report_table_action {
+    height: 100%;
+    overflow: auto;
+
+    .o_report_table {
+        th.o_report_th {
+            white-space: nowrap;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            background-color: var(--o-gray-200, #e9ecef);
+            z-index: 1;
+        }
+
+        .o_report_row_header td {
+            background-color: var(--o-gray-200, #e9ecef);
+            text-transform: uppercase;
+        }
+
+        .o_report_row_section td {
+            background-color: var(--o-gray-100, #f8f9fa);
+        }
+
+        .o_report_row_grand_total td,
+        .o_report_row_total td,
+        .o_report_row_subtotal td {
+            border-top: 2px solid var(--o-gray-400, #ced4da);
+            background-color: var(--o-gray-100, #f8f9fa);
+        }
+
+        .o_report_row_drilldown {
+            cursor: pointer;
+
+            td:first-child {
+                color: var(--o-action, #714b67);
+                text-decoration: underline;
+            }
+        }
+
+        td.o_report_cell_drilldown {
+            color: var(--o-action, #714b67);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .o_report_row_check td {
+            font-style: italic;
+        }
+    }
+}

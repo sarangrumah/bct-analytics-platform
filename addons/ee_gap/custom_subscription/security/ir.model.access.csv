@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_subscription_plan_user,subscription.plan user,model_subscription_plan,custom_subscription.group_user,1,0,0,0
+access_subscription_plan_manager,subscription.plan manager,model_subscription_plan,custom_subscription.group_manager,1,1,1,1
+access_subscription_contract_user,subscription.contract user,model_subscription_contract,custom_subscription.group_user,1,1,1,0
+access_subscription_contract_manager,subscription.contract manager,model_subscription_contract,custom_subscription.group_manager,1,1,1,1

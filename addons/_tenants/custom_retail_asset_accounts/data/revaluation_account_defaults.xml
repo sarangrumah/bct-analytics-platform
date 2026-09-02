@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Re-runs on every module update. The method is idempotent and
+      non-destructive: it only fills empty revaluation-account fields on asset
+      groups belonging to companies that carry the 10-digit chart codes.
+    -->
+    <function model="custom.fixed.asset.group"
+              name="_apply_id_coa_10d_revaluation_defaults"/>
+</odoo>

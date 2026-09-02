@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_retail_mdm_pending_sku_list" model="ir.ui.view">
+        <field name="name">retail.mdm.pending.sku.list</field>
+        <field name="model">retail.mdm.pending.sku</field>
+        <field name="arch" type="xml">
+            <list string="Unregistered SKUs" decoration-danger="state == 'pending'"
+                  decoration-success="state == 'replayed'" decoration-muted="state == 'ignored'">
+                <field name="composite_code"/>
+                <field name="item_code" optional="show"/>
+                <field name="ean" optional="show"/>
+                <field name="description" optional="show"/>
+                <field name="store_code" optional="hide"/>
+                <field name="occurrence_count" sum="Occurrences"/>
+                <field name="parked_line_count" sum="Parked Rows"/>
+                <field name="parked_txn_count" sum="Parked Transactions"/>
+                <field name="first_seen_at" optional="hide"/>
+                <field name="last_seen_at" optional="show"/>
+                <field name="resolved_product_id" optional="hide"/>
+                <field name="state" widget="badge"/>
+                <button name="action_replay" type="object" string="Replay"
+                        icon="fa-refresh" invisible="state in ('replayed', 'ignored')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_retail_mdm_pending_sku_form" model="ir.ui.view">
+        <field name="name">retail.mdm.pending.sku.form</field>
+        <field name="model">retail.mdm.pending.sku</field>
+        <field name="arch" type="xml">
+            <form string="Unregistered SKU">
+                <header>
+                    <button name="action_replay" type="object" string="Replay Parked Transactions"
+                            class="btn-primary" invisible="state in ('replayed', 'ignored')"/>
+                    <button name="action_ignore" type="object" string="Ignore"
+                            invisible="state == 'ignored'"/>
+                    <button name="action_reset_pending" type="object" string="Reset to Pending"
+                            invisible="state == 'pending'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="pending,registered,replayed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_parked_lines" type="object"
+                                class="oe_stat_button" icon="fa-list">
+                            <field name="parked_line_count" widget="statinfo" string="Parked Rows"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Identity">
+                            <field name="item_code"/>
+                            <field name="waist"/>
+                            <field name="inseam"/>
+                            <field name="composite_code"/>
+                            <field name="ean"/>
+                            <field name="description"/>
+                        </group>
+                        <group string="Occurrence">
+                            <field name="store_code"/>
+                            <field name="occurrence_count"/>
+                            <field name="parked_txn_count"/>
+                            <field name="first_seen_at"/>
+                            <field name="last_seen_at"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Resolution">
+                            <field name="resolved_product_id"/>
+                            <field name="resolved_at"/>
+                            <field name="replayed_at"/>
+                            <field name="last_error"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Parked Rows" name="parked">
+                            <field name="parked_line_ids" readonly="1">
+                                <list>
+                                    <field name="log_id"/>
+                                    <field name="row_number"/>
+                                    <field name="aggregate_key"/>
+                                    <field name="state"/>
+                                    <field name="error_message"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_retail_mdm_pending_sku_search" model="ir.ui.view">
+        <field name="name">retail.mdm.pending.sku.search</field>
+        <field name="model">retail.mdm.pending.sku</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="composite_code"/>
+                <field name="item_code"/>
+                <field name="ean"/>
+                <field name="description"/>
+                <field name="store_code"/>
+                <filter name="filter_pending" string="Pending" domain="[('state', '=', 'pending')]"/>
+                <filter name="filter_registered" string="Registered"
+                        domain="[('state', '=', 'registered')]"/>
+                <filter name="filter_replayed" string="Replayed" domain="[('state', '=', 'replayed')]"/>
+                <filter name="filter_still_parked" string="Still Has Parked Rows"
+                        domain="[('parked_line_count', '&gt;', 0)]"/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_store" string="Store" context="{'group_by': 'store_code'}"/>
+                    <filter name="group_first_seen" string="First Seen"
+                            context="{'group_by': 'first_seen_at:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_retail_mdm_pending_sku" model="ir.actions.act_window">
+        <field name="name">Unregistered SKUs</field>
+        <field name="res_model">retail.mdm.pending.sku</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_retail_mdm_pending_sku_search"/>
+        <field name="context">{'search_default_filter_pending': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No unregistered SKUs.</p>
+            <p>
+                Sales rows quoting a product that is not yet in the master land here, together
+                with the transactions they parked. When the master arrives — from the X101 file
+                or from the MDM API — those transactions are posted automatically.
+            </p>
+        </field>
+    </record>
+
+    <!-- Product-side filters for the same problem, from the other direction. -->
+    <record id="view_product_template_search_mdm" model="ir.ui.view">
+        <field name="name">product.template.search.mdm</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="filter_mdm_pending" string="MDM Pending"
+                        domain="[('mdm_pending', '=', True)]"/>
+                <filter name="filter_mdm_category_unmapped" string="MDM Category Unmapped"
+                        domain="[('mdm_category_unmapped', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

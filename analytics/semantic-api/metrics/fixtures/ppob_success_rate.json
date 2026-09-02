@@ -1,0 +1,99 @@
+{
+  "metric": "ppob_success_rate",
+  "dimensions": [
+    "date_day"
+  ],
+  "rows": [
+    {
+      "date_day": "2026-06-10",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-03-03",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-01-29",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-06-07",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-07-13",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-02-10",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-02-03",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-02-07",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-05-05",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-04-21",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-03-19",
+      "value": 0.6
+    },
+    {
+      "date_day": "2026-04-14",
+      "value": 0.75
+    },
+    {
+      "date_day": "2026-01-10",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-03-21",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-03-12",
+      "value": 0.3333333333333333
+    },
+    {
+      "date_day": "2026-04-06",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-06-20",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-04-27",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-03-06",
+      "value": 1.0
+    },
+    {
+      "date_day": "2026-08-11",
+      "value": 1.0
+    }
+  ],
+  "meta": {
+    "tenant_id": "bct",
+    "row_count": 20,
+    "last_refreshed_at": "2026-08-31T11:14:30.091922+00:00",
+    "is_stale": false,
+    "refresh_sla_seconds": 60,
+    "source_model": "fct_ppob_transaction",
+    "unit": null,
+    "type": "percent",
+    "query_duration_ms": 16.8
+  }
+}

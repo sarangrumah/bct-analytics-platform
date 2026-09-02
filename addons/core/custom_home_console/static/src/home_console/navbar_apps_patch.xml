@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!--
+        Replace the desktop Dropdown apps-menu trigger with a button
+        that opens the Home Console client action directly.
+
+        Pattern: t-inherit (extension mode) — same as
+        addons/website/.../navbar.xml uses on the same template. The
+        inherit block must NOT carry a t-name attribute; otherwise OWL
+        registers a brand-new template under that name instead of
+        modifying the upstream one in place.
+    -->
+    <t t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension">
+        <!-- Target only the first child of the apps-menu wrapper (i.e.
+             the <Dropdown>), leaving the wrapper's t-if and the sibling
+             t-else stub intact. Using *[1] dodges the case-sensitive
+             OWL Component tag-name match that made //Dropdown a no-op. -->
+        <xpath expr="//div[hasclass('o_navbar_apps_menu')]/*[1]" position="replace">
+            <button class="border-0 bg-transparent o_navbar_apps_button"
+                    data-hotkey="h"
+                    title="Home"
+                    t-on-click="() => this.openHomeConsole()">
+                <i class="oi oi-apps"/>
+            </button>
+        </xpath>
+    </t>
+
+</templates>

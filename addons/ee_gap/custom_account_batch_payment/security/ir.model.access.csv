@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_batch_payment_read,custom.account.batch.payment read,model_custom_account_batch_payment,account.group_account_readonly,1,0,0,0
+access_batch_payment_user,custom.account.batch.payment user,model_custom_account_batch_payment,account.group_account_user,1,1,1,1
+access_batch_format_read,custom.batch.payment.format read,model_custom_batch_payment_format,account.group_account_readonly,1,0,0,0
+access_batch_format_manager,custom.batch.payment.format manager,model_custom_batch_payment_format,account.group_account_manager,1,1,1,1

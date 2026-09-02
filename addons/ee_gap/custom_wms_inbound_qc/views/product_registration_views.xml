@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_wms_product_registration_list" model="ir.ui.view">
+        <field name="name">custom.wms.product.registration.list</field>
+        <field name="model">custom.wms.product.registration</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'draft'" decoration-muted="state == 'rejected'"
+                  decoration-success="state == 'approved'">
+                <field name="name"/>
+                <field name="barcode"/>
+                <field name="proposed_name"/>
+                <field name="picking_id"/>
+                <field name="partner_id"/>
+                <field name="quantity"/>
+                <field name="product_id"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_wms_product_registration_form" model="ir.ui.view">
+        <field name="name">custom.wms.product.registration.form</field>
+        <field name="model">custom.wms.product.registration</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve &amp; Create Product" type="object"
+                            class="btn-primary" invisible="state != 'submitted'"
+                            groups="custom_wms_inbound_qc.group_wms_qc_manager"/>
+                    <button name="action_reject" string="Reject" type="object"
+                            invisible="state in ('approved', 'rejected')"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object"
+                            invisible="state in ('draft', 'approved')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Scanned">
+                            <field name="barcode"/>
+                            <field name="scanned_description"/>
+                            <field name="quantity"/>
+                            <field name="picking_id"/>
+                            <field name="partner_id"/>
+                            <field name="scanned_by_id"/>
+                        </group>
+                        <group string="Proposed Product Master">
+                            <field name="proposed_name"/>
+                            <field name="proposed_default_code"/>
+                            <field name="categ_id"/>
+                            <field name="uom_id"/>
+                            <field name="abc_class"/>
+                        </group>
+                        <group string="Logistics Data">
+                            <field name="weight"/>
+                            <field name="volume"/>
+                            <field name="package_type_id"/>
+                        </group>
+                        <group string="Outcome">
+                            <field name="product_id"/>
+                            <field name="rejection_reason" invisible="state != 'rejected'"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_wms_product_registration" model="ir.actions.act_window">
+        <field name="name">Unknown-Item Registrations</field>
+        <field name="res_model">custom.wms.product.registration</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

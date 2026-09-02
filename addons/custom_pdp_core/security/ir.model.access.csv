@@ -1,0 +1,3 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+access_pdp_field_classification_user,pdp.field.classification.user,model_pdp_field_classification,base.group_user,1,0,0,0
+access_pdp_field_classification_officer,pdp.field.classification.officer,model_pdp_field_classification,custom_pdp_core.group_pdp_officer,1,1,1,1

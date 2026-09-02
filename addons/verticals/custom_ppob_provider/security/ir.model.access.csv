@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ppob_provider_user,ppob provider user,model_custom_ppob_provider,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_provider_ops,ppob provider ops,model_custom_ppob_provider,custom_ppob_core.group_ppob_ops,1,0,0,0
+access_ppob_provider_manager,ppob provider manager,model_custom_ppob_provider,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_provider_bucket_user,ppob provider bucket user,model_custom_ppob_provider_bucket,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_provider_bucket_ops,ppob provider bucket ops,model_custom_ppob_provider_bucket,custom_ppob_core.group_ppob_ops,1,1,0,0
+access_ppob_provider_bucket_manager,ppob provider bucket manager,model_custom_ppob_provider_bucket,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_provider_bucket_move_user,ppob provider bucket move user,model_custom_ppob_provider_bucket_move,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_provider_bucket_move_ops,ppob provider bucket move ops,model_custom_ppob_provider_bucket_move,custom_ppob_core.group_ppob_ops,1,0,1,0
+access_ppob_provider_bucket_move_manager,ppob provider bucket move manager,model_custom_ppob_provider_bucket_move,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_provider_sku_map_user,ppob provider sku map user,model_custom_ppob_provider_sku_map,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_provider_sku_map_manager,ppob provider sku map manager,model_custom_ppob_provider_sku_map,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_provider_topup_wizard,ppob provider topup wizard,model_custom_ppob_provider_topup_wizard,custom_ppob_core.group_ppob_ops,1,1,1,1
+access_ppob_provider_topup_log_user,ppob provider topup log user,model_custom_ppob_provider_topup_log,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_provider_topup_log_ops,ppob provider topup log ops,model_custom_ppob_provider_topup_log,custom_ppob_core.group_ppob_ops,1,1,1,0
+access_ppob_provider_topup_log_manager,ppob provider topup log manager,model_custom_ppob_provider_topup_log,custom_ppob_core.group_ppob_manager,1,1,1,1

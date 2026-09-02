@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_company_form_ic" model="ir.ui.view">
+        <field name="name">res.company.form.ic</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Intercompany" name="intercompany_info">
+                    <field name="x_custom_ic_enabled"/>
+                </group>
+                <group string="Lock Dates" name="accounting_lock_dates"
+                       groups="account.group_account_manager">
+                    <field name="fiscalyear_lock_date"/>
+                    <field name="tax_lock_date"/>
+                    <field name="sale_lock_date"/>
+                    <field name="purchase_lock_date"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="seq_ppob_transaction" model="ir.sequence">
+            <field name="name">PPOB Transaction</field>
+            <field name="code">custom.ppob.transaction</field>
+            <field name="prefix">PPOB/%(year)s%(month)s%(day)s/</field>
+            <field name="padding">8</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_ppob_wallet_move" model="ir.sequence">
+            <field name="name">Wallet Move</field>
+            <field name="code">custom.ppob.wallet.move</field>
+            <field name="prefix">WM/%(year)s%(month)s/</field>
+            <field name="padding">8</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_ppob_va_topup" model="ir.sequence">
+            <field name="name">VA Topup</field>
+            <field name="code">custom.ppob.va.topup</field>
+            <field name="prefix">VAT/%(year)s%(month)s/</field>
+            <field name="padding">8</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_ppob_provider_bucket_move" model="ir.sequence">
+            <field name="name">Provider Bucket Move</field>
+            <field name="code">custom.ppob.provider.bucket.move</field>
+            <field name="prefix">PBM/%(year)s%(month)s/</field>
+            <field name="padding">8</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_ppob_commission_accrual" model="ir.sequence">
+            <field name="name">Commission Accrual</field>
+            <field name="code">custom.ppob.commission.accrual</field>
+            <field name="prefix">CA/%(year)s%(month)s/</field>
+            <field name="padding">8</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

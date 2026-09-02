@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_printer_config_list" model="ir.ui.view">
+        <field name="name">custom.printer.config.list</field>
+        <field name="model">custom.printer.config</field>
+        <field name="arch" type="xml">
+            <list decoration-success="status == 'active'"
+                  decoration-danger="status == 'error'"
+                  decoration-muted="status == 'disabled'">
+                <field name="name"/>
+                <field name="printer_type"/>
+                <field name="host"/>
+                <field name="port"/>
+                <field name="label_template_id"/>
+                <field name="status" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_custom_printer_config_form" model="ir.ui.view">
+        <field name="name">custom.printer.config.form</field>
+        <field name="model">custom.printer.config</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="printer_type"/>
+                            <field name="host" invisible="printer_type not in ('zebra_network','escpos_network')"/>
+                            <field name="port" invisible="printer_type not in ('zebra_network','escpos_network')"/>
+                            <field name="cups_queue" invisible="printer_type != 'cups'"/>
+                        </group>
+                        <group>
+                            <field name="label_template_id"/>
+                            <field name="status"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+                    <separator string="Last Error"/>
+                    <field name="last_error" readonly="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_custom_printer_config" model="ir.actions.act_window">
+        <field name="name">Printers</field>
+        <field name="res_model">custom.printer.config</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

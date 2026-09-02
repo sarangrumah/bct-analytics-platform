@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_voip_provider_list" model="ir.ui.view">
+        <field name="name">voip.provider.list</field>
+        <field name="model">voip.provider</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="kind"/>
+                <field name="api_base_url"/>
+                <field name="caller_id"/>
+                <field name="auth_token_set" widget="boolean_toggle" readonly="1"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_voip_provider" model="ir.actions.act_window">
+        <field name="name">Providers</field>
+        <field name="res_model">voip.provider</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

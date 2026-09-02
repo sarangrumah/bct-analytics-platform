@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_module_deployment_list" model="ir.ui.view">
+        <field name="name">custom.hub.module.deployment.list</field>
+        <field name="model">custom.hub.module.deployment</field>
+        <field name="arch" type="xml">
+            <list string="Deployments">
+                <field name="requested_at"/>
+                <field name="catalog_id"/>
+                <field name="tenant_id"/>
+                <!-- environment_id injected by custom_tenant_infra -->
+                <field name="deploy_mode"/>
+                <field name="state"
+                       decoration-success="state == 'installed'"
+                       decoration-warning="state in ('installing','upgrading','pending')"
+                       decoration-danger="state == 'failed'"
+                       decoration-muted="state == 'uninstalled'"
+                       widget="badge"/>
+                <field name="canary_phase"
+                       decoration-info="canary_phase in ('canary','staged')"
+                       decoration-success="canary_phase == 'full'"
+                       decoration-danger="canary_phase == 'rolled_back'"
+                       widget="badge" optional="show"/>
+                <field name="healthcheck_passed" widget="boolean_toggle" optional="show"/>
+                <field name="requested_by_id"/>
+                <field name="completed_at"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_module_deployment_form" model="ir.ui.view">
+        <field name="name">custom.hub.module.deployment.form</field>
+        <field name="model">custom.hub.module.deployment</field>
+        <field name="arch" type="xml">
+            <form string="Deployment">
+                <header>
+                    <button name="action_deploy" type="object"
+                            string="Retry Deploy" class="btn-primary"
+                            invisible="state not in ('pending','failed')"/>
+                    <button name="action_resolve_dependencies" type="object"
+                            string="Resolve Deps" class="btn-secondary"/>
+                    <button name="action_take_pre_backup" type="object"
+                            string="Pre-Backup" class="btn-secondary"/>
+                    <button name="action_deploy_canary" type="object"
+                            string="Deploy Canary" class="btn-secondary"
+                            invisible="canary_phase in ('full','rolled_back')"/>
+                    <button name="action_healthcheck" type="object"
+                            string="Healthcheck" class="btn-secondary"
+                            invisible="canary_phase == 'none'"/>
+                    <button name="action_rollout_full" type="object"
+                            string="Rollout Full" class="btn-primary"
+                            invisible="not healthcheck_passed or canary_phase == 'full'"/>
+                    <button name="action_rollback" type="object"
+                            string="Rollback" class="btn-danger"
+                            confirm="Restore the snapshot to the tenant?"
+                            invisible="not rollback_snapshot_id or canary_phase == 'rolled_back'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="catalog_id"/>
+                            <field name="tenant_id"/>
+                            <field name="deploy_mode"/>
+                        </group>
+                        <group>
+                            <field name="requested_by_id"/>
+                            <field name="requested_at"/>
+                            <field name="started_at"/>
+                            <field name="completed_at"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Error" name="page_error">
+                            <field name="error_message" nolabel="1"/>
+                        </page>
+                        <page string="Canary &amp; Rollback" name="page_canary">
+                            <group>
+                                <group string="Target">
+                                    <!-- environment_id injected by custom_tenant_infra -->
+                                    <field name="canary_phase"/>
+                                </group>
+                                <group string="Health">
+                                    <field name="healthcheck_passed"/>
+                                    <field name="healthcheck_at"/>
+                                    <field name="rollback_snapshot_id"/>
+                                </group>
+                            </group>
+                            <group string="Resolved Dependency Graph">
+                                <field name="dep_graph_resolved_json" nolabel="1"
+                                       widget="text"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_module_deployment_kanban" model="ir.ui.view">
+        <field name="name">custom.hub.module.deployment.kanban</field>
+        <field name="model">custom.hub.module.deployment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="catalog_id"/>
+                <field name="tenant_id"/>
+                <field name="deploy_mode"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="o_kanban_record_top">
+                            <strong><field name="catalog_id"/></strong>
+                        </div>
+                        <div>
+                            <field name="tenant_id"/>
+                            <span class="float-end">
+                                <field name="deploy_mode"/>
+                            </span>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_module_deployment_search" model="ir.ui.view">
+        <field name="name">custom.hub.module.deployment.search</field>
+        <field name="model">custom.hub.module.deployment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="catalog_id"/>
+                <field name="tenant_id"/>
+                <filter string="Pending" name="f_pending"
+                        domain="[('state', '=', 'pending')]"/>
+                <filter string="Failed" name="f_failed"
+                        domain="[('state', '=', 'failed')]"/>
+                <filter string="Installed" name="f_installed"
+                        domain="[('state', '=', 'installed')]"/>
+
+                    <filter string="State" name="g_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Tenant" name="g_tenant"
+                            context="{'group_by': 'tenant_id'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_module_deployment" model="ir.actions.act_window">
+        <field name="name">Deployments</field>
+        <field name="res_model">custom.hub.module.deployment</field>
+        <field name="view_mode">list,kanban,form</field>
+    </record>
+</odoo>

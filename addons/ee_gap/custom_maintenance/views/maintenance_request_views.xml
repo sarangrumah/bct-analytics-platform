@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_maintenance_request_form_iot" model="ir.ui.view">
+        <field name="name">maintenance.request.form.iot</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="IoT" name="iot_info">
+                    <group>
+                        <field name="x_iot_triggered"/>
+                        <field name="x_iot_metric_value"/>
+                    </group>
+                    <group>
+                        <field name="x_priority_score"/>
+                    </group>
+                </group>
+                <group string="SLA" name="sla_info">
+                    <group>
+                        <field name="x_sla_id"/>
+                        <field name="x_sla_status"/>
+                    </group>
+                    <group>
+                        <field name="x_sla_response_deadline"/>
+                        <field name="x_sla_resolve_deadline"/>
+                    </group>
+                </group>
+                <group string="Spare Parts" name="spare_parts">
+                    <field name="x_spare_part_ids" widget="many2many_tags" nolabel="1"
+                           options="{'no_create': True}"/>
+                </group>
+                <group string="Cost Tracking" name="cost_tracking">
+                    <group>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="x_labor_cost"/>
+                        <field name="x_parts_cost"/>
+                    </group>
+                    <group>
+                        <field name="x_total_cost"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_maintenance_request_list_iot" model="ir.ui.view">
+        <field name="name">maintenance.request.list.iot</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_iot_triggered" optional="show"/>
+                <field name="x_priority_score" optional="hide"/>
+                <field name="x_sla_status" optional="show"/>
+                <field name="x_sla_resolve_deadline" optional="hide"/>
+                <field name="x_total_cost" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

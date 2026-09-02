@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pos_txn_user,pos txn user,model_custom_ppob_pos_txn,custom_ppob_core.group_ppob_user,1,0,0,0
+access_pos_txn_ops,pos txn ops,model_custom_ppob_pos_txn,custom_ppob_core.group_ppob_ops,1,1,0,0
+access_pos_txn_manager,pos txn manager,model_custom_ppob_pos_txn,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_pos_connection_user,pos connection user,model_custom_ppob_pos_connection,custom_ppob_core.group_ppob_user,1,0,0,0
+access_pos_connection_manager,pos connection manager,model_custom_ppob_pos_connection,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_pos_settlement_user,pos settlement user,model_custom_ppob_pos_settlement,custom_ppob_core.group_ppob_user,1,0,0,0
+access_pos_settlement_ops,pos settlement ops,model_custom_ppob_pos_settlement,custom_ppob_core.group_ppob_ops,1,1,1,0
+access_pos_settlement_manager,pos settlement manager,model_custom_ppob_pos_settlement,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_pos_ingest_skipped_user,pos ingest skipped user,model_custom_ppob_pos_ingest_skipped,custom_ppob_core.group_ppob_user,1,0,0,0
+access_pos_ingest_skipped_ops,pos ingest skipped ops,model_custom_ppob_pos_ingest_skipped,custom_ppob_core.group_ppob_ops,1,1,0,0
+access_pos_ingest_skipped_manager,pos ingest skipped manager,model_custom_ppob_pos_ingest_skipped,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_pos_backfill_wizard,pos backfill wizard,model_custom_ppob_pos_backfill_wizard,custom_ppob_core.group_ppob_manager,1,1,1,1

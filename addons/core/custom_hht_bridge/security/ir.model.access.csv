@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hht_device_operator,hht.device operator,model_hht_device,group_hht_operator,1,0,0,0
+access_hht_device_admin,hht.device admin,model_hht_device,group_hht_admin,1,1,1,1
+access_hht_scan_log_operator,hht.scan.log operator,model_hht_scan_log,group_hht_operator,1,0,0,0
+access_hht_scan_log_admin,hht.scan.log admin,model_hht_scan_log,group_hht_admin,1,1,1,1
+access_hht_sync_queue_operator,hht.sync.queue operator,model_hht_sync_queue,group_hht_operator,1,1,1,0
+access_hht_sync_queue_admin,hht.sync.queue admin,model_hht_sync_queue,group_hht_admin,1,1,1,1
+access_hht_regenerate_secret_wizard_admin,hht.regenerate.secret.wizard admin,model_hht_regenerate_secret_wizard,group_hht_admin,1,1,1,1

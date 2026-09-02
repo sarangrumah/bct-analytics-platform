@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="param_auto_invoice_on_return" model="ir.config_parameter">
+            <field name="key">custom_rental_invoicing.auto_invoice_on_return</field>
+            <field name="value">False</field>
+        </record>
+    </data>
+</odoo>

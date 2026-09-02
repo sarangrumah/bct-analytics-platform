@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_livechat_canned_response_list" model="ir.ui.view">
+        <field name="name">custom.livechat.canned.response.list</field>
+        <field name="model">custom.livechat.canned.response</field>
+        <field name="arch" type="xml">
+            <list string="Canned Responses">
+                <field name="shortcut"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="language"/>
+                <field name="times_used"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_livechat_canned_response_form" model="ir.ui.view">
+        <field name="name">custom.livechat.canned.response.form</field>
+        <field name="model">custom.livechat.canned.response</field>
+        <field name="arch" type="xml">
+            <form string="Canned Response">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Friendly title..."/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="shortcut" placeholder=":greet"/>
+                            <field name="category" placeholder="Greeting, Pricing, Refund..."/>
+                            <field name="language"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                            <field name="times_used" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Body">
+                            <field name="body"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_livechat_canned_response_search" model="ir.ui.view">
+        <field name="name">custom.livechat.canned.response.search</field>
+        <field name="model">custom.livechat.canned.response</field>
+        <field name="arch" type="xml">
+            <search string="Canned Responses">
+                <field name="shortcut"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="language"/>
+                <filter name="active" string="Active" domain="[('active','=',True)]"/>
+                <filter name="inactive" string="Archived" domain="[('active','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_livechat_canned_response" model="ir.actions.act_window">
+        <field name="name">Canned Responses</field>
+        <field name="res_model">custom.livechat.canned.response</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_livechat_canned_response_search"/>
+    </record>
+</odoo>

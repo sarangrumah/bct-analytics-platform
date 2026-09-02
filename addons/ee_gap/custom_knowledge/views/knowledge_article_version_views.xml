@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_knowledge_article_version_list" model="ir.ui.view">
+        <field name="name">knowledge.article.version.list</field>
+        <field name="model">knowledge.article.version</field>
+        <field name="arch" type="xml">
+            <list string="Versions" create="false">
+                <field name="article_id"/>
+                <field name="version_no"/>
+                <field name="saved_by"/>
+                <field name="saved_at"/>
+                <button name="action_restore_version" type="object"
+                        string="Restore" icon="fa-undo"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_knowledge_article_version_form" model="ir.ui.view">
+        <field name="name">knowledge.article.version.form</field>
+        <field name="model">knowledge.article.version</field>
+        <field name="arch" type="xml">
+            <form string="Version" create="false">
+                <header>
+                    <button name="action_restore_version" type="object"
+                            string="Restore This Version" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="article_id" readonly="1"/>
+                        <field name="version_no" readonly="1"/>
+                        <field name="saved_by" readonly="1"/>
+                        <field name="saved_at" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Snapshot">
+                            <field name="body_snapshot" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_knowledge_article_version" model="ir.actions.act_window">
+        <field name="name">Article Versions</field>
+        <field name="res_model">knowledge.article.version</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

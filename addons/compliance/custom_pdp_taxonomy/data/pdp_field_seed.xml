@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--
+        Seed default PII classification on common res.partner fields.
+        Calls _seed_partner_pii_fields() on pdp.classification — idempotent;
+        safe to re-run on -u.
+    -->
+    <function model="pdp.classification" name="_seed_partner_pii_fields"/>
+</odoo>

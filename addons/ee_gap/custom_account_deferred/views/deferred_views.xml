@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_custom_deferred_entries" model="ir.actions.act_window">
+        <field name="name">Deferred Entries</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('deferred_entry_type', '!=', False)]</field>
+        <field name="context">{'search_default_group_by_origin': 1, 'create': 0}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No deferred entries yet</p>
+            <p>Set Start/End dates on invoice or bill lines; posting spreads
+               the amount monthly through the deferred account.</p>
+        </field>
+    </record>
+
+    <record id="view_deferred_entries_search" model="ir.ui.view">
+        <field name="name">account.move.deferred.search</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="deferred_origin_move_id"/>
+                <filter name="deferral" string="Deferrals"
+                        domain="[('deferred_entry_type', '=', 'deferral')]"/>
+                <filter name="recognition" string="Recognitions"
+                        domain="[('deferred_entry_type', '=', 'recognition')]"/>
+                <filter name="pending" string="Not yet posted"
+                        domain="[('state', '=', 'draft')]"/>
+                <separator/>
+                <filter name="group_by_origin" string="Origin"
+                        context="{'group_by': 'deferred_origin_move_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <menuitem id="menu_custom_deferred_entries"
+              name="Deferred Entries"
+              action="action_custom_deferred_entries"
+              parent="account.menu_finance_entries"
+              sequence="14"
+              groups="account.group_account_user"/>
+</odoo>

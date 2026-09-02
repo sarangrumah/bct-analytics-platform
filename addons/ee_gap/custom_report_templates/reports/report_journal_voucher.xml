@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Journal Voucher — a per-move printout (header + numbered GL lines with
+      debit/credit, total, amount in words, Input/Approved By). Works for any
+      account.move; vendor bills additionally show vendor / due-date / tax
+      number in the header. Bound to the account.move Print menu.
+
+      Follows the wkhtmltopdf-safe rules of report_common_templates.xml:
+      inline styles + <table> layout only, money via the NBSP-free partial.
+    -->
+    <template id="report_journal_voucher_document">
+        <t t-set="company" t-value="o.company_id"/>
+        <t t-set="accent" t-value="company.brand_accent_color or '#714B67'"/>
+        <t t-set="currency" t-value="o.currency_id"/>
+        <t t-set="comp_currency" t-value="company.currency_id"/>
+        <t t-set="is_bill" t-value="o.move_type in ('in_invoice', 'in_refund')"/>
+        <!-- account.code is company-dependent in Odoo 19: read the move's own
+             company or every GL Account cell prints blank for a user whose
+             active company is not the move's. -->
+        <t t-set="posting_lines" t-value="o.with_company(o.company_id).line_ids.filtered(lambda l: l.display_type not in ('line_section', 'line_note')).sorted(lambda l: ({'product': 0, 'tax': 1, 'payment_term': 2}.get(l.display_type, 3), l.sequence, l.id))"/>
+        <t t-set="total_debit" t-value="sum(posting_lines.mapped('debit'))"/>
+        <t t-set="total_credit" t-value="sum(posting_lines.mapped('credit'))"/>
+        <!-- Foreign-currency voucher: show the FX amounts and the rate used. -->
+        <t t-set="fx_lines" t-value="posting_lines.filtered(lambda l: l.currency_id and l.currency_id != comp_currency)"/>
+        <t t-set="is_fx" t-value="bool(fx_lines) or currency != comp_currency"/>
+        <t t-set="_fx_abs" t-value="sum([abs(l.amount_currency) for l in fx_lines])"/>
+        <t t-set="fx_rate" t-value="(1.0 / o.invoice_currency_rate) if (is_bill and o.invoice_currency_rate) else ((sum([abs(l.balance) for l in fx_lines]) / _fx_abs) if _fx_abs else 0.0)"/>
+        <t t-set="fx_currency" t-value="fx_lines[:1].currency_id or currency"/>
+        <t t-set="fx_debit" t-value="sum([l.amount_currency for l in fx_lines if l.amount_currency &gt; 0])"/>
+        <t t-set="fx_credit" t-value="sum([-l.amount_currency for l in fx_lines if l.amount_currency &lt; 0])"/>
+        <div t-attf-class="page o_company_#{company.id}_layout" style="font-size: 11px;">
+
+            <!-- Header -->
+            <t t-call="custom_report_templates.brand_header">
+                <t t-set="doc_title">JOURNAL VOUCHER</t>
+                <tr>
+                    <td style="width: 45%; font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">Document No</td>
+                    <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;" t-out="o.name or 'Draft'"/>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">Posting Date</td>
+                    <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">
+                        <span t-if="o.date" t-out="o.date" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">Document Type</td>
+                    <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;" t-out="o.journal_id.name"/>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">Period</td>
+                    <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">
+                        <span t-if="o.date" t-out="o.date" t-options="{'widget': 'date', 'format': 'MM.yyyy'}"/>
+                    </td>
+                </tr>
+                <tr t-if="o.ref">
+                    <td style="font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">Reference</td>
+                    <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;" t-out="o.ref"/>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">Currency</td>
+                    <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;" t-out="currency.name"/>
+                </tr>
+                <tr t-if="is_fx and fx_rate">
+                    <td style="font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">Exchange Rate</td>
+                    <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">
+                        1 <t t-out="currency.name"/> = <t t-out="comp_currency.symbol"/> <t t-out="'{:,.4f}'.format(fx_rate)"/>
+                    </td>
+                </tr>
+                <tr t-if="is_bill and o.invoice_date_due">
+                    <td style="font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">Due Date</td>
+                    <td style="text-align: right; background-color: #e8edf5; border: 1px solid #b0b0b0; padding: 3px 5px;">
+                        <span t-out="o.invoice_date_due" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                    </td>
+                </tr>
+            </t>
+
+            <!-- Vendor band (bills only) -->
+            <t t-if="is_bill and o.partner_id" t-call="custom_report_templates.party_band">
+                <t t-set="band_label">VENDOR</t>
+                <t t-set="partner" t-value="o.partner_id"/>
+            </t>
+
+            <!-- GL lines -->
+            <table style="width: 100%; font-size: 10px; border-collapse: collapse; margin-bottom: 12px;">
+                <thead>
+                    <tr t-attf-style="background-color: {{accent}}; color: #ffffff;">
+                        <th style="width: 4%; text-align: center; border: 1px solid #b0b0b0; padding: 3px 5px;">No</th>
+                        <th t-attf-style="width: {{'13' if is_fx else '14'}}%; text-align: left; border: 1px solid #b0b0b0; padding: 3px 5px;">GL Account</th>
+                        <th t-attf-style="width: {{'23' if is_fx else '32'}}%; text-align: left; border: 1px solid #b0b0b0; padding: 3px 5px;">Description</th>
+                        <th t-attf-style="width: {{'12' if is_fx else '16'}}%; text-align: left; border: 1px solid #b0b0b0; padding: 3px 5px;">Partner</th>
+                        <th t-if="is_fx" style="width: 12%; text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">Debit (<t t-out="currency.name"/>)</th>
+                        <th t-if="is_fx" style="width: 12%; text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">Credit (<t t-out="currency.name"/>)</th>
+                        <th t-attf-style="width: {{'12' if is_fx else '17'}}%; text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">Debit<t t-if="is_fx"> (<t t-out="comp_currency.name"/>)</t></th>
+                        <th t-attf-style="width: {{'12' if is_fx else '17'}}%; text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">Credit<t t-if="is_fx"> (<t t-out="comp_currency.name"/>)</t></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="posting_lines" t-as="line">
+                        <td style="text-align: center; border: 1px solid #b0b0b0; padding: 3px 5px;" t-out="line_index + 1"/>
+                        <td style="border: 1px solid #b0b0b0; padding: 3px 5px;">
+                            <span t-out="line.account_id.code"/>
+                            <span t-out="line.account_id.name"/>
+                        </td>
+                        <td style="white-space: pre-line; border: 1px solid #b0b0b0; padding: 3px 5px;" t-out="line.name or line.product_id.display_name or line.account_id.name or ''"/>
+                        <td style="border: 1px solid #b0b0b0; padding: 3px 5px;" t-out="line.partner_id.name or ''"/>
+                        <t t-if="is_fx">
+                            <t t-set="_fx" t-value="line.amount_currency if (line.currency_id and line.currency_id != comp_currency) else 0.0"/>
+                            <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">
+                                <t t-if="_fx &gt; 0"><t t-call="custom_report_templates.money"><t t-set="amount" t-value="_fx"/><t t-set="currency" t-value="line.currency_id"/></t></t>
+                            </td>
+                            <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">
+                                <t t-if="_fx &lt; 0"><t t-call="custom_report_templates.money"><t t-set="amount" t-value="-_fx"/><t t-set="currency" t-value="line.currency_id"/></t></t>
+                            </td>
+                        </t>
+                        <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">
+                            <t t-if="line.debit"><t t-call="custom_report_templates.money"><t t-set="amount" t-value="line.debit"/><t t-set="currency" t-value="comp_currency"/></t></t>
+                        </td>
+                        <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">
+                            <t t-if="line.credit"><t t-call="custom_report_templates.money"><t t-set="amount" t-value="line.credit"/><t t-set="currency" t-value="comp_currency"/></t></t>
+                        </td>
+                    </tr>
+                    <tr style="font-weight: bold; background-color: #f3f3f3;">
+                        <td colspan="4" style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">Total</td>
+                        <t t-if="is_fx">
+                            <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;"><t t-call="custom_report_templates.money"><t t-set="amount" t-value="fx_debit"/><t t-set="currency" t-value="fx_currency"/></t></td>
+                            <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;"><t t-call="custom_report_templates.money"><t t-set="amount" t-value="fx_credit"/><t t-set="currency" t-value="fx_currency"/></t></td>
+                        </t>
+                        <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;"><t t-call="custom_report_templates.money"><t t-set="amount" t-value="total_debit"/><t t-set="currency" t-value="comp_currency"/></t></td>
+                        <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;"><t t-call="custom_report_templates.money"><t t-set="amount" t-value="total_credit"/><t t-set="currency" t-value="comp_currency"/></t></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Amount in words -->
+            <div style="font-size: 10px; margin-bottom: 12px; font-style: italic;">
+                <div t-if="is_fx and fx_debit">In Words (<t t-out="fx_currency.name"/>): <t t-out="fx_currency.amount_to_text(fx_debit)"/></div>
+                <div>In Words<t t-if="is_fx"> (<t t-out="comp_currency.name"/>)</t>: <t t-out="comp_currency.amount_to_text(total_debit)"/></div>
+            </div>
+
+            <!-- Input By / Approved By -->
+            <table style="width: 100%; border-collapse: collapse; margin-top: 24px; font-size: 10px;">
+                <tr>
+                    <td style="width: 50%; text-align: center; vertical-align: top;">
+                        <div>Input By</div>
+                        <div style="height: 60px;"></div>
+                        <div style="border-top: 1px solid #000; padding-top: 4px;" t-out="o.create_uid.name or ''"/>
+                    </td>
+                    <td style="width: 50%; text-align: center; vertical-align: top;">
+                        <div>Approved By</div>
+                        <div style="height: 60px;"></div>
+                        <div style="border-top: 1px solid #000; padding-top: 4px;">&#160;</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </template>
+
+    <!-- Self-contained wrapper: no web.html_container → no external asset (report.url)
+         callback that stalls wkhtmltopdf. <main> required by _prepare_html. -->
+    <template id="report_journal_voucher">
+        <html>
+            <body>
+                <main>
+                    <!-- _prepare_html keeps only the children of <main>: anything left in
+                         <head> never reaches wkhtmltopdf, which then falls back to latin-1
+                         and prints "Â¥" for ¥. Charset and CSS therefore live in here. -->
+                    <meta charset="utf-8"/>
+                    <style>
+                        @page { margin: 15mm; }
+                        * { box-sizing: border-box; }
+                        body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; margin: 0; padding: 0; }
+                    </style>
+                    <t t-foreach="docs" t-as="o">
+                        <div t-if="not o_first" style="page-break-before: always;"></div>
+                        <t t-call="custom_report_templates.report_journal_voucher_document"/>
+                    </t>
+                </main>
+            </body>
+        </html>
+    </template>
+
+    <record id="action_report_journal_voucher" model="ir.actions.report">
+        <field name="name">Journal Voucher</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_report_templates.report_journal_voucher</field>
+        <field name="report_file">custom_report_templates.report_journal_voucher</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="custom_report_templates.paperformat_branded_a4"/>
+        <field name="print_report_name">'Journal Voucher - %s' % (object.name or '').replace('/', '-')</field>
+    </record>
+</odoo>

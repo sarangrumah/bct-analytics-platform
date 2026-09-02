@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_dashboard_tile_list" model="ir.ui.view">
+        <field name="name">custom.dashboard.tile.list</field>
+        <field name="model">custom.dashboard.tile</field>
+        <field name="arch" type="xml">
+            <list string="Tiles" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="dashboard_id"/>
+                <field name="name"/>
+                <field name="tile_type"/>
+                <field name="model_name"/>
+                <field name="domain"/>
+                <field name="measure_field"/>
+                <field name="groupby_field"/>
+                <field name="refresh_interval_seconds"/>
+                <field name="cached_display"/>
+                <field name="cached_at"/>
+                <field name="last_error" optional="hide"/>
+                <button name="action_refresh" type="object" string="Refresh"
+                        icon="fa-refresh"/>
+                <button name="action_open_tile_records" type="object" string="Open"
+                        icon="fa-external-link"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_dashboard_tile_form" model="ir.ui.view">
+        <field name="name">custom.dashboard.tile.form</field>
+        <field name="model">custom.dashboard.tile</field>
+        <field name="arch" type="xml">
+            <form string="Tile">
+                <header>
+                    <button name="action_refresh" type="object"
+                            string="Refresh" class="oe_highlight"
+                            icon="fa-refresh"/>
+                    <button name="action_open_tile_records" type="object"
+                            string="Open Records" icon="fa-external-link"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Tile name..."/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="dashboard_id"/>
+                            <field name="tile_type"/>
+                            <field name="sequence"/>
+                            <field name="color"/>
+                            <field name="refresh_interval_seconds"/>
+                        </group>
+                        <group>
+                            <field name="model_name"/>
+                            <field name="domain"/>
+                            <field name="measure_field"
+                                   invisible="tile_type not in ('sum','avg','last_value','chart_bar','chart_pie')"/>
+                            <field name="groupby_field"
+                                   invisible="tile_type not in ('chart_bar','chart_pie')"/>
+                        </group>
+                    </group>
+                    <group string="Formula" invisible="tile_type != 'formula'">
+                        <field name="formula_expression" nolabel="1"/>
+                    </group>
+                    <group string="Cached Result">
+                        <field name="cached_display" readonly="1"/>
+                        <field name="cached_value" readonly="1" widget="text"/>
+                        <field name="cached_at" readonly="1"/>
+                        <field name="last_error" readonly="1"
+                               invisible="not last_error"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_dashboard_tile_search" model="ir.ui.view">
+        <field name="name">custom.dashboard.tile.search</field>
+        <field name="model">custom.dashboard.tile</field>
+        <field name="arch" type="xml">
+            <search string="Tiles">
+                <field name="name"/>
+                <field name="dashboard_id"/>
+                <field name="model_name"/>
+                <filter name="has_error" string="With Errors"
+                        domain="[('last_error','!=',False)]"/>
+                <separator/>
+                <filter name="group_dashboard" string="Dashboard"
+                        context="{'group_by':'dashboard_id'}"/>
+                <filter name="group_type" string="Type"
+                        context="{'group_by':'tile_type'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_dashboard_tile" model="ir.actions.act_window">
+        <field name="name">Tiles</field>
+        <field name="res_model">custom.dashboard.tile</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_dashboard_tile_search"/>
+    </record>
+</odoo>

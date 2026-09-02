@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_email_template_gallery_user,custom.email.template.gallery user,model_custom_email_template_gallery,custom_email_marketing.group_user,1,0,0,0
+access_email_template_gallery_manager,custom.email.template.gallery manager,model_custom_email_template_gallery,custom_email_marketing.group_manager,1,1,1,1
+access_custom_email_ab_test_user,custom.email.ab.test user,model_custom_email_ab_test,custom_email_marketing.group_user,1,0,0,0
+access_custom_email_ab_test_manager,custom.email.ab.test manager,model_custom_email_ab_test,custom_email_marketing.group_manager,1,1,1,1
+access_custom_email_apply_template_wizard,custom.email.apply.template.wizard user,model_custom_email_apply_template_wizard,custom_email_marketing.group_user,1,1,1,1

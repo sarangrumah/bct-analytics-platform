@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_brd_document_form_inherit_journey" model="ir.ui.view">
+            <field name="name">brd.document.form.inherit.journey</field>
+            <field name="model">brd.document</field>
+            <field name="inherit_id" ref="custom_brd_analyzer.view_brd_document_form"/>
+            <field name="arch" type="xml">
+                <field name="vertical_target" position="after">
+                    <field name="journey_id"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

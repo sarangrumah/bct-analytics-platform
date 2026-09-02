@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="res_groups_privilege_operating_unit" model="res.groups.privilege">
+            <field name="name">Operating Unit</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="sequence">20</field>
+            <field name="description">Who may manage the Operating Unit dimension, and who is
+                exempt from the per-unit record rules.</field>
+        </record>
+
+        <!--
+          Manager: creates and edits units. Does NOT by itself lift the record rules - a manager
+          of the dimension is not automatically entitled to every unit's documents.
+        -->
+        <record id="group_operating_unit_manager" model="res.groups">
+            <field name="name">Operating Unit Manager</field>
+            <field name="sequence">10</field>
+            <field name="privilege_id" ref="res_groups_privilege_operating_unit"/>
+            <field name="comment">May create and edit Operating Units.</field>
+        </record>
+
+        <!--
+          All Operating Units: the record-rule bypass.
+
+          NOTE: the membership grant deliberately does NOT live here. With this block at
+          noupdate="0", a `user_ids` field would be re-applied on every `odoo -u`, silently
+          re-granting the bypass to an operator who had revoked it. The grant is done once, at
+          install, by post_init_hook in hooks.py. Do not add user_ids back to this record.
+        -->
+        <record id="group_operating_unit_all" model="res.groups">
+            <field name="name">All Operating Units</field>
+            <field name="sequence">20</field>
+            <field name="privilege_id" ref="res_groups_privilege_operating_unit"/>
+            <field name="implied_ids" eval="[(4, ref('group_operating_unit_manager'))]"/>
+            <field name="comment">Sees documents from every Operating Unit. Bypasses the per-unit
+                record rules.</field>
+        </record>
+
+    </data>
+</odoo>

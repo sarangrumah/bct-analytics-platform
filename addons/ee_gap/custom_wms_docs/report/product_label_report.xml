@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Self-contained wrapper (see picking_list_report.xml for the rationale):
+         no web.html_container / web.external_layout, and a mandatory <main>.
+         The rendering context is built by
+         report.custom_wms_docs.report_wms_product_label (models/wms_label_report.py),
+         which explodes the wizard's `data` payload into one dict per sticker. -->
+    <template id="report_wms_product_label" name="WMS Price Tag / Product Label">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+            </head>
+            <body>
+                <main>
+                <!-- The style and charset live INSIDE <main>, not in <head>:
+                     ir_actions_report._prepare_html keeps only the children of
+                     <main> and writes them to a bare .html file, so anything in
+                     <head> is silently dropped — the report would print
+                     unstyled and non-ASCII text would come out mojibake. -->
+                    <meta charset="utf-8"/>
+                    <style>
+                        @page { margin: 8mm; }
+                        * { box-sizing: border-box; }
+                        body { font-family: Arial, Helvetica, sans-serif; font-size: 10px; margin: 0; padding: 0; }
+                        .grid { display: block; width: 100%; }
+                        .label {
+                            display: inline-block;
+                            width: 32%;
+                            min-height: 34mm;
+                            border: 1px dashed #999;
+                            padding: 4px;
+                            margin: 0 0.4% 4px 0.4%;
+                            vertical-align: top;
+                            text-align: center;
+                            page-break-inside: avoid;
+                        }
+                        .label .name { font-weight: bold; font-size: 10px; line-height: 1.15; }
+                        .label .code { color: #666; font-size: 9px; }
+                        .label .price { font-size: 15px; font-weight: bold; margin: 3px 0; }
+                        .label .uom { font-size: 9px; color: #666; }
+                        .label .bc { margin-top: 2px; }
+                        .label .bcval { font-family: "Courier New", monospace; font-size: 9px; word-break: break-all; }
+                        .muted { color: #666; }
+                    </style>
+                    <div class="page">
+                        <p t-if="not labels" class="muted">Nothing to print.</p>
+                        <div class="grid">
+                            <div t-foreach="labels" t-as="l" class="label">
+                                <div class="name" t-out="l['name']"/>
+                                <div class="code" t-if="l['default_code']" t-out="l['default_code']"/>
+                                <div class="price" t-if="l['show_price']">
+                                    <span t-out="l['list_price']"
+                                          t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                </div>
+                                <div class="uom" t-if="not l['show_price'] and l['uom_name']">
+                                    <span>UoM: </span><span t-out="l['uom_name']"/>
+                                </div>
+                                <div class="bc" t-if="l['barcode_src']">
+                                    <img t-att-src="l['barcode_src']" alt="Barcode"
+                                         t-att-style="'height: 46px;' if barcode_kind == 'QR' else 'height: 30px; width: 92%;'"/>
+                                </div>
+                                <div class="bcval" t-out="l['barcode_value']"/>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </body>
+        </html>
+    </template>
+
+    <record id="action_report_wms_product_label" model="ir.actions.report">
+        <field name="name">Price Tag / Product Label (WMS)</field>
+        <field name="model">product.product</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_wms_docs.report_wms_product_label</field>
+        <field name="report_file">custom_wms_docs.report_wms_product_label</field>
+    </record>
+
+</odoo>

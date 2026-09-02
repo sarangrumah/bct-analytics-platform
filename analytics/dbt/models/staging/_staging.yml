@@ -1,0 +1,364 @@
+version: 2
+
+# ===========================================================================
+# Staging tests.
+#
+# The point of testing staging as well as marts is that a staging failure names
+# the CAUSE. A duplicate key here means the raw_latest deduplication is wrong;
+# the same defect surfaces in a mart as a wrong total with no indication where
+# it came from.
+#
+# Uniqueness is always composite on (tenant_id, <id>). A single-column `unique`
+# on the id would fail on correct multi-tenant data, because sale_order_line 42
+# legitimately exists in every tenant.
+# ===========================================================================
+
+models:
+  - name: stg_res_company
+    description: Legal entities, latest version per (tenant, id), tombstones removed.
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: company_id
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, company_id]}
+
+  - name: stg_res_partner
+    description: >-
+      Partners. Every `personal` column is already a 64-character HMAC digest
+      and every `sensitive` free-text column is already NULL - masking happened
+      at load, before the row reached raw.
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: partner_id
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, partner_id]}
+
+  - name: stg_product_template
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: product_tmpl_id
+        data_tests: [not_null]
+      - name: product_type
+        description: Odoo 19 product type.
+        data_tests:
+          - accepted_values:
+              arguments: {values: [consu, service, combo]}
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, product_tmpl_id]}
+
+  - name: stg_product_product
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: product_id
+        data_tests: [not_null]
+      - name: product_tmpl_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                  to: ref('stg_product_template')
+                  field: product_tmpl_id
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, product_id]}
+
+  - name: stg_operating_unit
+    description: >-
+      Operating Units. Natural key is (company_id, code); `code` alone is unique
+      only within a company (custom_operating_unit/MODULE_KNOWLEDGE.md §2).
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: operating_unit_id
+        data_tests: [not_null]
+      - name: operating_unit_code
+        data_tests: [not_null]
+      - name: company_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('stg_res_company'), field: company_id}
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, operating_unit_id]}
+      # The module's own SQL constraint, restated where the warehouse can see
+      # it: a recycled code would silently re-point history.
+      - unique_combination:
+          arguments:
+              combination_of_columns: [tenant_id, company_id, operating_unit_code]
+
+  - name: stg_sale_order
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: sale_order_id
+        data_tests: [not_null]
+      - name: state
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [draft, sent, sale, cancel]}
+      - name: invoice_status
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['upselling', 'invoiced', 'to invoice', 'no']}
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, sale_order_id]}
+
+  - name: stg_sale_order_line
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: sale_order_line_id
+        data_tests: [not_null]
+      - name: sale_order_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('stg_sale_order'), field: sale_order_id}
+      - name: state
+        data_tests:
+          - accepted_values:
+              arguments: {values: [draft, sent, sale, cancel]}
+      - name: display_type
+        description: >-
+          NULL for a real product line; a section or note line otherwise. The
+          fact filters on it, which is why it is asserted here.
+        data_tests:
+          - accepted_values:
+              arguments: {values: [line_section, line_note]}
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, sale_order_line_id]}
+
+  - name: stg_account_account
+    description: >-
+      Chart of accounts. Exists so fct_account_move_line can carry account_type.
+      No company_id: Odoo 19 shares the chart across companies and holds the
+      per-company code in the company_dependent code_store map instead.
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: account_id
+        data_tests: [not_null]
+      - name: account_type
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, account_id]}
+
+  - name: stg_account_move
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: account_move_id
+        data_tests: [not_null]
+      - name: state
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [draft, posted, cancel]}
+      - name: move_type
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                  values: [entry, out_invoice, out_refund, in_invoice, in_refund, out_receipt, in_receipt]
+      - name: payment_state
+        data_tests:
+          - accepted_values:
+              arguments:
+                  values: [not_paid, in_payment, paid, partial, reversed, blocked, invoicing_legacy]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, account_move_id]}
+
+  - name: stg_account_move_line
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: account_move_line_id
+        data_tests: [not_null]
+      - name: account_move_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('stg_account_move'), field: account_move_id}
+      - name: parent_state
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [draft, posted, cancel]}
+      - name: display_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                  values: [product, cogs, tax, discount, rounding, payment_term, line_section, line_note, epd]
+      - name: debit
+        data_tests: [not_null]
+      - name: credit
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, account_move_line_id]}
+
+  - name: stg_stock_picking
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: stock_picking_id
+        data_tests: [not_null]
+      - name: state
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [draft, waiting, confirmed, assigned, done, cancel]}
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, stock_picking_id]}
+
+  - name: stg_stock_move
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: stock_move_id
+        data_tests: [not_null]
+      - name: state
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [draft, waiting, confirmed, partially_available, assigned, done, cancel]}
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('stg_product_product'), field: product_id}
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, stock_move_id]}
+
+  - name: stg_pos_order
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: pos_order_id
+        data_tests: [not_null]
+      - name: state
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [draft, cancel, paid, done, invoiced]}
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, pos_order_id]}
+
+  - name: stg_pos_order_line
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: pos_order_line_id
+        data_tests: [not_null]
+      - name: pos_order_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('stg_pos_order'), field: pos_order_id}
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, pos_order_line_id]}
+
+  - name: stg_ppob_biller
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: biller_id
+        data_tests: [not_null]
+      - name: biller_code
+        data_tests: [not_null]
+      - name: biller_category
+        description: custom_ppob/MODULE_KNOWLEDGE.md §1.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                  values: [electricity, water, telco, internet, insurance, multifinance, tax, other]
+      - name: sla_target_seconds
+        description: The denominator of every PPOB SLA metric; the module CHECKs it is positive.
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, biller_id]}
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, biller_code]}
+
+  - name: stg_ppob_transaction
+    description: >-
+      PPOB transactions. `amount` is pass-through and is NOT revenue; the
+      revenue of a PPOB row is `commission` (custom_ppob §2).
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: ppob_transaction_id
+        data_tests: [not_null]
+      - name: transaction_name
+        data_tests: [not_null]
+      - name: state
+        description: >-
+          The five states of the module's state machine. Illegal transitions are
+          refused in write(), not only in the action methods, which is what lets
+          the warehouse trust this column (custom_ppob §3).
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [draft, pending, success, failed, reversed]}
+      - name: biller_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('stg_ppob_biller'), field: biller_id}
+      - name: requested_at
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, ppob_transaction_id]}
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, transaction_name]}
+
+  - name: int_product
+    description: One row per product variant, carrying its template's attributes.
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: product_id
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, product_id]}
+
+  - name: int_stock_move_operating_unit
+    description: >-
+      Stock moves with their Operating Unit resolved through the picking, and
+      the no-picking case made explicit rather than dropped.
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: stock_move_id
+        data_tests: [not_null]
+      - name: operating_unit_id
+        description: -1 for the explicit UNASSIGNED dimension member.
+        data_tests: [not_null]
+      - name: operating_unit_unassigned
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, stock_move_id]}

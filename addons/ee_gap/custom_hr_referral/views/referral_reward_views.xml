@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ref_reward_list" model="ir.ui.view">
+        <field name="name">referral.reward.list</field>
+        <field name="model">referral.reward</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'paid'"
+                  decoration-info="state == 'approved'"
+                  decoration-warning="state == 'pending'">
+                <field name="candidate_id"/>
+                <field name="referrer_id"/>
+                <field name="amount"/>
+                <field name="state" widget="badge"/>
+                <field name="approved_at"/>
+                <field name="paid_at"/>
+                <field name="currency_id" column_invisible="True"/>
+                <button name="action_approve" string="Approve" type="object"
+                        icon="fa-check" invisible="state != 'pending'"/>
+                <button name="action_pay" string="Mark Paid" type="object"
+                        icon="fa-money" invisible="state != 'approved'"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_ref_reward" model="ir.actions.act_window">
+        <field name="name">Rewards</field>
+        <field name="res_model">referral.reward</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

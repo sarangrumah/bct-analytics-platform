@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_partner_form_ppob" model="ir.ui.view">
+        <field name="name">res.partner.form.custom.ppob</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="PPOB" name="ppob">
+                    <group>
+                        <group string="Role" invisible="context.get('default_x_custom_ppob_is_mitra') or context.get('default_x_custom_ppob_is_provider')">
+                            <field name="x_custom_ppob_is_mitra"/>
+                            <field name="x_custom_ppob_is_provider"/>
+                        </group>
+                        <group string="Mitra Configuration" invisible="not x_custom_ppob_is_mitra">
+                            <field name="x_custom_ppob_mitra_code"/>
+                            <field name="x_custom_ppob_mitra_tier_id"/>
+                            <field name="x_custom_ppob_daily_txn_cap"/>
+                            <field name="x_custom_ppob_monthly_txn_cap"/>
+                            <field name="x_custom_ppob_has_npwp"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_partner_search_ppob" model="ir.ui.view">
+        <field name="name">res.partner.search.custom.ppob</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter name="filter_ppob_mitra" string="PPOB Mitra" domain="[('x_custom_ppob_is_mitra','=',True)]"/>
+                <filter name="filter_ppob_provider" string="PPOB Provider" domain="[('x_custom_ppob_is_provider','=',True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_ppob_mitra" model="ir.actions.act_window">
+        <field name="name">Mitra</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('x_custom_ppob_is_mitra','=',True)]</field>
+        <field name="context">{'default_x_custom_ppob_is_mitra': True, 'default_is_company': True}</field>
+    </record>
+
+    <record id="action_ppob_provider_partner" model="ir.actions.act_window">
+        <field name="name">Provider Partners</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('x_custom_ppob_is_provider','=',True)]</field>
+        <field name="context">{'default_x_custom_ppob_is_provider': True, 'default_supplier_rank': 1, 'default_is_company': True}</field>
+    </record>
+
+</odoo>

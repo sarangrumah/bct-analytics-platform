@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_trial_balance">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th rowspan="2">Code</th>
+                        <th rowspan="2">Account</th>
+                        <th colspan="2" class="text-center">Opening</th>
+                        <th colspan="2" class="text-center">Movement</th>
+                        <th colspan="2" class="text-center">Closing</th>
+                    </tr>
+                    <tr>
+                        <th class="text-end">Debit</th>
+                        <th class="text-end">Credit</th>
+                        <th class="text-end">Debit</th>
+                        <th class="text-end">Credit</th>
+                        <th class="text-end">Debit</th>
+                        <th class="text-end">Credit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines" t-as="line">
+                        <tr t-if="line.get('type') == 'account'">
+                            <td t-esc="line['account_code']"/>
+                            <td t-esc="line['account_name']"/>
+                            <td class="text-end">
+                                <span t-esc="line['opening_debit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line['opening_credit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line['movement_debit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line['movement_credit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line['closing_debit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line['closing_credit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                        </tr>
+                        <tr t-if="line.get('type') == 'grand_total'"
+                            class="table-secondary fw-bold">
+                            <td colspan="2" t-esc="line['label']"/>
+                            <td class="text-end">
+                                <span t-esc="line['opening_debit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line['opening_credit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line['movement_debit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line['movement_credit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line['closing_debit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line['closing_credit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+    </data>
+</odoo>

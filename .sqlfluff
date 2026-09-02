@@ -1,0 +1,61 @@
+# sqlfluff - SQL linting for the analytics layer.
+# Owner: Security agent. Enforced by the `sqlfluff-lint` pre-commit hook, scoped to
+# ^analytics/.*\.sql$ (see .pre-commit-config.yaml for why postgres/init/**.sql is not
+# linted here).
+#
+# PHASE 3 HANDOVER - Data Warehouse agent, read this before writing your first model:
+#   templater is `jinja` today because dbt is not installed anywhere in this repo yet and
+#   a `templater = dbt` setting would make this hook fail with "dbt not found" on every
+#   machine - an error, not a finding, which is exactly what the Phase 1 acceptance
+#   criteria forbid. When analytics/dbt lands, change `templater` to `dbt`, add the
+#   [sqlfluff:templater:dbt] section with project_dir/profiles_dir, and send the diff to
+#   the Security agent if it needs anything under .github/ (CI conflict rule, PLAN.md).
+#   Until then `jinja` lints raw SQL and silently tolerates {{ ref() }} as an unknown
+#   macro rather than failing.
+
+[sqlfluff]
+dialect = postgres
+templater = jinja
+max_line_length = 120
+# Warehouse SQL is generated and reviewed as much as it is written. Fail on real defects,
+# not on preference. Widen at GATE 3 once there are models to be consistent about.
+exclude_rules = RF01, ST05, AM05, LT05
+processes = 0
+
+[sqlfluff:indentation]
+indented_joins = false
+indented_ctes = false
+template_blocks_indent = false
+
+[sqlfluff:layout:type:comma]
+line_position = trailing
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.identifiers]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.types]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:aliasing.table]
+aliasing = explicit
+
+[sqlfluff:rules:aliasing.column]
+aliasing = explicit
+
+# `select *` in a warehouse model is a PDP problem, not a style problem: it is how an
+# unclassified or `secret`-class column reaches a mart without anyone deciding it should
+# (contract 01, master prompt 7.5/7.9). Keep this enabled.
+[sqlfluff:rules:ambiguous.column_count]
+group_by_and_order_by_style = consistent
+
+[sqlfluff:templater:jinja]
+apply_dbt_builtins = true

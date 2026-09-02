@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_finance_portal_root"
+              name="Finance Portal"
+              parent="custom_core.menu_custom_root"
+              sequence="40"
+              groups="custom_finance_portal.group_finance_user"/>
+
+    <!-- ===== Transactions ===== -->
+    <menuitem id="menu_finance_tx"
+              name="Transactions"
+              parent="menu_finance_portal_root"
+              sequence="10"/>
+
+    <menuitem id="menu_finance_cash_advance"
+              name="Cash Advance"
+              parent="menu_finance_tx"
+              action="action_finance_cash_advance"
+              sequence="10"/>
+    <menuitem id="menu_finance_ca_realization"
+              name="CA Realization"
+              parent="menu_finance_tx"
+              action="action_finance_ca_realization"
+              sequence="20"/>
+    <menuitem id="menu_finance_reimbursement"
+              name="Reimbursement &amp; Expenses"
+              parent="menu_finance_tx"
+              action="action_finance_reimbursement"
+              sequence="30"/>
+    <menuitem id="menu_finance_vendor_invoice"
+              name="Vendor Invoice (Non-Trade)"
+              parent="menu_finance_tx"
+              action="action_finance_vendor_invoice"
+              sequence="40"/>
+    <menuitem id="menu_finance_travel"
+              name="Perjalanan Dinas"
+              parent="menu_finance_tx"
+              action="action_finance_travel_settlement"
+              sequence="50"/>
+
+    <!-- ===== Master Data ===== -->
+    <menuitem id="menu_finance_master"
+              name="Master Data"
+              parent="menu_finance_portal_root"
+              sequence="20"
+              groups="custom_finance_portal.group_finance_manager"/>
+
+    <menuitem id="menu_finance_master_vertical"
+              name="Verticals / Divisions"
+              parent="menu_finance_master"
+              action="action_finance_vertical"
+              sequence="10"/>
+    <menuitem id="menu_finance_master_submission_type"
+              name="Submission Types"
+              parent="menu_finance_master"
+              action="action_finance_submission_type"
+              sequence="20"/>
+    <menuitem id="menu_finance_master_invoice_type"
+              name="Invoice Types"
+              parent="menu_finance_master"
+              action="action_finance_invoice_type"
+              sequence="30"/>
+    <menuitem id="menu_finance_master_invoice_routine_type"
+              name="Invoice Routine Types"
+              parent="menu_finance_master"
+              action="action_finance_invoice_routine_type"
+              sequence="40"/>
+    <menuitem id="menu_finance_master_item_submission"
+              name="Items of Submission"
+              parent="menu_finance_master"
+              action="action_finance_item_submission"
+              sequence="50"/>
+    <menuitem id="menu_finance_master_limitation"
+              name="Limitation for Submission"
+              parent="menu_finance_master"
+              action="action_finance_limitation"
+              sequence="60"/>
+
+</odoo>

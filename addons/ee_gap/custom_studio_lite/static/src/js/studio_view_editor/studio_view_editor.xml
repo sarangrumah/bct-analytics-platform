@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="custom_studio_lite.StudioViewEditor">
+        <div class="o_studio_view_editor">
+            <div class="o_studio_view_editor_topbar">
+                <button class="btn btn-secondary o_studio_back" t-on-click="cancel">
+                    <i class="fa fa-arrow-left"/> Back
+                </button>
+                <h2>Studio Visual View Editor</h2>
+                <div class="o_studio_picker">
+                    <label>Model:</label>
+                    <select t-on-change="onModelChange">
+                        <option value="">— pick a model —</option>
+                        <option t-foreach="state.models" t-as="m" t-key="m.id"
+                                t-att-value="m.id" t-att-selected="state.modelId === m.id">
+                            <t t-esc="m.name"/> (<t t-esc="m.model"/>)
+                        </option>
+                    </select>
+                    <label t-if="state.modelId">View:</label>
+                    <select t-if="state.modelId" t-on-change="onViewChange">
+                        <option value="">— pick a view —</option>
+                        <option t-foreach="state.views" t-as="v" t-key="v.id"
+                                t-att-value="v.id" t-att-selected="state.viewId === v.id">
+                            [<t t-esc="v.type"/>] <t t-esc="v.name"/>
+                        </option>
+                    </select>
+                    <button class="btn btn-primary"
+                            t-if="state.view"
+                            t-on-click="save"
+                            t-att-disabled="state.saving">
+                        <span t-if="!state.saving">Save &amp; Apply</span>
+                        <span t-if="state.saving">Saving…</span>
+                    </button>
+                    <button class="btn btn-link"
+                            t-if="state.customizationId"
+                            t-on-click="openCustomization">
+                        Open record →
+                    </button>
+                </div>
+            </div>
+
+            <div t-if="state.loading" class="o_studio_loading">Loading…</div>
+            <div t-if="state.error" class="o_studio_error">
+                <strong>Error:</strong> <t t-esc="state.error"/>
+            </div>
+
+            <div t-if="state.view" class="o_studio_view_editor_body">
+                <div class="o_studio_field_panel">
+                    <h3>Fields in view (<t t-esc="state.fieldNodes.length"/>)</h3>
+                    <p class="o_studio_hint">Drop a field from the sidebar onto a row to insert it after that row.</p>
+                    <ul class="o_studio_field_list">
+                        <!-- Same field name can appear multiple times in a
+                             view (e.g. partner same_vat_partner_id), so key
+                             on position not name to avoid t-foreach clashes. -->
+                        <li t-foreach="state.fieldNodes" t-as="node" t-key="node_index"
+                            class="o_studio_drop_target"
+                            t-on-dragover="onDragOverViewSlot"
+                            t-on-drop="(ev) => this.onDropOnViewSlot(node.name, ev)">
+                            <span class="o_studio_field_label"><t t-esc="node.string"/></span>
+                            <code class="o_studio_field_name"><t t-esc="node.name"/></code>
+                            <span class="o_studio_field_actions">
+                                <button class="btn btn-sm btn-link"
+                                        t-on-click="() => this.onHideFieldClick(node.name)"
+                                        title="Add a hide_field op">Hide</button>
+                            </span>
+                        </li>
+                        <li class="o_studio_drop_target o_studio_drop_end"
+                            t-on-dragover="onDragOverViewSlot"
+                            t-on-drop="(ev) => this.onDropOnViewSlot('', ev)">
+                            <em>Drop here to append at the end of the view</em>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="o_studio_available_panel">
+                    <h3>Available fields (<t t-esc="state.availableFields.length"/>)</h3>
+                    <p class="o_studio_hint">Drag a field onto the left panel, or click Add.</p>
+                    <input type="text"
+                           placeholder="Filter fields…"
+                           t-on-input="(ev) => state.filter = ev.target.value"/>
+                    <ul class="o_studio_field_list">
+                        <li t-foreach="state.availableFields" t-as="f" t-key="f.id"
+                            class="o_studio_drag_source"
+                            draggable="true"
+                            t-on-dragstart="(ev) => this.onDragStartField(f.name, ev)">
+                            <i class="fa fa-bars o_studio_drag_handle" title="Drag"/>
+                            <span class="o_studio_field_label"><t t-esc="f.field_description"/></span>
+                            <code class="o_studio_field_name"><t t-esc="f.name"/></code>
+                            <span class="o_studio_field_type">[<t t-esc="f.ttype"/>]</span>
+                            <button class="btn btn-sm btn-secondary"
+                                    t-on-click="() => this.onAddFieldClick(f.name)">Add</button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="o_studio_ops_panel">
+                    <h3>Pending operations (<t t-esc="state.operations.length"/>)</h3>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Op</th>
+                                <th>Field</th>
+                                <th>Anchor</th>
+                                <th>Position</th>
+                                <th>Attr</th>
+                                <th>Value</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="state.operations" t-as="op"
+                                t-key="op.id || op.draftId">
+                                <td>
+                                    <button class="btn btn-xs btn-link"
+                                            t-on-click="() => this.moveOperation(op_index, -1)">↑</button>
+                                    <button class="btn btn-xs btn-link"
+                                            t-on-click="() => this.moveOperation(op_index, 1)">↓</button>
+                                </td>
+                                <td>
+                                    <select t-att-value="op.op_type"
+                                            t-on-change="(ev) => this.updateOperation(op_index, 'op_type', ev.target.value)">
+                                        <option value="add_field">add_field</option>
+                                        <option value="hide_field">hide_field</option>
+                                        <option value="move_field">move_field</option>
+                                        <option value="set_attr">set_attr</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           t-att-value="op.field_name"
+                                           t-on-change="(ev) => this.updateOperation(op_index, 'field_name', ev.target.value)"/>
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           t-att-value="op.anchor_field"
+                                           t-att-disabled="op.op_type === 'hide_field' or op.op_type === 'set_attr'"
+                                           t-on-change="(ev) => this.updateOperation(op_index, 'anchor_field', ev.target.value)"/>
+                                </td>
+                                <td>
+                                    <select t-att-value="op.position"
+                                            t-att-disabled="op.op_type === 'hide_field' or op.op_type === 'set_attr'"
+                                            t-on-change="(ev) => this.updateOperation(op_index, 'position', ev.target.value)">
+                                        <option value="before">before</option>
+                                        <option value="after">after</option>
+                                        <option value="inside">inside</option>
+                                        <option value="replace">replace</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           t-att-value="op.attr_name"
+                                           t-att-disabled="op.op_type !== 'set_attr'"
+                                           t-on-change="(ev) => this.updateOperation(op_index, 'attr_name', ev.target.value)"/>
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           t-att-value="op.attr_value"
+                                           t-att-disabled="op.op_type !== 'set_attr'"
+                                           t-on-change="(ev) => this.updateOperation(op_index, 'attr_value', ev.target.value)"/>
+                                </td>
+                                <td>
+                                    <button class="btn btn-xs btn-danger"
+                                            t-on-click="() => this.removeOperation(op_index)">×</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p t-if="!state.operations.length" class="o_studio_empty">
+                        No operations yet. Click "Add" on an available field, or "Hide" on a field in the view.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

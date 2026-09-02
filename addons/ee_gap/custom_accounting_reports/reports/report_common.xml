@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Dispatcher: routes to the right per-report template based on
+             report_code returned by custom_report_dispatch. -->
+        <!-- Self-contained wrapper: no web.html_container / web.internal_layout, so
+             wkhtmltopdf never makes the external asset (report.url) callback that
+             stalls on this platform. <main> is required by
+             ir_actions_report._prepare_html (root.xpath('//main')[0]). -->
+        <template id="report_dispatch">
+            <html>
+                <head>
+                    <meta charset="utf-8"/>
+                    <style>
+                        @page { margin: 12mm; }
+                        * { box-sizing: border-box; }
+                        body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; margin: 0; padding: 0; }
+                        table { border-collapse: collapse; }
+                    </style>
+                </head>
+                <body>
+                <main>
+                    <div class="page">
+                        <t t-if="report_code == 'general_ledger'">
+                            <t t-call="custom_accounting_reports.report_general_ledger"/>
+                        </t>
+                        <t t-elif="report_code == 'trial_balance'">
+                            <t t-call="custom_accounting_reports.report_trial_balance"/>
+                        </t>
+                        <t t-elif="report_code == 'balance_sheet'">
+                            <t t-call="custom_accounting_reports.report_balance_sheet"/>
+                        </t>
+                        <t t-elif="report_code == 'profit_loss'">
+                            <t t-call="custom_accounting_reports.report_profit_loss"/>
+                        </t>
+                        <t t-elif="report_code == 'cash_flow'">
+                            <t t-call="custom_accounting_reports.report_cash_flow"/>
+                        </t>
+                        <t t-elif="report_code == 'aged_receivable'">
+                            <t t-call="custom_accounting_reports.report_aged_receivable"/>
+                        </t>
+                        <t t-elif="report_code == 'aged_payable'">
+                            <t t-call="custom_accounting_reports.report_aged_payable"/>
+                        </t>
+                        <t t-elif="report_code == 'partner_ledger'">
+                            <t t-call="custom_accounting_reports.report_partner_ledger"/>
+                        </t>
+                        <t t-elif="report_code == 'payable_card' or report_code == 'receivable_card'">
+                            <t t-call="custom_accounting_reports.report_partner_card"/>
+                        </t>
+                        <t t-elif="report_code == 'advance'">
+                            <t t-call="custom_accounting_reports.report_advance"/>
+                        </t>
+                        <t t-elif="report_code == 'sales'">
+                            <t t-call="custom_accounting_reports.report_sales"/>
+                        </t>
+                        <t t-elif="report_code == 'sales_detail'">
+                            <t t-call="custom_accounting_reports.report_sales_detail"/>
+                        </t>
+                        <t t-elif="report_code == 'purchase'">
+                            <t t-call="custom_accounting_reports.report_purchase"/>
+                        </t>
+                        <t t-elif="report_code == 'credit_limit'">
+                            <t t-call="custom_accounting_reports.report_credit_limit"/>
+                        </t>
+                        <t t-elif="report_code == 'gl_open_items'">
+                            <t t-call="custom_accounting_reports.report_gl_open_items"/>
+                        </t>
+                        <t t-elif="report_code == 'bill_payment'">
+                            <t t-call="custom_accounting_reports.report_bill_payment"/>
+                        </t>
+                        <t t-elif="report_code == 'tax'">
+                            <t t-call="custom_accounting_reports.report_tax"/>
+                        </t>
+                        <t t-elif="report_code == 'faktur_pajak'">
+                            <t t-call="custom_accounting_reports.report_faktur_pajak"/>
+                        </t>
+                        <t t-elif="report_code == 'ppn_masukan_import'">
+                            <t t-call="custom_accounting_reports.report_ppn_masukan_import"/>
+                        </t>
+                        <t t-elif="report_code == 'bupot'">
+                            <t t-call="custom_accounting_reports.report_bupot"/>
+                        </t>
+                        <t t-elif="report_code == 'spt_ppn'">
+                            <t t-call="custom_accounting_reports.report_spt_ppn"/>
+                        </t>
+                        <t t-elif="report_code == 'pph_withholding'">
+                            <t t-call="custom_accounting_reports.report_pph_withholding"/>
+                        </t>
+                        <t t-elif="report_code == 'nsfp_monitoring'">
+                            <t t-call="custom_accounting_reports.report_nsfp_monitoring"/>
+                        </t>
+                        <t t-elif="report_code == 'npwp_quality'">
+                            <t t-call="custom_accounting_reports.report_npwp_quality"/>
+                        </t>
+                        <t t-elif="report_code == 'dpp_nilai_lain'">
+                            <t t-call="custom_accounting_reports.report_dpp_nilai_lain"/>
+                        </t>
+                        <t t-elif="report_code == 'faktur_pengganti'">
+                            <t t-call="custom_accounting_reports.report_faktur_pengganti"/>
+                        </t>
+                        <t t-elif="report_code == 'ekualisasi_omzet'">
+                            <t t-call="custom_accounting_reports.report_ekualisasi_omzet"/>
+                        </t>
+                        <t t-elif="report_code == 'pph_equalisasi'">
+                            <t t-call="custom_accounting_reports.report_pph_equalisasi"/>
+                        </t>
+                        <t t-elif="report_code == 'coretax_submission'">
+                            <t t-call="custom_accounting_reports.report_coretax_submission"/>
+                        </t>
+                        <t t-elif="report_code == 'pajakku_usage'">
+                            <t t-call="custom_accounting_reports.report_pajakku_usage"/>
+                        </t>
+                        <t t-elif="report_code == 'pph_reconciliation'">
+                            <t t-call="custom_accounting_reports.report_pph_reconciliation"/>
+                        </t>
+                        <t t-elif="report_code == 'pph25'">
+                            <t t-call="custom_accounting_reports.report_pph25"/>
+                        </t>
+                        <t t-elif="report_code == 'tax_audit'">
+                            <t t-call="custom_accounting_reports.report_tax_audit"/>
+                        </t>
+                        <t t-elif="report_code == 'day_book'">
+                            <t t-call="custom_accounting_reports.report_day_book"/>
+                        </t>
+                        <t t-elif="report_code == 'cash_book'">
+                            <t t-call="custom_accounting_reports.report_cash_book"/>
+                        </t>
+                        <t t-elif="report_code == 'bank_book'">
+                            <t t-call="custom_accounting_reports.report_bank_book"/>
+                        </t>
+                        <t t-elif="report_code == 'journal_audit'">
+                            <t t-call="custom_accounting_reports.report_journal_audit"/>
+                        </t>
+                        <t t-elif="report_code == 'financial'">
+                            <t t-call="custom_accounting_reports.report_financial"/>
+                        </t>
+                        <t t-else="">
+                            <p>Unknown report: <t t-esc="report_code"/></p>
+                        </t>
+                    </div>
+                </main>
+                </body>
+            </html>
+        </template>
+
+        <!-- Full letterhead: company logo + address (left), report title + company
+             names + period (right). `company` is a single res.company (the first
+             selected company) provided by the report engine context; `company_names`
+             may list several when a multi-company scope is selected. Logo is embedded
+             inline via image_data_uri (no HTTP fetch). Styles inline for wkhtmltopdf. -->
+        <template id="report_header">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 6px;">
+                <tr>
+                    <td style="width: 55%; vertical-align: top; padding: 0 0 6px 0;">
+                        <img t-if="company and company.logo"
+                             t-att-src="image_data_uri(company.logo)"
+                             style="max-height: 60px; max-width: 240px;" alt="Logo"/>
+                        <div style="margin-top: 6px; font-size: 10px; line-height: 1.3;">
+                            <div style="font-weight: bold; font-size: 12px;" t-out="company.name if company else company_names"/>
+                            <div t-if="company and company.street" t-out="company.street"/>
+                            <div t-if="company and company.street2" t-out="company.street2"/>
+                            <div t-if="company">
+                                <span t-if="company.city" t-out="company.city"/><span t-if="company.state_id">, <t t-out="company.state_id.name"/></span><span t-if="company.zip"> <t t-out="company.zip"/></span>
+                            </div>
+                            <div t-if="company and company.phone">Phone: <t t-out="company.phone"/></div>
+                            <div t-if="company and company.email">Email: <t t-out="company.email"/></div>
+                        </div>
+                    </td>
+                    <td style="width: 45%; vertical-align: top; text-align: right; padding: 0 0 6px 0;">
+                        <div style="font-weight: bold; font-size: 20px; margin-bottom: 8px;" t-out="report_title"/>
+                        <div style="font-size: 10px; line-height: 1.5;">
+                            <div t-if="company_names and (not company or company_names != company.name)">
+                                <span style="color: #666;">Company: </span><strong t-out="company_names"/>
+                            </div>
+                            <div>
+                                <span style="color: #666;">Period: </span><strong t-out="date_from_str"/> &#8594; <strong t-out="date_to_str"/>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </template>
+
+        <template id="report_footer_signature">
+            <table style="width: 100%; border-collapse: collapse; margin-top: 48px; font-size: 0.8em;">
+                <tr>
+                    <td style="width: 33.33%; text-align: center; vertical-align: top; padding: 16px 8px 0;">
+                        <div style="border-top: 1px solid #000; padding-top: 4px;">Prepared by</div>
+                    </td>
+                    <td style="width: 33.33%; text-align: center; vertical-align: top; padding: 16px 8px 0;">
+                        <div style="border-top: 1px solid #000; padding-top: 4px;">Reviewed by</div>
+                    </td>
+                    <td style="width: 33.33%; text-align: center; vertical-align: top; padding: 16px 8px 0;">
+                        <div style="border-top: 1px solid #000; padding-top: 4px;">Approved by</div>
+                    </td>
+                </tr>
+            </table>
+        </template>
+    </data>
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_type_form_inherit_qc" model="ir.ui.view">
+        <field name="name">stock.picking.type.form.inherit.inbound.qc</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_picking_type_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Inbound QC" invisible="code != 'incoming'">
+                    <field name="wms_qc_required"/>
+                    <field name="wms_qc_location_id" invisible="not wms_qc_required"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

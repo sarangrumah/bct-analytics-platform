@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_onboarding_journey_ba,onboarding.journey BA,model_onboarding_journey,group_onboarding_ba,1,1,1,0
+access_onboarding_journey_mgr,onboarding.journey Manager,model_onboarding_journey,group_onboarding_manager,1,1,1,1
+access_onboarding_stage_transition_ba,onboarding.stage.transition BA,model_onboarding_stage_transition,group_onboarding_ba,1,0,1,0
+access_onboarding_stage_transition_mgr,onboarding.stage.transition Manager,model_onboarding_stage_transition,group_onboarding_manager,1,0,1,0
+access_onboarding_public_submission_ba,onboarding.public.submission BA,model_onboarding_public_submission,group_onboarding_ba,1,1,1,0
+access_onboarding_public_submission_mgr,onboarding.public.submission Manager,model_onboarding_public_submission,group_onboarding_manager,1,1,1,1
+access_onboarding_intake_wizard,onboarding.intake.wizard,model_onboarding_intake_wizard,group_onboarding_ba,1,1,1,1
+access_onboarding_brd_upload_wizard,onboarding.brd.upload.wizard,model_onboarding_brd_upload_wizard,group_onboarding_ba,1,1,1,1
+access_onboarding_go_no_go_wizard,onboarding.go.no.go.wizard,model_onboarding_go_no_go_wizard,group_onboarding_manager,1,1,1,1

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_consol_chart_list" model="ir.ui.view">
+        <field name="name">custom.consolidation.chart.list</field>
+        <field name="model">custom.consolidation.chart</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="currency_id"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_consol_chart_form" model="ir.ui.view">
+        <field name="name">custom.consolidation.chart.form</field>
+        <field name="model">custom.consolidation.chart</field>
+        <field name="arch" type="xml">
+            <form string="Consolidation Chart">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="currency_id"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="company_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Accounts">
+                            <field name="account_ids">
+                                <list editable="bottom">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="account_category"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Mappings">
+                            <field name="mapping_ids">
+                                <list editable="bottom">
+                                    <field name="company_id"/>
+                                    <field name="source_account_id"/>
+                                    <field name="target_account_id"/>
+                                    <field name="fx_method"/>
+                                    <field name="weight"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Elimination Rules">
+                            <field name="elimination_rule_ids">
+                                <list>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="company_a_id"/>
+                                    <field name="company_b_id"/>
+                                    <field name="account_a_id"/>
+                                    <field name="account_b_id"/>
+                                    <field name="match_type"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_consolidation_chart" model="ir.actions.act_window">
+        <field name="name">Consolidation Charts</field>
+        <field name="res_model">custom.consolidation.chart</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

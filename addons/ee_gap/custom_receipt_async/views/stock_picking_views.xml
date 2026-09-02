@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_form_inherit_receipt_async" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.receipt_async</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="move_line_count" invisible="1"/>
+                <field name="async_validate_job_uuid" invisible="1"/>
+                <button name="action_validate_async"
+                        type="object"
+                        string="Validate (Background)"
+                        class="btn-primary"
+                        invisible="state not in ('assigned', 'confirmed', 'waiting') or move_line_count &lt; 500"
+                        help="Run validate as a background job. Use for receipts with 500+ move lines that would otherwise time out in the browser."/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

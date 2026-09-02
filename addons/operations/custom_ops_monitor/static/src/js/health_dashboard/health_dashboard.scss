@@ -1,0 +1,65 @@
+.o_ops_health_dashboard {
+    padding: 16px;
+
+    .o_ops_header {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .o_ops_heatmap {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 8px;
+    }
+
+    .o_health_tile {
+        border-radius: 6px;
+        padding: 12px;
+        color: #fff;
+        cursor: pointer;
+        transition: transform 0.1s ease-in-out;
+
+        &:hover { transform: scale(1.02); }
+
+        &.o_health_tile_green  { background: #16a34a; }
+        &.o_health_tile_yellow { background: #eab308; color: #111; }
+        &.o_health_tile_red    { background: #dc2626; }
+        &.o_health_tile_unknown{ background: #6b7280; }
+
+        .o_health_tile_name { font-weight: 600; }
+        .o_health_tile_score { font-size: 28px; font-weight: 700; line-height: 1.1; }
+        .o_health_tile_metrics {
+            display: flex; gap: 8px; font-size: 12px; opacity: 0.9;
+        }
+        .o_health_tile_backup { font-size: 11px; opacity: 0.85; margin-top: 4px; }
+    }
+
+    .o_ops_detail_panel {
+        margin-top: 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 12px;
+
+        .o_ops_detail_header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .o_ops_sparklines {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+
+            label { font-size: 12px; color: #4b5563; display: block; }
+            .o_ops_spark { background: #f9fafb; border-radius: 4px; }
+        }
+
+        .o_ops_grafana iframe {
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+        }
+    }
+}

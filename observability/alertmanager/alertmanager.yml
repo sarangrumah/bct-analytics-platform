@@ -1,0 +1,63 @@
+# ---------------------------------------------------------------------------
+# Alertmanager routing.
+#
+# Dev default is a null receiver: alerts are visible in the Alertmanager UI at
+# 127.0.0.1:39093 and go nowhere else. Wiring a real receiver on a developer
+# workstation produces noise that trains people to ignore alerts, which is
+# worse than having none.
+#
+# NO SECRET LIVES IN THIS FILE. A Slack webhook or an SMTP password is a
+# credential; it belongs in SOPS (Security agent) and reaches Alertmanager
+# through a *_file directive, never inline. The commented receiver below shows
+# the shape.
+# ---------------------------------------------------------------------------
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: default
+  group_by: [alertname, component]
+  # Long enough to batch a cascade (a Postgres restart fires several rules at
+  # once), short enough that the first notification is still useful.
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+
+  routes:
+    # Critical goes to its own receiver with a much shorter repeat, so a paging
+    # alert cannot sit silent for 12 hours.
+    - matchers:
+        - severity = "critical"
+      receiver: critical
+      group_wait: 10s
+      repeat_interval: 1h
+
+inhibit_rules:
+  # If Postgres is down, its connection-count and slot-lag alerts are noise.
+  - source_matchers:
+      - alertname = "PostgresDown"
+    target_matchers:
+      - component = "postgres"
+    equal: [component]
+
+  # A critical disk alert supersedes the warning for the same mountpoint.
+  - source_matchers:
+      - severity = "critical"
+    target_matchers:
+      - severity = "warning"
+    equal: [alertname, mountpoint]
+
+receivers:
+  - name: default
+
+  - name: critical
+    # Deliberately empty in dev. To wire a real one, add a receiver here and
+    # keep the credential out of this file:
+    #
+    #   - name: critical
+    #     slack_configs:
+    #       - api_url_file: /run/secrets/alertmanager_slack_url
+    #         channel: '#bct-alerts'
+    #         send_resolved: true
+    #
+    # api_url_file, not api_url. The Security agent owns the secret.

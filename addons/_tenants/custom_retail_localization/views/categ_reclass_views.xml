@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_retail_categ_reclass_form" model="ir.ui.view">
+        <field name="name">retail.categ.reclass.form</field>
+        <field name="model">retail.categ.reclass</field>
+        <field name="arch" type="xml">
+            <form string="Product Category Reclassification">
+                <header>
+                    <button name="action_compute" type="object" string="Preview Impact"
+                            class="btn-primary"
+                            invisible="state in ('applied', 'cancel')"/>
+                    <button name="action_apply" type="object"
+                            string="Change Category &amp; Book Correction"
+                            class="btn-primary"
+                            confirm="This changes the products' category and creates draft correction entries. Continue?"
+                            invisible="state != 'computed'"/>
+                    <button name="action_cancel" type="object" string="Undo"
+                            invisible="state != 'applied'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,computed,applied"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_moves" type="object"
+                                class="oe_stat_button" icon="fa-book"
+                                invisible="move_count == 0">
+                            <field name="move_count" widget="statinfo" string="Entries"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="product_tmpl_ids" widget="many2many_tags"
+                                   readonly="state in ('applied', 'cancel')"/>
+                            <field name="new_categ_id"
+                                   readonly="state in ('applied', 'cancel')"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="date_from" readonly="state in ('applied', 'cancel')"/>
+                            <field name="date_to" readonly="state in ('applied', 'cancel')"/>
+                            <field name="posting_policy" readonly="state in ('applied', 'cancel')"/>
+                            <field name="fallback_date" readonly="state in ('applied', 'cancel')"/>
+                            <field name="journal_id" readonly="state in ('applied', 'cancel')"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert"
+                         invisible="closed_period_count == 0">
+                        <field name="closed_period_count" readonly="1" nolabel="1"
+                               class="oe_inline"/>
+                        line(s) fall in a period that is already closed. The fiscal-year
+                        lock is never lifted — those corrections are booked on the
+                        <field name="fallback_date" readonly="1" nolabel="1"
+                               class="oe_inline"/> instead, with their original date kept
+                        on the line below.
+                    </div>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="unmatched_count == 0">
+                        <field name="unmatched_count" readonly="1" nolabel="1"
+                               class="oe_inline"/>
+                        line(s) are not backed by the general ledger: the source account
+                        does not hold that balance on the source date. Review them before
+                        booking — the category may already have been corrected once.
+                    </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not warning_text">
+                        <field name="warning_text" readonly="1" nolabel="1"/>
+                    </div>
+                    <notebook>
+                        <page string="Correction Lines" name="lines">
+                            <field name="line_ids" readonly="1">
+                                <list create="false" delete="false">
+                                    <field name="product_id"/>
+                                    <field name="kind"/>
+                                    <field name="origin_date"/>
+                                    <field name="posting_date"/>
+                                    <field name="is_period_closed" widget="boolean_toggle"/>
+                                    <field name="analytic_account_id"/>
+                                    <field name="source_account_id"/>
+                                    <field name="target_account_id"/>
+                                    <field name="amount" sum="Balance moved"/>
+                                    <field name="is_matched" widget="boolean_toggle"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="total_amount" widget="monetary"/>
+                            </group>
+                        </page>
+                        <page string="Category Changes" name="products">
+                            <field name="product_ids" readonly="1">
+                                <list create="false" delete="false">
+                                    <field name="product_tmpl_id"/>
+                                    <field name="old_categ_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_retail_categ_reclass_list" model="ir.ui.view">
+        <field name="name">retail.categ.reclass.list</field>
+        <field name="model">retail.categ.reclass</field>
+        <field name="arch" type="xml">
+            <list string="Product Category Reclassification">
+                <field name="name"/>
+                <field name="new_categ_id"/>
+                <field name="total_amount" sum="Reclassified"/>
+                <field name="closed_period_count"/>
+                <field name="state"
+                       decoration-success="state == 'applied'"
+                       decoration-info="state == 'computed'"
+                       decoration-muted="state == 'cancel'"
+                       widget="badge"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_retail_categ_reclass" model="ir.actions.act_window">
+        <field name="name">Product Category Reclassification</field>
+        <field name="res_model">retail.categ.reclass</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Correct a product's category and its ledger</p>
+            <p>A product category decides which <b>Gross Sales</b>, <b>Sales Discount</b>
+               and <b>Sales Return</b> account a product's turnover lands on. Changing the
+               category on its own leaves everything already posted where it was.</p>
+            <p>Pick the products and the category they should have been in: the impact is
+               recomputed from the POS lines and shown per day and per store before
+               anything is written. Periods that are already closed are corrected in the
+               current month — the fiscal-year lock is never lifted.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_retail_categ_reclass"
+              name="Product Category Reclassification"
+              parent="account.menu_finance_entries"
+              action="action_retail_categ_reclass"
+              sequence="92"/>
+</odoo>

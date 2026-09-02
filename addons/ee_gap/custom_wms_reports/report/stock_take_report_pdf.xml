@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Self-contained wrapper: no web.html_container / web.external_layout, so
+         wkhtmltopdf never makes the external asset callback that stalls on this
+         platform. <main> is required by ir_actions_report._prepare_html. -->
+    <template id="report_wms_stock_take" name="WMS Stock Take Report">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+            </head>
+            <body>
+                <main>
+                <!-- The style and charset live INSIDE <main>, not in <head>:
+                     ir_actions_report._prepare_html keeps only the children of
+                     <main> and writes them to a bare .html file, so anything in
+                     <head> is silently dropped — the report would print
+                     unstyled and non-ASCII text would come out mojibake. -->
+                    <meta charset="utf-8"/>
+                    <style>
+                        @page { margin: 10mm; }
+                        * { box-sizing: border-box; }
+                        body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; margin: 0; padding: 0; }
+                        h1 { font-size: 16px; margin: 0 0 2px 0; }
+                        .muted { color: #666; }
+                        table.meta { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+                        table.meta td { padding: 1px 4px; vertical-align: top; }
+                        table.data { width: 100%; border-collapse: collapse; font-size: 10px; }
+                        table.data th, table.data td { border: 1px solid #b0b0b0; padding: 3px 4px; vertical-align: top; }
+                        table.data thead th { background-color: #f3f3f3; text-align: left; }
+                        table.data td.num, table.data th.num { text-align: right; }
+                        table.data tr.total td { font-weight: bold; background-color: #e8e8e8; }
+                        .sig { margin-top: 28px; width: 100%; }
+                        .sig td { width: 33%; text-align: center; padding-top: 40px; }
+                    </style>
+                    <t t-foreach="docs" t-as="o">
+                        <div class="page" style="page-break-after: always;">
+                            <table class="meta">
+                                <tr>
+                                    <td style="width: 62%;">
+                                        <h1>
+                                            <t t-if="o.plan_id.method == 'spot_check'">SPOT CHECK REPORT</t>
+                                            <t t-else="">STOCK TAKE REPORT</t>
+                                        </h1>
+                                        <div><b t-out="o.name"/></div>
+                                        <div class="muted" t-out="o.company_id.display_name"/>
+                                    </td>
+                                    <td style="width: 38%; text-align: right;">
+                                        <img t-att-src="o._wms_barcode_src(o.name, 'Code128', 500, 90)"
+                                             alt="Session barcode" style="height: 42px;"/>
+                                        <div><b>Warehouse:</b> <span t-out="o.warehouse_id.display_name or '-'"/></div>
+                                        <div><b>Plan:</b> <span t-out="o.plan_id.display_name or '-'"/></div>
+                                        <div><b>Method:</b> <span t-out="dict(o.plan_id._fields['method'].selection).get(o.plan_id.method, '-') if o.plan_id else '-'"/></div>
+                                        <div><b>Scheduled:</b> <span t-out="o.scheduled_date or '-'"/></div>
+                                        <div><b>Status:</b> <span t-out="o.state"/></div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table class="data">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Location</th>
+                                        <th>SKU</th>
+                                        <th>Product</th>
+                                        <th style="width: 13%;">Item Barcode</th>
+                                        <th>Lot/Serial</th>
+                                        <th class="num">System Qty</th>
+                                        <th class="num">Counted Qty</th>
+                                        <th class="num">Variance</th>
+                                        <th class="num">Var %</th>
+                                        <th>Status</th>
+                                        <th>Counter</th>
+                                        <th>Remark</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="idx" t-value="0"/>
+                                    <t t-foreach="o.line_ids.sorted(key=lambda l: (l.location_id.complete_name or '', l.sequence))" t-as="ln">
+                                        <t t-set="idx" t-value="idx + 1"/>
+                                        <tr>
+                                            <td t-out="idx"/>
+                                            <td t-out="ln.location_id.complete_name or '-'"/>
+                                            <td t-out="ln.product_id.default_code or '-'"/>
+                                            <td t-out="ln.product_id.name"/>
+                                            <t t-set="item_value" t-value="o._wms_count_line_barcode(ln)"/>
+                                            <td style="text-align: center;">
+                                                <t t-set="item_src" t-value="o._wms_item_barcode_src(item_value)"/>
+                                                <img t-if="item_src" t-att-src="item_src"
+                                                     alt="Item barcode" style="height: 24px; width: 100%;"/>
+                                                <div class="muted" style="font-size: 7px;" t-out="item_value"/>
+                                            </td>
+                                            <td t-out="ln.lot_id.name or '-'"/>
+                                            <td class="num" t-out="'%.2f' % (ln.expected_qty or 0.0)"/>
+                                            <td class="num" t-out="'%.2f' % (ln.counted_qty or 0.0) if ln.status != 'pending' else ''"/>
+                                            <td class="num" t-out="'%.2f' % (ln.variance_qty or 0.0) if ln.status != 'pending' else ''"/>
+                                            <!-- str.format, not %-formatting: the data loader
+                                                 collapses '%%' in a <template> attribute to a
+                                                 single '%', which then blows up at render time
+                                                 with "incomplete format". -->
+                                            <td class="num" t-out="'{:.1f}%'.format(ln.variance_pct or 0.0) if ln.status != 'pending' else ''"/>
+                                            <td t-out="ln.status"/>
+                                            <td t-out="ln.counter_user_id.name or ''"/>
+                                            <td t-out="ln.remark or ''"/>
+                                        </tr>
+                                    </t>
+                                    <tr class="total">
+                                        <td colspan="6">TOTAL</td>
+                                        <td class="num" t-out="'%.2f' % sum(o.line_ids.mapped('expected_qty'))"/>
+                                        <td class="num" t-out="'%.2f' % sum(o.line_ids.mapped('counted_qty'))"/>
+                                        <td class="num" t-out="'%.2f' % sum(o.line_ids.mapped('variance_qty'))"/>
+                                        <td class="num"></td>
+                                        <td colspan="3">
+                                            <span t-out="o.variance_count"/> variance line(s),
+                                            value <span t-out="'%.2f' % (o.variance_value or 0.0)"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="sig">
+                                <tr>
+                                    <td>Counted by<br/><br/>(____________________)</td>
+                                    <td>Checked by<br/><br/>(____________________)</td>
+                                    <td>Approved by<br/><br/>(____________________)</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </t>
+                </main>
+            </body>
+        </html>
+    </template>
+
+    <record id="action_report_wms_stock_take" model="ir.actions.report">
+        <field name="name">Stock Take / Spot Check Report</field>
+        <field name="model">custom.cycle.count.session</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_wms_reports.report_wms_stock_take</field>
+        <field name="report_file">custom_wms_reports.report_wms_stock_take</field>
+        <field name="print_report_name">'StockTake - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="custom_wms_cycle_count.model_custom_cycle_count_session"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

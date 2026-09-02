@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_ecommerce_courier_list" model="ir.ui.view">
+        <field name="name">custom.ecommerce.courier.list</field>
+        <field name="model">custom.ecommerce.courier</field>
+        <field name="arch" type="xml">
+            <list string="Couriers ID">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="service_types"/>
+                <field name="is_active"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_ecommerce_courier_form" model="ir.ui.view">
+        <field name="name">custom.ecommerce.courier.form</field>
+        <field name="model">custom.ecommerce.courier</field>
+        <field name="arch" type="xml">
+            <form string="Courier">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="JNE Express"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="is_active"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="service_types"/>
+                        </group>
+                        <group>
+                            <field name="api_endpoint"/>
+                            <field name="api_key"/>
+                            <field name="tracking_url_template"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_ecommerce_courier_search" model="ir.ui.view">
+        <field name="name">custom.ecommerce.courier.search</field>
+        <field name="model">custom.ecommerce.courier</field>
+        <field name="arch" type="xml">
+            <search string="Couriers">
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="active" string="Active" domain="[('is_active','=',True)]"/>
+                <filter name="inactive" string="Inactive" domain="[('is_active','=',False)]"/>
+                <separator/>
+                <filter name="group_code" string="Code" context="{'group_by':'code'}"/>
+                <filter name="group_company" string="Company" context="{'group_by':'company_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_ecommerce_courier" model="ir.actions.act_window">
+        <field name="name">Couriers ID</field>
+        <field name="res_model">custom.ecommerce.courier</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_ecommerce_courier_search"/>
+    </record>
+</odoo>

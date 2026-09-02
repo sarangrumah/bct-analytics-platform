@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="custom_brd_analyzer.BrdReport">
+        <div class="o_brd_report_owl_root">
+            <t t-if="state.loading">
+                <div class="text-muted">Loading…</div>
+            </t>
+            <t t-elif="!state.payload">
+                <div class="text-muted">No data.</div>
+            </t>
+            <t t-else="">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 t-esc="state.payload.name"/>
+                    <div>
+                        <button class="btn btn-outline-primary me-2" t-on-click="onDownloadPdf">Download PDF</button>
+                        <button class="btn btn-outline-secondary" t-on-click="onShareClick">Share Link</button>
+                    </div>
+                </div>
+
+                <div class="alert alert-info" t-if="state.shareUrl">
+                    <strong>Share:</strong> <a t-att-href="state.shareUrl" t-esc="state.shareUrl"/>
+                </div>
+
+                <div class="o_brd_gauge mb-4">
+                    <div class="progress" style="height: 24px;">
+                        <div class="progress-bar bg-success" t-att-style="`width: ${state.payload.overall_fit_pct}%`">
+                            <span t-esc="state.payload.overall_fit_pct"/>%
+                        </div>
+                    </div>
+                </div>
+
+                <h4>Sections</h4>
+                <table class="table table-sm table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Title</th>
+                            <th>Modules</th>
+                            <th>Fit</th>
+                            <th>Status</th>
+                            <th>Severity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="state.payload.sections" t-as="s" t-key="s.id">
+                            <td t-esc="s.id"/>
+                            <td t-esc="s.title"/>
+                            <td>
+                                <span t-foreach="s.mapped" t-as="m" t-key="m" class="badge bg-info me-1" t-esc="m"/>
+                            </td>
+                            <td t-esc="s.fit_score"/>
+                            <td><span t-att-class="statusClass(s.gap_status)" t-esc="s.gap_status"/></td>
+                            <td><span t-att-class="severityClass(s.gap_severity)" t-esc="s.gap_severity"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4 class="mt-4">Recommended Modules</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-3" t-foreach="state.payload.recommendations" t-as="r" t-key="r.id">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between">
+                                <strong t-esc="r.name"/>
+                                <span t-att-class="severityClass(r.severity)" t-esc="r.severity"/>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted small">Estimated <span t-esc="r.estimated_md"/> MD</p>
+                                <p t-esc="r.scope"/>
+                                <div><strong>Depends:</strong> <span t-foreach="r.depends" t-as="d" t-key="d" class="badge bg-light text-dark me-1" t-esc="d"/></div>
+                                <div><strong>Impacts:</strong> <span t-foreach="r.impact" t-as="i" t-key="i" class="badge bg-light text-dark me-1" t-esc="i"/></div>
+                                <div class="mt-2 small text-muted" t-esc="r.justification"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+
+</templates>

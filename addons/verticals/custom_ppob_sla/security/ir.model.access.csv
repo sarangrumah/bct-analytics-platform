@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ppob_sla_target_user,ppob sla target user,model_custom_ppob_sla_target,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_sla_target_ops,ppob sla target ops,model_custom_ppob_sla_target,custom_ppob_core.group_ppob_ops,1,0,0,0
+access_ppob_sla_target_manager,ppob sla target manager,model_custom_ppob_sla_target,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_throughput_sample_user,ppob throughput sample user,model_custom_ppob_throughput_sample,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_throughput_sample_ops,ppob throughput sample ops,model_custom_ppob_throughput_sample,custom_ppob_core.group_ppob_ops,1,0,0,0
+access_ppob_throughput_sample_manager,ppob throughput sample manager,model_custom_ppob_throughput_sample,custom_ppob_core.group_ppob_manager,1,1,1,1

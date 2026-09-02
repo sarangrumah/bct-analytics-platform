@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Shared layout snippet: header with perimeter + date range     -->
+    <!-- ============================================================ -->
+
+    <template id="consolidation_report_header" name="Consolidation Report Header">
+        <div class="container-fluid">
+            <h2 t-out="data['config'].name"/>
+            <p class="text-muted">
+                Perimeter:
+                <span t-out="data['config'].parent_company_id.name"/>
+                (+
+                <t t-foreach="data['config'].subsidiary_ids" t-as="sub">
+                    <span t-out="sub.name"/><t t-if="not sub_last"> , </t>
+                </t>
+                )
+            </p>
+            <p>
+                Period: <span t-out="data['date_from']"/> → <span t-out="data['date_to']"/>
+                | Presentation currency: <span t-out="data['config'].presentation_currency_id.name"/>
+            </p>
+        </div>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- Trial Balance                                                -->
+    <!-- ============================================================ -->
+
+    <template id="consolidation_trial_balance_template" name="Consolidated Trial Balance">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <t t-call="custom_accounting_full.consolidation_report_header"/>
+                    <h3>Trial Balance (Consolidated)</h3>
+                    <table class="table table-sm" style="font-size: 11px;">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Account</th>
+                                <th>Type</th>
+                                <th t-foreach="data['companies']" t-as="c" class="text-end">
+                                    <span t-out="c.name"/>
+                                </th>
+                                <th class="text-end">Eliminations</th>
+                                <th class="text-end"><b>Consolidated</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="data['accounts']" t-as="a">
+                                <td><span t-out="a['account_code']"/></td>
+                                <td><span t-out="a['account_name']"/></td>
+                                <td><small t-out="a['account_type']"/></td>
+                                <td t-foreach="data['companies']" t-as="c" class="text-end">
+                                    <span t-out="'%.2f' % a['by_company'].get(c.id, 0.0)"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-out="'%.2f' % a['elimination']"/>
+                                </td>
+                                <td class="text-end">
+                                    <b><span t-out="'%.2f' % a['consolidated']"/></b>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_consol_trial_balance_pdf" model="ir.actions.report">
+        <field name="name">Consolidated Trial Balance</field>
+        <field name="model">account.consolidation.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_accounting_full.consolidation_trial_balance_template</field>
+        <field name="report_file">custom_accounting_full.consolidation_trial_balance_template</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Profit &amp; Loss                                            -->
+    <!-- ============================================================ -->
+
+    <template id="consolidation_pl_template" name="Consolidated P&amp;L">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <t t-call="custom_accounting_full.consolidation_report_header"/>
+                    <h3>Profit &amp; Loss (Consolidated)</h3>
+                    <table class="table table-sm" style="font-size: 11px;">
+                        <thead>
+                            <tr>
+                                <th>Section</th>
+                                <th>Account</th>
+                                <th t-foreach="data['companies']" t-as="c" class="text-end">
+                                    <span t-out="c.name"/>
+                                </th>
+                                <th class="text-end">Eliminations</th>
+                                <th class="text-end"><b>Consolidated</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="data['accounts']" t-as="a">
+                                <td>
+                                    <t t-if="a['account_type'] in ('income','income_other')">REVENUE</t>
+                                    <t t-else="">EXPENSE</t>
+                                </td>
+                                <td>
+                                    <small t-out="a['account_code']"/>
+                                    <span t-out="' — ' + a['account_name']"/>
+                                </td>
+                                <td t-foreach="data['companies']" t-as="c" class="text-end">
+                                    <span t-out="'%.2f' % (-a['by_company'].get(c.id, 0.0) if a['account_type'] in ('income','income_other') else a['by_company'].get(c.id, 0.0))"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-out="'%.2f' % (-a['elimination'] if a['account_type'] in ('income','income_other') else a['elimination'])"/>
+                                </td>
+                                <td class="text-end">
+                                    <b><span t-out="'%.2f' % (-a['consolidated'] if a['account_type'] in ('income','income_other') else a['consolidated'])"/></b>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_consol_pl_pdf" model="ir.actions.report">
+        <field name="name">Consolidated P&amp;L</field>
+        <field name="model">account.consolidation.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_accounting_full.consolidation_pl_template</field>
+        <field name="report_file">custom_accounting_full.consolidation_pl_template</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Balance Sheet                                                -->
+    <!-- ============================================================ -->
+
+    <template id="consolidation_bs_template" name="Consolidated Balance Sheet">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <t t-call="custom_accounting_full.consolidation_report_header"/>
+                    <h3>Balance Sheet (Consolidated)</h3>
+                    <table class="table table-sm" style="font-size: 11px;">
+                        <thead>
+                            <tr>
+                                <th>Section</th>
+                                <th>Account</th>
+                                <th t-foreach="data['companies']" t-as="c" class="text-end">
+                                    <span t-out="c.name"/>
+                                </th>
+                                <th class="text-end">Eliminations</th>
+                                <th class="text-end"><b>Consolidated</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="data['accounts']" t-as="a">
+                                <td>
+                                    <t t-if="a['account_type'].startswith('asset_')">ASSET</t>
+                                    <t t-elif="a['account_type'].startswith('liability_')">LIABILITY</t>
+                                    <t t-else="">EQUITY</t>
+                                </td>
+                                <td>
+                                    <small t-out="a['account_code']"/>
+                                    <span t-out="' — ' + a['account_name']"/>
+                                </td>
+                                <td t-foreach="data['companies']" t-as="c" class="text-end">
+                                    <span t-out="'%.2f' % a['by_company'].get(c.id, 0.0)"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-out="'%.2f' % a['elimination']"/>
+                                </td>
+                                <td class="text-end">
+                                    <b><span t-out="'%.2f' % a['consolidated']"/></b>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_consol_bs_pdf" model="ir.actions.report">
+        <field name="name">Consolidated Balance Sheet</field>
+        <field name="model">account.consolidation.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_accounting_full.consolidation_bs_template</field>
+        <field name="report_file">custom_accounting_full.consolidation_bs_template</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+</odoo>

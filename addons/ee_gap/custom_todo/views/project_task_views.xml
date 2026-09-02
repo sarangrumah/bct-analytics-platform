@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_task_form_custom_todo" model="ir.ui.view">
+        <field name="name">project.task.form.custom.todo</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Pomodoro" name="pomodoro">
+                        <group>
+                            <group>
+                                <field name="x_pomodoro_state"/>
+                                <field name="x_pomodoro_started_at" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="x_pomodoro_minutes_focus"/>
+                                <field name="x_pomodoro_minutes_break"/>
+                            </group>
+                        </group>
+                        <div>
+                            <button name="action_pomodoro_start_focus" type="object"
+                                    string="Start Focus" class="btn-primary"
+                                    icon="fa-play"/>
+                            <button name="action_pomodoro_start_break" type="object"
+                                    string="Start Break" class="btn-secondary"
+                                    icon="fa-coffee"/>
+                            <button name="action_pomodoro_done" type="object"
+                                    string="Done" class="btn-success"
+                                    icon="fa-check"/>
+                        </div>
+                    </page>
+                    <page string="AI Breakdown" name="ai_breakdown">
+                        <button name="action_ai_breakdown" type="object"
+                                string="Generate Breakdown" class="btn-primary"
+                                icon="fa-magic"/>
+                        <field name="x_ai_breakdown" widget="text"/>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+</odoo>

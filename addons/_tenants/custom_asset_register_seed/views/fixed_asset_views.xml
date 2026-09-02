@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Surface the serial / source-listing fields on the asset form + list. -->
+    <record id="view_fixed_asset_form_aim_serial" model="ir.ui.view">
+        <field name="name">custom.fixed.asset.form.aim.serial</field>
+        <field name="model">custom.fixed.asset</field>
+        <field name="inherit_id" ref="custom_accounting_asset.view_fixed_asset_form"/>
+        <field name="arch" type="xml">
+            <field name="location_id" position="after">
+                <field name="serial_number"/>
+                <field name="source_group"/>
+                <field name="source_desc"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_fixed_asset_list_aim_serial" model="ir.ui.view">
+        <field name="name">custom.fixed.asset.list.aim.serial</field>
+        <field name="model">custom.fixed.asset</field>
+        <field name="inherit_id" ref="custom_accounting_asset.view_fixed_asset_list"/>
+        <field name="arch" type="xml">
+            <field name="location_id" position="after">
+                <field name="serial_number" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_fixed_asset_search_aim_serial" model="ir.ui.view">
+        <field name="name">custom.fixed.asset.search.aim.serial</field>
+        <field name="model">custom.fixed.asset</field>
+        <field name="inherit_id" ref="custom_accounting_asset.view_fixed_asset_search"/>
+        <field name="arch" type="xml">
+            <field name="code" position="after">
+                <field name="serial_number"/>
+            </field>
+        </field>
+    </record>
+</odoo>

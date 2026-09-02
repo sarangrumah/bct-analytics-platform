@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_leave_carryover_policy_list" model="ir.ui.view">
+        <field name="name">custom.leave.carryover.policy.list</field>
+        <field name="model">custom.leave.carryover.policy</field>
+        <field name="arch" type="xml">
+            <list string="Leave Carry-Over Policies">
+                <field name="leave_type_id"/>
+                <field name="max_carryover_days"/>
+                <field name="expiry_months_after_year_end"/>
+                <field name="is_active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_leave_carryover_policy_form" model="ir.ui.view">
+        <field name="name">custom.leave.carryover.policy.form</field>
+        <field name="model">custom.leave.carryover.policy</field>
+        <field name="arch" type="xml">
+            <form string="Leave Carry-Over Policy">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="leave_type_id"/>
+                            <field name="is_active"/>
+                        </group>
+                        <group>
+                            <field name="max_carryover_days"/>
+                            <field name="expiry_months_after_year_end"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_leave_carryover_policy_search" model="ir.ui.view">
+        <field name="name">custom.leave.carryover.policy.search</field>
+        <field name="model">custom.leave.carryover.policy</field>
+        <field name="arch" type="xml">
+            <search string="Carry-Over Policies">
+                <field name="leave_type_id"/>
+                <filter name="active" string="Active" domain="[('is_active','=',True)]"/>
+                <filter name="inactive" string="Inactive" domain="[('is_active','=',False)]"/>
+                <separator/>
+                <filter name="group_type" string="Leave Type" context="{'group_by':'leave_type_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_leave_carryover_policy" model="ir.actions.act_window">
+        <field name="name">Leave Carry-Over Policies</field>
+        <field name="res_model">custom.leave.carryover.policy</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_leave_carryover_policy_search"/>
+    </record>
+</odoo>

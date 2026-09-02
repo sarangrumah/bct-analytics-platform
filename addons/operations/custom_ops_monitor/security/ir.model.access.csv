@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_tenant_health_viewer,tenant health viewer,model_custom_ops_tenant_health,group_ops_viewer,1,0,0,0
+access_tenant_health_admin,tenant health admin,model_custom_ops_tenant_health,group_ops_admin,1,1,1,1
+access_capacity_forecast_viewer,capacity forecast viewer,model_custom_ops_capacity_forecast,group_ops_viewer,1,0,0,0
+access_capacity_forecast_admin,capacity forecast admin,model_custom_ops_capacity_forecast,group_ops_admin,1,1,1,1
+access_ops_incident_viewer,incident viewer,model_custom_ops_incident,group_ops_viewer,1,0,0,0
+access_ops_incident_engineer,incident engineer,model_custom_ops_incident,group_ops_engineer,1,1,0,0
+access_ops_incident_admin,incident admin,model_custom_ops_incident,group_ops_admin,1,1,1,1

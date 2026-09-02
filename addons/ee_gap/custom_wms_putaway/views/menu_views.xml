@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_putaway_root"
+              name="Putaway"
+              parent="stock.menu_stock_config_settings"
+              sequence="50"
+              groups="group_putaway_user"/>
+
+    <menuitem id="menu_putaway_strategies"
+              name="Strategies"
+              parent="menu_putaway_root"
+              action="action_putaway_strategy"
+              sequence="10"/>
+
+    <menuitem id="menu_putaway_rules"
+              name="Rules"
+              parent="menu_putaway_root"
+              action="action_putaway_rule"
+              sequence="20"/>
+
+    <menuitem id="menu_putaway_suggestions"
+              name="Suggestions"
+              parent="menu_putaway_root"
+              action="action_putaway_suggestion"
+              sequence="30"/>
+</odoo>

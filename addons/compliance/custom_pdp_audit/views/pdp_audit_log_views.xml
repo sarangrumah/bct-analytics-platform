@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pdp_audit_log_list" model="ir.ui.view">
+        <field name="name">pdp.audit.log.list</field>
+        <field name="model">pdp.audit.log</field>
+        <field name="arch" type="xml">
+            <list string="PDP Audit Log" create="false" edit="false" delete="false">
+                <field name="ts"/>
+                <field name="actor_login"/>
+                <field name="model_name"/>
+                <field name="res_id"/>
+                <field name="action"/>
+                <field name="classification"/>
+                <field name="ip_address" optional="hide"/>
+                <field name="request_id" optional="hide"/>
+                <field name="hash_hex" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pdp_audit_log_form" model="ir.ui.view">
+        <field name="name">pdp.audit.log.form</field>
+        <field name="model">pdp.audit.log</field>
+        <field name="arch" type="xml">
+            <form string="PDP Audit Log Entry" create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="id"/>
+                            <field name="ts"/>
+                            <field name="actor_login"/>
+                            <field name="actor_user_id"/>
+                            <field name="tenant_db"/>
+                        </group>
+                        <group>
+                            <field name="action"/>
+                            <field name="model_name"/>
+                            <field name="res_id"/>
+                            <field name="classification"/>
+                            <field name="request_id"/>
+                        </group>
+                    </group>
+                    <group string="Network">
+                        <field name="ip_address"/>
+                        <field name="user_agent"/>
+                    </group>
+                    <group string="Details">
+                        <field name="reason"/>
+                        <field name="field_changes" widget="json"/>
+                    </group>
+                    <group string="Hash Chain">
+                        <field name="prev_hash_hex"/>
+                        <field name="hash_hex"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_pdp_audit_log_search" model="ir.ui.view">
+        <field name="name">pdp.audit.log.search</field>
+        <field name="model">pdp.audit.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="actor_login"/>
+                <field name="model_name"/>
+                <field name="action"/>
+                <field name="classification"/>
+                <field name="request_id"/>
+                <filter string="Today" name="today" domain="[('ts','&gt;=', (context_today()).strftime('%Y-%m-%d'))]"/>
+                <filter string="Create" name="f_create" domain="[('action','=','create')]"/>
+                <filter string="Write" name="f_write" domain="[('action','=','write')]"/>
+                <filter string="Unlink" name="f_unlink" domain="[('action','=','unlink')]"/>
+                <filter string="Unmask" name="f_unmask" domain="[('action','=','unmask')]"/>
+                <filter string="DSAR" name="f_dsar" domain="[('action','=','dsar')]"/>
+                <separator/>
+                <filter string="User" name="g_user" context="{'group_by':'actor_login'}"/>
+                <filter string="Model" name="g_model" context="{'group_by':'model_name'}"/>
+                <filter string="Action" name="g_action" context="{'group_by':'action'}"/>
+                <filter string="Classification" name="g_class" context="{'group_by':'classification'}"/>
+                <filter string="Day" name="g_day" context="{'group_by':'ts:day'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_pdp_audit_log" model="ir.actions.act_window">
+        <field name="name">PDP Audit Log</field>
+        <field name="res_model">pdp.audit.log</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_pdp_audit_verify_chain" model="ir.actions.server">
+        <field name="name">Verify Hash Chain</field>
+        <field name="model_id" ref="model_pdp_audit_log"/>
+        <field name="binding_model_id" ref="model_pdp_audit_log"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = env['pdp.audit.log'].action_verify_chain()</field>
+    </record>
+</odoo>

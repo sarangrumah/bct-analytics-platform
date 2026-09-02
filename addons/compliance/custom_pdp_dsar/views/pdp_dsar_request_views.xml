@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pdp_dsar_request_list" model="ir.ui.view">
+        <field name="name">pdp.dsar.request.list</field>
+        <field name="model">pdp.dsar.request</field>
+        <field name="arch" type="xml">
+            <list string="DSAR Requests" decoration-info="state=='received'" decoration-warning="state=='gathering'" decoration-success="state=='delivered'" decoration-muted="state=='rejected'">
+                <field name="name"/>
+                <field name="subject_email"/>
+                <field name="subject_nik" optional="show"/>
+                <field name="partner_id"/>
+                <field name="request_kind"/>
+                <field name="requested_at"/>
+                <field name="delivered_at"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pdp_dsar_request_form" model="ir.ui.view">
+        <field name="name">pdp.dsar.request.form</field>
+        <field name="model">pdp.dsar.request</field>
+        <field name="arch" type="xml">
+            <form string="DSAR Request">
+                <header>
+                    <button name="action_verify" type="object" string="Start Verification" class="btn-primary"
+                            invisible="state != 'received'"/>
+                    <button name="action_gather" type="object" string="Gather &amp; Deliver" class="btn-primary"
+                            invisible="state not in ('verifying','received')"/>
+                    <button name="action_anonymize" type="object" string="Anonymize Subject" class="btn-warning"
+                            confirm="This will overwrite PII fields for the resolved partner with hash placeholders. Continue?"
+                            invisible="state != 'delivered' or request_kind != 'erasure'"/>
+                    <button name="action_reject" type="object" string="Reject" class="btn-danger"
+                            invisible="state in ('delivered','rejected')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="received,verifying,gathering,delivered"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="subject_email"/>
+                            <field name="subject_nik"/>
+                            <field name="partner_id"/>
+                            <field name="request_kind"/>
+                        </group>
+                        <group>
+                            <field name="requested_at"/>
+                            <field name="delivered_at"/>
+                            <field name="response_attachment_id"/>
+                        </group>
+                    </group>
+                    <group string="AI Summary" invisible="not ai_summary">
+                        <field name="ai_summary" nolabel="1" readonly="1"/>
+                    </group>
+                    <group string="Rejection Reason" invisible="state != 'rejected'">
+                        <field name="rejection_reason" nolabel="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_pdp_dsar_request_search" model="ir.ui.view">
+        <field name="name">pdp.dsar.request.search</field>
+        <field name="model">pdp.dsar.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="subject_email"/>
+                <field name="subject_nik"/>
+                <field name="partner_id"/>
+                <filter string="Open" name="f_open" domain="[('state','in',('received','verifying','gathering'))]"/>
+                <filter string="Delivered" name="f_delivered" domain="[('state','=','delivered')]"/>
+                <filter string="Rejected" name="f_rejected" domain="[('state','=','rejected')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_pdp_dsar_request" model="ir.actions.act_window">
+        <field name="name">DSAR Requests</field>
+        <field name="res_model">pdp.dsar.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

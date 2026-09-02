@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pdp_classification_user,pdp.classification user,model_pdp_classification,custom_core.group_custom_user,1,0,0,0
+access_pdp_classification_dpo,pdp.classification dpo,model_pdp_classification,group_dpo,1,1,1,1
+access_pdp_tag_fields_wizard,pdp.tag.fields.wizard,model_pdp_tag_fields_wizard,group_dpo,1,1,1,1

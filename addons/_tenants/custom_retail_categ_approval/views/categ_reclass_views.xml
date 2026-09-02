@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_retail_categ_reclass_form_approval" model="ir.ui.view">
+        <field name="name">retail.categ.reclass.form.approval</field>
+        <field name="model">retail.categ.reclass</field>
+        <field name="inherit_id" ref="custom_retail_localization.view_retail_categ_reclass_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Applying is now a request, so say so on the button. -->
+            <xpath expr="//button[@name='action_apply']" position="attributes">
+                <attribute name="string">Submit for Finance Approval</attribute>
+                <attribute name="confirm">This submits the category change and its correction entries to Finance for approval. Continue?</attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='action_apply']" position="after">
+                <button name="action_open_approval_request" type="object"
+                        string="View Approval"
+                        invisible="not x_custom_approval_request_id"/>
+            </xpath>
+
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="statusbar_visible">draft,computed,to_approve,applied</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='journal_id']" position="after">
+                <field name="x_custom_approval_state" string="Approval" readonly="1"
+                       widget="badge"
+                       invisible="not x_custom_approval_request_id"/>
+                <field name="x_custom_approval_request_id" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="before">
+                <div class="alert alert-warning" role="alert"
+                     invisible="state != 'to_approve'">
+                    Waiting for Finance approval. Nothing has been changed yet — the
+                    products keep their current category and no journal entry exists
+                    until the last approver signs off.
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_retail_categ_reclass_list_approval" model="ir.ui.view">
+        <field name="name">retail.categ.reclass.list.approval</field>
+        <field name="model">retail.categ.reclass</field>
+        <field name="inherit_id" ref="custom_retail_localization.view_retail_categ_reclass_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="before">
+                <field name="x_custom_approval_state" string="Approval" widget="badge" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

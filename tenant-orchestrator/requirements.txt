@@ -1,0 +1,16 @@
+# Pinned exactly, resolved together against the live index rather than guessed
+# independently. Same versions the login-gateway carries where they overlap, so
+# the two Python services in this platform share one set to patch.
+#
+# starlette 1.6.0 rather than the 0.4x line: CVE-2026-48818 (SSRF / NTLM
+# credential theft via UNC paths in StaticFiles) and CVE-2026-54283 (form()
+# size limits ignored) are fixed only in 1.x, and fastapi 0.141.1 is the first
+# release whose starlette range admits it.
+fastapi==0.141.1
+starlette==1.6.0
+uvicorn[standard]==0.52.4
+pydantic==2.13.5
+# The registry is the orchestrator's only persistent state, and this is the
+# same driver and pin the semantic API and the login gateway use.
+psycopg2-binary==2.9.10
+prometheus-client==0.21.1

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_studio_field_rename_wizard" model="ir.actions.act_window">
+        <field name="name">Rename Custom Field</field>
+        <field name="res_model">studio.field.impact.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <record id="view_studio_field_list" model="ir.ui.view">
+        <field name="name">studio.custom.field.list</field>
+        <field name="model">studio.custom.field</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'applied'"
+                  decoration-danger="state == 'error'">
+                <field name="name"/>
+                <field name="technical_name"/>
+                <field name="model_id"/>
+                <field name="field_type"/>
+                <field name="relation_model_id" optional="show"/>
+                <field name="dependent_view_count" string="Used in views"/>
+                <field name="required"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_studio_field_form" model="ir.ui.view">
+        <field name="name">studio.custom.field.form</field>
+        <field name="model">studio.custom.field</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_apply" string="Apply" type="object" class="btn-primary"
+                            invisible="state == 'applied'"/>
+                    <button name="action_delete_with_impact_check" string="Delete"
+                            type="object" class="btn-danger"
+                            invisible="not id"
+                            confirm="Delete this custom field? If any views still reference it, the impact wizard will open."/>
+                    <button name="%(action_studio_field_rename_wizard)d"
+                            string="Rename..." type="action" class="btn-secondary"
+                            context="{'default_custom_field_id': id, 'default_operation': 'rename'}"
+                            invisible="state != 'applied'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="model_id" options="{'no_create': True}"/>
+                            <field name="technical_name" placeholder="x_studio_..."/>
+                            <field name="field_type"/>
+                        </group>
+                        <group>
+                            <field name="required"/>
+                            <field name="readonly"/>
+                            <field name="ir_model_fields_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Relational target"
+                           invisible="field_type not in ('many2one', 'many2many', 'one2many')">
+                        <field name="relation_model_id" options="{'no_create': True}"/>
+                        <field name="relation_field_id"
+                               options="{'no_create': True}"
+                               invisible="field_type != 'one2many'"
+                               required="field_type == 'one2many'"/>
+                        <field name="relation_table"
+                               invisible="field_type != 'many2many'"
+                               placeholder="(auto-derived if blank)"/>
+                    </group>
+                    <separator string="Selection values (key|label per line)"
+                               invisible="field_type != 'selection'"/>
+                    <field name="selection_values"
+                           invisible="field_type != 'selection'"
+                           placeholder="draft|Draft&#10;done|Done"/>
+                    <separator string="Help text"/>
+                    <field name="help_text"/>
+                    <notebook>
+                        <page string="Impact Analysis">
+                            <group>
+                                <field name="dependent_view_count" readonly="1"/>
+                                <button name="action_refresh_impact" type="object"
+                                        string="Refresh" class="btn-link"/>
+                            </group>
+                            <field name="dependent_view_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="model"/>
+                                    <field name="type"/>
+                                    <field name="xml_id"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Last error" invisible="not last_error">
+                            <field name="last_error" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_studio_field" model="ir.actions.act_window">
+        <field name="name">Custom Fields</field>
+        <field name="res_model">studio.custom.field</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,25 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_retail_inv_recon_acct,retail.inventory.reconciliation account,model_retail_inventory_reconciliation,account.group_account_manager,1,1,1,1
+access_retail_inv_recon_line_acct,retail.inventory.reconciliation.line account,model_retail_inventory_reconciliation_line,account.group_account_manager,1,1,1,1
+access_retail_inv_recon_stock,retail.inventory.reconciliation stock,model_retail_inventory_reconciliation,stock.group_stock_manager,1,0,0,0
+access_retail_inv_recon_line_stock,retail.inventory.reconciliation.line stock,model_retail_inventory_reconciliation_line,stock.group_stock_manager,1,0,0,0
+access_retail_payment_register_fee,retail.payment.register.fee,model_retail_payment_register_fee,account.group_account_invoice,1,1,1,1
+access_retail_purchase_account_map_mgr,retail.purchase.account.map manager,model_retail_purchase_account_map,account.group_account_manager,1,1,1,1
+access_retail_purchase_account_map_user,retail.purchase.account.map user,model_retail_purchase_account_map,account.group_account_invoice,1,0,0,0
+access_retail_purchase_account_map_purchase,retail.purchase.account.map purchase,model_retail_purchase_account_map,purchase.group_purchase_user,1,0,0,0
+access_custom_scrap_batch_user,custom.scrap.batch user,model_custom_scrap_batch,stock.group_stock_user,1,1,1,0
+access_custom_scrap_batch_manager,custom.scrap.batch manager,model_custom_scrap_batch,stock.group_stock_manager,1,1,1,1
+access_custom_scrap_batch_line_user,custom.scrap.batch.line user,model_custom_scrap_batch_line,stock.group_stock_user,1,1,1,1
+access_custom_scrap_batch_line_manager,custom.scrap.batch.line manager,model_custom_scrap_batch_line,stock.group_stock_manager,1,1,1,1
+access_retail_mdr_bin_manager,retail.mdr.bin manager,model_retail_mdr_bin,account.group_account_manager,1,1,1,1
+access_retail_mdr_bin_user,retail.mdr.bin user,model_retail_mdr_bin,account.group_account_invoice,1,0,0,0
+access_retail_cogs_run_acct,retail.cogs.run account,model_retail_cogs_run,account.group_account_manager,1,1,1,1
+access_retail_cogs_run_line_acct,retail.cogs.run.line account,model_retail_cogs_run_line,account.group_account_manager,1,1,1,1
+access_retail_cogs_run_stock,retail.cogs.run stock,model_retail_cogs_run,stock.group_stock_manager,1,0,0,0
+access_retail_cogs_run_line_stock,retail.cogs.run.line stock,model_retail_cogs_run_line,stock.group_stock_manager,1,0,0,0
+access_retail_categ_reclass_acct,retail.categ.reclass account,model_retail_categ_reclass,account.group_account_manager,1,1,1,1
+access_retail_categ_reclass_line_acct,retail.categ.reclass.line account,model_retail_categ_reclass_line,account.group_account_manager,1,1,1,1
+access_retail_categ_reclass_product_acct,retail.categ.reclass.product account,model_retail_categ_reclass_product,account.group_account_manager,1,1,1,1
+access_retail_categ_reclass_stock,retail.categ.reclass stock,model_retail_categ_reclass,stock.group_stock_manager,1,0,0,0
+access_retail_categ_reclass_line_stock,retail.categ.reclass.line stock,model_retail_categ_reclass_line,stock.group_stock_manager,1,0,0,0
+access_retail_categ_reclass_product_stock,retail.categ.reclass.product stock,model_retail_categ_reclass_product,stock.group_stock_manager,1,0,0,0

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- The full adapter form lives in custom_adapter_framework; this action just
+         scopes it to the WMS-typed configs so warehouse admins do not have to
+         wade through Coretax / bank / PPOB rows. -->
+    <record id="action_wms_adapter_config" model="ir.actions.act_window">
+        <field name="name">WMS Host Adapters</field>
+        <field name="res_model">custom.adapter.config</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('adapter_type', 'in', ('wms_host', 'wms_sap_host'))]</field>
+        <field name="context">{'default_adapter_type': 'wms_host', 'default_auth_method': 'hmac'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No WMS host adapter configured</p>
+            <p>Set base_url, store the shared secret under the credential_ref key, then
+            set status to Active. Pin the one the outbox uses with the system parameter
+            <code>wms_integration.adapter_config</code>.</p>
+        </field>
+    </record>
+</odoo>

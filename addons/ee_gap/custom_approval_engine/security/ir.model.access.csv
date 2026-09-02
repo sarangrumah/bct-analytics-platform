@@ -1,0 +1,17 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_matrix_admin,approval.matrix admin,model_approval_matrix,group_approval_admin,1,1,1,1
+access_matrix_manager,approval.matrix manager read,model_approval_matrix,group_approval_manager,1,0,0,0
+access_matrix_user,approval.matrix user read,model_approval_matrix,group_approval_user,1,0,0,0
+access_tier_admin,approval.matrix.tier admin,model_approval_matrix_tier,group_approval_admin,1,1,1,1
+access_tier_manager,approval.matrix.tier manager read,model_approval_matrix_tier,group_approval_manager,1,0,0,0
+access_tier_user,approval.matrix.tier user read,model_approval_matrix_tier,group_approval_user,1,0,0,0
+access_request_user,approval.request user,model_approval_request,group_approval_user,1,1,1,0
+access_request_manager,approval.request manager,model_approval_request,group_approval_manager,1,1,1,0
+access_request_admin,approval.request admin,model_approval_request,group_approval_admin,1,1,1,1
+access_line_user,approval.request.line user read,model_approval_request_line,group_approval_user,1,0,0,0
+access_line_manager,approval.request.line manager,model_approval_request_line,group_approval_manager,1,1,1,0
+access_line_admin,approval.request.line admin,model_approval_request_line,group_approval_admin,1,1,1,0
+access_delegation_user,approval.delegation own user,model_approval_delegation,group_approval_user,1,1,1,1
+access_delegation_admin,approval.delegation admin,model_approval_delegation,group_approval_admin,1,1,1,1
+access_ooo_user,approval.ooo own user,model_approval_ooo,group_approval_user,1,1,1,1
+access_ooo_admin,approval.ooo admin,model_approval_ooo,group_approval_admin,1,1,1,1

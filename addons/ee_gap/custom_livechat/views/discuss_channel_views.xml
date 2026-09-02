@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend the im_livechat discuss.channel form -->
+    <record id="view_discuss_channel_form_livechat_ext" model="ir.ui.view">
+        <field name="name">discuss.channel.form.livechat.ext</field>
+        <field name="model">discuss.channel</field>
+        <field name="inherit_id" ref="im_livechat.discuss_channel_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_escalate_to_helpdesk"
+                            type="object"
+                            string="Escalate to Helpdesk"
+                            class="oe_highlight"
+                            icon="fa-life-ring"
+                            invisible="x_escalated_to_helpdesk"
+                            groups="custom_livechat.group_user"/>
+                    <button name="action_escalate_to_helpdesk"
+                            type="object"
+                            string="Open Helpdesk Ticket"
+                            icon="fa-life-ring"
+                            invisible="not x_escalated_to_helpdesk"
+                            groups="custom_livechat.group_user"/>
+                    <button name="action_ai_suggest_reply"
+                            type="object"
+                            string="AI Suggest Reply"
+                            icon="fa-magic"
+                            groups="custom_livechat.group_user"/>
+                    <button name="action_request_visitor_rating"
+                            type="object"
+                            string="Request Rating"
+                            icon="fa-star"
+                            invisible="x_rating_requested or x_rating"
+                            groups="custom_livechat.group_user"/>
+                </header>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="Live Chat Extensions" name="livechat_ext">
+                    <group>
+                        <field name="x_escalated_to_helpdesk" readonly="1"/>
+                        <field name="x_helpdesk_ticket_id" readonly="1"/>
+                        <field name="x_helpdesk_priority"/>
+                    </group>
+                    <group>
+                        <field name="x_ai_suggested_text"
+                               widget="text"
+                               class="o_custom_livechat_ai_reply"
+                               placeholder="AI suggested reply will appear here..."/>
+                        <field name="x_last_ai_query" readonly="1" invisible="not x_last_ai_query"/>
+                    </group>
+                </group>
+                <group string="Visitor Satisfaction" name="livechat_rating">
+                    <group>
+                        <field name="x_rating_requested" readonly="1"/>
+                        <field name="x_rating"/>
+                    </group>
+                    <group>
+                        <field name="x_rating_feedback"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action: Escalated channels -->
+    <record id="action_discuss_channel_escalated" model="ir.actions.act_window">
+        <field name="name">Escalated Channels</field>
+        <field name="res_model">discuss.channel</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('x_escalated_to_helpdesk', '=', True)]</field>
+    </record>
+</odoo>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_ppob_providers"
+              name="Providers"
+              parent="custom_ppob_core.menu_ppob_master"
+              action="action_ppob_provider"
+              sequence="20"/>
+
+    <menuitem id="menu_ppob_provider_buckets"
+              name="Provider Buckets"
+              parent="custom_ppob_core.menu_ppob_operations"
+              action="action_ppob_provider_bucket"
+              sequence="20"/>
+
+    <menuitem id="menu_ppob_provider_bucket_moves"
+              name="Bucket Moves"
+              parent="custom_ppob_core.menu_ppob_operations"
+              action="action_ppob_provider_bucket_move"
+              sequence="25"/>
+
+    <menuitem id="menu_ppob_provider_sku_map"
+              name="SKU Mapping"
+              parent="custom_ppob_core.menu_ppob_configuration"
+              action="action_ppob_provider_sku_map"
+              sequence="30"/>
+
+    <menuitem id="menu_ppob_provider_topup_log"
+              name="Topup Requests"
+              parent="custom_ppob_core.menu_ppob_operations"
+              action="action_ppob_provider_topup_log"
+              sequence="30"/>
+
+</odoo>

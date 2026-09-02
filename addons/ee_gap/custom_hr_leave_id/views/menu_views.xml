@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Submenu under standard Time Off app -->
+    <menuitem id="menu_id_public_holiday"
+              name="Public Holidays ID"
+              parent="hr_holidays.menu_hr_holidays_root"
+              action="action_id_public_holiday"
+              sequence="80"
+              groups="custom_hr_leave_id.group_user"/>
+
+    <menuitem id="menu_leave_balance_report"
+              name="Leave Balance Report"
+              parent="hr_holidays.menu_hr_holidays_root"
+              action="action_custom_leave_balance_report"
+              sequence="82"
+              groups="custom_hr_leave_id.group_user"/>
+
+    <menuitem id="menu_leave_carryover_policy"
+              name="Carry-Over Policies"
+              parent="hr_holidays.menu_hr_holidays_root"
+              action="action_custom_leave_carryover_policy"
+              sequence="84"
+              groups="custom_hr_leave_id.group_manager"/>
+</odoo>

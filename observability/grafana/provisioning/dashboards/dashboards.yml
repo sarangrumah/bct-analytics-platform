@@ -1,0 +1,32 @@
+# ---------------------------------------------------------------------------
+# Grafana dashboard providers.
+#
+# THE DROP-IN MECHANISM. Platform-Infra owns this file; it points a file
+# provider at /var/lib/grafana/dashboards, which is the host directory
+# observability/grafana/dashboards/.
+#
+# Any *.json placed there is loaded on the next scan. The Data Warehouse agent
+# owns analytics-*.json in that directory and needs no change to this file to
+# add one. Platform-Infra never edits analytics-*.json.
+#
+# foldersFromFilesStructure means a subdirectory becomes a Grafana folder, so
+# `dashboards/analytics/revenue.json` lands in a folder called "analytics"
+# without any per-dashboard configuration.
+# ---------------------------------------------------------------------------
+apiVersion: 1
+
+providers:
+  - name: bct-filesystem
+    orgId: 1
+    type: file
+    # false: dashboards are code. An edit made in the UI is overwritten on the
+    # next scan, which is the correct outcome — the file is the source of
+    # truth. Use "Save JSON to file" and commit it.
+    allowUiUpdates: false
+    # false: deleting the JSON removes the dashboard. Otherwise a removed file
+    # leaves an orphan nobody can explain.
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: true

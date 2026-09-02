@@ -1,0 +1,46 @@
+version: 2
+
+seeds:
+  - name: id_public_holiday
+    description: >-
+      Indonesian national public holidays (hari libur nasional), feeding dim_date.
+
+      HONESTY ABOUT THESE DATES, because a holiday calendar that pretends to be
+      authoritative is worse than one that says what it is:
+
+      * `is_estimated = false` marks the six FIXED-DATE holidays set by statute -
+        1 January, 1 May (Hari Buruh), 1 June (Hari Lahir Pancasila), 17 August
+        (Kemerdekaan) and 25 December. These do not move.
+      * `is_estimated = true` marks every holiday whose Gregorian date is
+        derived: Islamic dates follow the Hijri calendar and depend on moon
+        sighting; Nyepi follows the Saka calendar; Imlek the Chinese lunisolar
+        calendar; Good Friday, Ascension and Waisak are computed. All of them are
+        CONFIRMED annually by a joint ministerial decree (SKB 3 Menteri) which
+        also sets cuti bersama, and the decree can and does move a date by a day.
+
+      A production deployment must load the SKB for the year rather than rely on
+      these. `holiday_is_estimated` is carried through to dim_date so a consumer
+      can tell the difference; nothing here silently claims a decreed date.
+
+      CUTI BERSAMA (collective leave) is deliberately ABSENT. It is set per year
+      by the same decree, it is not a public holiday in law, and guessing it
+      would put non-working days in the calendar that no statute supports.
+    columns:
+      - name: holiday_date
+        description: The Gregorian date of the holiday.
+        data_tests: [not_null, unique]
+      - name: holiday_name
+        description: Indonesian name, as it appears in the decree.
+        data_tests: [not_null]
+      - name: holiday_type
+        description: Which calendar the date derives from.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                  values: [fixed, islamic, christian, chinese, hindu, buddhist]
+      - name: is_estimated
+        description: >-
+          True when the Gregorian date is derived rather than fixed by statute.
+          Carried into dim_date.holiday_is_estimated.
+        data_tests: [not_null]

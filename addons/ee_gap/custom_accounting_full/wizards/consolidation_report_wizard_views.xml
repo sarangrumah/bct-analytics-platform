@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_consolidation_report_wizard" model="ir.ui.view">
+        <field name="name">account.consolidation.report.wizard.form</field>
+        <field name="model">account.consolidation.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Consolidation Report">
+                <sheet>
+                    <group>
+                        <field name="config_id"/>
+                        <field name="report_type"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="output_format"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_render" string="Render" type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_consolidation_report_wizard" model="ir.actions.act_window">
+        <field name="name">Consolidation Report</field>
+        <field name="res_model">account.consolidation.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

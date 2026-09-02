@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rental_invoicing_settings" model="ir.ui.view">
+        <field name="name">res.config.settings.rental.invoicing</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Rental Invoicing" string="Rental Invoicing" name="custom_rental_invoicing"
+                     groups="base.group_system">
+                    <block title="Rental Invoicing">
+                        <setting id="rental_auto_invoice"
+                                 string="Auto-invoice on Rental Return"
+                                 help="When a rental is marked returned, automatically generate a draft invoice.">
+                            <field name="rental_invoicing_auto_invoice_on_return"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

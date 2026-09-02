@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Self-contained wrapper: no web.html_container / web.external_layout, so
+         wkhtmltopdf never makes the external asset callback that stalls on this
+         platform. <main> is required by ir_actions_report._prepare_html. -->
+    <template id="report_wms_scrap_note" name="WMS Scrap Note">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+            </head>
+            <body>
+                <main>
+                <!-- The style and charset live INSIDE <main>, not in <head>:
+                     ir_actions_report._prepare_html keeps only the children of
+                     <main> and writes them to a bare .html file, so anything in
+                     <head> is silently dropped — the report would print
+                     unstyled and non-ASCII text would come out mojibake. -->
+                    <meta charset="utf-8"/>
+                    <style>
+                        @page { margin: 10mm; }
+                        * { box-sizing: border-box; }
+                        body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; margin: 0; padding: 0; }
+                        h1 { font-size: 16px; margin: 0 0 2px 0; }
+                        .muted { color: #666; }
+                        table.meta { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+                        table.meta td { padding: 1px 4px; vertical-align: top; }
+                        table.data { width: 100%; border-collapse: collapse; font-size: 10px; }
+                        table.data th, table.data td { border: 1px solid #b0b0b0; padding: 3px 4px; vertical-align: top; }
+                        table.data thead th { background-color: #f3f3f3; text-align: left; }
+                        table.data td.num, table.data th.num { text-align: right; }
+                        table.data tr.total td { font-weight: bold; background-color: #e8e8e8; }
+                        .sig { margin-top: 28px; width: 100%; }
+                        .sig td { width: 33%; text-align: center; padding-top: 40px; }
+                    </style>
+                    <t t-set="hdr" t-value="docs._wms_scrap_header()"/>
+                    <t t-set="rows" t-value="docs._wms_scrap_rows()"/>
+                    <t t-set="totals" t-value="docs._wms_scrap_totals()"/>
+                    <div class="page">
+                        <table class="meta">
+                            <tr>
+                                <td style="width: 62%;">
+                                    <h1>SCRAP NOTE</h1>
+                                    <div><b t-out="hdr['reference']"/></div>
+                                    <div class="muted" t-out="hdr['company'].display_name"/>
+                                </td>
+                                <td style="width: 38%; text-align: right;">
+                                    <img t-if="hdr['reference_barcode']" t-att-src="hdr['reference_barcode']"
+                                         alt="Scrap note barcode" style="height: 45px;"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table class="meta">
+                            <tr>
+                                <td style="width: 50%;">
+                                    <div><b>Warehouse:</b> <span t-out="hdr['warehouse']"/></div>
+                                    <div><b>Source Document:</b> <span t-out="hdr['origin']"/></div>
+                                </td>
+                                <td style="width: 50%;">
+                                    <div><b>Date:</b> <span t-out="hdr['date']"/></div>
+                                    <div><b>Related Transfer:</b> <span t-out="hdr['picking_names']"/></div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table class="data">
+                            <thead>
+                                <tr>
+                                    <th style="width: 3%;">#</th>
+                                    <th style="width: 12%;">Scrap Ref</th>
+                                    <th style="width: 9%;">SKU</th>
+                                    <th style="width: 20%;">Product</th>
+                                    <th style="width: 13%;">Item Barcode</th>
+                                    <th style="width: 10%;">Lot / Serial</th>
+                                    <th style="width: 14%;">From Bin</th>
+                                    <th class="num" style="width: 7%;">Qty</th>
+                                    <th class="num" style="width: 12%;">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="rows" t-as="r">
+                                    <td t-out="r['seq']"/>
+                                    <td t-out="r['name']"/>
+                                    <td t-out="r['default_code']"/>
+                                    <td t-out="r['product'].display_name"/>
+                                    <td style="text-align: center;">
+                                        <img t-if="r['item_barcode']" t-att-src="r['item_barcode']"
+                                             alt="Item barcode" style="height: 26px; width: 100%;"/>
+                                        <div class="muted" style="font-size: 7px;" t-out="r['item_barcode_value']"/>
+                                    </td>
+                                    <td t-out="r['lot_name']"/>
+                                    <td t-out="r['location_name']"/>
+                                    <td class="num">
+                                        <span t-out="'%.3f' % r['qty']"/>
+                                        <span class="muted" t-out="r['uom_name']"/>
+                                    </td>
+                                    <td class="num" t-out="'%.2f' % r['value']"/>
+                                </tr>
+                                <tr t-if="not rows">
+                                    <td colspan="9" class="muted">No scrap lines.</td>
+                                </tr>
+                                <tr class="total">
+                                    <td colspan="7">TOTAL — <span t-out="totals['line_count']"/> line(s)</td>
+                                    <td class="num" t-out="'%.3f' % totals['total_qty']"/>
+                                    <td class="num" t-out="'%.2f' % totals['total_value']"/>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="sig">
+                            <tr>
+                                <td>____________________<br/>Warehouse</td>
+                                <td>____________________<br/>QC / Inspector</td>
+                                <td>____________________<br/>Approved by</td>
+                            </tr>
+                        </table>
+                    </div>
+                </main>
+            </body>
+        </html>
+    </template>
+
+    <record id="action_report_wms_scrap_note" model="ir.actions.report">
+        <field name="name">Scrap Note (WMS)</field>
+        <field name="model">stock.scrap</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_wms_reports.report_wms_scrap_note</field>
+        <field name="report_file">custom_wms_reports.report_wms_scrap_note</field>
+        <field name="binding_model_id" ref="stock.model_stock_scrap"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Scrap Note - %s' % (object.origin or object.name)</field>
+    </record>
+
+</odoo>

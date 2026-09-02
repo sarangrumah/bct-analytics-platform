@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_event_registration_form_inherit_custom_events" model="ir.ui.view">
+        <field name="name">event.registration.form.inherit.custom_events</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="WhatsApp &amp; QR Check-in">
+                    <group>
+                        <field name="x_whatsapp_ticket_sent"/>
+                        <field name="x_qr_token"/>
+                    </group>
+                    <group>
+                        <field name="x_checked_in_at"/>
+                        <field name="x_checked_in_by_user_id"/>
+                    </group>
+                </group>
+                <div class="oe_button_box">
+                    <button name="action_send_whatsapp_ticket"
+                            type="object"
+                            string="Send WhatsApp Ticket"
+                            class="btn-secondary"
+                            icon="fa-whatsapp"/>
+                    <button name="action_manual_checkin"
+                            type="object"
+                            string="Check-in"
+                            class="btn-primary"
+                            icon="fa-qrcode"
+                            invisible="x_checked_in_at"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

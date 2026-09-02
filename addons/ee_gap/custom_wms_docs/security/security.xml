@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- This module ships no groups of its own: warehouse documents are a
+             plain stock.group_stock_user capability. The only record rule keeps
+             one operator's transient label selection out of another's way. -->
+        <record id="rule_wms_label_wizard_own" model="ir.rule">
+            <field name="name">WMS Label Wizard: own records only</field>
+            <field name="model_id" ref="model_custom_wms_label_wizard"/>
+            <field name="domain_force">[('create_uid', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('stock.group_stock_user'))]"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="res_groups_privilege_esb" model="res.groups.privilege">
+            <field name="name">ESB Connector</field>
+            <field name="sequence">140</field>
+        </record>
+
+        <!-- Read ESB master data, stock snapshots and outbound documents. -->
+        <record id="group_esb_user" model="res.groups">
+            <field name="name">ESB / User</field>
+            <field name="privilege_id" ref="res_groups_privilege_esb"/>
+        </record>
+
+        <!-- Configure connections and credentials, trigger syncs, push and cancel
+             outbound documents. Only this group can read stored access tokens
+             (see the groups= on custom.esb.session.access_token). -->
+        <record id="group_esb_admin" model="res.groups">
+            <field name="name">ESB / Administrator</field>
+            <field name="privilege_id" ref="res_groups_privilege_esb"/>
+            <field name="implied_ids" eval="[(4, ref('group_esb_user')), (4, ref('base.group_user'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+    </data>
+</odoo>

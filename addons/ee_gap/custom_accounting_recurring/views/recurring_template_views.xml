@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_recurring_journal_template_list" model="ir.ui.view">
+        <field name="name">custom.recurring.journal.template.list</field>
+        <field name="model">custom.recurring.journal.template</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active" decoration-info="next_date == context_today().strftime('%Y-%m-%d')">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="journal_id"/>
+                <field name="period"/>
+                <field name="next_date"/>
+                <field name="end_date"/>
+                <field name="auto_post"/>
+                <field name="last_generated_at"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_recurring_journal_template_form" model="ir.ui.view">
+        <field name="name">custom.recurring.journal.template.form</field>
+        <field name="model">custom.recurring.journal.template</field>
+        <field name="arch" type="xml">
+            <form string="Recurring Journal Template">
+                <header>
+                    <button name="action_run_now" type="object" string="Run Now"
+                            class="btn-primary"
+                            groups="custom_accounting_recurring.group_recurring_admin"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" icon="fa-book"
+                                name="action_view_moves" invisible="generated_count == 0"
+                                style="display:none"/>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Monthly Depreciation"/></h1>
+                        <field name="code" readonly="1"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="journal_id"/>
+                            <field name="period"/>
+                            <field name="auto_post"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="next_date"/>
+                            <field name="end_date"/>
+                            <field name="last_generated_at"/>
+                            <field name="generated_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lines" name="lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="account_id"/>
+                                    <field name="partner_id" optional="hide"/>
+                                    <field name="debit" sum="Total Debit"/>
+                                    <field name="credit" sum="Total Credit"/>
+                                    <field name="analytic_distribution" widget="analytic_distribution" optional="show"/>
+                                    <field name="company_id" column_invisible="True"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_recurring_journal_template_search" model="ir.ui.view">
+        <field name="name">custom.recurring.journal.template.search</field>
+        <field name="model">custom.recurring.journal.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="journal_id"/>
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                <filter name="due" string="Due Today"
+                        domain="[('next_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+
+                    <filter name="group_period" string="Period" context="{'group_by': 'period'}"/>
+                    <filter name="group_journal" string="Journal" context="{'group_by': 'journal_id'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_recurring_journal_template" model="ir.actions.act_window">
+        <field name="name">Recurring Journal Templates</field>
+        <field name="res_model">custom.recurring.journal.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_recurring_journal_template_search"/>
+    </record>
+
+</odoo>

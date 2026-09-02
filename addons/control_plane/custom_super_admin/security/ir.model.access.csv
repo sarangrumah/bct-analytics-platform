@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_tenant_registry_csm,tenant.registry CSM read,model_tenant_registry,group_csm,1,0,0,0
+access_tenant_registry_super,tenant.registry SuperAdmin RW,model_tenant_registry,group_super_admin,1,1,1,0
+access_tenant_action_log_csm,tenant.action.log CSM read,model_tenant_action_log,group_csm,1,0,0,0
+access_tenant_action_log_super,tenant.action.log SuperAdmin read,model_tenant_action_log,group_super_admin,1,0,0,0
+access_tenant_backup_csm,tenant.backup CSM read,model_tenant_backup,group_csm,1,0,0,0
+access_tenant_backup_super,tenant.backup SuperAdmin RW,model_tenant_backup,group_super_admin,1,1,1,0
+access_provision_wizard,tenant.provision.wizard SuperAdmin,model_tenant_provision_wizard,group_super_admin,1,1,1,1
+access_restore_wizard,tenant.restore.wizard SuperAdmin,model_tenant_restore_wizard,group_super_admin,1,1,1,1
+access_replicate_wizard,tenant.replicate.wizard SuperAdmin,model_tenant_replicate_wizard,group_super_admin,1,1,1,1
+access_orchestrator_client,orchestrator client SuperAdmin,model_custom_super_admin_orchestrator_client,group_super_admin,1,1,1,1

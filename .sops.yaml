@@ -1,0 +1,57 @@
+# SOPS encryption policy for the BCT analytics platform.
+# Owner: Security agent. Authority: docs/agents/PLAN.md roster.
+#
+# WHAT THIS FILE IS
+#   The list of age *public* recipients allowed to decrypt each class of encrypted
+#   file, plus the path patterns that must never be committed in plaintext.
+#   `sops <file>` and `sops --encrypt` consult this file automatically.
+#
+# WHAT THIS FILE IS NOT
+#   It holds no key material. An age *public* recipient (`age1...`) is not a secret;
+#   it is a lock, not a key. The matching private key (`AGE-SECRET-KEY-1...`) is
+#   NEVER committed, NEVER pasted into a brief, NEVER placed in this repository.
+#   See security/SOPS-ONBOARDING.md for where it lives and how to get one.
+#
+# ADDING A RECIPIENT (new engineer, or a CI deploy key in Phase 5)
+#   1. They run `age-keygen -o "$HOME/.config/sops/age/bct-analytics.txt"` and send
+#      you ONLY the "Public key:" line.
+#   2. Add it under `keys:` below with a comment naming the holder.
+#   3. Re-key every encrypted file:  sops updatekeys .secrets.enc.yaml
+#   4. Commit .sops.yaml and the re-keyed files together, in one commit.
+#   Removing a recipient is the same flow, plus rotating every value they could
+#   read - revoking access does not un-read what they already decrypted.
+
+keys:
+  # Project development recipient. Generated 2026-08-31 on the operator host.
+  # Private half: $HOME/.config/sops/age/bct-analytics.txt (outside the repo, mode 600).
+  - &bct_dev age14mh5ttdkqd9sah0pnpdx3mx385pdsy7ukjh663th8zw3hmyh2pzsytq7ws
+  # Phase 5 will add a separate CI/CD recipient here. It is deliberately absent now:
+  # there is no remote and no deployment target, so no automation needs decrypt rights.
+
+creation_rules:
+  # The committed example secret bundle. Dev-grade `changeme` values only.
+  - path_regex: (^|/)\.secrets\.enc\.ya?ml$
+    key_groups:
+      - age:
+          - *bct_dev
+
+  # Any other encrypted YAML anywhere in the tree, e.g. analytics/.secrets.enc.yaml
+  # once the Data Warehouse agent needs a per-tenant masking salt.
+  - path_regex: \.enc\.ya?ml$
+    key_groups:
+      - age:
+          - *bct_dev
+
+  # Encrypted JSON (service-account style payloads).
+  - path_regex: \.enc\.json$
+    key_groups:
+      - age:
+          - *bct_dev
+
+  # Encrypted dotenv. Note: `.env` itself is gitignored and must stay that way -
+  # this rule exists so that a secret which genuinely must be versioned is
+  # versioned *encrypted*, never as a plaintext `.env` someone force-adds.
+  - path_regex: \.enc\.env$
+    key_groups:
+      - age:
+          - *bct_dev

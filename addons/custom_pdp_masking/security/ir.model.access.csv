@@ -1,0 +1,3 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+access_pdp_masking_rule_user,pdp.masking.rule.user,model_pdp_masking_rule,base.group_user,1,0,0,0
+access_pdp_masking_rule_officer,pdp.masking.rule.officer,model_pdp_masking_rule,custom_pdp_core.group_pdp_officer,1,1,1,1

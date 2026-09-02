@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_deferred" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.deferred</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='default_taxes_setting_container']" position="before">
+                <block title="Deferred Entries" name="custom_deferred_setting_container">
+                    <setting id="custom_deferred_expense" string="Deferred Expense Account"
+                             company_dependent="1"
+                             help="Prepaid expenses park here until each month's recognition entry.">
+                        <field name="deferred_expense_account_id"/>
+                    </setting>
+                    <setting id="custom_deferred_revenue" string="Deferred Revenue Account"
+                             company_dependent="1"
+                             help="Unearned revenue parks here until each month's recognition entry.">
+                        <field name="deferred_revenue_account_id"/>
+                    </setting>
+                    <setting id="custom_deferred_journal" string="Deferred Journal"
+                             company_dependent="1"
+                             help="Miscellaneous journal the deferral and recognition entries post to.">
+                        <field name="deferred_journal_id"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

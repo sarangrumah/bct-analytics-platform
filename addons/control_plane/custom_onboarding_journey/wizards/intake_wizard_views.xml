@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_onboarding_intake_wizard_form" model="ir.ui.view">
+        <field name="name">onboarding.intake.wizard.form</field>
+        <field name="model">onboarding.intake.wizard</field>
+        <field name="arch" type="xml">
+            <form string="New Onboarding Intake">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="partner_name"/>
+                            <field name="partner_email"/>
+                            <field name="vertical_target"/>
+                        </group>
+                        <group>
+                            <field name="npwp"/>
+                            <field name="bank_name"/>
+                            <field name="bank_account"/>
+                            <field name="company_logo" filename="company_logo_filename"/>
+                            <field name="company_logo_filename" invisible="1"/>
+                        </group>
+                    </group>
+                    <separator string="Modules Wishlist"/>
+                    <field name="modules_wishlist"/>
+                    <separator string="Business Process Narrative"/>
+                    <field name="business_process_narrative"/>
+                </sheet>
+                <footer>
+                    <button name="action_submit" type="object" string="Create Journey" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_onboarding_intake_wizard" model="ir.actions.act_window">
+        <field name="name">New Intake</field>
+        <field name="res_model">onboarding.intake.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

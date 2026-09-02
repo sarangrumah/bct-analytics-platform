@@ -1,0 +1,265 @@
+# pre-commit - the local half of the security gate.
+# Owner: Security agent (docs/agents/PLAN.md roster). Mirrored by the `lint` job in
+# .github/workflows/ci.yml, which runs `pre-commit run --all-files` on every push and PR.
+#
+# INSTALL (every agent, once):   pre-commit install
+# RUN OVER EVERYTHING:           pre-commit run --all-files
+#
+# PINNING POLICY
+#   Every `rev` is a full 40-character commit SHA with the released version in a trailing
+#   comment - the same rule the CI workflow applies to `uses:`. A tag is a movable label;
+#   an attacker who can move a tag can move your hooks. Bump with `pre-commit autoupdate`
+#   and then re-resolve the tag to its SHA before committing.
+#
+# HOST PREREQUISITES
+#   * Docker (running) - the hadolint hook is a digest-pinned container, so no engineer
+#     needs a Haskell toolchain and no unpinned `:latest` image enters the supply chain.
+#   * Go - the upstream gitleaks hook builds the scanner from the pinned source revision.
+#   Both are already required by this project (Docker for the Odoo stack, Go is present on
+#   the operator host). If either is missing the hook reports a missing prerequisite; it
+#   does not silently pass.
+
+minimum_pre_commit_version: "3.5.0"
+default_install_hook_types: [pre-commit]
+default_stages: [pre-commit]
+
+repos:
+  # ------------------------------------------------------------------------------
+  # Hygiene. The CRLF guard is not optional: the operator host is Windows and a .sh
+  # with CRLF endings bind-mounted into a container dies with
+  # `bad interpreter: /bin/sh^M`, which costs hours to diagnose.
+  # ------------------------------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # v6.0.0
+    hooks:
+      - id: mixed-line-ending
+        name: CRLF guard - force LF line endings
+        args: [--fix=lf]
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: check-added-large-files
+        args: [--maxkb=512]
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+        # .secrets.enc.yaml is valid YAML after SOPS encryption, so it is NOT excluded.
+      - id: check-json
+      - id: check-toml
+      - id: check-xml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-illegal-windows-names
+      - id: detect-private-key
+      - id: detect-aws-credentials
+        args: [--allow-missing-credentials]
+      - id: forbid-submodules
+        # Supply chain: a submodule is an unpinned third-party dependency that no
+        # scanner in this repo inspects. If one is ever genuinely needed, it comes
+        # through the Lead with a threat-model note, not through a hook exemption.
+
+  # ------------------------------------------------------------------------------
+  # Python. `ruff check` reports, it does not rewrite; `ruff format` rewrites.
+  # The rule selection is deliberately narrow for Phase 1: real bugs (F), syntax
+  # errors (E9), security (S, flake8-bandit) and correctness traps (B, bugbear).
+  # A pedantic style gate on 3 000 lines of freshly written addon code is how a
+  # linter gets disabled in week two. Widen it at GATE 3, not now.
+  # Configured entirely through args: this project has no pyproject.toml, and the
+  # Security agent does not own one.
+  # ------------------------------------------------------------------------------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 1f1e8bf348ff38fc88619a38d3ca4d9c56abea49 # v0.16.5
+    hooks:
+      - id: ruff-check
+        args:
+          - --line-length=120
+          - --target-version=py311
+          - --select=E9,F,B,S
+          # Every exclusion below was measured against the real tree, not guessed. Each is
+          # a rule that cannot distinguish correct code from a defect in THIS codebase:
+          #   S101 assert-used ........ Odoo test cases use bare assert; that is the idiom.
+          #   S608 hardcoded-sql ...... Odoo model code composes SQL by design. The real
+          #                             control is the semgrep rule
+          #                             bct-python-sql-string-interpolation, which can tell
+          #                             a literal from an interpolated value.
+          #   B008 call-in-default .... `fields.Date.today()` in an Odoo default is idiomatic.
+          #   S603/S607 subprocess .... fire on every subprocess call with an argument list,
+          #                             including the correct ones. The actual injection
+          #                             vector is shell=True, caught by
+          #                             bct-python-subprocess-shell-true in semgrep.
+          #   S105/S106/S107 .......... "hardcoded password" by variable-NAME matching. It
+          #                             flags `SECRET_BASIS = "UU 27/2022 Art. 35 ..."`, a
+          #                             legal citation. Secret detection is gitleaks' job -
+          #                             it has entropy analysis, scoped allowlists and full
+          #                             history. Two tools doing it, one of them badly,
+          #                             costs signal and buys nothing.
+          - --ignore=S101,S608,B008,S603,S607,S105,S106,S107
+          # Framework structure, not code style. `from . import models` in an Odoo
+          # __init__.py is how a module loads; a bare dict in __manifest__.py IS the
+          # manifest format. Scoped to those filenames so the rules stay live everywhere else.
+          - --per-file-ignores=**/__init__.py:F401
+          - --per-file-ignores=**/__manifest__.py:B018
+          # The demo seeder needs reproducible pseudo-randomness from a caller-supplied
+          # seed, which is the opposite of a cryptographic requirement. Scoped to that
+          # module: S311 stays live for any future token or salt generation.
+          - --per-file-ignores=addons/custom_demo_seed/**:S311
+          # ------------------------------------------------------------------
+          # IMPORTED-ADDON DEBT, 2026-09-01. Scoped to addons/ ONLY, so every rule
+          # below stays live for login-gateway, analytics/, scripts/ and tests/.
+          #
+          # ADR 0002 imported 149 modules (239k lines) that had been running in
+          # production elsewhere. Linting them for the first time produced 119
+          # findings. 41 were fixed rather than suppressed:
+          #   * 4 S310  a real repair - urlopen honours file:// and data://, so
+          #             capacity_forecast and prometheus_client now check the scheme
+          #             before opening an operator-configured URL.
+          #   * 15 B905 zip(..., strict=False), which makes the existing silent
+          #             truncation explicit without changing behaviour.
+          #   * 14 B904 raise ... from err, so the original traceback survives.
+          #   * 5 B007  unused loop variables renamed.
+          #   * 3 more  individually justified `# noqa` at the call site (S104 on an
+          #             Oracle stored-procedure ARGUMENT rather than a bind address;
+          #             S324 x2 on the md5 Digiflazz mandates for its request
+          #             signature; S314 on XML the test itself just produced; S704 x2
+          #             where every interpolated value already passes through escape()).
+          #
+          # The 78 below are what is left, and each is here for a stated reason:
+          #
+          #   B023 (20) VERIFIED FALSE POSITIVE, not deferred work. Every occurrence
+          #             defines a closure inside a loop and calls it within the SAME
+          #             iteration, so late binding never happens. The rule matches the
+          #             shape and cannot see the lifetime - which is exactly the
+          #             "cannot distinguish correct code from a defect in THIS
+          #             codebase" test the ignores above are held to.
+          #   S110 (25) try/except/pass and
+          #   S112 (9)  try/except/continue. REAL DEBT. Each one needs a per-site
+          #             decision on whether swallowing is intended and, where it is,
+          #             a log line. That is 34 judgements about business logic, not a
+          #             mechanical edit, so it is dated rather than rushed.
+          #   F841 (15) Unused locals. NOT mechanical: `x = self.env[...].create(...)`
+          #             has a side effect, so deleting the binding is not always safe.
+          #   B017 (9)  assertRaises(Exception) in tests. Narrowing them needs to know
+          #             which exception each case should actually raise.
+          #
+          # expires: 2027-03-31 - re-review with the addon suite's next audit. This is
+          # a dated acceptance of known debt, not a decision that the rules are wrong.
+          # One flag per rule: ruff splits this option's value on commas, so a
+          # single `addons/**:B023,S110,...` is rejected as a malformed mapping.
+          - --per-file-ignores=addons/**:B023
+          - --per-file-ignores=addons/**:S110
+          - --per-file-ignores=addons/**:S112
+          - --per-file-ignores=addons/**:F841
+          - --per-file-ignores=addons/**:B017
+          - --extend-exclude=addons/*/migrations
+          # addons/_vendor/ is third-party code we redistribute unchanged:
+          # queue_job and auth_jwt are OCA modules (github.com/OCA/queue,
+          # github.com/OCA/server-auth), LGPL-3, vendored so the platform pins a
+          # known revision rather than resolving one at build time.
+          #
+          # Excluded because patching it is the wrong repair. Every fix here is
+          # lost on the next re-vendor, and a locally-patched copy that no
+          # longer matches upstream is harder to reason about than the original
+          # finding. Eight findings live here (S311 x6, S324 sha1, S110); the
+          # place to fix them is upstream, and the place to record that we
+          # accept them meanwhile is this comment.
+          - --extend-exclude=addons/_vendor
+
+      - id: ruff-format
+        # DELIBERATELY NOT BLOCKING IN WAVE 1, and not silently dropped either.
+        #
+        # `ruff format` would rewrite 21 files right now, all of them owned by other
+        # agents who are writing them at this moment. The Security agent running a
+        # formatter over addons/** and scripts/** is a write outside its owned paths
+        # (PLAN.md roster) and would collide with in-flight work.
+        #
+        # `stages: [manual]` keeps it configured, pinned and one word away, without it
+        # firing on commit or in the `lint` CI job. Run it deliberately:
+        #     pre-commit run --hook-stage manual ruff-format --all-files
+        #
+        # ENABLE AT GATE 1: the Lead schedules one dedicated `style(repo): format with
+        # ruff` commit when no agent has uncommitted Python, then this line is deleted.
+        # Formatting the tree in a commit of its own keeps the diff that does it separate
+        # from the diffs that change behaviour.
+        stages: [manual]
+        args: [--line-length=120]
+
+  # ------------------------------------------------------------------------------
+  # SQL. Scoped to analytics/** because that is where Phase 3 puts dbt models.
+  # postgres/init/**.sql is Platform-Infra's bootstrap DDL: it is executed by the
+  # Postgres entrypoint with psql meta-commands and server-side settings that a dbt
+  # dialect lint mis-parses. Linting it here would produce noise, not safety.
+  # Phase 3 flips `templater` in .sqlfluff from jinja to dbt once dbt is installed.
+  # ------------------------------------------------------------------------------
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 8108cc202d2aa2732b21d48507152c95ee244030 # 4.3.0
+    hooks:
+      - id: sqlfluff-lint
+        name: sqlfluff-lint (analytics SQL only)
+        files: ^analytics/.*\.sql$
+
+  # ------------------------------------------------------------------------------
+  # Secrets. This hook scans the *staged* diff, which is what you want on a commit.
+  # It is not a substitute for the `secrets` CI job, which scans the entire history
+  # with --log-opts=--all: a secret that was committed and then removed is still in
+  # the object database and still leaked.
+  # ------------------------------------------------------------------------------
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e # v8.30.1
+    hooks:
+      - id: gitleaks
+        name: gitleaks (staged diff)
+
+  # ------------------------------------------------------------------------------
+  # Dockerfiles. Digest-pinned container so the hook needs no Haskell toolchain and
+  # pulls no floating tag. Reads .hadolint.yaml from the repository root.
+  # ------------------------------------------------------------------------------
+  - repo: local
+    hooks:
+      - id: hadolint
+        name: hadolint (Dockerfile lint, digest-pinned image)
+        language: docker_image
+        entry: hadolint/hadolint:v2.15.1-alpine@sha256:a1d49ae1a4e83c1dbad26b8c1ad7588c8bd1e04f4866b34ad3cac50335198552 hadolint --config .hadolint.yaml
+        files: (?i)(^|/)dockerfile[^/]*$
+        types: [file]
+
+      # ----------------------------------------------------------------------------
+      # Project-specific gates. Pure stdlib Python, no third-party import, no jq -
+      # jq is absent on the operator host and no tool in this repo may depend on it.
+      # ----------------------------------------------------------------------------
+      - id: security-ignore-policy
+        name: every scanner ignore has a reason and an unexpired date
+        language: system
+        entry: python3 security/check_ignore_policy.py
+        pass_filenames: false
+        files: ^(\.trivyignore|\.hadolint\.yaml|\.gitleaks\.toml|security/check_ignore_policy\.py)$
+
+      - id: scan-target-coverage
+        name: no image or Node project ships unscanned (master prompt 5.2)
+        language: system
+        entry: python3 security/scan_targets.py --check
+        pass_filenames: false
+        files: ((^|/)[Dd]ockerfile[^/]*|(^|/)package\.json|^security/scan-targets\.yml)$
+
+      - id: forbid-plaintext-secret-files
+        name: refuse to commit a plaintext secret or private key file
+        language: fail
+        entry: >-
+          This file must never be committed in plaintext. Encrypt it with SOPS
+          (see security/SOPS-ONBOARDING.md) so it lands as *.enc.yaml, or leave it
+          untracked. Private keys never enter this repository at all.
+        files: >-
+          (?x)^(
+            (.*/)?\.env(\.(?!example$)[^/]*)?
+            |(.*/)?[^/]*\.(pem|key|p12|pfx|jks|keystore)
+            |(.*/)?id_(rsa|dsa|ecdsa|ed25519)
+            |(.*/)?[^/]*age-key[^/]*\.txt
+            |(.*/)?keys\.txt
+          )$
+        exclude: >-
+          (?x)^(
+            .*\.enc\.(env|yaml|yml|json)
+            |.*\.pub
+            |.*\.pub\.(pem|key)
+            |[^/]*public[^/]*\.(pem|key)
+            |.*/[^/]*public[^/]*\.(pem|key)
+            |.*\.(crt|cer|csr)
+          )$

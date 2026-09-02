@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_ppob_root"
+              name="PPOB"
+              parent="custom_core.menu_custom_root"
+              sequence="56"
+              groups="custom_ppob_core.group_ppob_user"/>
+
+    <menuitem id="menu_ppob_operations"
+              name="Operations"
+              parent="menu_ppob_root"
+              sequence="10"/>
+
+    <menuitem id="menu_ppob_master"
+              name="Master Data"
+              parent="menu_ppob_root"
+              sequence="50"/>
+
+    <menuitem id="menu_ppob_master_mitra"
+              name="Mitra"
+              parent="menu_ppob_master"
+              action="action_ppob_mitra"
+              sequence="10"/>
+
+    <menuitem id="menu_ppob_master_products"
+              name="PPOB Products"
+              parent="menu_ppob_master"
+              action="action_ppob_product"
+              sequence="30"/>
+
+    <menuitem id="menu_ppob_configuration"
+              name="Configuration"
+              parent="menu_ppob_root"
+              sequence="90"
+              groups="custom_ppob_core.group_ppob_manager"/>
+
+    <menuitem id="menu_ppob_configuration_classes"
+              name="Product Classes"
+              parent="menu_ppob_configuration"
+              action="action_ppob_product_class"
+              sequence="10"/>
+
+    <menuitem id="menu_ppob_configuration_tiers"
+              name="Price Tiers"
+              parent="menu_ppob_configuration"
+              action="action_ppob_price_tier"
+              sequence="20"/>
+
+    <menuitem id="menu_ppob_configuration_accounts"
+              name="Account Mapping"
+              parent="menu_ppob_configuration"
+              action="action_ppob_account_mapping"
+              sequence="30"/>
+
+</odoo>

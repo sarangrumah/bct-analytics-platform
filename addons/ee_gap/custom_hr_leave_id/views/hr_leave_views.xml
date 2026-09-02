@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_leave_form_inherit_id" model="ir.ui.view">
+        <field name="name">hr.leave.form.inherit.custom_hr_leave_id</field>
+        <field name="model">hr.leave</field>
+        <field name="inherit_id" ref="hr_holidays.hr_leave_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='holiday_status_id']" position="after">
+                <field name="x_id_leave_category"
+                       invisible="not x_id_leave_category"
+                       readonly="1"/>
+            </xpath>
+            <xpath expr="//field[@name='holiday_status_id']" position="before">
+                <field name="x_overlapping_holidays_count" invisible="1"/>
+                <field name="x_overlapping_holidays_warning" invisible="1"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <div class="alert alert-warning"
+                     role="alert"
+                     invisible="x_overlapping_holidays_count == 0">
+                    <field name="x_overlapping_holidays_warning" readonly="1" nolabel="1"/>
+                    <field name="x_overlapping_holidays"
+                           widget="many2many_tags"
+                           readonly="1"
+                           nolabel="1"/>
+                </div>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_open_approval_request"
+                        type="object"
+                        string="View Approval"
+                        invisible="not x_custom_approval_request_id"/>
+                <field name="x_custom_approval_state" widget="badge" readonly="1"
+                       invisible="not x_custom_approval_state"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

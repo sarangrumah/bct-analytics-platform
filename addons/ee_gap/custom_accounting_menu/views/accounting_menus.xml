@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--
+            The new root. `web_icon` reuses account's own icon deliberately: two
+            apps drawn from one module should look related, and inventing a second
+            icon would imply a second accounting engine.
+        -->
+        <menuitem id="menu_accounting_root"
+                  name="Accounting"
+                  web_icon="account,static/description/icon.png"
+                  sequence="16"
+                  groups="account.group_account_readonly,account.group_account_manager"/>
+
+        <!--
+            Re-parented, not redefined. Writing <menuitem id="account.x" parent="..."/>
+            updates the existing record, so every child menu these already have – the
+            75 items the custom accounting modules contribute – moves with them and
+            needs no edit of its own.
+
+            `menu_finance_entries` is called "Accounting" upstream. Under a root of
+            that name it would read "Accounting / Accounting", so it becomes "Entries",
+            which is what it actually contains.
+        -->
+        <menuitem id="account.menu_finance_entries"
+                  name="Entries"
+                  parent="menu_accounting_root"
+                  sequence="1"/>
+
+        <menuitem id="account.account_audit_menu" name="Review"
+                  parent="menu_accounting_root"
+                  sequence="2"/>
+
+        <menuitem id="account.menu_finance_reports" name="Reporting"
+                  parent="menu_accounting_root"
+                  sequence="3"/>
+
+        <!--
+            Configuration moves too. It is already gated on group_account_manager, so
+            nobody loses access: an invoicing-only user could not open it from
+            Invoicing either.
+        -->
+        <menuitem id="account.menu_finance_configuration" name="Configuration"
+                  parent="menu_accounting_root"
+                  sequence="9"/>
+
+        <!--
+            The suite's own accounting menus attach to `account.menu_finance`, so
+            they stayed behind in Invoicing when their siblings moved. These are
+            ledger and tax-compliance tools, not document entry.
+
+            Deliberately NOT moved, because they are customer-facing work done by
+            whoever raises the invoice: Payment Terms, Incoterms, Product
+            Categories, Customer Follow-up, and Indonesia Payments (which
+            configures the providers a customer pays through).
+        -->
+        <menuitem id="custom_coretax.menu_coretax_root" name="Coretax"        parent="menu_accounting_root" sequence="20"/>
+        <menuitem id="custom_tax_id.menu_tax_id_root" name="Pajak Indonesia"          parent="menu_accounting_root" sequence="21"/>
+        <menuitem id="custom_coretax_bupot.menu_bupot_root" name="Bupot Unifikasi"    parent="menu_accounting_root" sequence="22"/>
+        <menuitem id="custom_pph_witholding.menu_witholding_root" name="Witholding" parent="menu_accounting_root" sequence="23"/>
+        <menuitem id="custom_accounting_asset.menu_assets_root" name="Assets" parent="menu_accounting_root" sequence="30"/>
+        <menuitem id="custom_accounting_recurring.menu_recurring_root" name="Recurring" parent="menu_accounting_root" sequence="31"/>
+        <menuitem id="custom_accounting_full.menu_accounting_full_root" name="Group Reporting" parent="menu_accounting_root" sequence="40"/>
+        <menuitem id="custom_accounting_full.menu_credit_check_log" name="Credit Check Logs" parent="menu_accounting_root" sequence="41"/>
+        <menuitem id="custom_accounting_full.menu_match_result" name="3-Way Match Results"  parent="menu_accounting_root" sequence="42"/>
+
+    </data>
+</odoo>

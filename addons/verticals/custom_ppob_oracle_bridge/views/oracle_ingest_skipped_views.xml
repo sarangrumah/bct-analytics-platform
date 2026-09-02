@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_oracle_ingest_skipped_list" model="ir.ui.view">
+        <field name="name">custom.ppob.oracle.ingest.skipped.list</field>
+        <field name="model">custom.ppob.oracle.ingest.skipped</field>
+        <field name="arch" type="xml">
+            <list string="Skipped MSG016T Rows" decoration-success="replayed">
+                <field name="msg016t_id"/>
+                <field name="oracle_member_id"/>
+                <field name="kode_voucher"/>
+                <field name="trx_number_client"/>
+                <field name="skip_reason"/>
+                <field name="create_date"/>
+                <field name="replayed" widget="boolean_toggle"/>
+                <field name="replayed_at"/>
+                <field name="transaction_id" optional="show"/>
+                <button name="action_replay" type="object" string="Replay"
+                        invisible="replayed" icon="fa-refresh"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_oracle_ingest_skipped_form" model="ir.ui.view">
+        <field name="name">custom.ppob.oracle.ingest.skipped.form</field>
+        <field name="model">custom.ppob.oracle.ingest.skipped</field>
+        <field name="arch" type="xml">
+            <form string="Skipped MSG016T Row">
+                <header>
+                    <button name="action_replay" type="object"
+                            string="Replay" class="btn-primary" invisible="replayed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="msg016t_id"/>
+                            <field name="oracle_member_id"/>
+                            <field name="kode_voucher"/>
+                            <field name="trx_number_client"/>
+                        </group>
+                        <group>
+                            <field name="skip_reason"/>
+                            <field name="create_date"/>
+                            <field name="replayed"/>
+                            <field name="replayed_at"/>
+                            <field name="transaction_id"/>
+                        </group>
+                    </group>
+                    <group string="Raw Payload">
+                        <field name="raw_payload" nolabel="1" widget="text"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_oracle_ingest_skipped_search" model="ir.ui.view">
+        <field name="name">custom.ppob.oracle.ingest.skipped.search</field>
+        <field name="model">custom.ppob.oracle.ingest.skipped</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="msg016t_id"/>
+                <field name="oracle_member_id"/>
+                <field name="kode_voucher"/>
+                <filter name="filter_pending" string="Not Replayed" domain="[('replayed','=',False)]"/>
+                <filter name="filter_replayed" string="Replayed" domain="[('replayed','=',True)]"/>
+                <separator/>
+                <filter name="filter_member" string="Member Not Mapped"
+                        domain="[('skip_reason','=','member_not_mapped')]"/>
+                <filter name="filter_voucher" string="Voucher Not Mapped"
+                        domain="[('skip_reason','=','voucher_not_mapped')]"/>
+                <group>
+                    <filter name="group_reason" string="Skip Reason" context="{'group_by': 'skip_reason'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_oracle_ingest_skipped" model="ir.actions.act_window">
+        <field name="name">Skipped Inbound</field>
+        <field name="res_model">custom.ppob.oracle.ingest.skipped</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_pending': 1}</field>
+    </record>
+
+</odoo>

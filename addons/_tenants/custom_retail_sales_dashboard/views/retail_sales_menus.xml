@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_retail_sales_root"
+              name="Retail Analytics"
+              sequence="41"
+              groups="group_retail_sales_viewer"/>
+
+    <menuitem id="menu_retail_sales_dashboard"
+              name="Sales Command Centre"
+              parent="menu_retail_sales_root"
+              action="action_retail_sales_dashboard"
+              sequence="10"/>
+
+    <menuitem id="menu_retail_sales_report"
+              name="Sales Analysis"
+              parent="menu_retail_sales_root"
+              action="action_retail_sales_report"
+              sequence="20"/>
+
+    <menuitem id="menu_retail_sales_config"
+              name="Configuration"
+              parent="menu_retail_sales_root"
+              sequence="90"
+              groups="group_retail_sales_manager"/>
+
+    <menuitem id="menu_retail_sales_target"
+              name="Sales Targets"
+              parent="menu_retail_sales_config"
+              action="action_retail_sales_target"
+              sequence="10"/>
+
+</odoo>

@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# deploy_odoo.sh — deploy Odoo + Postgres + Redis docker-compose stack
+# Tenant: {{ tenant_slug }} / db: {{ db_name }} / env: {{ env_type }}
+set -euo pipefail
+
+LOG_PREFIX="[deploy_odoo]"
+log() { echo "${LOG_PREFIX} $*"; }
+
+STACK_DIR="/opt/odoo/{{ tenant_slug }}-{{ env_type }}"
+mkdir -p "${STACK_DIR}"/{config,addons,data,backups}
+
+# --- compose file ---
+cat > "${STACK_DIR}/docker-compose.yml" <<EOF
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: "{{ pg_password | default('changeme-bootstrap') }}"
+      POSTGRES_DB: postgres
+    volumes:
+      - ./data/pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - ./data/redis:/data
+
+  odoo:
+    image: odoo:19
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      HOST: postgres
+      USER: odoo
+      PASSWORD: "{{ pg_password | default('changeme-bootstrap') }}"
+    volumes:
+      - ./config:/etc/odoo
+      - ./addons:/mnt/extra-addons
+      - ./data/odoo:/var/lib/odoo
+    ports:
+      - "127.0.0.1:8069:8069"
+      - "127.0.0.1:8072:8072"
+EOF
+
+# --- odoo.conf (minimal) ---
+cat > "${STACK_DIR}/config/odoo.conf" <<EOF
+[options]
+addons_path = /mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons
+data_dir = /var/lib/odoo
+db_host = postgres
+db_user = odoo
+db_password = {{ pg_password | default('changeme-bootstrap') }}
+db_name = {{ db_name }}
+proxy_mode = True
+workers = {{ workers | default(2) }}
+limit_memory_hard = 2684354560
+limit_memory_soft = 2147483648
+EOF
+
+cd "${STACK_DIR}"
+log "starting stack"
+docker compose pull --quiet
+docker compose up -d
+docker compose ps
+
+log "DONE"

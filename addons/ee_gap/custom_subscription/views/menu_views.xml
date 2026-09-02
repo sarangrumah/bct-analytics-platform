@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_subscription_root"
+              name="Subscriptions"
+              parent="sale.sale_menu_root"
+              sequence="50"
+              groups="custom_subscription.group_user"/>
+
+    <menuitem id="menu_subscription_contracts"
+              name="Contracts"
+              parent="menu_subscription_root"
+              action="action_subscription_contract"
+              sequence="10"/>
+
+    <menuitem id="menu_subscription_plans"
+              name="Plans"
+              parent="menu_subscription_root"
+              action="action_subscription_plan"
+              sequence="20"
+              groups="custom_subscription.group_manager"/>
+</odoo>

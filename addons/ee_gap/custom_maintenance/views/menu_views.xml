@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_maintenance_in_custom"
+              name="Maintenance"
+              parent="maintenance.menu_maintenance_title"
+              action="maintenance.hr_equipment_action"
+              sequence="60"
+              groups="custom_maintenance.group_user"/>
+
+    <menuitem id="menu_maintenance_sla"
+              name="Maintenance SLAs"
+              parent="menu_maintenance_in_custom"
+              action="action_custom_maintenance_team_sla"
+              sequence="20"
+              groups="custom_maintenance.group_manager"/>
+</odoo>

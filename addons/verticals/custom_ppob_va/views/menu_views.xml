@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_ppob_va_accounts"
+              name="Virtual Accounts"
+              parent="custom_ppob_core.menu_ppob_master"
+              action="action_ppob_va_account"
+              sequence="40"/>
+
+    <menuitem id="menu_ppob_va_topups"
+              name="VA Topups"
+              parent="custom_ppob_core.menu_ppob_operations"
+              action="action_ppob_va_topup"
+              sequence="12"/>
+
+    <menuitem id="menu_ppob_va_bank_connections"
+              name="Bank H2H Connections"
+              parent="custom_ppob_core.menu_ppob_configuration"
+              action="action_ppob_va_bank_connection"
+              sequence="40"/>
+
+</odoo>

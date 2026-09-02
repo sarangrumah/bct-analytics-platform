@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_sms_account_list" model="ir.ui.view">
+        <field name="name">custom.sms.account.list</field>
+        <field name="model">custom.sms.account</field>
+        <field name="arch" type="xml">
+            <list string="SMS Accounts">
+                <field name="name"/>
+                <field name="provider"/>
+                <field name="sender_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="sandbox_mode" widget="boolean_toggle"/>
+                <field name="is_active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_sms_account_form" model="ir.ui.view">
+        <field name="name">custom.sms.account.form</field>
+        <field name="model">custom.sms.account</field>
+        <field name="arch" type="xml">
+            <form string="SMS Account">
+                <header>
+                    <button name="action_test_connection" type="object"
+                            string="Test Connection" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Main Transactional Sender"/></h1>
+                    </div>
+                    <group>
+                        <group string="Provider">
+                            <field name="provider"/>
+                            <field name="sender_id"/>
+                            <field name="api_url" placeholder="Defaults vary by provider"/>
+                            <field name="is_active"/>
+                            <field name="sandbox_mode"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Credentials">
+                            <field name="userkey" invisible="provider != 'zenziva'"/>
+                            <field name="passkey" password="True" invisible="provider != 'zenziva'"/>
+                            <field name="account_sid" invisible="provider != 'twilio'"/>
+                            <field name="auth_token" password="True" invisible="provider != 'twilio'"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_sms_account_search" model="ir.ui.view">
+        <field name="name">custom.sms.account.search</field>
+        <field name="model">custom.sms.account</field>
+        <field name="arch" type="xml">
+            <search string="SMS Accounts">
+                <field name="name"/>
+                <field name="sender_id"/>
+                <field name="userkey"/>
+                <field name="account_sid"/>
+                <filter name="active" string="Active" domain="[('is_active','=',True)]"/>
+                <filter name="sandbox" string="Sandbox" domain="[('sandbox_mode','=',True)]"/>
+                <separator/>
+                <filter name="group_provider" string="Provider" context="{'group_by':'provider'}"/>
+                <filter name="group_company" string="Company" context="{'group_by':'company_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_sms_account" model="ir.actions.act_window">
+        <field name="name">SMS Accounts</field>
+        <field name="res_model">custom.sms.account</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_sms_account_search"/>
+    </record>
+</odoo>

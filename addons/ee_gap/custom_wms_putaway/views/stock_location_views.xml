@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_stock_location_form_inherit_putaway" model="ir.ui.view">
+        <field name="name">stock.location.form.inherit.putaway</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="WMS Slotting">
+                    <group string="Capacity">
+                        <field name="wms_max_weight_kg"/>
+                        <field name="wms_weight_used_kg"/>
+                        <field name="volume_capacity_m3"/>
+                        <field name="volume_used_m3"/>
+                    </group>
+                    <group string="Bin Geometry (mm)">
+                        <field name="wms_length_mm"/>
+                        <field name="wms_width_mm"/>
+                        <field name="wms_height_mm"/>
+                        <field name="wms_walk_sequence"/>
+                    </group>
+                    <group string="Category Reservation" colspan="2">
+                        <field name="wms_allowed_categ_ids" widget="many2many_tags"/>
+                        <field name="wms_enforce_categ"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

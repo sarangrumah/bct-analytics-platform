@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  PLACEHOLDER XSD for faktur_masukan.
+  TODO: download from official source.
+  Last attempted: https://www.pajak.go.id/sites/default/files/2025-01/FakturPajakMasukan.xsd
+  Landing page : https://www.pajak.go.id/reformdjp/coretax/template-xml-dan-converter-excel-ke-xml
+  Date         : 2026-05-16
+
+  This file exists so the module loads and the export wizard can locate
+  a schema path. Validation against this placeholder will pass any well-
+  formed XML — replace with the real DJP XSD before going to production.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+  <xs:element name="CoretaxDocument">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+      </xs:sequence>
+      <xs:anyAttribute processContents="skip"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

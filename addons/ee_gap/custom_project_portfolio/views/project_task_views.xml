@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_vas_task_kanban" model="ir.ui.view">
+        <field name="name">project.task.pmo.kanban</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage_id" quick_create="false">
+                <field name="stage_id"/>
+                <field name="custom_vertical_id"/>
+                <field name="custom_is_blocked"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_details">
+                            <strong><field name="name"/></strong>
+                            <div class="text-muted">
+                                <field name="custom_vertical_id"/>
+                            </div>
+                            <div class="mt4">
+                                <field name="custom_priority" widget="badge"
+                                       decoration-danger="custom_priority == 'critical'"
+                                       decoration-warning="custom_priority == 'high'"/>
+                                <field name="custom_story_points" string="pts"/>
+                                <field name="custom_source"/>
+                            </div>
+                            <div class="mt4">
+                                <field name="user_ids" widget="many2many_avatar_user"/>
+                                <field name="date_deadline"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_vas_task_list" model="ir.ui.view">
+        <field name="name">project.task.pmo.list</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <list string="Tasks">
+                <field name="name"/>
+                <field name="custom_vertical_id"/>
+                <field name="project_id"/>
+                <field name="stage_id"/>
+                <field name="user_ids" widget="many2many_avatar_user" optional="show"/>
+                <field name="custom_priority" optional="show"/>
+                <field name="custom_story_points" optional="show"/>
+                <field name="custom_sprint_id" optional="show"/>
+                <field name="custom_source" optional="hide"/>
+                <field name="date_deadline" optional="show"/>
+                <field name="custom_due_sla_date" optional="hide"/>
+                <field name="custom_hold_duration_hours" string="Hold (h)" optional="hide"/>
+                <field name="custom_user_wait_hours" string="User wait (h)" optional="hide"/>
+                <field name="custom_cycle_time_team" string="Cycle — team (h)" optional="show"/>
+                <field name="custom_lead_time_total" string="Lead — total (h)" optional="hide"/>
+                <field name="custom_is_blocked" optional="hide"/>
+                <field name="custom_carried_over" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vas_task_form" model="ir.ui.view">
+        <field name="name">project.task.pmo.form</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <form string="Task">
+                <header>
+                    <button name="action_pmo_hold" type="object" string="Hold"
+                            help="Pauses the SLA clock. Needs a reason."/>
+                    <button name="action_pmo_resume" type="object" string="Resume"
+                            class="btn-primary"
+                            invisible="not custom_hold_since"/>
+                    <button name="action_pmo_request_verification" type="object"
+                            string="Request user verification"/>
+                    <button name="action_pmo_verified" type="object" string="Verified — close"
+                            class="btn-primary"/>
+                    <field name="stage_id" widget="statusbar"
+                           options="{'clickable': '1'}"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Context">
+                            <field name="custom_vertical_id"/>
+                            <field name="project_id"/>
+                            <field name="custom_portfolio_id"/>
+                            <field name="custom_sprint_id"/>
+                            <field name="user_ids" widget="many2many_avatar_user"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group string="Planning">
+                            <field name="custom_task_type"/>
+                            <field name="custom_priority"/>
+                            <field name="custom_story_points"/>
+                            <field name="custom_source"/>
+                            <field name="date_deadline"/>
+                            <field name="custom_due_sla_date"/>
+                            <field name="depend_on_ids" widget="many2many_tags"/>
+                            <field name="custom_is_blocked"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Hold">
+                            <field name="custom_hold_reason"/>
+                            <field name="custom_hold_until"/>
+                            <field name="custom_hold_since"/>
+                            <field name="custom_hold_by_id"/>
+                            <field name="custom_hold_duration_hours"/>
+                        </group>
+                        <group string="User verification">
+                            <field name="custom_verification_owner_id"/>
+                            <field name="custom_verification_requested_at"/>
+                            <field name="custom_verification_due"/>
+                            <field name="custom_user_wait_hours"/>
+                            <field name="custom_verify_reminders_sent"/>
+                            <field name="custom_auto_closed"/>
+                        </group>
+                    </group>
+                    <group string="Two honest numbers">
+                        <group>
+                            <field name="custom_cycle_time_team"/>
+                        </group>
+                        <group>
+                            <field name="custom_lead_time_total"/>
+                        </group>
+                    </group>
+                    <group string="Vertical override"
+                           invisible="not custom_vertical_override">
+                        <field name="custom_vertical_override"/>
+                        <field name="custom_vertical_override_reason"/>
+                    </group>
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" widget="html"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vas_task_search" model="ir.ui.view">
+        <field name="name">project.task.pmo.search</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="custom_vertical_id"/>
+                <field name="project_id"/>
+                <field name="user_ids"/>
+                <field name="custom_sprint_id"/>
+                <filter name="f_hold" string="On hold"
+                        domain="[('stage_id.custom_is_hold','=',True)]"/>
+                <filter name="f_waiting" string="Waiting user verification"
+                        domain="[('stage_id.custom_is_waiting_user','=',True)]"/>
+                <filter name="f_blocked" string="Blocked" domain="[('custom_is_blocked','=',True)]"/>
+                <separator/>
+                <filter name="f_open" string="Open"
+                        domain="[('stage_id.custom_is_closed_stage','=',False)]"/>
+                <filter name="f_overdue" string="Overdue"
+                        domain="[('custom_due_sla_date','&lt;',context_today().strftime('%Y-%m-%d')),
+                                 ('stage_id.custom_is_closed_stage','=',False)]"/>
+                <filter name="f_carried" string="Carried over"
+                        domain="[('custom_carried_over','=',True)]"/>
+                <group>
+                    <filter name="g_vertical" string="Vertical"
+                            context="{'group_by':'custom_vertical_id'}"/>
+                    <filter name="g_stage" string="Stage" context="{'group_by':'stage_id'}"/>
+                    <filter name="g_project" string="Project" context="{'group_by':'project_id'}"/>
+                    <filter name="g_sprint" string="Sprint" context="{'group_by':'custom_sprint_id'}"/>
+                    <filter name="g_priority" string="Priority"
+                            context="{'group_by':'custom_priority'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_vas_task" model="ir.actions.act_window">
+        <field name="name">Tasks</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_vas_task_search"/>
+        <field name="view_ids" eval="[
+            Command.clear(),
+            Command.create({'view_mode': 'kanban', 'view_id': ref('view_vas_task_kanban')}),
+            Command.create({'view_mode': 'list', 'view_id': ref('view_vas_task_list')}),
+            Command.create({'view_mode': 'form', 'view_id': ref('view_vas_task_form')}),
+        ]"/>
+        <field name="context">{'search_default_f_open': 1}</field>
+    </record>
+
+</odoo>

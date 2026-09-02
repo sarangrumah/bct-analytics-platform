@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Self-contained wrapper: no web.html_container / web.external_layout, so
+         wkhtmltopdf never makes the external asset (report.url) callback that
+         stalls on this platform. <main> is required by
+         ir_actions_report._prepare_html (its absence raises IndexError). -->
+    <template id="report_wms_picking_list" name="WMS Picking List">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+            </head>
+            <body>
+                <main>
+                <!-- The style and charset live INSIDE <main>, not in <head>:
+                     ir_actions_report._prepare_html keeps only the children of
+                     <main> and writes them to a bare .html file, so anything in
+                     <head> is silently dropped — the report would print
+                     unstyled and non-ASCII text would come out mojibake. -->
+                    <meta charset="utf-8"/>
+                    <style>
+                        @page { margin: 10mm; }
+                        * { box-sizing: border-box; }
+                        body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; margin: 0; padding: 0; }
+                        h1 { font-size: 16px; margin: 0 0 2px 0; }
+                        .muted { color: #666; }
+                        table.meta { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+                        table.meta td { padding: 1px 4px; vertical-align: top; }
+                        table.data { width: 100%; border-collapse: collapse; font-size: 10px; }
+                        table.data th, table.data td { border: 1px solid #b0b0b0; padding: 3px 4px; vertical-align: top; }
+                        table.data thead th { background-color: #f3f3f3; text-align: left; }
+                        table.data td.num, table.data th.num { text-align: right; }
+                        table.data tr.total td { font-weight: bold; background-color: #e8e8e8; }
+                        .tick { display: block; width: 14px; height: 14px; border: 1px solid #333; margin: 0 auto; }
+                        .sig { margin-top: 24px; }
+                    </style>
+                    <t t-foreach="docs" t-as="o">
+                        <div class="page" style="page-break-after: always;">
+                            <table class="meta">
+                                <tr>
+                                    <td style="width: 62%;">
+                                        <h1>PICKING LIST</h1>
+                                        <div><b t-out="o.name"/></div>
+                                        <div class="muted" t-out="o.company_id.display_name"/>
+                                    </td>
+                                    <td style="width: 38%; text-align: right;">
+                                        <img t-att-src="o._wms_barcode_src(o.name, 'Code128', 500, 90)"
+                                             alt="Picking barcode" style="height: 45px;"/>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table class="meta">
+                                <tr>
+                                    <td style="width: 50%;">
+                                        <div><b>Partner:</b> <span t-out="o.partner_id.display_name or '-'"/></div>
+                                        <div><b>Source Document:</b> <span t-out="o.origin or '-'"/></div>
+                                    </td>
+                                    <td style="width: 50%;">
+                                        <div><b>Scheduled:</b> <span t-out="o.scheduled_date"/></div>
+                                        <div><b>Operation Type:</b> <span t-out="o.picking_type_id.display_name or '-'"/></div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <t t-set="rows" t-value="o._wms_pick_rows()"/>
+                            <t t-set="totals" t-value="o._wms_pick_totals()"/>
+
+                            <table class="data">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 3%;">#</th>
+                                        <th style="width: 17%;">Location</th>
+                                        <th style="width: 7%;">Loc. QR</th>
+                                        <th style="width: 10%;">Code</th>
+                                        <th style="width: 19%;">Product</th>
+                                        <th style="width: 14%;">Item Barcode</th>
+                                        <th style="width: 10%;">Lot / Serial</th>
+                                        <th style="width: 8%;">Expiry</th>
+                                        <th class="num" style="width: 9%;">Qty</th>
+                                        <th style="width: 3%;">✓</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="rows" t-as="r">
+                                        <td t-out="r['seq']"/>
+                                        <td t-out="r['location_name']"/>
+                                        <td style="text-align: center;">
+                                            <img t-if="r['location_qr']" t-att-src="r['location_qr']"
+                                                 alt="Location" style="height: 34px;"/>
+                                        </td>
+                                        <td t-out="r['default_code']"/>
+                                        <td t-out="r['product'].display_name"/>
+                                        <td style="text-align: center;">
+                                            <img t-if="r['item_barcode']" t-att-src="r['item_barcode']"
+                                                 alt="Item barcode" style="height: 26px; width: 100%;"/>
+                                            <div class="muted" style="font-size: 7px;" t-out="r['item_barcode_value']"/>
+                                        </td>
+                                        <td t-out="r['lot_name']"/>
+                                        <td t-out="r['expiry'] or ''"/>
+                                        <td class="num">
+                                            <span t-out="'%.3f' % r['qty']"/>
+                                            <span class="muted" t-out="r['uom_name']"/>
+                                        </td>
+                                        <td><span class="tick"/></td>
+                                    </tr>
+                                    <tr t-if="not rows">
+                                        <td colspan="10" class="muted">No detailed operations on this transfer.</td>
+                                    </tr>
+                                    <tr class="total">
+                                        <td colspan="8">TOTAL — <span t-out="totals['line_count']"/> line(s)</td>
+                                        <td class="num" t-out="'%.3f' % totals['total_qty']"/>
+                                        <td/>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="sig">
+                                Picked by: ____________________________
+                                <span style="display: inline-block; width: 40px;"/>
+                                Date: ____________________
+                            </div>
+                        </div>
+                    </t>
+                </main>
+            </body>
+        </html>
+    </template>
+
+    <record id="action_report_wms_picking_list" model="ir.actions.report">
+        <field name="name">Picking List (WMS)</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_wms_docs.report_wms_picking_list</field>
+        <field name="report_file">custom_wms_docs.report_wms_picking_list</field>
+        <field name="binding_model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_type">report</field>
+        <!-- All three legs print the same walk sheet: a receipt puts away
+             against it, an internal transfer moves against it, a delivery
+             picks against it. -->
+        <field name="domain">[('picking_type_id.code', 'in', ['incoming', 'outgoing', 'internal'])]</field>
+        <field name="print_report_name">'Picking List - %s' % object.name</field>
+    </record>
+
+</odoo>

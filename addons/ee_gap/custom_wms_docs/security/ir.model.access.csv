@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_wms_label_wizard_stock_user,wms.label.wizard.stock.user,model_custom_wms_label_wizard,stock.group_stock_user,1,1,1,1

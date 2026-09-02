@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_retail_sales_report_list" model="ir.ui.view">
+        <field name="name">retail.sales.report.list</field>
+        <field name="model">retail.sales.report</field>
+        <field name="arch" type="xml">
+            <list string="Sales Analysis" create="false" edit="false" delete="false"
+                  default_order="date desc" sample="1">
+                <field name="date"/>
+                <field name="warehouse_id"/>
+                <field name="pos_reference" optional="show"/>
+                <field name="default_code" optional="show"/>
+                <field name="product_id"/>
+                <field name="categ_id" optional="hide"/>
+                <field name="categ_root_id" optional="hide"/>
+                <field name="staff_name" optional="hide"/>
+                <field name="member_type" optional="hide"/>
+                <field name="discount_code" optional="hide"/>
+                <field name="qty" sum="Units"/>
+                <field name="gross_amount" sum="Gross" optional="hide"/>
+                <field name="discount_amount" sum="Discount" optional="show"/>
+                <field name="net_amount" sum="Net Sales"/>
+                <field name="tax_amount" sum="Tax" optional="hide"/>
+                <field name="total_amount" sum="Total" optional="hide"/>
+                <field name="order_count" sum="Transactions" optional="hide"/>
+                <field name="is_return" optional="hide"/>
+                <field name="is_omni" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_retail_sales_report_pivot" model="ir.ui.view">
+        <field name="name">retail.sales.report.pivot</field>
+        <field name="model">retail.sales.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Sales Analysis" sample="1">
+                <field name="warehouse_id" type="row"/>
+                <field name="date" interval="month" type="col"/>
+                <field name="net_amount" type="measure"/>
+                <field name="qty" type="measure"/>
+                <field name="order_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_retail_sales_report_graph" model="ir.ui.view">
+        <field name="name">retail.sales.report.graph</field>
+        <field name="model">retail.sales.report</field>
+        <field name="arch" type="xml">
+            <graph string="Sales Analysis" type="line" sample="1">
+                <field name="date" interval="day"/>
+                <field name="net_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_retail_sales_report_search" model="ir.ui.view">
+        <field name="name">retail.sales.report.search</field>
+        <field name="model">retail.sales.report</field>
+        <field name="arch" type="xml">
+            <search string="Sales Analysis">
+                <field name="product_id"/>
+                <field name="default_code" string="SKU"/>
+                <field name="warehouse_id" string="Store"/>
+                <field name="pos_reference" string="Receipt"/>
+                <field name="staff_name" string="Cashier"/>
+                <field name="discount_code" string="Promo Code"/>
+                <field name="categ_id"/>
+
+                <filter name="filter_today" string="Today"
+                        domain="[('date', '=', time.strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_mtd" string="Month to Date"
+                        domain="[('date', '&gt;=', time.strftime('%Y-%m-01'))]"/>
+                <filter name="filter_ytd" string="Year to Date"
+                        domain="[('date', '&gt;=', time.strftime('%Y-01-01'))]"/>
+                <separator/>
+                <!-- Native period picker: gives month/quarter/year plus the
+                     "compare to previous period / previous year" toggle for free. -->
+                <filter name="filter_period" string="Trading Date" date="date"/>
+                <separator/>
+                <filter name="filter_sales_only" string="Sales only" domain="[('is_return', '=', False)]"/>
+                <filter name="filter_returns" string="Returns only" domain="[('is_return', '=', True)]"/>
+                <separator/>
+                <filter name="filter_discounted" string="Discounted" domain="[('has_discount', '=', True)]"/>
+                <filter name="filter_member" string="Member sales" domain="[('is_member', '=', True)]"/>
+                <filter name="filter_omni" string="Omnichannel" domain="[('is_omni', '=', True)]"/>
+
+                <group>
+                    <filter name="group_date" string="Trading Date" context="{'group_by': 'date'}"/>
+                    <filter name="group_store" string="Store" context="{'group_by': 'warehouse_id'}"/>
+                    <filter name="group_ou" string="Operating Unit" context="{'group_by': 'analytic_account_id'}"/>
+                    <filter name="group_categ_root" string="Revenue Bucket" context="{'group_by': 'categ_root_id'}"/>
+                    <filter name="group_categ" string="Category" context="{'group_by': 'categ_id'}"/>
+                    <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_staff" string="Cashier" context="{'group_by': 'staff_name'}"/>
+                    <filter name="group_member_type" string="Member Type" context="{'group_by': 'member_type'}"/>
+                    <filter name="group_promo" string="Promo Code" context="{'group_by': 'discount_code'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_retail_sales_report" model="ir.actions.act_window">
+        <field name="name">Sales Analysis</field>
+        <field name="res_model">retail.sales.report</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="search_view_id" ref="view_retail_sales_report_search"/>
+        <field name="context">{'search_default_filter_mtd': 1, 'search_default_group_store': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No POS sales in this period</p>
+            <p>
+                Sales Analysis reads the imported X24DN retail sales. If it is empty,
+                either no sales file has been imported for these dates or the POS
+                sessions behind them are still open.
+            </p>
+        </field>
+    </record>
+
+</odoo>

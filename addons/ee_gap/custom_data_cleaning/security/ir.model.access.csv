@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_dedup_rule_user,custom.dedup.rule user,model_custom_dedup_rule,custom_data_cleaning.group_user,1,0,0,0
+access_dedup_rule_manager,custom.dedup.rule manager,model_custom_dedup_rule,custom_data_cleaning.group_manager,1,1,1,1
+access_dedup_candidate_user,custom.dedup.candidate user,model_custom_dedup_candidate,custom_data_cleaning.group_user,1,1,0,0
+access_dedup_candidate_manager,custom.dedup.candidate manager,model_custom_dedup_candidate,custom_data_cleaning.group_manager,1,1,1,1
+access_dedup_merge_wizard_user,custom.dedup.merge.wizard user,model_custom_dedup_merge_wizard,custom_data_cleaning.group_user,1,1,1,1
+access_dedup_merge_wizard_manager,custom.dedup.merge.wizard manager,model_custom_dedup_merge_wizard,custom_data_cleaning.group_manager,1,1,1,1
+access_dedup_normalize_wizard_user,custom.dedup.normalize.wizard user,model_custom_dedup_normalize_wizard,custom_data_cleaning.group_user,1,1,1,1
+access_dedup_normalize_wizard_manager,custom.dedup.normalize.wizard manager,model_custom_dedup_normalize_wizard,custom_data_cleaning.group_manager,1,1,1,1

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_pajakku_usage_list" model="ir.ui.view">
+        <field name="name">custom.coretax.pajakku.usage.list</field>
+        <field name="model">custom.coretax.pajakku.usage</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0">
+                <field name="period"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="api_calls" sum="api_calls"/>
+                <field name="faktur_submits" sum="faktur_submits"/>
+                <field name="bupot_submits" sum="bupot_submits"/>
+                <field name="errors" sum="errors"/>
+                <field name="last_updated_at"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_pajakku_usage" model="ir.actions.act_window">
+        <field name="name">Pajakku Usage</field>
+        <field name="res_model">custom.coretax.pajakku.usage</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

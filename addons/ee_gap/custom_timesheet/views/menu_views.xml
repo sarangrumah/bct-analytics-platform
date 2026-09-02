@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Mount entries under the native Timesheets app so billable timesheets
+         live alongside the standard timesheet menus.
+         Reuse the standard analytic line action so we don't redefine it here. -->
+    <menuitem id="menu_timesheet_in_custom"
+              name="Timesheets (Billable)"
+              parent="hr_timesheet.timesheet_menu_root"
+              action="hr_timesheet.timesheet_action_all"
+              sequence="45"
+              groups="custom_timesheet.group_user"/>
+
+    <menuitem id="menu_timesheet_pivot"
+              name="Timesheet Pivot"
+              parent="hr_timesheet.timesheet_menu_root"
+              action="action_timesheet_pivot"
+              sequence="46"
+              groups="custom_timesheet.group_user"/>
+
+    <menuitem id="menu_weekly_summary"
+              name="Weekly Summaries"
+              parent="hr_timesheet.timesheet_menu_root"
+              action="action_weekly_summary"
+              sequence="47"
+              groups="custom_timesheet.group_manager"/>
+
+    <menuitem id="menu_invoice_timesheet_wizard"
+              name="Invoice Timesheets"
+              parent="hr_timesheet.timesheet_menu_root"
+              action="action_invoice_timesheet_wizard"
+              sequence="48"
+              groups="custom_timesheet.group_manager"/>
+</odoo>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_pdp_field_classification_list" model="ir.ui.view">
+        <field name="name">pdp.field.classification.list</field>
+        <field name="model">pdp.field.classification</field>
+        <field name="arch" type="xml">
+            <!-- Odoo 19: the list view root tag is <list>, not <tree>. -->
+            <list string="PDP Field Classification" default_order="model_name, field_name">
+                <field name="model_name"/>
+                <field name="field_name"/>
+                <field name="pdp_class"
+                       decoration-danger="pdp_class in ('sensitive', 'secret')"
+                       decoration-warning="pdp_class == 'personal'"/>
+                <field name="drop_to_null" optional="show"/>
+                <field name="legal_basis" optional="show"/>
+                <field name="notes" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pdp_field_classification_form" model="ir.ui.view">
+        <field name="name">pdp.field.classification.form</field>
+        <field name="model">pdp.field.classification</field>
+        <field name="arch" type="xml">
+            <form string="PDP Field Classification">
+                <sheet>
+                    <group>
+                        <group string="Column">
+                            <field name="model_name" placeholder="res.partner"/>
+                            <field name="field_name" placeholder="email"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="Classification">
+                            <field name="pdp_class"/>
+                            <field name="drop_to_null"
+                                   invisible="pdp_class != 'sensitive'"/>
+                            <field name="legal_basis" placeholder="UU 27/2022 Art. 4(2)"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1" placeholder="Why this class was chosen."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_pdp_field_classification_search" model="ir.ui.view">
+        <field name="name">pdp.field.classification.search</field>
+        <field name="model">pdp.field.classification</field>
+        <field name="arch" type="xml">
+            <search string="PDP Field Classification">
+                <field name="model_name"/>
+                <field name="field_name"/>
+                <field name="legal_basis"/>
+                <filter name="filter_personal" string="Personal"
+                        domain="[('pdp_class', '=', 'personal')]"/>
+                <filter name="filter_sensitive" string="Sensitive"
+                        domain="[('pdp_class', '=', 'sensitive')]"/>
+                <filter name="filter_secret" string="Secret"
+                        domain="[('pdp_class', '=', 'secret')]"/>
+                <separator/>
+                <filter name="filter_inactive" string="Archived"
+                        domain="[('active', '=', False)]"/>
+                <!-- Odoo 19: a search-view <group> takes no string/expand attribute. -->
+                <group>
+                    <filter name="group_by_model" string="Model" domain="[]"
+                            context="{'group_by': 'model_name'}"/>
+                    <filter name="group_by_class" string="PDP Class" domain="[]"
+                            context="{'group_by': 'pdp_class'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_pdp_field_classification" model="ir.actions.act_window">
+        <field name="name">Field Classification</field>
+        <field name="res_model">pdp.field.classification</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_by_model': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Classify a database column</p>
+            <p>Every column the warehouse extracts must carry exactly one PDP class.
+               An unclassified column makes the CDC loader refuse to start.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_pdp_root"
+              name="Data Privacy"
+              sequence="95"
+              groups="custom_pdp_core.group_pdp_officer"/>
+
+    <menuitem id="menu_pdp_configuration"
+              name="Configuration"
+              parent="menu_pdp_root"
+              sequence="10"/>
+
+    <menuitem id="menu_pdp_field_classification"
+              name="Field Classification"
+              parent="menu_pdp_configuration"
+              action="action_pdp_field_classification"
+              sequence="10"/>
+
+</odoo>

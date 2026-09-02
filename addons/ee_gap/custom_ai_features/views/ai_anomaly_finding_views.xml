@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_anomaly_finding_list" model="ir.ui.view">
+        <field name="name">ai.anomaly.finding.list</field>
+        <field name="model">ai.anomaly.finding</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="severity == 'critical'"
+                  decoration-warning="severity == 'warning'"
+                  decoration-muted="state in ('dismissed','resolved')">
+                <field name="create_date"/>
+                <field name="res_model"/>
+                <field name="res_name"/>
+                <field name="metric"/>
+                <field name="latest_value"/>
+                <field name="severity" widget="badge"/>
+                <field name="score" widget="progressbar"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_anomaly_finding_form" model="ir.ui.view">
+        <field name="name">ai.anomaly.finding.form</field>
+        <field name="model">ai.anomaly.finding</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open_source" string="Open Record" type="object"/>
+                    <button name="action_triage" string="Triage" type="object"
+                            class="btn-primary" invisible="state != 'new'"/>
+                    <button name="action_resolve" string="Resolved" type="object"
+                            class="btn-success" invisible="state in ('resolved','dismissed')"/>
+                    <button name="action_dismiss" string="False Positive" type="object"
+                            invisible="state in ('resolved','dismissed')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="res_model" readonly="1"/>
+                            <field name="res_id" readonly="1"/>
+                            <field name="res_ref"/>
+                            <field name="metric"/>
+                            <field name="latest_value"/>
+                        </group>
+                        <group>
+                            <field name="severity"/>
+                            <field name="score" widget="progressbar"/>
+                            <field name="scan_id"/>
+                            <field name="triaged_by_id" readonly="1"/>
+                            <field name="triaged_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Rationale"/>
+                    <field name="rationale" readonly="1"/>
+                    <separator string="Suggested Action"/>
+                    <field name="suggested_action" readonly="1"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_anomaly_finding_search" model="ir.ui.view">
+        <field name="name">ai.anomaly.finding.search</field>
+        <field name="model">ai.anomaly.finding</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="res_model"/>
+                <field name="metric"/>
+                <filter name="new" string="New" domain="[('state','=','new')]"/>
+                <filter name="critical" string="Critical" domain="[('severity','=','critical')]"/>
+                <filter name="warning" string="Warning" domain="[('severity','=','warning')]"/>
+                <group>
+                    <filter name="by_severity" string="Severity" context="{'group_by': 'severity'}"/>
+                    <filter name="by_model" string="Source Model" context="{'group_by': 'res_model'}"/>
+                    <filter name="by_state" string="State" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_anomaly_finding" model="ir.actions.act_window">
+        <field name="name">Anomaly Inbox</field>
+        <field name="res_model">ai.anomaly.finding</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_anomaly_finding_search"/>
+        <field name="context">{"search_default_new": 1}</field>
+    </record>
+</odoo>

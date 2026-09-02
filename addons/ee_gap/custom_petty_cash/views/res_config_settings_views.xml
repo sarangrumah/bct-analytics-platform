@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_petty_cash_config_settings" model="ir.ui.view">
+            <field name="name">res.config.settings.petty.cash</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//block[@id='analytic']" position="after">
+                    <block title="Petty Cash" id="petty_cash_settings" groups="custom_petty_cash.group_petty_cash_finance">
+                        <setting string="Advance Account" help="Reconcilable 'Uang Muka Petty Cash' account.">
+                            <field name="petty_cash_advance_account_id"/>
+                        </setting>
+                        <setting string="Bank-Out Journal" help="Funds disbursement and receives returned cash.">
+                            <field name="petty_cash_bank_out_journal_id"/>
+                        </setting>
+                        <setting string="Payment Journal" help="Pays third-party bills out of the advance (outstanding = advance account).">
+                            <field name="petty_cash_payment_journal_id"/>
+                        </setting>
+                        <setting string="Expense Journal" help="Miscellaneous journal for non-third-party expense entries.">
+                            <field name="petty_cash_expense_journal_id"/>
+                        </setting>
+                        <setting string="Realization Deadline (days)">
+                            <field name="petty_cash_realization_days"/>
+                        </setting>
+                        <setting string="Disburse via account.payment"
+                                 help="Book disbursement through an account.payment (bank-reconcilable) instead of a direct journal entry.">
+                            <field name="petty_cash_disburse_via_payment"/>
+                        </setting>
+                    </block>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

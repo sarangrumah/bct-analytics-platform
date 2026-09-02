@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_survey_question_form_custom" model="ir.ui.view">
+        <field name="name">survey.question.form.custom</field>
+        <field name="model">survey.question</field>
+        <field name="inherit_id" ref="survey.survey_question_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Custom Scoring" name="custom_survey_scoring">
+                    <field name="x_score_weight"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

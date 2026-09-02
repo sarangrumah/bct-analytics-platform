@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rental_asset_user,rental.asset user,model_rental_asset,group_rental_user,1,0,0,0
+access_rental_asset_mgr,rental.asset mgr,model_rental_asset,group_rental_manager,1,1,1,1
+access_rental_order_user,rental.order user,model_rental_order,group_rental_user,1,1,1,0
+access_rental_order_mgr,rental.order mgr,model_rental_order,group_rental_manager,1,1,1,1
+access_rental_order_portal,rental.order portal,model_rental_order,base.group_portal,1,0,0,0
+access_custom_rental_pricing_user,custom.rental.pricing user,model_custom_rental_pricing,group_rental_user,1,0,0,0
+access_custom_rental_pricing_mgr,custom.rental.pricing mgr,model_custom_rental_pricing,group_rental_manager,1,1,1,1
+access_custom_rental_schedule_user,custom.rental.schedule user,model_custom_rental_schedule,group_rental_user,1,0,0,0
+access_custom_rental_late_fee_user,custom.rental.late.fee.line user,model_custom_rental_late_fee_line,group_rental_user,1,0,0,0
+access_custom_rental_late_fee_mgr,custom.rental.late.fee.line mgr,model_custom_rental_late_fee_line,group_rental_manager,1,1,1,1

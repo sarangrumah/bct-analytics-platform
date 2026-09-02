@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===== GL Analysis (native pivot/graph/list cube) ===== -->
+
+    <record id="view_gl_analysis_pivot" model="ir.ui.view">
+        <field name="name">custom.report.journal.item.analysis.pivot</field>
+        <field name="model">custom.report.journal.item.analysis</field>
+        <field name="arch" type="xml">
+            <pivot string="GL Analysis" sample="1">
+                <field name="account_type" type="row"/>
+                <field name="account_id" type="row"/>
+                <field name="debit" type="measure"/>
+                <field name="credit" type="measure"/>
+                <field name="balance" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_gl_analysis_graph" model="ir.ui.view">
+        <field name="name">custom.report.journal.item.analysis.graph</field>
+        <field name="model">custom.report.journal.item.analysis</field>
+        <field name="arch" type="xml">
+            <graph string="GL Analysis" type="bar" sample="1">
+                <field name="account_type"/>
+                <field name="balance" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_gl_analysis_list" model="ir.ui.view">
+        <field name="name">custom.report.journal.item.analysis.list</field>
+        <field name="model">custom.report.journal.item.analysis</field>
+        <field name="arch" type="xml">
+            <list string="GL Analysis" create="false" edit="false" delete="false">
+                <field name="date"/>
+                <field name="move_id"/>
+                <field name="account_id"/>
+                <field name="account_type" optional="show"/>
+                <field name="journal_id" optional="show"/>
+                <field name="partner_id" optional="show"/>
+                <field name="ou_analytic_id" optional="show"/>
+                <field name="employee_analytic_id" optional="show"/>
+                <field name="debit" sum="Debit"/>
+                <field name="credit" sum="Credit"/>
+                <field name="balance" sum="Balance"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="parent_state" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_gl_analysis_search" model="ir.ui.view">
+        <field name="name">custom.report.journal.item.analysis.search</field>
+        <field name="model">custom.report.journal.item.analysis</field>
+        <field name="arch" type="xml">
+            <search string="GL Analysis">
+                <field name="account_id"/>
+                <field name="partner_id"/>
+                <field name="journal_id"/>
+                <field name="move_id"/>
+                <field name="ou_analytic_id"/>
+                <field name="employee_analytic_id"/>
+                <filter name="posted" string="Posted"
+                        domain="[('parent_state', '=', 'posted')]"/>
+                <filter name="draft" string="Unposted"
+                        domain="[('parent_state', '=', 'draft')]"/>
+                <separator/>
+                <filter name="date" string="Date" date="date"/>
+                <group>
+                    <filter name="g_account" string="Account"
+                            context="{'group_by': 'account_id'}"/>
+                    <filter name="g_type" string="Account Type"
+                            context="{'group_by': 'account_type'}"/>
+                    <filter name="g_journal" string="Journal"
+                            context="{'group_by': 'journal_id'}"/>
+                    <filter name="g_partner" string="Partner"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter name="g_ou" string="Operating Unit"
+                            context="{'group_by': 'ou_analytic_id'}"/>
+                    <filter name="g_employee" string="Employee"
+                            context="{'group_by': 'employee_analytic_id'}"/>
+                    <filter name="g_company" string="Company"
+                            context="{'group_by': 'company_id'}"
+                            groups="base.group_multi_company"/>
+                    <filter name="g_month" string="Month"
+                            context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_gl_analysis" model="ir.actions.act_window">
+        <field name="name">GL Analysis</field>
+        <field name="res_model">custom.report.journal.item.analysis</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="context">{'search_default_posted': 1, 'search_default_date': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No journal items to analyse yet</p>
+            <p>Slice the general ledger interactively by account, journal, partner and period.</p>
+        </field>
+    </record>
+</odoo>

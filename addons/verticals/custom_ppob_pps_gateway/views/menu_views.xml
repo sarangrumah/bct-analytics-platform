@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_pps_gateway_root"
+              name="PPS Gateway"
+              parent="custom_ppob_core.menu_ppob_configuration"
+              sequence="90"/>
+
+    <menuitem id="menu_pps_mitra_credential"
+              name="Mitra Credentials"
+              parent="menu_pps_gateway_root"
+              action="action_pps_mitra_credential"
+              sequence="10"/>
+
+    <menuitem id="menu_pps_game_field"
+              name="Game Fields"
+              parent="menu_pps_gateway_root"
+              action="action_pps_game_field"
+              sequence="20"/>
+
+    <menuitem id="menu_pps_callback_log"
+              name="Callback Log"
+              parent="menu_pps_gateway_root"
+              action="action_pps_callback_log"
+              sequence="30"/>
+
+</odoo>

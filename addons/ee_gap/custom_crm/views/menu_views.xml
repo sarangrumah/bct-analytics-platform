@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Surface custom CRM features inside the native CRM app.
+         "CRM Leads" and "Lead Mining" native/custom actions are already reachable
+         from CRM's own menus, so we only add the genuinely custom entries here. -->
+    <menuitem id="menu_crm_web_form_tokens"
+              name="Web-Form Tokens"
+              parent="crm.crm_menu_root"
+              action="action_custom_crm_web_form_token"
+              sequence="101"
+              groups="custom_crm.group_manager"/>
+
+    <menuitem id="menu_crm_lead_mining_in_crm"
+              name="Lead Mining"
+              parent="crm.crm_menu_root"
+              action="action_custom_crm_lead_mining_request"
+              sequence="100"
+              groups="custom_crm.group_user"/>
+</odoo>

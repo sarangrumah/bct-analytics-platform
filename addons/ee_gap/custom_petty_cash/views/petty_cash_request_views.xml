@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ===================== FORM ===================== -->
+        <record id="view_petty_cash_request_form" model="ir.ui.view">
+            <field name="name">petty.cash.request.form</field>
+            <field name="model">petty.cash.request</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_submit" type="object" string="Submit"
+                                class="btn-primary" invisible="state != 'draft'"/>
+                        <button name="action_approve" type="object" string="Approve"
+                                class="btn-primary" invisible="state != 'to_approve'"
+                                groups="custom_petty_cash.group_petty_cash_finance"/>
+                        <button name="action_reject" type="object" string="Send Back"
+                                invisible="state != 'to_approve'"
+                                groups="custom_petty_cash.group_petty_cash_finance"/>
+                        <button name="action_disburse" type="object" string="Disburse (Bank Out)"
+                                class="btn-primary" invisible="state != 'approved'"
+                                groups="custom_petty_cash.group_petty_cash_finance"/>
+                        <button name="action_open_realization" type="object" string="New Realization"
+                                class="btn-primary" invisible="state not in ('disbursed', 'in_realization')"/>
+                        <button name="action_return_balance" type="object" string="Return Balance"
+                                invisible="state not in ('disbursed', 'in_realization') or amount_outstanding &lt;= 0"
+                                groups="custom_petty_cash.group_petty_cash_finance"/>
+                        <button name="action_reimburse_shortfall" type="object" string="Reimburse Shortfall"
+                                invisible="state not in ('disbursed', 'in_realization') or amount_outstanding &gt;= 0"
+                                groups="custom_petty_cash.group_petty_cash_finance"/>
+                        <button name="action_settle" type="object" string="Settle"
+                                class="btn-primary"
+                                invisible="state not in ('disbursed', 'in_realization') or amount_outstanding != 0"
+                                groups="custom_petty_cash.group_petty_cash_finance"/>
+                        <button name="action_cancel" type="object" string="Cancel"
+                                invisible="state in ('settled', 'cancelled')"/>
+                        <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                                invisible="state not in ('cancelled', 'to_approve')"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,to_approve,approved,disbursed,in_realization,settled"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_realizations" type="object" class="oe_stat_button"
+                                    icon="fa-list" invisible="realization_count == 0">
+                                <field name="realization_count" widget="statinfo" string="Realizations"/>
+                            </button>
+                            <button name="action_view_moves" type="object" class="oe_stat_button"
+                                    icon="fa-book" invisible="move_count == 0">
+                                <field name="move_count" widget="statinfo" string="Journal Entries"/>
+                            </button>
+                        </div>
+                        <widget name="web_ribbon" title="Overdue" bg_color="text-bg-danger"
+                                invisible="not is_overdue"/>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="employee_id" readonly="state != 'draft'"/>
+                                <field name="l10n_ou_analytic_id" readonly="state != 'draft'"/>
+                                <field name="purpose" readonly="state not in ('draft', 'to_approve')"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="currency_id" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="request_date" readonly="state != 'draft'"/>
+                                <field name="realization_deadline"/>
+                                <field name="amount_requested" readonly="state not in ('draft', 'to_approve')"/>
+                                <field name="x_custom_approval_state" string="Approval Status" readonly="1"
+                                       invisible="not x_custom_approval_request_id"/>
+                            </group>
+                        </group>
+                        <group string="Accounting" groups="custom_petty_cash.group_petty_cash_finance">
+                            <group>
+                                <field name="advance_account_id"/>
+                                <field name="bank_journal_id"/>
+                            </group>
+                            <group>
+                                <field name="amount_disbursed"/>
+                                <field name="amount_realized"/>
+                                <field name="amount_outstanding"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Estimate Breakdown" name="breakdown">
+                                <field name="line_ids" readonly="state not in ('draft', 'to_approve')">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="account_id"/>
+                                        <field name="currency_id" column_invisible="1"/>
+                                        <field name="amount" sum="Total"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Realizations" name="realizations">
+                                <field name="realization_ids" readonly="1">
+                                    <list>
+                                        <field name="name"/>
+                                        <field name="date"/>
+                                        <field name="amount_total"/>
+                                        <field name="state" widget="badge"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ===================== LIST ===================== -->
+        <record id="view_petty_cash_request_list" model="ir.ui.view">
+            <field name="name">petty.cash.request.list</field>
+            <field name="model">petty.cash.request</field>
+            <field name="arch" type="xml">
+                <list decoration-info="state == 'to_approve'"
+                      decoration-success="state in ('approved', 'disbursed')"
+                      decoration-danger="is_overdue"
+                      decoration-muted="state in ('settled', 'cancelled')">
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="l10n_ou_analytic_id" optional="show"/>
+                    <field name="request_date"/>
+                    <field name="realization_deadline" optional="show"/>
+                    <field name="amount_requested" sum="Requested"/>
+                    <field name="amount_outstanding" sum="Outstanding"/>
+                    <field name="is_overdue" optional="hide"/>
+                    <field name="currency_id" column_invisible="1"/>
+                    <field name="state" widget="badge"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ===================== KANBAN (monitoring) ===================== -->
+        <record id="view_petty_cash_request_kanban" model="ir.ui.view">
+            <field name="name">petty.cash.request.kanban</field>
+            <field name="model">petty.cash.request</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="state" class="o_kanban_small_column">
+                    <field name="state"/>
+                    <field name="is_overdue"/>
+                    <templates>
+                        <t t-name="card">
+                            <div class="oe_kanban_card oe_kanban_global_click">
+                                <div class="o_kanban_record_top">
+                                    <strong><field name="name"/></strong>
+                                    <span t-if="record.is_overdue.raw_value" class="float-end badge text-bg-danger">Overdue</span>
+                                </div>
+                                <div><field name="employee_id"/></div>
+                                <div class="text-muted"><field name="l10n_ou_analytic_id"/></div>
+                                <div>
+                                    Outstanding: <field name="amount_outstanding"/>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- ===================== SEARCH ===================== -->
+        <record id="view_petty_cash_request_search" model="ir.ui.view">
+            <field name="name">petty.cash.request.search</field>
+            <field name="model">petty.cash.request</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="l10n_ou_analytic_id"/>
+                    <filter name="my_requests" string="My Requests"
+                            domain="[('employee_id.user_id', '=', uid)]"/>
+                    <separator/>
+                    <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                    <filter name="to_approve" string="To Approve" domain="[('state', '=', 'to_approve')]"/>
+                    <filter name="approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                    <filter name="disbursed" string="Disbursed"
+                            domain="[('state', 'in', ('disbursed', 'in_realization'))]"/>
+                    <filter name="settled" string="Settled" domain="[('state', '=', 'settled')]"/>
+                    <separator/>
+                    <filter name="overdue" string="Overdue" domain="[('is_overdue', '=', True)]"/>
+                    <filter name="outstanding" string="Outstanding"
+                            domain="[('state', 'in', ('disbursed', 'in_realization')), ('amount_outstanding', '!=', 0)]"/>
+                    <group>
+                        <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                        <filter name="group_ou" string="Operating Unit" context="{'group_by': 'l10n_ou_analytic_id'}"/>
+                        <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_petty_cash_request" model="ir.actions.act_window">
+            <field name="name">Petty Cash Requests</field>
+            <field name="res_model">petty.cash.request</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="search_view_id" ref="view_petty_cash_request_search"/>
+            <field name="context">{'search_default_my_requests': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create a petty cash request</p>
+            </field>
+        </record>
+    </data>
+</odoo>

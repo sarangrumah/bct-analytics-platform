@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_super_admin_root"
+              name="Super Admin"
+              sequence="1"
+              web_icon="custom_super_admin,static/description/icon.png"
+              groups="custom_super_admin.group_csm"/>
+
+    <menuitem id="menu_tenants"
+              name="Tenants"
+              parent="menu_super_admin_root"
+              action="action_tenant_registry"
+              sequence="10"/>
+
+    <menuitem id="menu_provision"
+              name="Provision New..."
+              parent="menu_super_admin_root"
+              action="action_tenant_provision_wizard"
+              sequence="20"
+              groups="custom_super_admin.group_super_admin"/>
+
+    <menuitem id="menu_backups"
+              name="Backups"
+              parent="menu_super_admin_root"
+              action="action_tenant_backup"
+              sequence="30"/>
+
+    <menuitem id="menu_action_log"
+              name="Action Log"
+              parent="menu_super_admin_root"
+              action="action_tenant_action_log"
+              sequence="40"/>
+
+    <menuitem id="menu_verify_chain"
+              name="Verify Chain Integrity"
+              parent="menu_super_admin_root"
+              action="action_verify_chain"
+              sequence="50"
+              groups="custom_super_admin.group_super_admin"/>
+
+    <menuitem id="menu_super_admin_settings"
+              name="Settings"
+              parent="menu_super_admin_root"
+              sequence="100"
+              action="base.res_config_setting_act_window"
+              groups="custom_super_admin.group_super_admin"/>
+
+</odoo>

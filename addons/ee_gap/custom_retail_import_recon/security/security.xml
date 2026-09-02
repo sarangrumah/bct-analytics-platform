@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Groups that share one res.groups.privilege render as a single pick-one
+     dropdown on the user form, so saving a user silently drops every other
+     module's group. Each module therefore declares its own privilege and only
+     shares the category, which is what keeps the selectors together in the
+     same section of the form. -->
+<odoo noupdate="1">
+
+    <record id="res_groups_privilege_retail_recon" model="res.groups.privilege">
+        <field name="name">Retail Import Reconciliation</field>
+        <field name="sequence">115</field>
+        <field name="category_id" ref="custom_core.module_category_custom_platform"/>
+    </record>
+
+    <!-- The report is read-only and carries no data of its own, so one group is
+         enough. Finance reaches it through the accounting groups in the ACL
+         instead, without needing this one assigned. -->
+    <record id="group_retail_recon_user" model="res.groups">
+        <field name="name">Retail Reconciliation / User</field>
+        <field name="privilege_id" ref="res_groups_privilege_retail_recon"/>
+        <field name="implied_ids" eval="[(4, ref('custom_retail_import.group_retail_import_user'))]"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,549 @@
+version: 2
+
+# ===========================================================================
+# Mart tests.
+#
+# `relationships` is on EVERY dimension foreign key, with no exceptions and no
+# `where` clauses. That is only possible because dim_partner, dim_product and
+# dim_operating_unit each carry an explicit unknown/unassigned member, so a NULL
+# source id still resolves to a real dimension row. The alternative - allowing
+# a NULL foreign key and excusing it from the test - is how a genuinely broken
+# key stops being noticed.
+#
+# `unique` is on the VERSION key of an SCD2 dimension, never on the durable key:
+# a dimension with history has many rows per entity by design.
+# ===========================================================================
+
+models:
+
+  # ---------------------------------------------------------------- dimensions
+  - name: dim_tenant
+    description: The tenant dimension, built from warehouse.tenant_registry.
+    columns:
+      - name: tenant_key
+        data_tests: [not_null, unique]
+      - name: tenant_id
+        data_tests: [not_null, unique]
+      - name: is_test_tenant
+        description: >-
+          True for a tenant that exists to exercise isolation rather than serve
+          a customer. Surfaced so no dashboard mistakes it for real volume.
+        data_tests: [not_null]
+
+  - name: dim_company
+    description: Legal entities. Type 1 - a rename overwrites.
+    columns:
+      - name: company_key
+        data_tests: [not_null, unique]
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: company_id
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, company_id]}
+
+  - name: dim_operating_unit
+    description: >-
+      Operating Units plus one synthetic UNASSIGNED member per tenant, for the
+      stock moves that have no picking and therefore no unit.
+    columns:
+      - name: operating_unit_key
+        data_tests: [not_null, unique]
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: operating_unit_id
+        data_tests: [not_null]
+      - name: operating_unit_code
+        data_tests: [not_null]
+      - name: is_unassigned
+        data_tests: [not_null]
+      - name: hierarchy_depth
+        description: Derived from Odoo's materialised parent_path; no recursive CTE needed.
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, operating_unit_id]}
+
+  - name: dim_biller
+    description: PPOB billers. sla_target_seconds here is the CURRENT target.
+    columns:
+      - name: biller_key
+        data_tests: [not_null, unique]
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: biller_category
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                  values: [electricity, water, telco, internet, insurance, multifinance, tax, other]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, biller_id]}
+
+  - name: dim_date
+    description: >-
+      Date dimension with the Indonesian fiscal calendar and national holidays.
+      Carries tenant_id like every other dimension, so RLS covers it too - a
+      shared calendar would be the one row in the star a cross-tenant join could
+      use as a bridge.
+    columns:
+      - name: date_key
+        data_tests: [not_null, unique]
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: date_day
+        data_tests: [not_null]
+      - name: fiscal_year
+        data_tests: [not_null]
+      - name: fiscal_quarter
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [1, 2, 3, 4], quote: false}
+      - name: is_national_holiday
+        data_tests: [not_null]
+      - name: is_business_day
+        data_tests: [not_null]
+      - name: holiday_is_estimated
+        description: >-
+          True when the holiday's Gregorian date is derived rather than fixed by
+          statute. Islamic, Saka, Chinese lunisolar and computed Christian dates
+          are all confirmed annually by SKB and can move by a day.
+        data_tests: [not_null]
+      - name: day_name_id
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [Senin, Selasa, Rabu, Kamis, Jumat, Sabtu, Minggu]}
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, date_day]}
+
+  - name: dim_partner
+    description: >-
+      SCD Type 2 partner dimension. partner_key is the durable key (many rows
+      per key by design); partner_version_key is unique per version.
+    columns:
+      - name: partner_version_key
+        data_tests: [not_null, unique]
+      - name: partner_key
+        data_tests: [not_null]
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: valid_from
+        data_tests: [not_null]
+      - name: valid_to
+        data_tests: [not_null]
+      - name: is_current
+        data_tests: [not_null]
+    data_tests:
+      # Exactly one current version per partner. This is the test that catches a
+      # broken SCD2 close-out, which otherwise shows up as double-counting in
+      # every report that joins the dimension without an as-of predicate.
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, partner_key, is_current]}
+
+  - name: dim_product
+    description: SCD Type 2 product dimension at the variant grain.
+    columns:
+      - name: product_version_key
+        data_tests: [not_null, unique]
+      - name: product_key
+        data_tests: [not_null]
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: valid_from
+        data_tests: [not_null]
+      - name: valid_to
+        data_tests: [not_null]
+      - name: is_current
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, product_key, is_current]}
+
+  # --------------------------------------------------------------------- facts
+  - name: fct_sale_order_line
+    description: "GRAIN: one sales order line. Section and note lines excluded."
+    columns:
+      - name: sale_order_line_key
+        data_tests: [not_null, unique]
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: date_day
+        data_tests: [not_null]
+      - name: partner_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_partner'), field: partner_key}
+      - name: product_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_product'), field: product_key}
+      - name: company_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_company'), field: company_key}
+      - name: operating_unit_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_operating_unit'), field: operating_unit_key}
+      - name: date_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_date'), field: date_key}
+      - name: order_state
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [draft, sent, sale, cancel]}
+      - name: price_subtotal
+        data_tests: [not_null]
+
+  - name: fct_account_move_line
+    description: >-
+      "GRAIN: one journal item. The table the debit == credit reconciliation is
+      asserted on, per day per tenant, at severity: error."
+    columns:
+      - name: account_move_line_key
+        data_tests: [not_null, unique]
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: date_day
+        data_tests: [not_null]
+      - name: partner_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_partner'), field: partner_key}
+      - name: product_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_product'), field: product_key}
+      - name: company_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_company'), field: company_key}
+      - name: operating_unit_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_operating_unit'), field: operating_unit_key}
+      - name: date_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_date'), field: date_key}
+      - name: parent_state
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [draft, posted, cancel]}
+      - name: account_type
+        description: >-
+          account.account.account_type. NULL on section and note lines, which
+          carry no account - preserved by a LEFT join, because an inner join
+          would drop them and silently change the set debit == credit is
+          asserted over.
+      - name: is_profit_and_loss
+        description: >-
+          True for income/expense accounts, false for balance sheet, NULL where
+          the line has no account. NULL rather than false on purpose: a section
+          line is neither, and false would file it under balance sheet by
+          omission.
+      - name: move_type
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                  values: [entry, out_invoice, out_refund, in_invoice, in_refund, out_receipt, in_receipt]
+      - name: debit
+        data_tests: [not_null]
+      - name: credit
+        data_tests: [not_null]
+
+  - name: fct_stock_move
+    description: "GRAIN: one stock move. Operating Unit resolved through the picking."
+    columns:
+      - name: stock_move_key
+        data_tests: [not_null, unique]
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: date_day
+        data_tests: [not_null]
+      - name: product_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_product'), field: product_key}
+      - name: company_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_company'), field: company_key}
+      - name: operating_unit_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_operating_unit'), field: operating_unit_key}
+      - name: date_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_date'), field: date_key}
+      - name: state
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [draft, waiting, confirmed, partially_available, assigned, done, cancel]}
+      - name: operating_unit_unassigned
+        description: >-
+          True for a move with no picking - an inventory adjustment, a scrap, or
+          manufacturing consumption. Nine of the seeded 248, carrying the largest
+          quantities in the dataset. Surfaced rather than dropped.
+        data_tests: [not_null]
+
+  - name: fct_pos_order_line
+    description: "GRAIN: one POS order line."
+    columns:
+      - name: pos_order_line_key
+        data_tests: [not_null, unique]
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: date_day
+        data_tests: [not_null]
+      - name: partner_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_partner'), field: partner_key}
+      - name: product_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_product'), field: product_key}
+      - name: operating_unit_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_operating_unit'), field: operating_unit_key}
+      - name: date_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_date'), field: date_key}
+      - name: order_state
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [draft, cancel, paid, done, invoiced]}
+
+  - name: fct_ppob_transaction
+    description: >-
+      "GRAIN: one PPOB transaction. commission_revenue is the ONLY revenue
+      figure here; pass_through_amount is money owed to the biller."
+    columns:
+      - name: ppob_transaction_key
+        data_tests: [not_null, unique]
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: date_day
+        data_tests: [not_null]
+      - name: state
+        description: custom_ppob's five-state machine; illegal transitions are refused in write().
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [draft, pending, success, failed, reversed]}
+      - name: biller_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_biller'), field: biller_key}
+      - name: partner_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_partner'), field: partner_key}
+      - name: product_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_product'), field: product_key}
+      - name: operating_unit_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_operating_unit'), field: operating_unit_key}
+      - name: date_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_date'), field: date_key}
+      - name: commission_revenue
+        description: The revenue of a PPOB row. Not `amount`, which is pass-through.
+        data_tests: [not_null]
+      - name: sla_breached
+        data_tests: [not_null]
+
+  # --------------------------------------------------------------------- marts
+  - name: mart_sales_daily
+    description: >-
+      "GRAIN: (tenant_id, date_day, operating_unit_id, company_id, partner_key,
+      product_key). Rolled up to the lowest grain contract 03 declares, so it can
+      answer its own contract without falling back to the fact."
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: date_day
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments:
+              combination_of_columns:
+                [tenant_id, date_day, operating_unit_id, company_id, partner_key, product_key]
+
+  - name: mart_revenue_daily
+    description: >-
+      "GRAIN: (tenant_id, date_day, operating_unit_id, company_id,
+      revenue_channel, partner_key, product_key). Three channels unioned rather
+      than summed: invoice, pos and ppob_commission are not the same kind of
+      money."
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: date_day
+        data_tests: [not_null]
+      - name: revenue_channel
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [invoice, pos, ppob_commission]}
+      - name: revenue_net
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments:
+              combination_of_columns:
+                [tenant_id, date_day, operating_unit_id, company_id, revenue_channel,
+                 partner_key, product_key]
+
+  - name: dim_product_cost
+    description: >-
+      "GRAIN: (tenant_id, product_key, company_id). Unit cost unpacked from
+      Odoo's company_dependent standard_price map. A separate model rather than
+      a column on dim_product because that is the grain the DATA has - putting
+      it on dim_product would mean either picking one company's cost and calling
+      it the cost, or exploding dim_product and breaking product_key uniqueness,
+      the SCD2 version key and every relationships test pointing at it."
+    columns:
+      - name: product_cost_key
+        data_tests: [not_null, unique]
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: product_key
+        description: Resolves against dim_product; many cost rows per product is expected.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_product'), field: product_key}
+      - name: company_id
+        description: >-
+          The company the cost belongs to, parsed from the jsonb map key. Never
+          NULL - a row only exists because a company key was present.
+        data_tests: [not_null]
+      - name: unit_cost
+        description: >-
+          Cost in the company's own currency. NOT list_price, which is the sales
+          price and would overstate inventory by the entire margin.
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, product_key, company_id]}
+
+  - name: mart_stock_position
+    description: >-
+      "GRAIN: (tenant_id, product_key, company_id, operating_unit_id). Net
+      position from completed moves, not from stock.quant - quant has no history
+      and a warehouse built on it can only answer 'how much now'."
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: product_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_product'), field: product_key}
+      - name: net_qty
+        data_tests: [not_null]
+      - name: has_unit_cost
+        description: >-
+          False when the product has no standard_price for this company, in
+          which case stock_valuation is NULL rather than 0. Carried so a
+          consumer can report how much of a position is unvalued instead of
+          summing over NULLs and presenting a partial total as a whole one.
+        data_tests: [not_null]
+      - name: stock_valuation
+        description: >-
+          net_qty * unit_cost, in company currency. NULL - not 0 - where the
+          cost is unknown. NULL means "we do not know what this is worth"; 0
+          would mean "this is worth nothing".
+    data_tests:
+      - unique_combination:
+          arguments:
+              combination_of_columns: [tenant_id, product_key, company_id, operating_unit_id]
+
+  - name: mart_ppob_transaction
+    description: >-
+      "GRAIN: (tenant_id, date_day, operating_unit_id, biller_key, state). The
+      60-second mart: ADR 0001 gives it the tightest SLA in the project and a
+      page on breach."
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: date_day
+        data_tests: [not_null]
+      - name: state
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [draft, pending, success, failed, reversed]}
+      - name: commission_revenue
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments:
+              combination_of_columns: [tenant_id, date_day, operating_unit_id, biller_key, state]
+
+  - name: recon_daily
+    description: >-
+      Per-tenant per-day comparison of the warehouse against a LIVE read of the
+      Odoo database through postgres_fdw. Lives in the `warehouse` schema, not
+      `marts`, because it is pipeline metadata rather than a published surface.
+    columns:
+      - name: tenant_id
+        data_tests: [not_null]
+      - name: date_day
+        data_tests: [not_null]
+      - name: check_name
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                  values:
+                    [sale_line_subtotal, journal_debit, journal_credit, journal_balance,
+                     stock_quantity, pos_line_subtotal, ppob_commission]
+      - name: passed
+        data_tests: [not_null]
+    data_tests:
+      - unique_combination:
+          arguments: {combination_of_columns: [tenant_id, date_day, check_name]}

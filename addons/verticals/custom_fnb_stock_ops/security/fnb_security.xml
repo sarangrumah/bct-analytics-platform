@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="res_groups_privilege_fnb_stock_ops" model="res.groups.privilege">
+            <field name="name">F&amp;B Stock Ops</field>
+            <field name="sequence">145</field>
+        </record>
+
+        <!-- Read forecasts and proposals; count stock. -->
+        <record id="group_fnb_user" model="res.groups">
+            <field name="name">F&amp;B Stock Ops / User</field>
+            <field name="privilege_id" ref="res_groups_privilege_fnb_stock_ops"/>
+            <field name="implied_ids" eval="[(4, ref('custom_esb_connector.group_esb_user'))]"/>
+        </record>
+
+        <!-- Maintain rules and, crucially, approve proposals — approval is what
+             authorises a document to be created in ESB. -->
+        <record id="group_fnb_planner" model="res.groups">
+            <field name="name">F&amp;B Stock Ops / Planner</field>
+            <field name="privilege_id" ref="res_groups_privilege_fnb_stock_ops"/>
+            <field name="implied_ids" eval="[(4, ref('group_fnb_user')), (4, ref('base.group_user'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+    </data>
+</odoo>

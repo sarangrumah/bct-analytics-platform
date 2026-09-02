@@ -1,0 +1,86 @@
+.o_hub_dashboard {
+    padding: 1.5rem;
+    background: var(--o-view-background-color);
+    color: var(--o-main-text-color);
+    min-height: 100%;
+
+    .o_hub_header {
+        margin-bottom: 1.5rem;
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+            color: var(--o-main-text-color);
+        }
+
+        p {
+            margin: 0;
+            color: var(--o-form-lighter-text-color, var(--o-main-text-color));
+            opacity: 0.85;
+        }
+    }
+
+    .o_hub_loading {
+        padding: 3rem;
+        text-align: center;
+        color: var(--o-form-lighter-text-color, var(--o-main-text-color));
+    }
+
+    .o_hub_tile_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+    }
+
+    .o_hub_tile {
+        padding: 1.25rem 1.5rem;
+        border-radius: 10px;
+        background: var(--o-component-background-color, var(--o-view-background-color));
+        color: var(--o-main-text-color);
+        border: 1px solid var(--border-color, rgba(128, 128, 128, 0.25));
+        border-left: 4px solid #7c5cff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+            border-color: var(--o-brand-primary, #7c5cff);
+        }
+
+        .o_hub_tile_label {
+            font-size: 0.85rem;
+            color: var(--o-main-text-color);
+            opacity: 0.75;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+
+        .o_hub_tile_value {
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: var(--o-main-text-color);
+            line-height: 1.2;
+        }
+
+        .o_hub_tile_sub {
+            font-size: 0.95rem;
+            font-weight: 400;
+            color: var(--o-main-text-color);
+            opacity: 0.7;
+            margin-left: 0.3rem;
+        }
+
+        &.o_hub_tile_tenants    { border-left-color: #4f46e5; }
+        &.o_hub_tile_modules    { border-left-color: #06b6d4; }
+        &.o_hub_tile_brd        { border-left-color: #f59e0b; }
+        &.o_hub_tile_incidents  { border-left-color: #ef4444; }
+        &.o_hub_tile_ai         { border-left-color: #10b981; }
+        &.o_hub_tile_hht        { border-left-color: #8b5cf6; }
+        &.o_hub_tile_audit      { border-left-color: #94a3b8; }
+    }
+}

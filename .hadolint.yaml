@@ -1,0 +1,49 @@
+# hadolint - Dockerfile linting policy.
+# Owner: Security agent. Enforced by the `hadolint` pre-commit hook and the `hadolint`
+# CI job over EVERY Dockerfile in the tree, not just the ones in the scan registry.
+#
+# IGNORE POLICY - enforced in code, not by convention
+#   Every id under `ignored:` MUST carry, in the contiguous comment block directly above
+#   it, both a `reason:` line and an `expires: YYYY-MM-DD` line. An entry with no reason,
+#   no expiry, or an expiry in the past FAILS `security/check_ignore_policy.py`, which
+#   runs as a pre-commit hook and as a CI step. An undated permanent ignore is not
+#   something this repository can express.
+#
+#   Prefer an inline `# hadolint ignore=DLxxxx` on the single offending line in the
+#   Dockerfile over a global entry here. A global ignore switches the rule off for every
+#   image the project will ever build, including images that do not exist yet.
+
+failure-threshold: warning
+
+ignored:
+  # reason: Style only, and information-level: consolidating consecutive RUN layers is a
+  #   review conversation about image size, not a security control. Left on as noise would
+  #   train agents to ignore hadolint output, which is the failure mode that matters.
+  # expires: 2027-02-28
+  # review-at: GATE 5 (CD), when image size becomes a deploy-time cost rather than a preference.
+  - DL3059
+
+  # reason: ShellCheck cannot follow a file that only exists inside the image at build time
+  #   (`. /opt/venv/bin/activate`, `. /etc/os-release`). The finding is unactionable by
+  #   construction - the sourced file is not in the build context for the linter to read.
+  #   This suppresses an unresolvable diagnostic, not a real class of defect.
+  # expires: 2027-02-28
+  # review-at: GATE 5, or sooner if hadolint gains build-context-aware source resolution.
+  - SC1091
+
+# Raise the rules that actually matter for this stack from warning to error, so they fail
+# the gate rather than scrolling past. These are the anti-patterns the master prompt names:
+# a root runtime user, an unpinned base image, and a pipeline whose failure is swallowed.
+override:
+  error:
+    - DL3002 # last USER must not be root - Platform-Infra brief item 1 requires non-root runtime
+    - DL3007 # do not use `latest` - PLAN.md pins every base image by sha256 digest
+    - DL3020 # use COPY, not ADD - ADD silently fetches URLs and unpacks archives
+    - DL4006 # set -o pipefail before a pipe, or a failing curl produces a "successful" layer
+    - DL3004 # do not use sudo inside a Dockerfile
+
+# Only these registries may appear in a FROM. An image from anywhere else is DL3026/error.
+# Adding a registry here is a supply-chain decision and goes through the Lead.
+trustedRegistries:
+  - docker.io
+  - ghcr.io

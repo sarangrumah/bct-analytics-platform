@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_coretax_config_user,coretax.config user (read),model_custom_coretax_config,group_user,1,0,0,0
+access_coretax_config_admin,coretax.config admin (full),model_custom_coretax_config,group_admin,1,1,1,1
+access_coretax_bupot_user,coretax.bupot user,model_custom_coretax_bukti_potong,group_user,1,1,1,0
+access_coretax_bupot_admin,coretax.bupot admin,model_custom_coretax_bukti_potong,group_admin,1,1,1,1
+access_coretax_export_wizard_user,coretax.export.wizard user,model_custom_coretax_export_wizard,group_user,1,1,1,1
+access_coretax_import_wizard_user,coretax.import.wizard user,model_custom_coretax_import_wizard,group_user,1,1,1,1
+access_coretax_sertel_wizard_admin,coretax.sertel.upload admin only,model_custom_coretax_sertel_upload_wizard,group_admin,1,1,1,1

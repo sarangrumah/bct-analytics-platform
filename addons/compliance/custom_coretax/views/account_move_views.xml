@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_move_form_inherit_coretax" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.coretax</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- Smart button: navigate to the linked formal Bukti Potong records -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_bukti_potong" type="object"
+                        class="oe_stat_button" icon="fa-scissors"
+                        groups="custom_coretax.group_user"
+                        invisible="x_custom_bukti_potong_count == 0">
+                    <field name="x_custom_bukti_potong_count" widget="statinfo"
+                           string="Bukti Potong"/>
+                </button>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Pajak (Coretax)" name="coretax"
+                      groups="account.group_account_invoice">
+                    <group>
+                        <group string="Faktur Pajak">
+                            <field name="x_custom_has_faktur_pajak"/>
+                            <field name="x_custom_nsfp"
+                                   placeholder="No. Faktur Pajak dari Coretax"/>
+                            <field name="x_custom_tanggal_faktur_pajak"/>
+                        </group>
+                        <group string="Bukti Potong (PPh)">
+                            <field name="x_custom_has_bukti_potong"/>
+                            <field name="x_custom_no_bukti_potong"/>
+                            <field name="x_custom_tanggal_bukti_potong"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Status DJP / Coretax">
+                            <field name="x_custom_coretax_status"/>
+                            <field name="x_custom_coretax_status_code"/>
+                            <field name="x_custom_coretax_submission_uuid"/>
+                            <field name="x_custom_coretax_response_attach_id"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- List/tree: surface the faktur/bupot columns on every invoice & bill
+         list. Inheriting the base `account.view_invoice_tree` is robust — in
+         Odoo 19 CE it is the parent of view_out_invoice_tree / view_in_invoice_*,
+         and its root element is <list>. We append the columns via an anchor on
+         the <list> root itself (NOT a named field) so the inherit never breaks
+         on field-name drift across CE builds. Columns are user-toggleable via
+         `optional`. -->
+    <record id="view_invoice_tree_inherit_coretax" model="ir.ui.view">
+        <field name="name">account.move.list.inherit.coretax</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_custom_has_faktur_pajak"
+                       string="Ada FP" optional="show"/>
+                <field name="x_custom_nsfp"
+                       string="No. Faktur Pajak" optional="show"/>
+                <field name="x_custom_has_bukti_potong"
+                       string="Ada Bupot" optional="hide"/>
+                <field name="x_custom_no_bukti_potong"
+                       string="No. Bukti Potong" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Pre-filtered shortcut to find invoices/bills still missing a Faktur
+         Pajak number (drives the bulk Import-update workflow). Implemented as a
+         window action + menu item (see menu_views.xml) instead of inheriting a
+         core search view, so it cannot break the `-u` upgrade if the core
+         search-view xmlid differs across CE builds. Any Invoicing user can also
+         filter on these stored fields directly via the list's custom filters. -->
+    <record id="action_coretax_invoices_need_faktur" model="ir.actions.act_window">
+        <field name="name">Faktur Pajak — Belum Lengkap</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')), ('state', '=', 'posted'), ('x_custom_has_faktur_pajak', '=', False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Semua invoice/bill yang sudah diposting memiliki Faktur Pajak.</p>
+            <p>Daftar ini menampilkan invoice/bill terposting yang belum diberi No. Faktur Pajak.
+               Isi nomor satu per satu di form, atau ekspor &amp; gunakan <b>Import update</b>
+               untuk pengisian massal.</p>
+        </field>
+    </record>
+
+</odoo>

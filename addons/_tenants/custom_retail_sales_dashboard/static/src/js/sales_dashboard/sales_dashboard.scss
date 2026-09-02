@@ -1,0 +1,663 @@
+// Sales Command Centre.
+//
+// Tokens rather than literals so the whole surface can be re-themed in one
+// place, and so the dark-mode block only has to restate colours — never layout.
+.o_lsd_dashboard {
+    --lsd-bg: #f8fafc;
+    --lsd-surface: #ffffff;
+    --lsd-border: #e2e8f0;
+    --lsd-text: #0f172a;
+    --lsd-muted: #64748b;
+    --lsd-faint: #f1f5f9;
+    --lsd-accent: #2563eb;
+    --lsd-up: #16a34a;
+    --lsd-down: #dc2626;
+    --lsd-warn: #f59e0b;
+
+    background: var(--lsd-bg);
+    color: var(--lsd-text);
+    padding: 16px;
+    height: 100%;
+    overflow: auto;
+    font-size: 13px;
+
+    // ---------------------------------------------------------------- header
+    .o_lsd_header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .o_lsd_title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
+
+    .o_lsd_subtitle {
+        color: var(--lsd-muted);
+        font-size: 12px;
+        margin-top: 2px;
+    }
+
+    .o_lsd_sep {
+        margin: 0 6px;
+        opacity: 0.5;
+    }
+
+    .o_lsd_header_actions {
+        display: flex;
+        gap: 8px;
+        flex: 0 0 auto;
+    }
+
+    // --------------------------------------------------------------- filters
+    .o_lsd_filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px 16px;
+        padding: 10px 12px;
+        background: var(--lsd-surface);
+        border: 1px solid var(--lsd-border);
+        border-radius: 8px;
+        margin-bottom: 14px;
+    }
+
+    .o_lsd_filter_group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        label {
+            margin: 0;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--lsd-muted);
+        }
+
+        input[type="date"],
+        select {
+            width: auto;
+            min-width: 130px;
+        }
+    }
+
+    .o_lsd_switch {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        font-size: 12px;
+        color: var(--lsd-muted);
+        cursor: pointer;
+    }
+
+    // Store multi-select. A plain checkbox list beats a tag widget here: the
+    // question is almost always "these three malls", and a list answers it in
+    // one glance without a search box.
+    .o_lsd_store_picker {
+        position: relative;
+    }
+
+    .o_lsd_dropdown {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        z-index: 20;
+        min-width: 260px;
+        max-height: 320px;
+        overflow-y: auto;
+        background: var(--lsd-surface);
+        border: 1px solid var(--lsd-border);
+        border-radius: 6px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+        padding: 6px;
+    }
+
+    .o_lsd_dropdown_head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+        text-transform: uppercase;
+        color: var(--lsd-muted);
+        padding: 2px 6px 6px;
+        border-bottom: 1px solid var(--lsd-border);
+        margin-bottom: 4px;
+    }
+
+    .o_lsd_dropdown_item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 6px;
+        margin: 0;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 400;
+
+        &:hover {
+            background: var(--lsd-faint);
+        }
+    }
+
+    // ---------------------------------------------------------------- states
+    .o_lsd_state {
+        padding: 24px;
+        text-align: center;
+        color: var(--lsd-muted);
+        background: var(--lsd-surface);
+        border: 1px solid var(--lsd-border);
+        border-radius: 8px;
+    }
+
+    .o_lsd_error {
+        color: var(--lsd-down);
+        text-align: left;
+    }
+
+    .o_lsd_empty {
+        padding: 16px;
+        text-align: center;
+        color: var(--lsd-muted);
+        font-style: italic;
+    }
+
+    // ---------------------------------------------------------------- target
+    .o_lsd_target {
+        background: var(--lsd-surface);
+        border: 1px solid var(--lsd-border);
+        border-radius: 8px;
+        padding: 12px 14px;
+        margin-bottom: 14px;
+    }
+
+    .o_lsd_target_empty {
+        color: var(--lsd-muted);
+        font-style: italic;
+    }
+
+    .o_lsd_target_head {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+    }
+
+    .o_lsd_target_label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--lsd-muted);
+    }
+
+    .o_lsd_target_value {
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .o_lsd_target_detail {
+        color: var(--lsd-muted);
+        font-size: 12px;
+    }
+
+    .o_lsd_target_track {
+        height: 8px;
+        border-radius: 4px;
+        background: var(--lsd-faint);
+        overflow: hidden;
+    }
+
+    .o_lsd_target_fill {
+        height: 100%;
+        background: var(--lsd-accent);
+        transition: width 0.3s ease;
+
+        &.is_ok {
+            background: var(--lsd-up);
+        }
+    }
+
+    // ------------------------------------------------------------------ KPIs
+    .o_lsd_kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .o_lsd_kpi {
+        background: var(--lsd-surface);
+        border: 1px solid var(--lsd-border);
+        border-radius: 8px;
+        padding: 10px 12px;
+    }
+
+    .o_lsd_kpi_label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--lsd-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .o_lsd_kpi_value {
+        font-size: 21px;
+        font-weight: 600;
+        line-height: 1.25;
+        margin: 2px 0;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .o_lsd_kpi_delta {
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+    }
+
+    .o_lsd_kpi_prev {
+        font-weight: 400;
+        color: var(--lsd-muted);
+    }
+
+    .o_lsd_delta_up { color: var(--lsd-up); }
+    .o_lsd_delta_down { color: var(--lsd-down); }
+    .o_lsd_delta_flat { color: var(--lsd-muted); }
+
+    // ----------------------------------------------------------------- cards
+    .o_lsd_card {
+        background: var(--lsd-surface);
+        border: 1px solid var(--lsd-border);
+        border-radius: 8px;
+        padding: 12px 14px;
+        margin-bottom: 14px;
+        min-width: 0; // let flex children shrink instead of overflowing the row
+    }
+
+    .o_lsd_card_head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 8px;
+
+        h3 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+    }
+
+    .o_lsd_row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+
+        > .o_lsd_card {
+            margin-bottom: 0;
+        }
+    }
+
+    .o_lsd_col_wide { flex: 2 1 480px; }
+    .o_lsd_col_narrow { flex: 1 1 300px; }
+    .o_lsd_col_third { flex: 1 1 320px; }
+
+    .o_lsd_row + .o_lsd_row,
+    .o_lsd_row + .o_lsd_card {
+        margin-top: 14px;
+    }
+
+    // ----------------------------------------------------------- trend chart
+    .o_lsd_legend {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 14px;
+        font-size: 11px;
+        color: var(--lsd-muted);
+        margin-bottom: 4px;
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        i {
+            width: 10px;
+            height: 3px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+    }
+
+    .o_lsd_legend_hint {
+        margin-left: auto;
+        font-style: italic;
+        opacity: 0.75;
+    }
+
+    .o_lsd_chart {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .o_lsd_grid {
+        stroke: var(--lsd-border);
+        stroke-width: 1;
+    }
+
+    .o_lsd_axis {
+        fill: var(--lsd-muted);
+        font-size: 10px;
+    }
+
+    .o_lsd_area {
+        fill: rgba(37, 99, 235, 0.10);
+    }
+
+    // Transparent hit strips: one per day, so the pointer never has to find a
+    // 4px marker to read a value off the line.
+    .o_lsd_hit {
+        fill: transparent;
+        cursor: pointer;
+
+        &:hover {
+            fill: rgba(37, 99, 235, 0.06);
+        }
+    }
+
+    .o_lsd_tooltip {
+        pointer-events: none;
+
+        rect {
+            fill: rgba(15, 23, 42, 0.92);
+        }
+    }
+
+    .o_lsd_tt_title {
+        fill: #f8fafc;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .o_lsd_tt_line {
+        font-size: 11px;
+        fill: #e2e8f0;
+
+        tspan[text-anchor="end"] {
+            fill: #f8fafc;
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    // ----------------------------------------------------------- store bars
+    .o_lsd_stores {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .o_lsd_store {
+        display: grid;
+        grid-template-columns: minmax(120px, 1.6fr) 3fr auto auto auto;
+        align-items: center;
+        gap: 10px;
+        padding: 5px 6px;
+        border-radius: 5px;
+        cursor: pointer;
+
+        &:hover {
+            background: var(--lsd-faint);
+        }
+    }
+
+    .o_lsd_store_name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .o_lsd_store_bar {
+        height: 10px;
+        background: var(--lsd-faint);
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .o_lsd_store_fill {
+        height: 100%;
+        border-radius: 5px;
+    }
+
+    .o_lsd_store_net,
+    .o_lsd_store_delta,
+    .o_lsd_store_attain {
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+        white-space: nowrap;
+        font-size: 12px;
+    }
+
+    .o_lsd_store_net { font-weight: 600; min-width: 92px; }
+    .o_lsd_store_delta { min-width: 64px; font-size: 11px; }
+
+    .o_lsd_store_attain {
+        min-width: 68px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 1px 6px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .o_lsd_attain_ok { background: rgba(22, 163, 74, 0.12); color: var(--lsd-up); }
+    .o_lsd_attain_near { background: rgba(245, 158, 11, 0.14); color: #b45309; }
+    .o_lsd_attain_behind { background: rgba(220, 38, 38, 0.10); color: var(--lsd-down); }
+    .o_lsd_attain_none { background: var(--lsd-faint); color: var(--lsd-muted); font-weight: 400; }
+
+    // ----------------------------------------------------------------- donut
+    .o_lsd_donut_wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .o_lsd_donut {
+        width: 168px;
+        height: 168px;
+        flex: 0 0 auto;
+    }
+
+    .o_lsd_donut_seg {
+        cursor: pointer;
+        transition: opacity 0.15s ease;
+
+        &:hover {
+            opacity: 0.75;
+        }
+    }
+
+    .o_lsd_donut_total {
+        font-size: 15px;
+        font-weight: 600;
+        fill: var(--lsd-text);
+    }
+
+    .o_lsd_donut_caption {
+        font-size: 10px;
+        fill: var(--lsd-muted);
+    }
+
+    .o_lsd_donut_legend {
+        flex: 1 1 150px;
+        min-width: 0;
+    }
+
+    .o_lsd_legend_row {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 3px 4px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+
+        &:hover {
+            background: var(--lsd-faint);
+        }
+
+        i {
+            width: 9px;
+            height: 9px;
+            border-radius: 2px;
+            flex: 0 0 auto;
+        }
+    }
+
+    .o_lsd_legend_name {
+        flex: 1 1 auto;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .o_lsd_legend_val {
+        color: var(--lsd-muted);
+        font-variant-numeric: tabular-nums;
+    }
+
+    // ---------------------------------------------------------- weekday bars
+    .o_lsd_dow {
+        display: flex;
+        align-items: flex-end;
+        gap: 6px;
+        height: 168px;
+    }
+
+    .o_lsd_dow_col {
+        flex: 1 1 0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        cursor: pointer;
+
+        &:hover .o_lsd_dow_bar {
+            opacity: 0.8;
+        }
+    }
+
+    .o_lsd_dow_bar_wrap {
+        flex: 1 1 auto;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .o_lsd_dow_bar {
+        width: 100%;
+        border-radius: 3px 3px 0 0;
+        min-height: 2px;
+    }
+
+    .o_lsd_dow_label {
+        text-align: center;
+        font-size: 10px;
+        color: var(--lsd-muted);
+        padding-top: 4px;
+    }
+
+    // -------------------------------------------------------------- calendar
+    .o_lsd_calendar {
+        width: 100%;
+        height: auto;
+        max-height: 170px;
+        display: block;
+    }
+
+    .o_lsd_cal_label {
+        font-size: 9px;
+        fill: var(--lsd-muted);
+    }
+
+    .o_lsd_cal_cell {
+        cursor: pointer;
+        stroke: rgba(15, 23, 42, 0.04);
+
+        &:hover {
+            stroke: var(--lsd-accent);
+            stroke-width: 1.5;
+        }
+    }
+
+    // ---------------------------------------------------------------- tables
+    .o_lsd_table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+
+        th {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--lsd-muted);
+            font-weight: 600;
+            padding: 4px 6px;
+            border-bottom: 1px solid var(--lsd-border);
+        }
+
+        td {
+            padding: 5px 6px;
+            border-bottom: 1px solid var(--lsd-faint);
+            vertical-align: top;
+            font-variant-numeric: tabular-nums;
+        }
+
+        tbody tr {
+            cursor: pointer;
+
+            &:hover {
+                background: var(--lsd-faint);
+            }
+        }
+    }
+
+    .o_lsd_cell_main {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 220px;
+    }
+
+    .o_lsd_cell_sub {
+        font-size: 10px;
+        color: var(--lsd-muted);
+    }
+}
+
+// Odoo's dark theme flips the shell but not inline colours, so restate only the
+// tokens. Layout is untouched by design — a theme should never move anything.
+.o_web_client.o_dark_mode .o_lsd_dashboard,
+.o_lsd_dashboard[data-theme="dark"] {
+    --lsd-bg: #0f172a;
+    --lsd-surface: #1e293b;
+    --lsd-border: #334155;
+    --lsd-text: #e2e8f0;
+    --lsd-muted: #94a3b8;
+    --lsd-faint: #273449;
+
+    .o_lsd_area { fill: rgba(59, 130, 246, 0.18); }
+    .o_lsd_donut_total { fill: var(--lsd-text); }
+    .o_lsd_cal_cell { stroke: rgba(226, 232, 240, 0.06); }
+}

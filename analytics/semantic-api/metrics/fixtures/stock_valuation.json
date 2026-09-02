@@ -1,0 +1,31 @@
+{
+  "metric": "stock_valuation",
+  "dimensions": [
+    "operating_unit_id"
+  ],
+  "rows": [
+    {
+      "operating_unit_id": 1,
+      "value": -104809000.0
+    },
+    {
+      "operating_unit_id": -1,
+      "value": 130400000000.0
+    },
+    {
+      "operating_unit_id": 2,
+      "value": -104562000.0
+    }
+  ],
+  "meta": {
+    "tenant_id": "bct",
+    "row_count": 3,
+    "last_refreshed_at": "2026-08-31T11:14:30.091922+00:00",
+    "is_stale": false,
+    "refresh_sla_seconds": 300,
+    "source_model": "mart_stock_position",
+    "unit": "IDR",
+    "type": "decimal",
+    "query_duration_ms": 9.3
+  }
+}

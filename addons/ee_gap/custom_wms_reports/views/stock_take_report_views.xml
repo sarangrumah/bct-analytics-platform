@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_stock_take_report_list" model="ir.ui.view">
+        <field name="name">custom.wms.stock.take.report.list</field>
+        <field name="model">custom.wms.stock.take.report</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <header>
+                    <button name="action_export_xlsx" type="object" string="Export XLSX (with barcode)"
+                            class="btn-primary"/>
+                </header>
+                <field name="session_id"/>
+                <field name="method" optional="show"/>
+                <field name="warehouse_id" optional="show"/>
+                <field name="scheduled_date" optional="hide"/>
+                <field name="counted_at" optional="show"/>
+                <field name="location_id"/>
+                <field name="default_code" optional="show"/>
+                <field name="product_id"/>
+                <field name="lot_id" optional="hide"/>
+                <field name="expected_qty" sum="Total System"/>
+                <field name="counted_qty" sum="Total Counted"/>
+                <field name="variance_qty" sum="Total Variance"/>
+                <field name="variance_pct" optional="show"/>
+                <field name="variance_value" sum="Total Variance Value"/>
+                <field name="status"/>
+                <field name="counter_user_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_stock_take_report_pivot" model="ir.ui.view">
+        <field name="name">custom.wms.stock.take.report.pivot</field>
+        <field name="model">custom.wms.stock.take.report</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="session_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="expected_qty" type="measure"/>
+                <field name="counted_qty" type="measure"/>
+                <field name="variance_qty" type="measure"/>
+                <field name="variance_value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_stock_take_report_search" model="ir.ui.view">
+        <field name="name">custom.wms.stock.take.report.search</field>
+        <field name="model">custom.wms.stock.take.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="session_id"/>
+                <field name="product_id"/>
+                <field name="default_code"/>
+                <field name="location_id"/>
+                <filter name="filter_variance" string="With Variance" domain="[('variance_qty', '!=', 0), ('status', '!=', 'pending')]"/>
+                <filter name="filter_spot_check" string="Spot Check" domain="[('method', '=', 'spot_check')]"/>
+                <filter name="filter_counted_at" date="counted_at"/>
+                <group>
+                    <filter name="group_session" string="Session" context="{'group_by': 'session_id'}"/>
+                    <filter name="group_method" string="Method" context="{'group_by': 'method'}"/>
+                    <filter name="group_warehouse" string="Warehouse" context="{'group_by': 'warehouse_id'}"/>
+                    <filter name="group_location" string="Location" context="{'group_by': 'location_id'}"/>
+                    <filter name="group_product" string="Product (SKU)" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_stock_take_report" model="ir.actions.act_window">
+        <field name="name">Stock Take Report</field>
+        <field name="res_model">custom.wms.stock.take.report</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="view_stock_take_report_search"/>
+        <field name="context">{'search_default_group_session': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">No stock take lines yet</p>
+            <p>Every cycle-count line with system vs counted quantities and
+               variance value. Print the PDF sheet from a session's Print menu.</p>
+        </field>
+    </record>
+
+    <record id="action_spot_check_report" model="ir.actions.act_window">
+        <field name="name">Spot Check Report</field>
+        <field name="res_model">custom.wms.stock.take.report</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="view_stock_take_report_search"/>
+        <field name="domain">[('method', '=', 'spot_check')]</field>
+        <field name="context">{'search_default_group_session': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">No spot checks yet</p>
+            <p>Create a cycle-count plan with method <b>Spot Check</b> and start
+               a session: a small random sample of bins is drawn to count.</p>
+        </field>
+    </record>
+
+</odoo>

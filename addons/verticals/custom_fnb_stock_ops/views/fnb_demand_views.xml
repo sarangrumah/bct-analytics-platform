@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Demand history -->
+    <record id="view_fnb_demand_history_list" model="ir.ui.view">
+        <field name="name">custom.fnb.demand.history.list</field>
+        <field name="model">custom.fnb.demand.history</field>
+        <field name="arch" type="xml">
+            <list string="Demand History" create="false">
+                <field name="date"/>
+                <field name="branch_id"/>
+                <field name="product_id"/>
+                <field name="qty" sum="Qty"/>
+                <field name="uom_name"/>
+                <field name="source" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fnb_demand_history_search" model="ir.ui.view">
+        <field name="name">custom.fnb.demand.history.search</field>
+        <field name="model">custom.fnb.demand.history</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+                <field name="branch_id"/>
+                <filter name="last_30" string="Last 30 Days"
+                        domain="[('date', '&gt;=', (context_today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <group>
+                    <filter name="group_branch" string="Branch" context="{'group_by': 'branch_id'}"/>
+                    <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_date" string="Date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fnb_demand_history" model="ir.actions.act_window">
+        <field name="name">Demand History</field>
+        <field name="res_model">custom.fnb.demand.history</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_fnb_demand_history_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No demand history yet</p>
+            <p>Daily material consumption per outlet, pulled from the ESB OMS material-usage
+            feed. ESB has already exploded it through the bill of materials, so these are
+            ingredient quantities, not dishes sold.</p>
+        </field>
+    </record>
+
+    <!-- Forecast -->
+    <record id="view_fnb_demand_forecast_list" model="ir.ui.view">
+        <field name="name">custom.fnb.demand.forecast.list</field>
+        <field name="model">custom.fnb.demand.forecast</field>
+        <field name="arch" type="xml">
+            <list string="Demand Forecast" create="false" decoration-muted="not reliable">
+                <field name="branch_id"/>
+                <field name="product_id"/>
+                <field name="method"/>
+                <field name="daily_qty" string="Forecast / Day"/>
+                <field name="demand_stdev" string="Std Dev" optional="show"/>
+                <field name="sample_days" string="Days"/>
+                <field name="mape" string="MAPE %" optional="show"/>
+                <field name="reliable"/>
+                <field name="computed_at" optional="hide"/>
+                <button name="action_recompute" type="object" icon="fa-refresh" string="Recompute"/>
+                <button name="action_compare_methods" type="object" icon="fa-balance-scale"
+                        string="Pick Best Method"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fnb_demand_forecast_search" model="ir.ui.view">
+        <field name="name">custom.fnb.demand.forecast.search</field>
+        <field name="model">custom.fnb.demand.forecast</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+                <field name="branch_id"/>
+                <filter name="unreliable" string="Not Enough History" domain="[('reliable', '=', False)]"/>
+                <filter name="high_error" string="High Error (MAPE &gt; 50%)" domain="[('mape', '&gt;', 50)]"/>
+                <group>
+                    <filter name="group_branch" string="Branch" context="{'group_by': 'branch_id'}"/>
+                    <filter name="group_method" string="Method" context="{'group_by': 'method'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fnb_demand_forecast" model="ir.actions.act_window">
+        <field name="name">Demand Forecast</field>
+        <field name="res_model">custom.fnb.demand.forecast</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_fnb_demand_forecast_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No forecasts yet</p>
+            <p>Forecasts are created automatically for every outlet/product pair that has
+            demand history. The default method is day-of-week seasonal, because F&amp;B demand
+            is dominated by which day it is. <b>MAPE</b> is the backtest error — use
+            <b>Pick Best Method</b> to let each product choose the method that fits it.</p>
+        </field>
+    </record>
+</odoo>

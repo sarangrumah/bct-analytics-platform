@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_sms_message_list" model="ir.ui.view">
+        <field name="name">custom.sms.message.list</field>
+        <field name="model">custom.sms.message</field>
+        <field name="arch" type="xml">
+            <list string="SMS Messages"
+                  decoration-success="state == 'delivered'"
+                  decoration-info="state == 'sent'"
+                  decoration-danger="state == 'failed'"
+                  decoration-muted="state == 'draft'">
+                <field name="create_date"/>
+                <field name="account_id"/>
+                <field name="to_phone"/>
+                <field name="to_partner_id"/>
+                <field name="purpose"/>
+                <field name="consent_verified" widget="boolean_toggle"/>
+                <field name="state" widget="badge"/>
+                <field name="sent_at"/>
+                <field name="provider_message_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_sms_message_form" model="ir.ui.view">
+        <field name="name">custom.sms.message.form</field>
+        <field name="model">custom.sms.message</field>
+        <field name="arch" type="xml">
+            <form string="SMS Message">
+                <header>
+                    <button name="action_send" type="object" string="Send"
+                            class="oe_highlight"
+                            invisible="state not in ('draft','queued','failed')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,queued,sent,delivered"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="account_id"/>
+                            <field name="to_partner_id"/>
+                            <field name="to_phone"/>
+                            <field name="purpose"/>
+                        </group>
+                        <group>
+                            <field name="consent_verified"/>
+                            <field name="sent_at"/>
+                            <field name="provider_message_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Body">
+                            <field name="body" placeholder="SMS body (160-char segments recommended)..."/>
+                        </page>
+                        <page string="Error" invisible="state != 'failed'">
+                            <field name="error_message"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_sms_message_search" model="ir.ui.view">
+        <field name="name">custom.sms.message.search</field>
+        <field name="model">custom.sms.message</field>
+        <field name="arch" type="xml">
+            <search string="SMS Messages">
+                <field name="to_phone"/>
+                <field name="to_partner_id"/>
+                <field name="account_id"/>
+                <field name="provider_message_id"/>
+                <filter name="draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="queued" string="Queued" domain="[('state','=','queued')]"/>
+                <filter name="failed" string="Failed" domain="[('state','=','failed')]"/>
+                <filter name="marketing" string="Marketing" domain="[('purpose','=','marketing')]"/>
+                <filter name="otp" string="OTP" domain="[('purpose','=','otp')]"/>
+                <filter name="no_consent" string="Consent Not Verified"
+                        domain="[('consent_verified','=',False)]"/>
+                <separator/>
+                <filter name="group_state" string="State" context="{'group_by':'state'}"/>
+                <filter name="group_purpose" string="Purpose" context="{'group_by':'purpose'}"/>
+                <filter name="group_account" string="Account" context="{'group_by':'account_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_sms_message" model="ir.actions.act_window">
+        <field name="name">SMS Messages</field>
+        <field name="res_model">custom.sms.message</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_sms_message_search"/>
+    </record>
+</odoo>

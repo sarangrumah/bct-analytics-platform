@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_account_payment_register_form_tenant_fx" model="ir.ui.view">
+        <field name="name">account.payment.register.form.tenant.fx</field>
+        <field name="model">account.payment.register</field>
+        <field name="inherit_id" ref="account.view_account_payment_register_form"/>
+        <field name="arch" type="xml">
+            <!--
+                Foreign-currency context at the top of the popup. Like the
+                invoice-header block, this deliberately carries no `groups`
+                attribute: the native currency selector next to Amount sits
+                behind base.group_multi_currency, so without this an ordinary
+                accounting user has no way to see that the IDR figure is a
+                conversion of a CNY residual.
+            -->
+            <xpath expr="//field[@name='currency_id'][1]" position="after">
+                <field name="x_fx_is_foreign" invisible="1"/>
+                <field name="x_fx_rate_missing" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//group[1]" position="before">
+                <div name="tenant_fx_payment_rate"
+                     class="alert alert-info d-flex flex-wrap align-items-center gap-5 py-2 px-3"
+                     role="status"
+                     invisible="not x_fx_is_foreign or x_fx_rate_missing">
+                    <div>
+                        <span class="text-muted small d-block">Open Amount (Document Currency)</span>
+                        <span class="fs-5 fw-bold">
+                            <field name="source_amount_currency" widget="monetary"
+                                   options="{'currency_field': 'source_currency_id'}"
+                                   readonly="1" class="oe_inline w-auto"/>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-muted small d-block">Exchange Rate</span>
+                        <span class="fw-bold d-flex align-items-center gap-1">
+                            <span>1</span>
+                            <field name="source_currency_id" readonly="1" options="{'no_open': True}" class="oe_inline w-auto"/>
+                            <span>=</span>
+                            <field name="x_fx_rate_payment_per_unit" readonly="1" digits="[16,4]" class="oe_inline w-auto"/>
+                            <field name="currency_id" readonly="1" options="{'no_open': True}" class="oe_inline w-auto"/>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-muted small d-block">Amount Below Settles</span>
+                        <span class="fw-bold">
+                            <field name="x_fx_amount_source" widget="monetary"
+                                   options="{'currency_field': 'source_currency_id'}"
+                                   readonly="1" class="oe_inline w-auto"/>
+                        </span>
+                    </div>
+                </div>
+
+                <div name="tenant_fx_payment_rate_missing"
+                     class="alert alert-danger py-2 px-3"
+                     role="alert"
+                     invisible="not x_fx_is_foreign or not x_fx_rate_missing">
+                    <span class="fw-bold">No exchange rate is defined for</span>
+                    <field name="source_currency_id" readonly="1" options="{'no_open': True}" class="oe_inline w-auto fw-bold"/>
+                    <span class="fw-bold">in this company.</span>
+                    <span>
+                        The amount proposed below is therefore the raw
+                        foreign-currency figure converted 1:1, which is wrong.
+                        Add the rate under Accounting &#8594; Configuration &#8594;
+                        Currencies before creating this payment.
+                    </span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

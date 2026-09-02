@@ -1,0 +1,223 @@
+# Semgrep - the frozen contracts, expressed as rules.
+# Owner: Security agent, who is the authority on contracts 01 and 02 (brief, "Read first").
+#
+# Contracts 01 (PDP field classification) and 02 (session) are prose. Prose is reviewed at
+# a gate, once, by whoever is paying attention that day. These rules make the two clauses
+# that actually carry the risk checkable on every commit, in every wave, by everyone:
+#
+#   contract 02 - tenant_id comes from the verified token and from nowhere else
+#   contract 02 - JWT verification is pinned to RS256; alg:none and HS256 confusion are out
+#   contract 01 - a `secret`-class column is never selected, so it cannot land in raw_
+#
+# These fire on code that does not exist yet (login-gateway, semantic-api, the CDC loader).
+# That is deliberate. A rule written after the code is a rule shaped to fit the code.
+
+rules:
+  # --------------------------------------------------------------------------------
+  # Contract 02: tenant_id is never taken from a request header, query string, cookie
+  # or body. "Never" is the contract's own word. This is the whole of multi-tenant
+  # isolation - a tenant_id the caller can choose is not an isolation boundary.
+  # --------------------------------------------------------------------------------
+  - id: bct-contract02-tenant-id-from-request
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      tenant_id derived from caller-controlled input. Contract 02: "Never taken from a
+      request header, query string, cookie or request body. Only from the verified token."
+      Read it from the verified JWT claims object instead. If this looks like a false
+      positive because the value is later validated against the token, it still fails -
+      the contract is about provenance, not about eventual agreement.
+    metadata:
+      category: security
+      cwe: "CWE-639: Authorization Bypass Through User-Controlled Key"
+      contract: docs/agents/contracts/02-session.md
+      owner: Security
+    patterns:
+      - pattern-either:
+          - pattern: $REQ.headers[$K]
+          - pattern: $REQ.headers.get($K)
+          - pattern: $REQ.query[$K]
+          - pattern: $REQ.body[$K]
+          - pattern: $REQ.cookies[$K]
+          - pattern: $REQ.cookies.get($K)
+          - pattern: $REQ.nextUrl.searchParams.get($K)
+          - pattern: $REQ.searchParams.get($K)
+          - pattern: headers().get($K)
+          - pattern: cookies().get($K)
+      - metavariable-regex:
+          metavariable: $K
+          regex: (?i)^["'](x-)?(tenant|tenant[-_]?id|db|database|company[-_]?id|ou|operating[-_]?unit)["']$
+
+  - id: bct-contract02-tenant-id-from-request-python
+    languages: [python]
+    severity: ERROR
+    message: >-
+      tenant_id derived from caller-controlled input. Contract 02 permits exactly one
+      source: the verified token. In the CDC loader and semantic-api this is also the
+      difference between an RLS session variable that means something and one that does not.
+    metadata:
+      category: security
+      cwe: "CWE-639: Authorization Bypass Through User-Controlled Key"
+      contract: docs/agents/contracts/02-session.md
+      owner: Security
+    patterns:
+      - pattern-either:
+          - pattern: $REQ.headers[$K]
+          - pattern: $REQ.headers.get($K)
+          - pattern: $REQ.args.get($K)
+          - pattern: $REQ.query_params[$K]
+          - pattern: $REQ.query_params.get($K)
+          - pattern: $REQ.cookies.get($K)
+          - pattern: $REQ.json[$K]
+      - metavariable-regex:
+          metavariable: $K
+          regex: (?i)^["'](x-)?(tenant|tenant_id|tenant-id|db|database|company_id|allowed_ou)["']$
+
+  # --------------------------------------------------------------------------------
+  # Contract 02: RS256, pinned. `alg: none` and HS256 confusion are named in the
+  # contract as rejected outright, because both let a verifier be talked into
+  # accepting a token the gateway never signed.
+  # --------------------------------------------------------------------------------
+  - id: bct-contract02-jwt-verify-without-algorithm-pin
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      jwt.verify() without an explicit algorithms allowlist. Contract 02 pins RS256. Left
+      open, a verifier holding the JWKS public key will accept an HS256 token signed WITH
+      that public key - the classic algorithm-confusion forgery. Pass
+      { algorithms: ["RS256"] }.
+    metadata:
+      category: security
+      cwe: "CWE-347: Improper Verification of Cryptographic Signature"
+      contract: docs/agents/contracts/02-session.md
+      owner: Security
+    patterns:
+      - pattern-either:
+          - pattern: jwt.verify($T, $K)
+          - pattern: jsonwebtoken.verify($T, $K)
+          - pattern: $J.verify($T, $K)
+      - pattern-not: "jwt.verify($T, $K, {..., algorithms: [...], ...})"
+      - pattern-not: "$J.verify($T, $K, {..., algorithms: [...], ...})"
+
+  - id: bct-contract02-jwt-weak-algorithm
+    languages: [typescript, javascript, python]
+    severity: ERROR
+    message: >-
+      A non-RS256 algorithm is accepted. Contract 02 pins RS256 for one reason: the
+      gateway holds the private key and every verifier holds only the public key, so no
+      verifier can mint a token. Accepting HS256 or none returns that power to whoever
+      can reach the verifier.
+    metadata:
+      category: security
+      cwe: "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"
+      contract: docs/agents/contracts/02-session.md
+      owner: Security
+      exception: >-
+        A verifier is only proven to reject `alg: none` by a test that MINTS an
+        `alg: none` token. On the first real CI run this rule blocked exactly that -
+        analytics/semantic-api/tests/test_auth.py:113 - which would have pressured
+        Backend into deleting a negative security test to make the gate go green. A rule
+        that destroys the control it exists to protect is worse than no rule. The
+        carve-out below is rule-scoped, matching bct-contract01-masking-salt-hardcoded;
+        it is NOT a .semgrepignore entry, which would exempt those paths from every rule
+        at once. A weak algorithm configured in NON-test code is still blocking, and a
+        genuine exception outside a test path is suppressed line-by-line with
+        `# nosemgrep: bct-contract02-jwt-weak-algorithm - <reason>`.
+    paths:
+      exclude:
+        - "*_test.py"
+        - "test_*.py"
+        - "**/tests/**"
+        - "*.test.ts"
+        - "*.spec.ts"
+    pattern-regex: (?i)algorithms?\s*[:=]\s*\[?\s*["'](none|hs256|hs384|hs512)["']
+
+  - id: bct-contract02-jwt-verification-disabled
+    languages: [typescript, javascript, python]
+    severity: ERROR
+    message: >-
+      Signature verification switched off. A decoded-but-unverified JWT is a string the
+      caller wrote, including every claim the whole authorisation model depends on -
+      tenant_id, roles and allowed_ou.
+    metadata:
+      category: security
+      cwe: "CWE-347: Improper Verification of Cryptographic Signature"
+      contract: docs/agents/contracts/02-session.md
+      owner: Security
+    pattern-either:
+      - pattern-regex: verify_signature["']?\s*:\s*False
+      - pattern-regex: '"verify_signature"\s*:\s*false'
+      - pattern: 'jwt.decode($T, options={"verify_signature": False})'
+      - pattern: jwt.decode($T, ..., verify=False, ...)
+
+  # --------------------------------------------------------------------------------
+  # Contract 01: a `secret`-class column is dropped at extraction - "the column is
+  # never selected", so it is structurally incapable of landing in the warehouse
+  # (master prompt anti-pattern 7.9). SELECT * defeats that by construction: it
+  # selects whatever exists today plus whatever anyone adds tomorrow.
+  # --------------------------------------------------------------------------------
+  - id: bct-contract01-select-star-from-odoo-source
+    languages: [python]
+    severity: ERROR
+    message: >-
+      SELECT * against an Odoo source table in the extraction path. Contract 01 requires
+      `secret`-class columns to be dropped at extraction by never being selected, and
+      requires the loader to hard-fail on an unclassified column. A wildcard select
+      cannot do either - it silently picks up res_users.password and every column added
+      after this code was written. Enumerate the columns from the classification map.
+    metadata:
+      category: security
+      cwe: "CWE-200: Exposure of Sensitive Information"
+      contract: docs/agents/contracts/01-classification.md
+      owner: Security
+    pattern-regex: (?i)select\s+\*\s+from\s+(res_partner|res_users|res_company|account_move|account_move_line|sale_order|sale_order_line|stock_move|pos_order|pos_order_line|product_template|product_product|ppob_transaction)
+
+  - id: bct-contract01-masking-salt-hardcoded
+    languages: [python, typescript, javascript]
+    severity: ERROR
+    message: >-
+      The per-tenant masking salt is a literal. Contract 01: the salt "lives in SOPS
+      (WAREHOUSE_MASK_SALT_<TENANT>), never in a file, never in git". A salt in the
+      repository makes every `personal` and `sensitive` hash reversible by anyone who can
+      read the repository, which is the entire point of the control.
+    metadata:
+      category: security
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+      contract: docs/agents/contracts/01-classification.md
+      owner: Security
+      exception: >-
+        Known-answer test vectors need a fixed salt. The `paths.exclude` below carves out
+        test files for THIS rule only - a rule-scoped carve-out, not a .semgrepignore
+        entry, which would exempt those paths from every rule at once. A KAT vector
+        outside a test path is suppressed line-by-line with
+        `# nosemgrep: bct-contract01-masking-salt-hardcoded - synthetic salt, KAT vector`.
+    paths:
+      exclude:
+        - "*_test.py"
+        - "test_*.py"
+        # `*/tests/*` is deprecated: Semgrepignore v2 will read it as ANCHORED
+        # (`/*/tests/*`), silently narrowing this carve-out to one directory level below
+        # the repo root. semgrep warns about it on every run today. `**/tests/**` keeps
+        # the intended unanchored meaning under both the old and the new semantics.
+        - "**/tests/**"
+        - "*.test.ts"
+        - "*.spec.ts"
+    patterns:
+      - pattern-either:
+          - pattern-regex: (?i)(mask_salt|masking_salt|pdp_salt|tenant_salt)\s*[:=]\s*["'][^"']{4,}["']
+      - pattern-not-regex: (?i)(mask_salt|masking_salt|pdp_salt|tenant_salt)\s*[:=]\s*["'](changeme|)["']
+
+  - id: bct-contract01-personal-field-in-log
+    languages: [python, typescript, javascript]
+    severity: WARNING
+    message: >-
+      A `personal`-class field looks like it is being logged. Under UU 27/2022 the log is
+      a second, unmasked copy of personal data with a different retention policy and a
+      wider audience than the warehouse it was so carefully masked for. Log the hashed
+      value or the record id.
+    metadata:
+      category: security
+      cwe: "CWE-532: Insertion of Sensitive Information into Log File"
+      contract: docs/agents/contracts/01-classification.md
+      owner: Security
+    pattern-regex: (?i)(logger|log|console)\.(debug|info|warn|warning|error)\([^)]*\b(partner\.name|partner_name|\.email|customer_ref|nik|npwp|ktp)\b

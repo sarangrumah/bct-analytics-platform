@@ -1,0 +1,230 @@
+# ======================================================================================
+# SCAN TARGET REGISTRY - the single source of truth for what CI scans.
+#
+#   *** THIS FILE IS THE EXTENSION POINT. ***
+#
+# To get a new image or Node service scanned you add ONE entry here. You do not edit
+# .github/workflows/ci.yml - the container-scan, sca-node and hadolint matrices are built
+# from this file at run time by security/scan_targets.py.
+#
+# Owner: Security agent (docs/agents/PLAN.md roster; master prompt 2.1 - Security owns
+# .github/workflows/**). DWH, Backend and Frontend request an entry through the Lead.
+#
+# --------------------------------------------------------------------------------------
+# HOW TO REGISTER A NEW IMAGE - send the Lead exactly this, and nothing else:
+#
+#     - name: my-service                  # the scan job's display name; must be unique
+#       dockerfile: my-service/Dockerfile # path from the repo root
+#       context: my-service               # docker build context
+#       owner: Backend                    # the agent accountable for its findings
+#       wave: 3                           # PLAN.md wave it lands in
+#       status: pending                   # pending until the Dockerfile exists, then present
+#
+# HOW TO REGISTER A NEW NODE PROJECT (npm audit + OSV-Scanner + CycloneDX SBOM):
+#
+#     - name: my-service
+#       path: my-service                  # directory holding package.json
+#       owner: Backend
+#       wave: 3
+#       status: pending
+#
+# --------------------------------------------------------------------------------------
+# WHAT `status` MEANS, AND WHY IT CANNOT BE USED TO HIDE AN IMAGE
+#
+#   present + path exists   -> scanned. Normal case.
+#   pending + path missing  -> SKIPPED, and the skip is printed to the job summary with
+#                              its owner and wave. It is never silently absent: master
+#                              prompt 5.2 says no new image ships unscanned, and an image
+#                              that quietly disappears from a matrix is how that happens.
+#   pending + path exists   -> SCANNED ANYWAY, plus a loud registry-drift warning telling
+#                              the Lead to flip the status. Landing an image never buys
+#                              you a scan-free window.
+#   present + path missing  -> HARD FAIL. Either the path is wrong or an image was deleted
+#                              without deregistering it.
+#   unregistered Dockerfile or package.json anywhere in the tree -> HARD FAIL.
+#                              This is the control that makes the registry trustworthy.
+#                              Verify locally before you push: python3 security/scan_targets.py --check
+# ======================================================================================
+
+schema_version: 1
+
+images:
+  - name: odoo
+    dockerfile: odoo/Dockerfile
+    context: odoo
+    owner: Platform-Infra
+    wave: 1
+    status: present
+    notes: Odoo 19 CE runtime. Base image digest-pinned in PLAN.md.
+
+  - name: analytics/dbt
+    dockerfile: analytics/dbt/Dockerfile
+    context: analytics/dbt
+    owner: Data-Warehouse
+    wave: 3
+    status: present
+    notes: dbt runner. Also gates the dbt-ci job, which stays disabled until this exists.
+
+  - name: analytics/cdc
+    dockerfile: analytics/cdc/Dockerfile
+    context: analytics/cdc
+    owner: Backend
+    wave: 3
+    status: present
+    notes: >-
+      CDC loader. Registered by Security on 2026-08-31 when the coverage guard failed on
+      it as an unregistered image - the control working as designed rather than a request
+      arriving first. Base pinned to the PLAN.md python:3.12-slim digest; runs as numeric
+      UID 10001. This is the process that applies contract 01 masking, so its findings are
+      release-blocking regardless of severity score: a compromise here reads unmasked
+      personal data before it is ever hashed.
+
+  - name: semantic-api
+    dockerfile: analytics/semantic-api/Dockerfile
+    context: analytics/semantic-api
+    owner: Backend
+    wave: 3
+    status: present
+    notes: >-
+      Language not yet decided by the Backend agent. If it ships a package.json it must
+      ALSO be added to node_projects below - the coverage check fails on an unregistered
+      package.json, so that decision cannot be made silently.
+
+  - name: login-gateway
+    dockerfile: login-gateway/Dockerfile
+    context: login-gateway
+    owner: Backend
+    wave: 3
+    status: present
+    notes: >-
+      Holds the RS256 signing key (contract 02). Highest-value image in the stack; its
+      findings are release-blocking regardless of severity score.
+
+  - name: hub-portal
+    dockerfile: hub-portal/Dockerfile
+    context: hub-portal
+    owner: Frontend
+    wave: 4
+    status: present
+
+  - name: marketing-site
+    dockerfile: marketing-site/Dockerfile
+    context: marketing-site
+    owner: Frontend
+    wave: 4
+    status: present
+
+  - name: ai-gateway
+    dockerfile: ai-gateway/Dockerfile
+    context: ai-gateway
+    owner: Backend
+    wave: 3
+    status: present
+
+  - name: tenant-orchestrator
+    dockerfile: tenant-orchestrator/Dockerfile
+    context: tenant-orchestrator
+    owner: Backend
+    wave: 3
+    status: present
+
+  - name: insight-portal
+    dockerfile: insight-portal/Dockerfile
+    context: insight-portal
+    owner: Frontend
+    wave: 4
+    status: present
+    notes: >-
+      Next.js BFF. Server-side session verification only; no token reaches the browser.
+      Flipped pending -> present by Security on 2026-08-31: the Dockerfile had landed and
+      the drift warning was firing on every run. It was already being scanned; the flip
+      makes a later disappearance a hard failure instead of a silent skip.
+
+node_projects:
+  - name: hub-portal
+    path: hub-portal
+    owner: Frontend
+    wave: 4
+    status: present
+
+  - name: marketing-site
+    path: marketing-site
+    owner: Frontend
+    wave: 4
+    status: present
+
+  - name: insight-portal
+    path: insight-portal
+    owner: Frontend
+    wave: 4
+    status: present
+
+python_projects:
+  - name: login-gateway
+    path: login-gateway
+    owner: Backend
+    wave: 3
+    status: present
+
+  - name: semantic-api
+    path: analytics/semantic-api
+    owner: Backend
+    wave: 3
+    status: present
+
+  - name: analytics-cdc
+    path: analytics/cdc
+    owner: Backend
+    wave: 3
+    status: present
+
+  - name: analytics-dbt
+    path: analytics/dbt
+    owner: Data-Warehouse
+    wave: 3
+    status: present
+
+# ======================================================================================
+# CI FIXTURES - the expiry control for a declared skip inside a workflow.
+#
+# A GitHub Actions `run:` step has exactly two outcomes, so a step that legitimately skips
+# cannot be given an exit code distinct from a pass (PLAN.md instance 11: a skip must never
+# share an exit code with a pass). The skip itself is honest; what it lacks is an END. A
+# fixture that lands and is later moved or deleted returns its job to a permanent, silent,
+# green skip, and nothing in that job can tell.
+#
+# So the expiry lives here instead, checked by `discover`, which every CI run executes and
+# which `ci-gate` requires. Same three-state semantics as an image:
+#
+#   pending + missing  -> the consumer job skips and reports why. Normal, pre-delivery.
+#   pending + present  -> the consumer job RUNS it, plus a loud drift warning to flip this.
+#   present + missing  -> HARD FAIL. This is the state the whole section exists for.
+# ======================================================================================
+ci_fixtures:
+  - name: dbt-ci-fixture
+    path: scripts/analytics/dbt-ci-fixture.sh
+    consumer: ci.yml dbt-ci tier 3
+    owner: Data-Warehouse + QA
+    wave: 5
+    status: pending
+    notes: >-
+      Must seed the raw_* source tables so `dbt build` has data, be idempotent, and exit
+      non-zero on failure. It does NOT need the executable bit: ci.yml invokes it as
+      `bash <path>`, deliberately, because every file in scripts/analytics/ is committed
+      100644 (this host is Windows with core.filemode=false) and the guard used to test
+      -x. That guard would have skipped a delivered fixture while reporting that the file
+      did not exist. Flip status to present the day it lands.
+
+# Paths excluded from the unregistered-artefact sweep. Each needs a reason. These are
+# directories that cannot contain a shippable artefact, not a way to hide one.
+coverage_exclusions:
+  - path: .git
+    reason: Git object database, not source.
+  - path: node_modules
+    reason: Vendored dependencies. Scanned as dependencies by sca-node, not as projects.
+  - path: .venv
+    reason: Local virtualenv, never committed.
+  - path: tests/fixtures
+    reason: >-
+      QA fixture Dockerfiles used to assert that the scanner itself fails correctly. If a
+      fixture ever becomes a shipped image it must be registered above like any other.

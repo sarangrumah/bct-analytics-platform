@@ -1,0 +1,71 @@
+# ---------------------------------------------------------------------------
+# Promtail — ships this project's container logs into Loki.
+#
+# SCOPE. This host also runs odoo19-platform-*, odoo19-analytics-* and
+# smart-warga-*. Promtail sees every container through the Docker socket, so it
+# is filtered explicitly to compose project odoo19-bct. Without that filter it
+# would silently ingest three unrelated production-ish stacks' logs into this
+# project's Loki, which is both noise and a data-handling problem.
+# ---------------------------------------------------------------------------
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+  log_level: warn
+
+positions:
+  filename: /tmp/promtail/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    # Docker restarts are routine; without a backoff a Loki restart drops a
+    # window of logs.
+    backoff_config:
+      min_period: 500ms
+      max_period: 5m
+      max_retries: 10
+
+scrape_configs:
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 15s
+        filters:
+          # THE SCOPE FILTER. Only containers belonging to this compose project.
+          - name: label
+            values: ["com.docker.compose.project=odoo19-bct"]
+
+    relabel_configs:
+      - source_labels: ["__meta_docker_container_name"]
+        regex: "/(.*)"
+        target_label: container
+      - source_labels: ["__meta_docker_container_label_com_docker_compose_service"]
+        target_label: service
+      - source_labels: ["__meta_docker_container_label_com_docker_compose_project"]
+        target_label: project
+      - target_label: job
+        replacement: docker
+
+    pipeline_stages:
+      # Odoo's log line format: "2026-08-31 03:41:08,510 1 INFO bct module: msg"
+      # Parsing it gives a `level` label, which is what makes
+      # {service="odoo", level="ERROR"} a useful query rather than a grep.
+      - match:
+          selector: '{service="odoo"}'
+          stages:
+            - regex:
+                expression: '^(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) (?P<pid>\d+) (?P<level>[A-Z]+) (?P<db>\S+) (?P<logger>\S+):'
+            - labels:
+                level:
+                db:
+      # Postgres: "2026-08-31 03:26:51.737 UTC [42] LOG:  checkpoint complete"
+      - match:
+          selector: '{service="postgres"}'
+          stages:
+            - regex:
+                expression: '^(?P<ts>\S+ \S+ \S+) \[(?P<pid>\d+)\] (?P<level>[A-Z]+):'
+            # The trailing colon is load-bearing: the `labels` stage takes a
+            # MAP of label -> optional source. A bare `level` parses as a
+            # string and promtail refuses to start with
+            # "invalid labels stage config: '' expected a map, got 'string'".
+            - labels:
+                level:

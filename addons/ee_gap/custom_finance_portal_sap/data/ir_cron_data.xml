@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Master-data sync from SAP. Disabled by default: enable per tenant once a
+         finance_sap_bridge custom.adapter.config is live. "Scheduler by day"
+         cadence per the requirement. -->
+    <record id="cron_sync_sap_masters" model="ir.cron">
+        <field name="name">Finance Portal: sync SAP master data</field>
+        <field name="model_id" ref="model_finance_sync_log"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_sync_sap_masters()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="False"/>
+    </record>
+
+    <!-- Travel mirror from HRIS. Disabled by default. -->
+    <record id="cron_sync_hris_travel" model="ir.cron">
+        <field name="name">Finance Portal: sync HRIS travel</field>
+        <field name="model_id" ref="model_finance_sync_log"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_sync_hris_travel()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

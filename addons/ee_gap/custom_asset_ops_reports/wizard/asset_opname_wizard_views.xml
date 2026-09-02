@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_asset_opname_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.asset.opname.wizard.form</field>
+        <field name="model">custom.report.asset.opname.wizard</field>
+        <field name="arch" type="xml">
+            <form string="General Report Aset (Opname)">
+                <group>
+                    <group>
+                        <field name="state"/>
+                    </group>
+                    <group>
+                        <field name="company_ids" widget="many2many_tags"/>
+                        <field name="group_ids" widget="many2many_tags"/>
+                        <field name="location_ids" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view" type="object" class="btn-primary"/>
+                    <button string="Export Excel" name="action_export_xlsx" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_asset_opname_wizard" model="ir.actions.act_window">
+        <field name="name">General Report Aset (Opname)</field>
+        <field name="res_model">custom.report.asset.opname.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

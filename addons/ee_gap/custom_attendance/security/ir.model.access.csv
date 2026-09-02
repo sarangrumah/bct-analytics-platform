@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_attendance_geofence_user,attendance.geofence user,model_attendance_geofence,custom_attendance.group_user,1,0,0,0
+access_attendance_geofence_manager,attendance.geofence manager,model_attendance_geofence,custom_attendance.group_manager,1,1,1,1
+access_custom_attendance_overtime_rule_user,custom.attendance.overtime.rule user,model_custom_attendance_overtime_rule,custom_attendance.group_user,1,0,0,0
+access_custom_attendance_overtime_rule_manager,custom.attendance.overtime.rule manager,model_custom_attendance_overtime_rule,custom_attendance.group_manager,1,1,1,1

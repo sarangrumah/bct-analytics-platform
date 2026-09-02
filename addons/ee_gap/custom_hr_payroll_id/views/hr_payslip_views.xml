@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_payslip_list" model="ir.ui.view">
+        <field name="name">hr.payslip.list</field>
+        <field name="model">hr.payslip</field>
+        <field name="arch" type="xml">
+            <list string="Payslips" decoration-info="state == 'computed'"
+                  decoration-success="state == 'paid'"
+                  decoration-muted="state == 'draft'">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="period_year"/>
+                <field name="period_month"/>
+                <field name="is_thr"/>
+                <field name="gross_salary"/>
+                <field name="pph21"/>
+                <field name="take_home_pay"/>
+                <field name="state" widget="badge"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hr_payslip_form" model="ir.ui.view">
+        <field name="name">hr.payslip.form</field>
+        <field name="model">hr.payslip</field>
+        <field name="arch" type="xml">
+            <form string="Payslip">
+                <header>
+                    <button name="action_compute" type="object" string="Compute"
+                            class="oe_highlight" invisible="state not in ('draft','computed')"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            invisible="state != 'computed'"/>
+                    <button name="action_pay" type="object" string="Mark Paid"
+                            invisible="state != 'approved'"/>
+                    <button name="action_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="period_year"/>
+                            <field name="period_month"/>
+                            <field name="is_thr"/>
+                        </group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="currency_id"/>
+                        </group>
+                    </group>
+                    <group string="Income">
+                        <field name="gross_salary"/>
+                        <field name="tunjangan_jabatan"/>
+                        <field name="tunjangan_lain"/>
+                    </group>
+                    <group string="Computed">
+                        <group string="Employee Contributions">
+                            <field name="bpjs_kesehatan_emp"/>
+                            <field name="bpjs_jht_emp"/>
+                            <field name="bpjs_jp_emp"/>
+                            <field name="pph21"/>
+                        </group>
+                        <group string="Company Contributions">
+                            <field name="bpjs_kesehatan_company"/>
+                            <field name="bpjs_jht_company"/>
+                            <field name="bpjs_jp_company"/>
+                            <field name="bpjs_jkk"/>
+                            <field name="bpjs_jkm"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="take_home_pay" class="oe_subtotal_footer"/>
+                    </group>
+                    <group string="Calculation Audit" invisible="state == 'draft'">
+                        <group>
+                            <field name="calc_method_used" readonly="1"/>
+                            <field name="ter_category_used" readonly="1"
+                                   invisible="calc_method_used != 'ter'"/>
+                            <field name="ter_rate_used" readonly="1"
+                                   invisible="calc_method_used != 'ter'"/>
+                        </group>
+                        <group>
+                            <field name="bupot_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="code"/>
+                                    <field name="label"/>
+                                    <field name="type"/>
+                                    <field name="amount"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hr_payslip_search" model="ir.ui.view">
+        <field name="name">hr.payslip.search</field>
+        <field name="model">hr.payslip</field>
+        <field name="arch" type="xml">
+            <search string="Payslips">
+                <field name="employee_id"/>
+                <field name="period_year"/>
+                <filter name="thr" string="THR Only" domain="[('is_thr','=',True)]"/>
+                <filter name="draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="paid" string="Paid" domain="[('state','=','paid')]"/>
+                <separator/>
+                <filter name="group_employee" string="Employee" context="{'group_by':'employee_id'}"/>
+                <filter name="group_year" string="Year" context="{'group_by':'period_year'}"/>
+                <filter name="group_state" string="State" context="{'group_by':'state'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_payslip" model="ir.actions.act_window">
+        <field name="name">Payslips</field>
+        <field name="res_model">hr.payslip</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_hr_payslip_search"/>
+    </record>
+</odoo>

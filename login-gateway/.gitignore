@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# PRIVATE signing keys never enter git. A private key committed once is a private key in every
+# clone, every CI cache and every backup, forever.
+#
+# Note the trap this file is written to avoid: a nested .gitignore WINS over the root one, so a
+# blanket `*.pem` here would silently override Platform-Infra's root negations and drop the PUBLIC
+# halves too. The public half is exactly what T-4 rotation depends on being committable -- a JWKS
+# test vector is a public key -- so the patterns below name the private halves specifically rather
+# than excluding the extension.
+secrets/
+*-private.pem
+*.key

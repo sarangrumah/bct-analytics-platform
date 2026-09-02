@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  PMK-131/2024 seed taxes for Indonesian Coretax (DJP).
+  Effective 1 January 2025. Non-luxury goods/services use DPP Nilai Lain
+  (base = 11/12 of price) so the effective rate is 11% while the
+  statutory rate is 12%. Luxury goods use full 12%.
+
+  Tax groups defined here (idempotent — guarded by xml-id).
+  No demo data; this is production seed.
+-->
+<odoo noupdate="1">
+
+    <!-- ============== Tax Groups ============== -->
+    <record id="tax_group_ppn" model="account.tax.group">
+        <field name="name">PPN</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="tax_group_ppn_impor" model="account.tax.group">
+        <field name="name">PPN Impor</field>
+        <field name="sequence">11</field>
+    </record>
+
+    <record id="tax_group_pph22_impor" model="account.tax.group">
+        <field name="name">PPh 22 Impor</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="tax_group_pph23" model="account.tax.group">
+        <field name="name">PPh 23</field>
+        <field name="sequence">21</field>
+    </record>
+
+    <!-- ============== PPN 12% DPP Nilai Lain (effective 11%) ============== -->
+    <!--
+      Per PMK-131/2024 Pasal 2 ayat (2): non-luxury goods/services use DPP
+      Nilai Lain = 11/12 × harga jual. Statutory 12% × (11/12) = 11% efektif.
+      We seed amount = 11.0 directly because Odoo CE account.tax has no
+      DPP-ratio field. Operators wanting the literal 12% × 11/12 split must
+      install the additional era_id_tax_pmk extension fields.
+    -->
+    <record id="tax_ppn_12_dpn_sale" model="account.tax">
+        <field name="name">PPN 12% DPP Nilai Lain (Keluaran) — efektif 11%</field>
+        <field name="description">PPN DPN 11/12</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">11.0</field>
+        <field name="tax_group_id" ref="tax_group_ppn"/>
+        <field name="price_include_override">tax_excluded</field>
+    </record>
+
+    <record id="tax_ppn_12_dpn_purchase" model="account.tax">
+        <field name="name">PPN 12% DPP Nilai Lain (Masukan) — efektif 11%</field>
+        <field name="description">PPN DPN 11/12</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">11.0</field>
+        <field name="tax_group_id" ref="tax_group_ppn"/>
+        <field name="price_include_override">tax_excluded</field>
+    </record>
+
+    <!-- ============== PPN 12% Penuh (barang mewah / luxury) ============== -->
+    <record id="tax_ppn_12_full_sale" model="account.tax">
+        <field name="name">PPN 12% Penuh (Keluaran)</field>
+        <field name="description">PPN 12% (luxury)</field>
+        <field name="type_tax_use">sale</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">12.0</field>
+        <field name="tax_group_id" ref="tax_group_ppn"/>
+        <field name="price_include_override">tax_excluded</field>
+    </record>
+
+    <record id="tax_ppn_12_full_purchase" model="account.tax">
+        <field name="name">PPN 12% Penuh (Masukan)</field>
+        <field name="description">PPN 12% (luxury)</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">12.0</field>
+        <field name="tax_group_id" ref="tax_group_ppn"/>
+        <field name="price_include_override">tax_excluded</field>
+    </record>
+
+    <!-- ============== PPN Impor 12% ============== -->
+    <record id="tax_ppn_impor_12" model="account.tax">
+        <field name="name">PPN Impor 12%</field>
+        <field name="description">PPN Impor 12%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">12.0</field>
+        <field name="tax_group_id" ref="tax_group_ppn_impor"/>
+        <field name="price_include_override">tax_excluded</field>
+    </record>
+
+    <!-- ============== PPh 22 Impor 2.5% (pemegang API) ============== -->
+    <record id="tax_pph22_impor_2_5" model="account.tax">
+        <field name="name">PPh 22 Impor 2.5% (API)</field>
+        <field name="description">PPh 22 Impor 2.5%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">-2.5</field>
+        <field name="tax_group_id" ref="tax_group_pph22_impor"/>
+        <field name="price_include_override">tax_excluded</field>
+    </record>
+
+    <!-- ============== PPh 23 Sewa 2% (withholding) ============== -->
+    <record id="tax_pph23_rental_2" model="account.tax">
+        <field name="name">PPh 23 Sewa 2% (Potong)</field>
+        <field name="description">PPh 23 Sewa 2%</field>
+        <field name="type_tax_use">purchase</field>
+        <field name="amount_type">percent</field>
+        <field name="amount">-2.0</field>
+        <field name="tax_group_id" ref="tax_group_pph23"/>
+        <field name="price_include_override">tax_excluded</field>
+    </record>
+
+</odoo>

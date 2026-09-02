@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_payroll_config_list" model="ir.ui.view">
+        <field name="name">hr.payroll.config.list</field>
+        <field name="model">hr.payroll.config</field>
+        <field name="arch" type="xml">
+            <list string="Payroll Config">
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hr_payroll_config_form" model="ir.ui.view">
+        <field name="name">hr.payroll.config.form</field>
+        <field name="model">hr.payroll.config</field>
+        <field name="arch" type="xml">
+            <form string="Payroll Config">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="calc_method"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="PTKP">
+                            <group>
+                                <group>
+                                    <field name="ptkp_tk0"/>
+                                    <field name="ptkp_tk1"/>
+                                    <field name="ptkp_tk2"/>
+                                    <field name="ptkp_tk3"/>
+                                </group>
+                                <group>
+                                    <field name="ptkp_k0"/>
+                                    <field name="ptkp_k1"/>
+                                    <field name="ptkp_k2"/>
+                                    <field name="ptkp_k3"/>
+                                </group>
+                                <group>
+                                    <field name="ptkp_ki0"/>
+                                    <field name="ptkp_ki1"/>
+                                    <field name="ptkp_ki2"/>
+                                    <field name="ptkp_ki3"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Biaya Jabatan">
+                            <group>
+                                <field name="biaya_jabatan_pct"/>
+                                <field name="biaya_jabatan_max_year"/>
+                            </group>
+                        </page>
+                        <page string="BPJS">
+                            <group>
+                                <group string="Kesehatan">
+                                    <field name="bpjs_kesehatan_ceiling"/>
+                                    <field name="bpjs_kesehatan_emp_pct"/>
+                                    <field name="bpjs_kesehatan_company_pct"/>
+                                </group>
+                                <group string="Ketenagakerjaan">
+                                    <field name="bpjs_jht_emp_pct"/>
+                                    <field name="bpjs_jht_company_pct"/>
+                                    <field name="bpjs_jkk_company_pct"/>
+                                    <field name="bpjs_jkm_company_pct"/>
+                                    <field name="bpjs_jp_emp_pct"/>
+                                    <field name="bpjs_jp_company_pct"/>
+                                    <field name="bpjs_jp_ceiling"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_payroll_config" model="ir.actions.act_window">
+        <field name="name">Payroll Configuration</field>
+        <field name="res_model">hr.payroll.config</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

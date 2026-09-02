@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Attribution / commission defaults (spec §8). All overridable per tenant. -->
+    <record id="cfg_attribution_model" model="ir.config_parameter">
+        <field name="key">custom_affiliate.attribution_model</field>
+        <field name="value">last_click</field>
+    </record>
+    <record id="cfg_attribution_window" model="ir.config_parameter">
+        <field name="key">custom_affiliate.attribution_window_days</field>
+        <field name="value">30</field>
+    </record>
+    <record id="cfg_reversal_window" model="ir.config_parameter">
+        <field name="key">custom_affiliate.reversal_window_days</field>
+        <field name="value">14</field>
+    </record>
+    <record id="cfg_default_commission" model="ir.config_parameter">
+        <field name="key">custom_affiliate.default_commission_rate</field>
+        <field name="value">10</field>
+    </record>
+    <record id="cfg_storefront_base" model="ir.config_parameter">
+        <field name="key">custom_affiliate.storefront_base_url</field>
+        <field name="value"></field>
+    </record>
+</odoo>

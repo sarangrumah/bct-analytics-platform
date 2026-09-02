@@ -1,0 +1,207 @@
+# gitleaks configuration - BCT analytics platform
+# Owner: Security agent. Engine: gitleaks 8.30.1 (Go RE2 - no lookaround in regexes).
+#
+# POLICY
+#   * The upstream default ruleset is extended, never replaced. Turning it off to
+#     silence one finding is not an option available to any agent.
+#   * Allowlists below are scoped with `targetRules` so an exception to one rule is
+#     not an exception to every rule. There are NO blanket path exclusions: a path
+#     that is allowlisted here is allowlisted for a named rule and a stated reason.
+#   * Every allowlist entry carries a reason and an expiry. An undated permanent
+#     exception is a finding in its own right - see security/check_ignore_policy.py.
+
+title = "bct-analytics-gitleaks"
+
+[extend]
+useDefault = true
+
+# --------------------------------------------------------------------------------
+# Project-specific rules. These cover the secrets THIS stack actually has, which the
+# generic ruleset does not know about: the Odoo master password, the warehouse
+# per-tenant masking salt (contract 01), and the login-gateway RS256 material
+# (contract 02).
+# --------------------------------------------------------------------------------
+
+[[rules]]
+id = "bct-odoo-admin-passwd"
+description = "Odoo master password (admin_passwd) committed with a real value"
+regex = '''(?i)admin_passwd\s*[=:]\s*["']?([^\s"'#$%{]{6,})'''
+keywords = ["admin_passwd"]
+tags = ["odoo", "master-password", "bct"]
+entropy = 2.0
+secretGroup = 1
+
+  [[rules.allowlists]]
+  description = "Placeholders and Compose/env indirection are the required form. reason: `changeme` is mandated by every Phase 1 brief; ENC[ is SOPS ciphertext; the Compose operators `${VAR:?err}` and `${VAR:-default}` mean the value is injected at render time and is not in the file. expires: never - this is the correct-usage carve-out, not debt."
+  regexTarget = "match"
+  regexes = [
+    '''(?i)admin_passwd\s*[=:]\s*["']?changeme''',
+    '''(?i)admin_passwd\s*[=:]\s*["']?ENC\[''',
+    '''(?i)admin_passwd\s*[=:]\s*[?+-]''',
+  ]
+
+  [[rules.allowlists]]
+  description = "The value is an interpolation of the variable itself. reason: `ODOO_ADMIN_PASSWD: ${ODOO_ADMIN_PASSWD:?...}` in docker-compose.yml carries no secret - the whole point of the form is that the value lives in the untracked .env. Line-scoped and anchored on the interpolation of an *_ADMIN_PASSWD variable, so a line that also contains a literal password still fails the rule. expires: never."
+  regexTarget = "line"
+  regexes = ['''\$\{?[A-Z0-9_]*ADMIN_PASSWD''']
+
+[[rules]]
+id = "bct-warehouse-mask-salt"
+description = "Per-tenant PDP masking salt hardcoded (contract 01 - the salt lives in SOPS only)"
+regex = '''(?i)WAREHOUSE_MASK_SALT[A-Z0-9_]*\s*[=:]\s*["']?([A-Za-z0-9+/=_-]{8,})'''
+keywords = ["WAREHOUSE_MASK_SALT"]
+tags = ["pdp", "uu-27-2022", "contract-01", "bct"]
+secretGroup = 1
+
+  [[rules.allowlists]]
+  description = "Placeholder / SOPS ciphertext. reason: contract 01 requires the literal `changeme` in .env.example and ENC[...] in .secrets.enc.yaml. expires: never."
+  regexTarget = "match"
+  regexes = [
+    '''(?i)WAREHOUSE_MASK_SALT[A-Z0-9_]*\s*[=:]\s*["']?changeme''',
+    '''(?i)WAREHOUSE_MASK_SALT[A-Z0-9_]*\s*[=:]\s*["']?ENC\[''',
+  ]
+
+  [[rules.allowlists]]
+  description = "The value is an interpolation of the salt variable itself. reason: `WAREHOUSE_MASK_SALT_BCT=${WAREHOUSE_MASK_SALT_BCT:-...}` carries no salt; contract 01 requires the real value to come from SOPS at render time. The `:-default` form captures the default fragment, so a line-scoped carve-out anchored on the interpolation of a *MASK_SALT variable is needed. Found by probing this rule against the correct-usage forms rather than waiting for it to block someone. expires: never."
+  regexTarget = "line"
+  regexes = ['''\$\{?[A-Z0-9_]*MASK_SALT''']
+
+[[rules]]
+id = "bct-datasource-uri-inline-password"
+description = "Data-source URI carrying an inline password (postgres, redis, amqp, mongodb, mysql, clickhouse, mssql)"
+# Two things this regex has to get right, both learned from a miss rather than from design:
+#
+#   1. The USERNAME slot must tolerate an interpolation. The original class was
+#      [a-z0-9_.-]+, which cannot match ${...}. When the username was interpolated the
+#      regex never engaged at all, so the capture never happened and the allowlists were
+#      never consulted - a URI with a real literal PASSWORD sailed through. That is a
+#      false negative, which is far worse than the false positive that led us here.
+#      Reported by Platform-Infra 2026-08-31 and confirmed by the Lead; their own
+#      postgres_exporter DSN was that shape and had been passing for the wrong reason.
+#
+#   2. The username may be ABSENT entirely: `redis://:password@host` is the ordinary
+#      Redis form. Hence the trailing `?` on the username group.
+#
+# Scheme list is explicit rather than a wildcard so this cannot start matching https://
+# or git+ssh:// URLs that legitimately carry a token in the userinfo position.
+regex = '''(?i)\b(?:postgres(?:ql)?|rediss?|amqps?|mongodb(?:\+srv)?|mysql|mariadb|clickhouse|mssql)://(?:[a-z0-9_.%+-]+|\$\{[^}@]{1,64}\})?:([^@\s"'?]{4,})@'''
+# keywords are a prefilter: a scheme missing here means the rule never runs on that line.
+keywords = [
+  "postgres://", "postgresql://",
+  "redis://", "rediss://",
+  "amqp://", "amqps://",
+  "mongodb://", "mongodb+srv://",
+  "mysql://", "mariadb://",
+  "clickhouse://", "mssql://",
+]
+tags = ["database", "connection-string", "bct"]
+secretGroup = 1
+
+  [[rules.allowlists]]
+  description = "The captured value is a port followed by a path, so the URI had no userinfo at all. reason: allowing `/` in the password (base64 secrets contain it constantly - `openssl rand -base64 32`) means `postgres://host:5432/db/page@rev` can match with `host` read as the username and `5432/db/page` as the password. A capture that begins with a port-shaped number and a slash is that shape, never a credential. Narrow on purpose: it does not exempt a password that merely CONTAINS a slash, only one that starts with digits-then-slash. expires: never - this is a URI-parsing artefact, not debt."
+  regexTarget = "secret"
+  regexes = ['''^[0-9]{1,5}/''']
+
+  [[rules.allowlists]]
+  description = "The password slot is a placeholder or an environment interpolation, so the URI carries no secret. reason: contract 04 and the onboarding docs must show the URI *shape*; `changeme` is the mandated placeholder, `<password>` the documentation token, and `${VAR}` / `${VAR:?msg}` / `${VAR:-default}` resolve at render time from the untracked .env. Scoped to the CAPTURED SECRET, deliberately: the earlier match-target version embedded a copy of the username character class, so widening the rule without widening the allowlist in lockstep would have made the documented placeholder form fire. A secret-scoped allowlist has no username class to keep in sync and is scheme-independent, so it cannot drift out of step with the rule again. It also stays precise - a URI with a literal password still fails even when an interpolation appears elsewhere on the same line. expires: never - this is the correct-usage form, not debt."
+  regexTarget = "secret"
+  regexes = [
+    '''^\$\{''',
+    '''^changeme$''',
+    '''^<[a-z_-]+>$''',
+  ]
+[[rules]]
+id = "bct-age-secret-key"
+description = "age private key (SOPS identity) - must never be committed under any circumstance"
+regex = '''AGE-SECRET-KEY-1[0-9A-Z]{50,}'''
+keywords = ["AGE-SECRET-KEY-1"]
+tags = ["sops", "age", "key-material", "bct"]
+
+[[rules]]
+id = "bct-login-gateway-jwt-signing-key"
+description = "login-gateway RS256 signing material inlined instead of mounted (contract 02)"
+regex = '''(?i)(LOGIN_GATEWAY_JWT_PRIVATE_KEY|JWT_PRIVATE_KEY|JWT_SIGNING_KEY)\s*[=:]\s*["']?(-----BEGIN|[A-Za-z0-9+/]{40,})'''
+keywords = ["JWT_PRIVATE_KEY", "JWT_SIGNING_KEY", "LOGIN_GATEWAY_JWT_PRIVATE_KEY"]
+tags = ["jwt", "rs256", "contract-02", "bct"]
+
+  [[rules.allowlists]]
+  description = "Path-valued variables are the required form. reason: contract 02 mounts the key by path (LOGIN_GATEWAY_JWT_PRIVATE_KEY_PATH=/run/secrets/...); the key bytes never enter an environment variable. expires: never."
+  regexTarget = "line"
+  regexes = ['''_PATH\s*[=:]''']
+
+[[rules]]
+id = "bct-hardcoded-jwt"
+description = "A signed JWT pasted into the tree (session fixture, debug token, curl example)"
+regex = '''eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}'''
+keywords = ["eyJ"]
+tags = ["jwt", "contract-02", "bct"]
+
+[[rules]]
+id = "bct-grafana-admin-password"
+description = "Grafana admin password committed with a real value"
+regex = '''(?i)(GF_SECURITY_ADMIN_PASSWORD|GRAFANA_ADMIN_PASSWORD)\s*[=:]\s*["']?([^\s"'#${]{4,})'''
+keywords = ["GF_SECURITY_ADMIN_PASSWORD", "GRAFANA_ADMIN_PASSWORD"]
+tags = ["observability", "bct"]
+secretGroup = 2
+
+  [[rules.allowlists]]
+  description = "Placeholder value. reason: `changeme` is mandated by the Platform-Infra brief for .env.example. expires: never."
+  regexTarget = "match"
+  regexes = ['''(?i)(GF_SECURITY_ADMIN_PASSWORD|GRAFANA_ADMIN_PASSWORD)\s*[=:]\s*["']?changeme''']
+
+  [[rules.allowlists]]
+  description = "The value is an interpolation of the variable itself. reason: `GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?...}` carries no secret - the value lives in the untracked .env. The rule's own character class excludes `$` and `{`, so it captures the *inner* fragment of the interpolation - for the `:?message` form that fragment is the English error message, which is why this needs a line-scoped carve-out rather than a match-scoped one. Anchored on the interpolation of an *_ADMIN_PASSWORD variable, so an unrelated line is not exempted. Mirrors the bct-odoo-admin-passwd twin; reported by Platform-Infra 2026-08-31, who hit it on a legitimate compose line. expires: never."
+  regexTarget = "line"
+  regexes = ['''\$\{?[A-Z0-9_]*ADMIN_PASSWORD''']
+
+# --------------------------------------------------------------------------------
+# Global allowlists. Each is scoped by targetRules where it is not universally safe.
+# --------------------------------------------------------------------------------
+
+[[allowlists]]
+description = "SOPS ciphertext and age public recipients. reason: ENC[AES256_GCM,...] is the *encrypted* form - flagging it inverts the control we are enforcing; an age1... recipient is a lock, not a key. This matches the ciphertext envelope itself and not a path, so a plaintext secret sitting next to it in the same file is still caught. expires: never - property of the format, not a temporary exception."
+regexTarget = "match"
+regexes = [
+  '''ENC\[AES256_GCM,data:[^\]]+\]''',
+  '''age1[0-9a-z]{58}''',
+  '''-----BEGIN AGE ENCRYPTED FILE-----''',
+]
+
+[[allowlists]]
+description = "The literal placeholder mandated by every Phase 1 brief. reason: .env.example and .secrets.enc.yaml must carry `changeme` and nothing else; a scanner that fails on the placeholder trains people to disable the scanner. expires: never."
+regexTarget = "secret"
+regexes = ['''^changeme$''', '''^change-?me$''']
+
+[[allowlists]]
+description = "Documentation and pinned-digest noise, scoped to the generic entropy rules only. reason: docs/**, security/**.md and MODULE_KNOWLEDGE.md quote sha256 digests, 40-char commit SHAs and JWT *claim shapes*; those are integrity pins and schemas, not credentials. targetRules keeps the project rules above (age keys, mask salts, Odoo master password, real JWTs) firing inside documentation. expires: 2027-02-28 - re-review at GATE 5 when CD adds signing material to docs."
+paths = [
+  '''(^|/)docs/.*\.md$''',
+  '''(^|/)security/.*\.md$''',
+  '''MODULE_KNOWLEDGE\.md$''',
+]
+targetRules = ["generic-api-key", "hashicorp-tf-password", "curl-auth-header", "curl-auth-user"]
+
+[[allowlists]]
+description = "Test fixtures inside vendored OCA modules, scoped to the generic entropy rule. reason: addons/_vendor/ is third-party code redistributed unchanged (queue_job from github.com/OCA/queue, auth_jwt from github.com/OCA/server-auth, both LGPL-3). auth_jwt/tests/test_auth_jwt.py signs its own tokens with a key= literal reading `thesecret` followed by digits - a self-describing fixture in a unit test that never leaves the test process. Editing vendored code to satisfy our scanner is the wrong repair: the change is lost on the next re-vendor and leaves a copy that no longer matches upstream, so the fix belongs upstream and this is where we record accepting it meanwhile. Scoped to tests/ inside _vendor only, so a credential in vendored RUNTIME code still fails. expires: 2027-02-28 - re-review whenever _vendor is refreshed."
+paths = [
+  '''^addons/_vendor/[^/]+/tests/.*\.py$''',
+]
+targetRules = ["generic-api-key"]
+
+[[allowlists]]
+description = "Minified third-party assets bundled inside vendored modules, scoped to the generic entropy rule. reason: addons/_vendor/queue_job/static/lib/ carries vis-network.min.js and its stylesheet - a graph library shipped by upstream OCA, not written here. Minified JavaScript is high-entropy BY CONSTRUCTION: the minifier renames every property and local to short opaque tokens, so an entropy rule cannot tell one from a credential and flags the compression itself. Scoped to static/lib/ under _vendor and to minified files only, so a real key committed into vendored Python or into a hand-written asset still fails. expires: 2027-02-28 - re-review whenever _vendor is refreshed."
+paths = [
+  '''^addons/_vendor/[^/]+/static/lib/.*\.min\.(js|css)$''',
+]
+targetRules = ["generic-api-key"]
+
+[[allowlists]]
+description = "Lockfile integrity hashes. reason: package-lock.json / yarn.lock / uv.lock integrity fields are base64 SHA-512 digests; treating them as credentials produces hundreds of false positives the moment the Node services land, which is how a secrets gate dies. Scoped to the generic entropy rule only. expires: 2027-02-28 - re-review when login-gateway and insight-portal land in wave 4."
+paths = [
+  '''(^|/)package-lock\.json$''',
+  '''(^|/)yarn\.lock$''',
+  '''(^|/)pnpm-lock\.yaml$''',
+  '''(^|/)poetry\.lock$''',
+  '''(^|/)uv\.lock$''',
+]
+targetRules = ["generic-api-key"]

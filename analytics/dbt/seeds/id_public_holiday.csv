@@ -1,0 +1,49 @@
+holiday_date,holiday_name,holiday_type,is_estimated
+2025-01-01,Tahun Baru Masehi,fixed,false
+2025-01-27,Isra Mikraj Nabi Muhammad SAW,islamic,true
+2025-01-29,Tahun Baru Imlek 2576 Kongzili,chinese,true
+2025-03-29,Hari Suci Nyepi (Tahun Baru Saka 1947),hindu,true
+2025-03-31,Hari Raya Idul Fitri 1446H (hari pertama),islamic,true
+2025-04-01,Hari Raya Idul Fitri 1446H (hari kedua),islamic,true
+2025-04-18,Wafat Isa Almasih,christian,true
+2025-05-01,Hari Buruh Internasional,fixed,false
+2025-05-12,Hari Raya Waisak 2569 BE,buddhist,true
+2025-05-29,Kenaikan Isa Almasih,christian,true
+2025-06-01,Hari Lahir Pancasila,fixed,false
+2025-06-06,Hari Raya Idul Adha 1446H,islamic,true
+2025-06-27,Tahun Baru Islam 1447H,islamic,true
+2025-08-17,Hari Kemerdekaan Republik Indonesia,fixed,false
+2025-09-05,Maulid Nabi Muhammad SAW,islamic,true
+2025-12-25,Hari Raya Natal,fixed,false
+2026-01-01,Tahun Baru Masehi,fixed,false
+2026-01-16,Isra Mikraj Nabi Muhammad SAW,islamic,true
+2026-02-17,Tahun Baru Imlek 2577 Kongzili,chinese,true
+2026-03-19,Hari Suci Nyepi (Tahun Baru Saka 1948),hindu,true
+2026-03-20,Hari Raya Idul Fitri 1447H (hari pertama),islamic,true
+2026-03-21,Hari Raya Idul Fitri 1447H (hari kedua),islamic,true
+2026-04-03,Wafat Isa Almasih,christian,true
+2026-05-01,Hari Buruh Internasional,fixed,false
+2026-05-14,Kenaikan Isa Almasih,christian,true
+2026-05-27,Hari Raya Idul Adha 1447H,islamic,true
+2026-05-31,Hari Raya Waisak 2570 BE,buddhist,true
+2026-06-01,Hari Lahir Pancasila,fixed,false
+2026-06-16,Tahun Baru Islam 1448H,islamic,true
+2026-08-17,Hari Kemerdekaan Republik Indonesia,fixed,false
+2026-08-25,Maulid Nabi Muhammad SAW,islamic,true
+2026-12-25,Hari Raya Natal,fixed,false
+2027-01-01,Tahun Baru Masehi,fixed,false
+2027-01-06,Isra Mikraj Nabi Muhammad SAW,islamic,true
+2027-02-06,Tahun Baru Imlek 2578 Kongzili,chinese,true
+2027-03-08,Hari Suci Nyepi (Tahun Baru Saka 1949),hindu,true
+2027-03-10,Hari Raya Idul Fitri 1448H (hari pertama),islamic,true
+2027-03-11,Hari Raya Idul Fitri 1448H (hari kedua),islamic,true
+2027-03-26,Wafat Isa Almasih,christian,true
+2027-05-01,Hari Buruh Internasional,fixed,false
+2027-05-06,Kenaikan Isa Almasih,christian,true
+2027-05-17,Hari Raya Idul Adha 1448H,islamic,true
+2027-05-20,Hari Raya Waisak 2571 BE,buddhist,true
+2027-06-01,Hari Lahir Pancasila,fixed,false
+2027-06-06,Tahun Baru Islam 1449H,islamic,true
+2027-08-15,Maulid Nabi Muhammad SAW,islamic,true
+2027-08-17,Hari Kemerdekaan Republik Indonesia,fixed,false
+2027-12-25,Hari Raya Natal,fixed,false

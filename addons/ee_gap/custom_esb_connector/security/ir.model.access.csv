@@ -1,0 +1,20 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_esb_session_admin,custom.esb.session admin,model_custom_esb_session,group_esb_admin,1,1,1,1
+access_esb_branch_user,custom.esb.branch user,model_custom_esb_branch,group_esb_user,1,0,0,0
+access_esb_branch_admin,custom.esb.branch admin,model_custom_esb_branch,group_esb_admin,1,1,1,1
+access_esb_location_user,custom.esb.location user,model_custom_esb_location,group_esb_user,1,0,0,0
+access_esb_location_admin,custom.esb.location admin,model_custom_esb_location,group_esb_admin,1,1,1,1
+access_esb_purpose_user,custom.esb.purpose user,model_custom_esb_purpose,group_esb_user,1,0,0,0
+access_esb_purpose_admin,custom.esb.purpose admin,model_custom_esb_purpose,group_esb_admin,1,1,1,1
+access_esb_document_template_user,custom.esb.document.template user,model_custom_esb_document_template,group_esb_user,1,0,0,0
+access_esb_document_template_admin,custom.esb.document.template admin,model_custom_esb_document_template,group_esb_admin,1,1,1,1
+access_esb_product_detail_user,custom.esb.product.detail user,model_custom_esb_product_detail,group_esb_user,1,0,0,0
+access_esb_product_detail_admin,custom.esb.product.detail admin,model_custom_esb_product_detail,group_esb_admin,1,1,1,1
+access_esb_stock_snapshot_user,custom.esb.stock.snapshot user,model_custom_esb_stock_snapshot,group_esb_user,1,0,0,0
+access_esb_stock_snapshot_admin,custom.esb.stock.snapshot admin,model_custom_esb_stock_snapshot,group_esb_admin,1,1,1,1
+access_esb_outbox_user,custom.esb.outbox user,model_custom_esb_outbox,group_esb_user,1,0,0,0
+access_esb_outbox_admin,custom.esb.outbox admin,model_custom_esb_outbox,group_esb_admin,1,1,1,1
+access_esb_sync_log_user,custom.esb.sync.log user,model_custom_esb_sync_log,group_esb_user,1,0,0,0
+access_esb_sync_log_admin,custom.esb.sync.log admin,model_custom_esb_sync_log,group_esb_admin,1,1,1,1
+access_esb_supplier_user,custom.esb.supplier user,model_custom_esb_supplier,group_esb_user,1,0,0,0
+access_esb_supplier_admin,custom.esb.supplier admin,model_custom_esb_supplier,group_esb_admin,1,1,1,1

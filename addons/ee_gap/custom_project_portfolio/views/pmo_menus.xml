@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_pmo_root" name="VAS PMO" sequence="18"
+              web_icon="project,static/description/icon.png"
+              groups="custom_project_portfolio.group_pmo_user"/>
+
+    <menuitem id="menu_pmo_monitor" name="Monitor" parent="menu_pmo_root" sequence="10"/>
+    <menuitem id="menu_pmo_projects" name="Projects" parent="menu_pmo_monitor"
+              action="action_vas_project" sequence="10"/>
+    <menuitem id="menu_pmo_tasks" name="Tasks" parent="menu_pmo_monitor"
+              action="action_vas_task" sequence="20"/>
+    <menuitem id="menu_pmo_portfolios" name="Portfolios" parent="menu_pmo_monitor"
+              action="action_portfolio" sequence="30"/>
+
+    <menuitem id="menu_pmo_weekly_root" name="Weekly" parent="menu_pmo_root" sequence="20"/>
+    <menuitem id="menu_pmo_weekly" name="Weekly Progress" parent="menu_pmo_weekly_root"
+              action="action_weekly" sequence="10"/>
+    <menuitem id="menu_pmo_ba_summary" name="Business Analyst Summary"
+              parent="menu_pmo_weekly_root" action="action_ba_summary" sequence="20"/>
+    <menuitem id="menu_pmo_sprints" name="Weekly Sprints" parent="menu_pmo_weekly_root"
+              action="action_sprint" sequence="30"/>
+
+    <menuitem id="menu_pmo_config" name="Configuration" parent="menu_pmo_root"
+              sequence="90" groups="custom_project_portfolio.group_pmo_admin"/>
+    <menuitem id="menu_pmo_verticals" name="Verticals / Brands" parent="menu_pmo_config"
+              action="action_vertical" sequence="10"/>
+    <menuitem id="menu_pmo_stages" name="Stages &amp; SLA Clock" parent="menu_pmo_config"
+              action="action_stage_config" sequence="20"/>
+
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Evaluate all TO rules and materialize each proposal as a proposed
+         transfer order. Anchored to the concrete custom.transfer.order model
+         (custom.to.engine is abstract); the entrypoint lives on the engine. -->
+    <record id="cron_evaluate_and_materialize" model="ir.cron">
+        <field name="name">Transfer Order: evaluate rules and materialize</field>
+        <field name="model_id" ref="model_custom_transfer_order"/>
+        <field name="state">code</field>
+        <field name="code">model.env["custom.to.engine"].cron_evaluate_and_materialize()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

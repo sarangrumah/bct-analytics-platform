@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_finance_sync_log_user,finance.sync.log user,model_finance_sync_log,custom_finance_portal.group_finance_user,1,0,0,0
+access_finance_sync_log_manager,finance.sync.log manager,model_finance_sync_log,custom_finance_portal.group_finance_manager,1,1,1,1

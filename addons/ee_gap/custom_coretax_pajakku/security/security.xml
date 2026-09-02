@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="module_category_pajakku" model="ir.module.category">
+            <field name="name">Coretax / Pajakku</field>
+            <field name="sequence">82</field>
+        </record>
+
+        <record id="group_pajakku_user" model="res.groups">
+            <field name="name">Pajakku User</field>
+            <field name="comment">Read transactions + usage. Retry failed submissions.</field>
+        </record>
+
+        <record id="group_pajakku_admin" model="res.groups">
+            <field name="name">Pajakku Admin</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_pajakku_user'))]"/>
+            <field name="comment">Configure adapter (URL, sandbox toggle, credentials). Test connection.</field>
+        </record>
+
+    </data>
+</odoo>

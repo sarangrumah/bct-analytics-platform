@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="mail_template_realization_reminder" model="mail.template">
+            <field name="name">Petty Cash: Realization Reminder</field>
+            <field name="model_id" ref="model_petty_cash_request"/>
+            <field name="subject">Petty cash realization overdue — {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="email_to">{{ object.employee_id.work_email or (object.employee_id.user_id and object.employee_id.user_id.email) }}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; font-size: 13px;">
+                    <p>Hi <t t-out="object.employee_id.name or ''"/>,</p>
+                    <p>
+                        Your petty cash request <strong t-out="object.name or ''"/>
+                        (Operating Unit <t t-out="object.l10n_ou_analytic_id.name or '-'"/>)
+                        is past its realization deadline
+                        (<t t-out="object.realization_deadline or ''"/>).
+                    </p>
+                    <p>
+                        Outstanding amount:
+                        <strong t-out="format_amount(object.amount_outstanding, object.currency_id) or ''"/>.
+                        Please submit the realization or return the remaining cash.
+                    </p>
+                    <p>Thank you.</p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

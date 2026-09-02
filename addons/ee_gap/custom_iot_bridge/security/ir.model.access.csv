@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_iot_device_user,device user,model_iot_device,group_iot_user,1,0,0,0
+access_iot_device_admin,device admin,model_iot_device,group_iot_admin,1,1,1,1
+access_iot_reading_user,reading user,model_iot_reading,group_iot_user,1,0,0,0
+access_iot_reading_admin,reading admin,model_iot_reading,group_iot_admin,1,1,1,1
+access_iot_threshold_user,threshold user,model_iot_threshold,group_iot_user,1,0,0,0
+access_iot_threshold_admin,threshold admin,model_iot_threshold,group_iot_admin,1,1,1,1

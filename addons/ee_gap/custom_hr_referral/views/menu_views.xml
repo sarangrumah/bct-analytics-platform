@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_referral_root" name="Referral" sequence="59"
+              groups="custom_hr_referral.group_referral_user"/>
+    <menuitem id="menu_referral_positions" name="Open Positions" parent="menu_referral_root"
+              action="action_ref_position" sequence="10"/>
+    <menuitem id="menu_referral_candidates" name="Candidates" parent="menu_referral_root"
+              action="action_ref_candidate" sequence="20"/>
+    <menuitem id="menu_referral_rewards" name="Rewards" parent="menu_referral_root"
+              action="action_ref_reward" sequence="30"
+              groups="custom_hr_referral.group_referral_hr"/>
+</odoo>

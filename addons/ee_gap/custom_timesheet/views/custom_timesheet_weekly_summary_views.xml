@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_weekly_summary_form" model="ir.ui.view">
+        <field name="name">custom.timesheet.weekly.summary.form</field>
+        <field name="model">custom.timesheet.weekly.summary</field>
+        <field name="arch" type="xml">
+            <form string="Weekly Summary">
+                <header>
+                    <button name="action_ai_summarize" type="object"
+                            string="AI Summarize" class="btn-primary"
+                            groups="custom_timesheet.group_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,summarized"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="project_id"/>
+                            <field name="week_start"/>
+                            <field name="week_end" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="line_count" readonly="1"/>
+                            <field name="total_hours" readonly="1"/>
+                            <field name="billable_hours" readonly="1"/>
+                            <field name="overtime_hours" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="AI Summary" name="ai_summary">
+                            <field name="summary_html" widget="html"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_weekly_summary_list" model="ir.ui.view">
+        <field name="name">custom.timesheet.weekly.summary.list</field>
+        <field name="model">custom.timesheet.weekly.summary</field>
+        <field name="arch" type="xml">
+            <list string="Weekly Summaries">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="week_start"/>
+                <field name="week_end"/>
+                <field name="total_hours"/>
+                <field name="billable_hours"/>
+                <field name="overtime_hours"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_weekly_summary_search" model="ir.ui.view">
+        <field name="name">custom.timesheet.weekly.summary.search</field>
+        <field name="model">custom.timesheet.weekly.summary</field>
+        <field name="arch" type="xml">
+            <search string="Weekly Summary">
+                <field name="project_id"/>
+                <field name="week_start"/>
+                <separator/>
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_summarized" string="Summarized"
+                        domain="[('state', '=', 'summarized')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_weekly_summary" model="ir.actions.act_window">
+        <field name="name">Weekly Summaries</field>
+        <field name="res_model">custom.timesheet.weekly.summary</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_weekly_summary_search"/>
+    </record>
+
+</odoo>

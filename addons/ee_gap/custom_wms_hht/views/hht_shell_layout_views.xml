@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- License: LGPL-3 -->
+<odoo>
+    <!-- Reuse the bridge's shell page wholesale — the ES5 boot trap, the
+         session bootstrap and the service-worker registration are all still
+         wanted — and swap only the asset bundle and the title, so this app
+         mounts instead of the generic 5-tab one. -->
+    <template id="wms_hht_shell_layout" name="WMS HHT Shell"
+              inherit_id="custom_hht_bridge.hht_shell_layout" primary="True">
+        <xpath expr="//title" position="replace">
+            <title>WMS Handheld</title>
+        </xpath>
+        <xpath expr="//t[@t-call-assets][1]" position="replace">
+            <t t-call-assets="custom_wms_hht.pwa_assets" t-css="true" t-js="false"/>
+        </xpath>
+        <xpath expr="//t[@t-call-assets][2]" position="replace">
+            <t t-call-assets="custom_wms_hht.pwa_assets" t-css="false" t-js="true"/>
+        </xpath>
+    </template>
+</odoo>

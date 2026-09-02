@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top-level app menu -->
+    <menuitem id="menu_frontdesk_root"
+              name="Frontdesk"
+              sequence="75"
+              web_icon="custom_frontdesk,static/description/icon.png"
+              groups="custom_frontdesk.group_user"/>
+
+    <menuitem id="menu_frontdesk_visitors"
+              name="Visitors"
+              parent="menu_frontdesk_root"
+              action="action_frontdesk_visitor"
+              sequence="10"/>
+
+    <menuitem id="menu_frontdesk_config"
+              name="Configuration"
+              parent="menu_frontdesk_root"
+              sequence="90"
+              groups="custom_frontdesk.group_manager"/>
+
+    <menuitem id="menu_frontdesk_stations"
+              name="Stations"
+              parent="menu_frontdesk_config"
+              action="action_frontdesk_station"
+              sequence="10"/>
+</odoo>

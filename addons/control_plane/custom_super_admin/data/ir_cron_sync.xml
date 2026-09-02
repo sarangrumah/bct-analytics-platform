@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Periodic safety-net sync of the tenant.registry mirror from the
+         orchestrator master DB. The mirror is also refreshed on-demand after
+         each lifecycle action (provision/suspend/resume) and by the provision
+         wizard; this cron catches changes made outside the console.
+         Requires ORCHESTRATOR_SHARED_SECRET in the odoo container env. -->
+    <record id="ir_cron_sync_tenant_registry" model="ir.cron">
+        <field name="name">Tenant: Sync Registry from Orchestrator</field>
+        <field name="model_id" ref="model_tenant_registry"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_sync_from_orchestrator()</field>
+        <field name="interval_number">15</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="True"/>
+    </record>
+
+</odoo>

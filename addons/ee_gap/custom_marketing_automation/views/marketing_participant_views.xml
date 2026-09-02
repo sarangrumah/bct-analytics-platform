@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_marketing_participant_list" model="ir.ui.view">
+        <field name="name">marketing.participant.list</field>
+        <field name="model">marketing.participant</field>
+        <field name="arch" type="xml">
+            <list create="0">
+                <field name="campaign_id"/>
+                <field name="partner_id"/>
+                <field name="current_step_id"/>
+                <field name="next_action_at"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_marketing_participant" model="ir.actions.act_window">
+        <field name="name">All Participants</field>
+        <field name="res_model">marketing.participant</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

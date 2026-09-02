@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_general_ledger_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.general.ledger.wizard.form</field>
+        <field name="model">custom.report.general.ledger.wizard</field>
+        <field name="arch" type="xml">
+            <form string="General Ledger">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group>
+                        <field name="company_ids" widget="many2many_tags"/>
+                        <field name="journal_ids" widget="many2many_tags"/>
+                        <field name="account_ids" widget="many2many_tags"/>
+                        <field name="gl_layout"/>
+                    </group>
+                </group>
+                <group string="Excel columns" invisible="gl_layout != 'flat'"
+                       col="4">
+                    <field name="show_doc_no"/>
+                    <field name="show_reference"/>
+                    <field name="show_tax"/>
+                    <field name="show_faktur_masukan"/>
+                    <field name="show_faktur_keluaran"/>
+                    <field name="show_clearing"/>
+                    <field name="show_cost_center"/>
+                    <field name="show_profit_center"/>
+                    <field name="show_currency"/>
+                    <field name="show_amount_currency"/>
+                    <field name="show_due_date"/>
+                    <field name="show_user"/>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print"
+                            type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx"
+                            type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_general_ledger_wizard" model="ir.actions.act_window">
+        <field name="name">General Ledger</field>
+        <field name="res_model">custom.report.general.ledger.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

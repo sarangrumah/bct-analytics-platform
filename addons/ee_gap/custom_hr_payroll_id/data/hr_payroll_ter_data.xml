@@ -1,0 +1,767 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--
+        TER (Tarif Efektif Rata-rata) brackets per PP 58/2023, effective Jan 2024.
+        Source: Lampiran PP 58/2023.
+
+        Bracket semantics: rate applies when lower_bound <= monthly_gross <= upper_bound.
+        upper_bound = 0 means open-ended (highest bracket).
+    -->
+
+    <!-- ===== Kategori A (TK/0, TK/1, K/0) ===== -->
+    <record id="ter_A_1" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">0</field>
+        <field name="upper_bound">5400000</field>
+        <field name="rate">0.0</field>
+    </record>
+    <record id="ter_A_2" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">5400001</field>
+        <field name="upper_bound">5650000</field>
+        <field name="rate">0.25</field>
+    </record>
+    <record id="ter_A_3" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">5650001</field>
+        <field name="upper_bound">5950000</field>
+        <field name="rate">0.5</field>
+    </record>
+    <record id="ter_A_4" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">5950001</field>
+        <field name="upper_bound">6300000</field>
+        <field name="rate">0.75</field>
+    </record>
+    <record id="ter_A_5" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">6300001</field>
+        <field name="upper_bound">6750000</field>
+        <field name="rate">1.0</field>
+    </record>
+    <record id="ter_A_6" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">6750001</field>
+        <field name="upper_bound">7500000</field>
+        <field name="rate">1.25</field>
+    </record>
+    <record id="ter_A_7" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">7500001</field>
+        <field name="upper_bound">8550000</field>
+        <field name="rate">1.5</field>
+    </record>
+    <record id="ter_A_8" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">8550001</field>
+        <field name="upper_bound">9650000</field>
+        <field name="rate">1.75</field>
+    </record>
+    <record id="ter_A_9" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">9650001</field>
+        <field name="upper_bound">10050000</field>
+        <field name="rate">2.0</field>
+    </record>
+    <record id="ter_A_10" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">10050001</field>
+        <field name="upper_bound">10350000</field>
+        <field name="rate">2.25</field>
+    </record>
+    <record id="ter_A_11" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">10350001</field>
+        <field name="upper_bound">10700000</field>
+        <field name="rate">2.5</field>
+    </record>
+    <record id="ter_A_12" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">10700001</field>
+        <field name="upper_bound">11050000</field>
+        <field name="rate">3.0</field>
+    </record>
+    <record id="ter_A_13" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">11050001</field>
+        <field name="upper_bound">11600000</field>
+        <field name="rate">3.5</field>
+    </record>
+    <record id="ter_A_14" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">11600001</field>
+        <field name="upper_bound">12500000</field>
+        <field name="rate">4.0</field>
+    </record>
+    <record id="ter_A_15" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">12500001</field>
+        <field name="upper_bound">13750000</field>
+        <field name="rate">5.0</field>
+    </record>
+    <record id="ter_A_16" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">13750001</field>
+        <field name="upper_bound">15100000</field>
+        <field name="rate">6.0</field>
+    </record>
+    <record id="ter_A_17" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">15100001</field>
+        <field name="upper_bound">16950000</field>
+        <field name="rate">7.0</field>
+    </record>
+    <record id="ter_A_18" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">16950001</field>
+        <field name="upper_bound">19750000</field>
+        <field name="rate">8.0</field>
+    </record>
+    <record id="ter_A_19" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">19750001</field>
+        <field name="upper_bound">24150000</field>
+        <field name="rate">9.0</field>
+    </record>
+    <record id="ter_A_20" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">24150001</field>
+        <field name="upper_bound">26450000</field>
+        <field name="rate">10.0</field>
+    </record>
+    <record id="ter_A_21" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">26450001</field>
+        <field name="upper_bound">28000000</field>
+        <field name="rate">11.0</field>
+    </record>
+    <record id="ter_A_22" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">28000001</field>
+        <field name="upper_bound">30050000</field>
+        <field name="rate">12.0</field>
+    </record>
+    <record id="ter_A_23" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">30050001</field>
+        <field name="upper_bound">32400000</field>
+        <field name="rate">13.0</field>
+    </record>
+    <record id="ter_A_24" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">32400001</field>
+        <field name="upper_bound">35400000</field>
+        <field name="rate">14.0</field>
+    </record>
+    <record id="ter_A_25" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">35400001</field>
+        <field name="upper_bound">39100000</field>
+        <field name="rate">15.0</field>
+    </record>
+    <record id="ter_A_26" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">39100001</field>
+        <field name="upper_bound">43850000</field>
+        <field name="rate">16.0</field>
+    </record>
+    <record id="ter_A_27" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">43850001</field>
+        <field name="upper_bound">47800000</field>
+        <field name="rate">17.0</field>
+    </record>
+    <record id="ter_A_28" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">47800001</field>
+        <field name="upper_bound">51400000</field>
+        <field name="rate">18.0</field>
+    </record>
+    <record id="ter_A_29" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">51400001</field>
+        <field name="upper_bound">56300000</field>
+        <field name="rate">19.0</field>
+    </record>
+    <record id="ter_A_30" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">56300001</field>
+        <field name="upper_bound">62200000</field>
+        <field name="rate">20.0</field>
+    </record>
+    <record id="ter_A_31" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">62200001</field>
+        <field name="upper_bound">68600000</field>
+        <field name="rate">21.0</field>
+    </record>
+    <record id="ter_A_32" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">68600001</field>
+        <field name="upper_bound">77500000</field>
+        <field name="rate">22.0</field>
+    </record>
+    <record id="ter_A_33" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">77500001</field>
+        <field name="upper_bound">89000000</field>
+        <field name="rate">23.0</field>
+    </record>
+    <record id="ter_A_34" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">89000001</field>
+        <field name="upper_bound">103000000</field>
+        <field name="rate">24.0</field>
+    </record>
+    <record id="ter_A_35" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">103000001</field>
+        <field name="upper_bound">125000000</field>
+        <field name="rate">25.0</field>
+    </record>
+    <record id="ter_A_36" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">125000001</field>
+        <field name="upper_bound">157000000</field>
+        <field name="rate">26.0</field>
+    </record>
+    <record id="ter_A_37" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">157000001</field>
+        <field name="upper_bound">206000000</field>
+        <field name="rate">27.0</field>
+    </record>
+    <record id="ter_A_38" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">206000001</field>
+        <field name="upper_bound">337000000</field>
+        <field name="rate">28.0</field>
+    </record>
+    <record id="ter_A_39" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">337000001</field>
+        <field name="upper_bound">454000000</field>
+        <field name="rate">29.0</field>
+    </record>
+    <record id="ter_A_40" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">454000001</field>
+        <field name="upper_bound">550000000</field>
+        <field name="rate">30.0</field>
+    </record>
+    <record id="ter_A_41" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">550000001</field>
+        <field name="upper_bound">695000000</field>
+        <field name="rate">31.0</field>
+    </record>
+    <record id="ter_A_42" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">695000001</field>
+        <field name="upper_bound">910000000</field>
+        <field name="rate">32.0</field>
+    </record>
+    <record id="ter_A_43" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">910000001</field>
+        <field name="upper_bound">1400000000</field>
+        <field name="rate">33.0</field>
+    </record>
+    <record id="ter_A_44" model="hr.payroll.ter.bracket">
+        <field name="category">A</field>
+        <field name="lower_bound">1400000001</field>
+        <field name="upper_bound">0</field>
+        <field name="rate">34.0</field>
+    </record>
+
+    <!-- ===== Kategori B (TK/2, TK/3, K/1, K/2) — abridged seed ===== -->
+    <record id="ter_B_1" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">0</field>
+        <field name="upper_bound">6200000</field>
+        <field name="rate">0.0</field>
+    </record>
+    <record id="ter_B_2" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">6200001</field>
+        <field name="upper_bound">6500000</field>
+        <field name="rate">0.25</field>
+    </record>
+    <record id="ter_B_3" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">6500001</field>
+        <field name="upper_bound">6850000</field>
+        <field name="rate">0.5</field>
+    </record>
+    <record id="ter_B_4" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">6850001</field>
+        <field name="upper_bound">7300000</field>
+        <field name="rate">0.75</field>
+    </record>
+    <record id="ter_B_5" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">7300001</field>
+        <field name="upper_bound">9200000</field>
+        <field name="rate">1.0</field>
+    </record>
+    <record id="ter_B_6" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">9200001</field>
+        <field name="upper_bound">10750000</field>
+        <field name="rate">1.5</field>
+    </record>
+    <record id="ter_B_7" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">10750001</field>
+        <field name="upper_bound">11250000</field>
+        <field name="rate">2.0</field>
+    </record>
+    <record id="ter_B_8" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">11250001</field>
+        <field name="upper_bound">11600000</field>
+        <field name="rate">2.5</field>
+    </record>
+    <record id="ter_B_9" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">11600001</field>
+        <field name="upper_bound">12600000</field>
+        <field name="rate">3.0</field>
+    </record>
+    <record id="ter_B_10" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">12600001</field>
+        <field name="upper_bound">13600000</field>
+        <field name="rate">4.0</field>
+    </record>
+    <record id="ter_B_11" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">13600001</field>
+        <field name="upper_bound">14950000</field>
+        <field name="rate">5.0</field>
+    </record>
+    <record id="ter_B_12" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">14950001</field>
+        <field name="upper_bound">16400000</field>
+        <field name="rate">6.0</field>
+    </record>
+    <record id="ter_B_13" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">16400001</field>
+        <field name="upper_bound">18450000</field>
+        <field name="rate">7.0</field>
+    </record>
+    <record id="ter_B_14" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">18450001</field>
+        <field name="upper_bound">21850000</field>
+        <field name="rate">8.0</field>
+    </record>
+    <record id="ter_B_15" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">21850001</field>
+        <field name="upper_bound">26000000</field>
+        <field name="rate">9.0</field>
+    </record>
+    <record id="ter_B_16" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">26000001</field>
+        <field name="upper_bound">27700000</field>
+        <field name="rate">10.0</field>
+    </record>
+    <record id="ter_B_17" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">27700001</field>
+        <field name="upper_bound">29350000</field>
+        <field name="rate">11.0</field>
+    </record>
+    <record id="ter_B_18" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">29350001</field>
+        <field name="upper_bound">31450000</field>
+        <field name="rate">12.0</field>
+    </record>
+    <record id="ter_B_19" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">31450001</field>
+        <field name="upper_bound">33950000</field>
+        <field name="rate">13.0</field>
+    </record>
+    <record id="ter_B_20" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">33950001</field>
+        <field name="upper_bound">37100000</field>
+        <field name="rate">14.0</field>
+    </record>
+    <record id="ter_B_21" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">37100001</field>
+        <field name="upper_bound">41100000</field>
+        <field name="rate">15.0</field>
+    </record>
+    <record id="ter_B_22" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">41100001</field>
+        <field name="upper_bound">45800000</field>
+        <field name="rate">16.0</field>
+    </record>
+    <record id="ter_B_23" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">45800001</field>
+        <field name="upper_bound">49500000</field>
+        <field name="rate">17.0</field>
+    </record>
+    <record id="ter_B_24" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">49500001</field>
+        <field name="upper_bound">53800000</field>
+        <field name="rate">18.0</field>
+    </record>
+    <record id="ter_B_25" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">53800001</field>
+        <field name="upper_bound">58500000</field>
+        <field name="rate">19.0</field>
+    </record>
+    <record id="ter_B_26" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">58500001</field>
+        <field name="upper_bound">64000000</field>
+        <field name="rate">20.0</field>
+    </record>
+    <record id="ter_B_27" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">64000001</field>
+        <field name="upper_bound">71000000</field>
+        <field name="rate">21.0</field>
+    </record>
+    <record id="ter_B_28" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">71000001</field>
+        <field name="upper_bound">80000000</field>
+        <field name="rate">22.0</field>
+    </record>
+    <record id="ter_B_29" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">80000001</field>
+        <field name="upper_bound">93000000</field>
+        <field name="rate">23.0</field>
+    </record>
+    <record id="ter_B_30" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">93000001</field>
+        <field name="upper_bound">109000000</field>
+        <field name="rate">24.0</field>
+    </record>
+    <record id="ter_B_31" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">109000001</field>
+        <field name="upper_bound">129000000</field>
+        <field name="rate">25.0</field>
+    </record>
+    <record id="ter_B_32" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">129000001</field>
+        <field name="upper_bound">163000000</field>
+        <field name="rate">26.0</field>
+    </record>
+    <record id="ter_B_33" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">163000001</field>
+        <field name="upper_bound">211000000</field>
+        <field name="rate">27.0</field>
+    </record>
+    <record id="ter_B_34" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">211000001</field>
+        <field name="upper_bound">374000000</field>
+        <field name="rate">28.0</field>
+    </record>
+    <record id="ter_B_35" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">374000001</field>
+        <field name="upper_bound">459000000</field>
+        <field name="rate">29.0</field>
+    </record>
+    <record id="ter_B_36" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">459000001</field>
+        <field name="upper_bound">555000000</field>
+        <field name="rate">30.0</field>
+    </record>
+    <record id="ter_B_37" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">555000001</field>
+        <field name="upper_bound">704000000</field>
+        <field name="rate">31.0</field>
+    </record>
+    <record id="ter_B_38" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">704000001</field>
+        <field name="upper_bound">957000000</field>
+        <field name="rate">32.0</field>
+    </record>
+    <record id="ter_B_39" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">957000001</field>
+        <field name="upper_bound">1405000000</field>
+        <field name="rate">33.0</field>
+    </record>
+    <record id="ter_B_40" model="hr.payroll.ter.bracket">
+        <field name="category">B</field>
+        <field name="lower_bound">1405000001</field>
+        <field name="upper_bound">0</field>
+        <field name="rate">34.0</field>
+    </record>
+
+    <!-- ===== Kategori C (K/3) — abridged seed ===== -->
+    <record id="ter_C_1" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">0</field>
+        <field name="upper_bound">6600000</field>
+        <field name="rate">0.0</field>
+    </record>
+    <record id="ter_C_2" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">6600001</field>
+        <field name="upper_bound">6950000</field>
+        <field name="rate">0.25</field>
+    </record>
+    <record id="ter_C_3" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">6950001</field>
+        <field name="upper_bound">7350000</field>
+        <field name="rate">0.5</field>
+    </record>
+    <record id="ter_C_4" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">7350001</field>
+        <field name="upper_bound">7800000</field>
+        <field name="rate">0.75</field>
+    </record>
+    <record id="ter_C_5" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">7800001</field>
+        <field name="upper_bound">8850000</field>
+        <field name="rate">1.0</field>
+    </record>
+    <record id="ter_C_6" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">8850001</field>
+        <field name="upper_bound">9800000</field>
+        <field name="rate">1.25</field>
+    </record>
+    <record id="ter_C_7" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">9800001</field>
+        <field name="upper_bound">10950000</field>
+        <field name="rate">1.5</field>
+    </record>
+    <record id="ter_C_8" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">10950001</field>
+        <field name="upper_bound">11200000</field>
+        <field name="rate">1.75</field>
+    </record>
+    <record id="ter_C_9" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">11200001</field>
+        <field name="upper_bound">12050000</field>
+        <field name="rate">2.0</field>
+    </record>
+    <record id="ter_C_10" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">12050001</field>
+        <field name="upper_bound">12950000</field>
+        <field name="rate">3.0</field>
+    </record>
+    <record id="ter_C_11" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">12950001</field>
+        <field name="upper_bound">14150000</field>
+        <field name="rate">4.0</field>
+    </record>
+    <record id="ter_C_12" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">14150001</field>
+        <field name="upper_bound">15550000</field>
+        <field name="rate">5.0</field>
+    </record>
+    <record id="ter_C_13" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">15550001</field>
+        <field name="upper_bound">17050000</field>
+        <field name="rate">6.0</field>
+    </record>
+    <record id="ter_C_14" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">17050001</field>
+        <field name="upper_bound">19500000</field>
+        <field name="rate">7.0</field>
+    </record>
+    <record id="ter_C_15" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">19500001</field>
+        <field name="upper_bound">22700000</field>
+        <field name="rate">8.0</field>
+    </record>
+    <record id="ter_C_16" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">22700001</field>
+        <field name="upper_bound">26600000</field>
+        <field name="rate">9.0</field>
+    </record>
+    <record id="ter_C_17" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">26600001</field>
+        <field name="upper_bound">28100000</field>
+        <field name="rate">10.0</field>
+    </record>
+    <record id="ter_C_18" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">28100001</field>
+        <field name="upper_bound">30100000</field>
+        <field name="rate">11.0</field>
+    </record>
+    <record id="ter_C_19" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">30100001</field>
+        <field name="upper_bound">32600000</field>
+        <field name="rate">12.0</field>
+    </record>
+    <record id="ter_C_20" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">32600001</field>
+        <field name="upper_bound">35400000</field>
+        <field name="rate">13.0</field>
+    </record>
+    <record id="ter_C_21" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">35400001</field>
+        <field name="upper_bound">38900000</field>
+        <field name="rate">14.0</field>
+    </record>
+    <record id="ter_C_22" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">38900001</field>
+        <field name="upper_bound">43000000</field>
+        <field name="rate">15.0</field>
+    </record>
+    <record id="ter_C_23" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">43000001</field>
+        <field name="upper_bound">47400000</field>
+        <field name="rate">16.0</field>
+    </record>
+    <record id="ter_C_24" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">47400001</field>
+        <field name="upper_bound">51200000</field>
+        <field name="rate">17.0</field>
+    </record>
+    <record id="ter_C_25" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">51200001</field>
+        <field name="upper_bound">55800000</field>
+        <field name="rate">18.0</field>
+    </record>
+    <record id="ter_C_26" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">55800001</field>
+        <field name="upper_bound">60400000</field>
+        <field name="rate">19.0</field>
+    </record>
+    <record id="ter_C_27" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">60400001</field>
+        <field name="upper_bound">66700000</field>
+        <field name="rate">20.0</field>
+    </record>
+    <record id="ter_C_28" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">66700001</field>
+        <field name="upper_bound">74500000</field>
+        <field name="rate">21.0</field>
+    </record>
+    <record id="ter_C_29" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">74500001</field>
+        <field name="upper_bound">83200000</field>
+        <field name="rate">22.0</field>
+    </record>
+    <record id="ter_C_30" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">83200001</field>
+        <field name="upper_bound">95600000</field>
+        <field name="rate">23.0</field>
+    </record>
+    <record id="ter_C_31" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">95600001</field>
+        <field name="upper_bound">110000000</field>
+        <field name="rate">24.0</field>
+    </record>
+    <record id="ter_C_32" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">110000001</field>
+        <field name="upper_bound">134000000</field>
+        <field name="rate">25.0</field>
+    </record>
+    <record id="ter_C_33" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">134000001</field>
+        <field name="upper_bound">169000000</field>
+        <field name="rate">26.0</field>
+    </record>
+    <record id="ter_C_34" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">169000001</field>
+        <field name="upper_bound">221000000</field>
+        <field name="rate">27.0</field>
+    </record>
+    <record id="ter_C_35" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">221000001</field>
+        <field name="upper_bound">390000000</field>
+        <field name="rate">28.0</field>
+    </record>
+    <record id="ter_C_36" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">390000001</field>
+        <field name="upper_bound">463000000</field>
+        <field name="rate">29.0</field>
+    </record>
+    <record id="ter_C_37" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">463000001</field>
+        <field name="upper_bound">561000000</field>
+        <field name="rate">30.0</field>
+    </record>
+    <record id="ter_C_38" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">561000001</field>
+        <field name="upper_bound">709000000</field>
+        <field name="rate">31.0</field>
+    </record>
+    <record id="ter_C_39" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">709000001</field>
+        <field name="upper_bound">965000000</field>
+        <field name="rate">32.0</field>
+    </record>
+    <record id="ter_C_40" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">965000001</field>
+        <field name="upper_bound">1419000000</field>
+        <field name="rate">33.0</field>
+    </record>
+    <record id="ter_C_41" model="hr.payroll.ter.bracket">
+        <field name="category">C</field>
+        <field name="lower_bound">1419000001</field>
+        <field name="upper_bound">0</field>
+        <field name="rate">34.0</field>
+    </record>
+
+</odoo>

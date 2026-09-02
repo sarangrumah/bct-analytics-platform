@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- All disabled by default; enable per tenant once ESB master data and
+         stock snapshots have been verified. -->
+
+    <record id="cron_pull_demand" model="ir.cron">
+        <field name="name">F&amp;B: pull daily demand from ESB OMS</field>
+        <field name="model_id" ref="model_custom_fnb_demand_history"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_pull_demand()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="cron_recompute_forecast" model="ir.cron">
+        <field name="name">F&amp;B: recompute demand forecasts</field>
+        <field name="model_id" ref="model_custom_fnb_demand_forecast"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_recompute_all()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="cron_generate_replenishment" model="ir.cron">
+        <field name="name">F&amp;B: generate replenishment proposals</field>
+        <field name="model_id" ref="model_custom_fnb_replenishment_proposal"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_generate()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="cron_close_replenishment" model="ir.cron">
+        <field name="name">F&amp;B: close replenishment proposals authorized in ESB</field>
+        <field name="model_id" ref="model_custom_fnb_replenishment_proposal"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_close_finished()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="param_fnb_demand_sync_enabled" model="ir.config_parameter">
+        <field name="key">fnb.demand_sync_enabled</field>
+        <field name="value">0</field>
+    </record>
+    <record id="param_fnb_forecast_enabled" model="ir.config_parameter">
+        <field name="key">fnb.forecast_enabled</field>
+        <field name="value">0</field>
+    </record>
+    <record id="param_fnb_replenishment_enabled" model="ir.config_parameter">
+        <field name="key">fnb.replenishment_enabled</field>
+        <field name="value">0</field>
+    </record>
+    <record id="param_fnb_demand_backfill_days" model="ir.config_parameter">
+        <field name="key">fnb.demand_backfill_days</field>
+        <field name="value">90</field>
+    </record>
+    <record id="param_fnb_esb_currency_id" model="ir.config_parameter">
+        <field name="key">fnb.esb_currency_id</field>
+        <field name="value">1</field>
+    </record>
+</odoo>

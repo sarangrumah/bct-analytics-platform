@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_bast_inventory"
+              name="BAST"
+              parent="stock.menu_stock_warehouse_mgmt"
+              action="action_bast_document"
+              sequence="200"
+              groups="custom_bast.group_bast_user"/>
+
+    <menuitem id="menu_bast_sales"
+              name="BAST"
+              parent="sale.sale_menu_root"
+              action="action_bast_document"
+              sequence="200"
+              groups="custom_bast.group_bast_user"/>
+</odoo>

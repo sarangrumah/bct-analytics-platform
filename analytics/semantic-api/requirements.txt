@@ -1,0 +1,16 @@
+# Pinned exactly. See login-gateway/requirements.txt for the full rationale; the same three
+# advisories apply here, and this is the service that VERIFIES tokens, so PyJWT's authentication
+# bypass (CVE-2026-48526) lands squarely on it.
+#
+# NOTE FOR ANYONE PATCHING THIS IMAGE: `apt --only-upgrade openssl` does NOT patch the OpenSSL that
+# performs RS256 verification - `cryptography` statically bundles its own, invisible to dpkg.
+fastapi==0.141.1
+starlette==1.6.0
+uvicorn[standard]==0.52.4
+pydantic==2.13.5
+psycopg2-binary==2.9.10
+PyJWT[crypto]==2.13.0
+cryptography==50.0.1
+PyYAML==6.0.2
+jsonschema==4.23.0
+prometheus-client==0.21.1

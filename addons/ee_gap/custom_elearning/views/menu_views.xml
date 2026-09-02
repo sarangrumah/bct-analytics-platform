@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top-level eLearning app menu -->
+    <menuitem id="menu_elearning_in_custom"
+              name="eLearning"
+              sequence="50"
+              web_icon="custom_elearning,static/description/icon.png"
+              groups="custom_elearning.group_user"/>
+
+    <menuitem id="menu_elearning_cohorts"
+              name="Cohorts"
+              parent="menu_elearning_in_custom"
+              action="action_elearning_cohort"
+              sequence="10"/>
+</odoo>

@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Rules -->
+    <record id="view_fnb_replenishment_rule_list" model="ir.ui.view">
+        <field name="name">custom.fnb.replenishment.rule.list</field>
+        <field name="model">custom.fnb.replenishment.rule</field>
+        <field name="arch" type="xml">
+            <list string="Replenishment Rules">
+                <field name="sequence" widget="handle"/>
+                <field name="branch_id"/>
+                <field name="product_id"/>
+                <field name="esb_location_id" optional="show"/>
+                <field name="lead_time_days"/>
+                <field name="review_period_days"/>
+                <field name="service_level"/>
+                <field name="order_multiple" optional="hide"/>
+                <field name="target_doc"/>
+                <field name="supplier_id" optional="show"/>
+                <field name="source_branch_id" optional="hide"/>
+                <field name="last_run_at" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fnb_replenishment_rule_form" model="ir.ui.view">
+        <field name="name">custom.fnb.replenishment.rule.form</field>
+        <field name="model">custom.fnb.replenishment.rule</field>
+        <field name="arch" type="xml">
+            <form string="Replenishment Rule">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Scope">
+                            <field name="branch_id"/>
+                            <field name="product_id"/>
+                            <field name="esb_location_id"/>
+                            <field name="active" invisible="1"/>
+                            <field name="sequence" invisible="1"/>
+                        </group>
+                        <group string="Cover">
+                            <field name="lead_time_days"/>
+                            <field name="review_period_days"/>
+                            <field name="service_level"/>
+                        </group>
+                        <group string="Quantity Limits">
+                            <field name="min_qty"/>
+                            <field name="max_qty"/>
+                            <field name="min_order_qty"/>
+                            <field name="order_multiple"/>
+                        </group>
+                        <group string="Output Document">
+                            <field name="target_doc"/>
+                            <field name="supplier_id" invisible="target_doc != 'purchase_order'"
+                                   required="target_doc == 'purchase_order'"/>
+                            <field name="unit_price" invisible="target_doc != 'purchase_order'"/>
+                            <field name="source_branch_id" invisible="target_doc != 'goods_transfer_request'"
+                                   required="target_doc == 'goods_transfer_request'"/>
+                            <field name="source_location_id" invisible="target_doc != 'goods_transfer_request'"/>
+                            <field name="last_run_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        Ordered quantity =
+                        <b>forecast over (lead time + review period)</b> + <b>safety stock</b>
+                        − on hand in ESB − already on order, then rounded up to the order multiple.
+                        A Purchase Request is the safest target: approval and pricing stay inside ESB.
+                    </div>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fnb_replenishment_rule" model="ir.actions.act_window">
+        <field name="name">Replenishment Rules</field>
+        <field name="res_model">custom.fnb.replenishment.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Proposals -->
+    <record id="view_fnb_proposal_list" model="ir.ui.view">
+        <field name="name">custom.fnb.replenishment.proposal.list</field>
+        <field name="model">custom.fnb.replenishment.proposal</field>
+        <field name="arch" type="xml">
+            <list string="Replenishment Proposals"
+                  decoration-warning="has_unreliable_forecast and state in ('draft','to_approve')"
+                  decoration-success="state == 'done'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="create_date" string="Generated"/>
+                <field name="branch_id"/>
+                <field name="target_doc"/>
+                <field name="supplier_id" optional="show"/>
+                <field name="source_branch_id" optional="hide"/>
+                <field name="required_date"/>
+                <field name="line_count" string="Lines"/>
+                <field name="total_qty" sum="Qty"/>
+                <field name="estimated_value" sum="Value" optional="show"/>
+                <field name="has_unreliable_forecast" string="Weak Forecast" optional="hide"/>
+                <field name="esb_doc_num"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fnb_proposal_form" model="ir.ui.view">
+        <field name="name">custom.fnb.replenishment.proposal.form</field>
+        <field name="model">custom.fnb.replenishment.proposal</field>
+        <field name="arch" type="xml">
+            <form string="Replenishment Proposal">
+                <header>
+                    <button name="action_submit" type="object" string="Submit for Approval"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve &amp; Send to ESB"
+                            class="btn-primary" invisible="state not in ('draft', 'to_approve')"
+                            groups="custom_fnb_stock_ops.group_fnb_planner"
+                            confirm="This creates the document in ESB. Continue?"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state not in ('to_approve', 'cancelled')"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('pushed', 'done', 'cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,to_approve,approved,pushed,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not has_unreliable_forecast or state in ('pushed', 'done', 'cancelled')">
+                        Some lines are based on fewer than two weeks of demand history. Review the
+                        quantities before approving — the forecast has not had time to learn this
+                        outlet's pattern.
+                    </div>
+                    <group>
+                        <group string="Destination">
+                            <field name="branch_id" readonly="state != 'draft'"/>
+                            <field name="required_date" readonly="state in ('pushed', 'done')"/>
+                        </group>
+                        <group string="Source">
+                            <field name="target_doc" readonly="state != 'draft'"/>
+                            <field name="supplier_id" invisible="target_doc != 'purchase_order'"/>
+                            <field name="source_branch_id" invisible="target_doc != 'goods_transfer_request'"/>
+                            <field name="source_location_id" invisible="target_doc != 'goods_transfer_request'"/>
+                        </group>
+                        <group string="Approval" invisible="not approved_by_id">
+                            <field name="approved_by_id"/>
+                            <field name="approved_at"/>
+                        </group>
+                        <group string="ESB" invisible="not esb_outbox_id">
+                            <field name="esb_doc_num"/>
+                            <field name="esb_state"/>
+                            <field name="esb_outbox_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lines">
+                            <field name="line_ids" readonly="state in ('pushed', 'done', 'cancelled')">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="qty"/>
+                                    <field name="unit_price"/>
+                                    <field name="note"/>
+                                    <field name="forecast_reliable" string="Reliable" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="How the quantity was derived">
+                            <field name="line_ids" readonly="1">
+                                <list create="false" delete="false">
+                                    <field name="product_id"/>
+                                    <field name="forecast_daily_qty" string="Forecast/Day"/>
+                                    <field name="cover_days" string="Cover Days"/>
+                                    <field name="forecast_horizon_qty" string="Demand over Cover"/>
+                                    <field name="safety_stock" string="Safety Stock"/>
+                                    <field name="on_hand_qty" string="On Hand (ESB)"/>
+                                    <field name="on_order_qty" string="On Order"/>
+                                    <field name="raw_need" string="Raw Need"/>
+                                    <field name="qty" string="Ordered (rounded)"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes" placeholder="Why this order was adjusted..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fnb_proposal_search" model="ir.ui.view">
+        <field name="name">custom.fnb.replenishment.proposal.search</field>
+        <field name="model">custom.fnb.replenishment.proposal</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="branch_id"/>
+                <field name="esb_doc_num"/>
+                <filter name="awaiting" string="Awaiting Approval"
+                        domain="[('state', 'in', ('draft', 'to_approve'))]"/>
+                <filter name="weak" string="Weak Forecast" domain="[('has_unreliable_forecast', '=', True)]"/>
+                <filter name="in_esb" string="In ESB" domain="[('state', 'in', ('pushed', 'done'))]"/>
+                <group>
+                    <filter name="group_branch" string="Branch" context="{'group_by': 'branch_id'}"/>
+                    <filter name="group_target" string="Document Type" context="{'group_by': 'target_doc'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fnb_proposal" model="ir.actions.act_window">
+        <field name="name">Replenishment Proposals</field>
+        <field name="res_model">custom.fnb.replenishment.proposal</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_fnb_proposal_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No proposals yet</p>
+            <p>Proposals are generated from replenishment rules and stay in Odoo as drafts.
+            <b>Nothing is created in ESB until someone approves.</b></p>
+        </field>
+    </record>
+
+    <record id="action_fnb_generate_proposals" model="ir.actions.server">
+        <field name="name">Generate Replenishment Proposals Now</field>
+        <field name="model_id" ref="model_custom_fnb_replenishment_proposal"/>
+        <field name="state">code</field>
+        <field name="code">model.generate_proposals()</field>
+    </record>
+</odoo>

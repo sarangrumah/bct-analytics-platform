@@ -1,0 +1,8 @@
+id,code,name,sequence,bin_type,is_high_density
+stype_ac1,AC1,Accessory,10,SH,0
+stype_ac2,AC2,Accessory HD,20,SH,1
+stype_ap1,AP1,Apparel,30,SH,0
+stype_ap2,AP2,Apparel HD,40,SH,1
+stype_fo1,FO1,Footwear,50,SH,0
+stype_fo2,FO2,Footwear HD,60,SH,1
+stype_fl1,FL1,Floor,70,FL,0

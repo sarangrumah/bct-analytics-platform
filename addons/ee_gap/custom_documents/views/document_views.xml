@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_document_list" model="ir.ui.view">
+        <field name="name">document.list</field>
+        <field name="model">document.document</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state == 'archived'"
+                  decoration-info="state == 'draft'">
+                <field name="name"/>
+                <field name="workspace_id"/>
+                <field name="filename"/>
+                <field name="classification_id"/>
+                <field name="owner_id"/>
+                <field name="version_count"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_document_form" model="ir.ui.view">
+        <field name="name">document.form</field>
+        <field name="model">document.document</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_download" string="Download" type="object" class="btn-primary"
+                            invisible="not attachment_id"/>
+                    <button name="action_publish" string="Publish" type="object"
+                            invisible="state != 'draft'"/>
+                    <button name="action_archive" string="Archive" type="object"
+                            invisible="state == 'archived'"/>
+                    <button name="action_generate_share_link" string="Generate Share Link"
+                            type="object" invisible="share_token"/>
+                    <button name="action_revoke_share" string="Revoke Share" type="object"
+                            invisible="not share_token"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="workspace_id"/>
+                            <field name="owner_id"/>
+                            <field name="tag_ids" widget="many2many_tags"/>
+                            <field name="classification_id"/>
+                        </group>
+                        <group>
+                            <field name="attachment_id" widget="many2one_binary"/>
+                            <field name="filename" readonly="1"/>
+                            <field name="mimetype" readonly="1"/>
+                            <field name="file_size" readonly="1"/>
+                            <field name="version_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <group invisible="not share_token">
+                        <field name="share_token" readonly="1"/>
+                        <field name="share_expires_at"/>
+                    </group>
+                    <separator string="Description"/>
+                    <field name="description"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_document" model="ir.actions.act_window">
+        <field name="name">Documents</field>
+        <field name="res_model">document.document</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

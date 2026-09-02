@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_wms_event_stock_user,wms.event.stock.user,model_wms_integration_event,stock.group_stock_user,1,0,0,0
+access_wms_event_manager,wms.event.manager,model_wms_integration_event,group_wms_integration_manager,1,1,1,1
+access_wms_mapping_stock_user,wms.mapping.stock.user,model_wms_integration_mapping,stock.group_stock_user,1,0,0,0
+access_wms_mapping_manager,wms.mapping.manager,model_wms_integration_mapping,group_wms_integration_manager,1,1,1,1

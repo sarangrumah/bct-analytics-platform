@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Seed the tenant "Office and outlet equipment" asset group + the RUKO GUDANG
+      PALEM location before the register is loaded. Idempotent and non-destructive
+      (only empty fields are filled). Runs on every module upgrade so the group
+      account wiring self-heals. The per-unit register itself is created by the
+      post_init_hook (guarded one-shot), NOT here.
+    -->
+    <function model="custom.fixed.asset.group"
+              name="_seed_aim_asset_register"/>
+</odoo>

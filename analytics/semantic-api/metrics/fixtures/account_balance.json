@@ -1,0 +1,99 @@
+{
+  "metric": "account_balance",
+  "dimensions": [
+    "date_day"
+  ],
+  "rows": [
+    {
+      "date_day": "2026-06-29",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-04-08",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-02-18",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-01-20",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-06-10",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-04-04",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-01-03",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-08-02",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-01-29",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-05-11",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-07-26",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-04-18",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-02-03",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-08-07",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-04-21",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-08-20",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-06-24",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-03-19",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-04-01",
+      "value": 0.0
+    },
+    {
+      "date_day": "2026-03-21",
+      "value": 0.0
+    }
+  ],
+  "meta": {
+    "tenant_id": "bct",
+    "row_count": 20,
+    "last_refreshed_at": "2026-08-31T11:14:30.091922+00:00",
+    "is_stale": false,
+    "refresh_sla_seconds": 3600,
+    "source_model": "fct_account_move_line",
+    "unit": "IDR",
+    "type": "decimal",
+    "query_duration_ms": 41.3
+  }
+}

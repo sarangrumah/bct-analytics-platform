@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ref_candidate_list" model="ir.ui.view">
+        <field name="name">referral.candidate.list</field>
+        <field name="model">referral.candidate</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'hired'"
+                  decoration-info="state in ('screening','interviewed','offered')"
+                  decoration-muted="state in ('rejected','withdrawn')">
+                <field name="name"/>
+                <field name="position_id"/>
+                <field name="referrer_id"/>
+                <field name="state" widget="badge"/>
+                <field name="submitted_at"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_ref_candidate_form" model="ir.ui.view">
+        <field name="name">referral.candidate.form</field>
+        <field name="model">referral.candidate</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_advance" string="Screening" type="object"
+                            context="{'default_target_state': 'screening'}"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_advance" string="Interviewed" type="object"
+                            context="{'default_target_state': 'interviewed'}"
+                            invisible="state != 'screening'"/>
+                    <button name="action_advance" string="Offered" type="object"
+                            context="{'default_target_state': 'offered'}"
+                            invisible="state != 'interviewed'"/>
+                    <button name="action_mark_hired" string="Hired" type="object"
+                            class="btn-success" invisible="state != 'offered'"/>
+                    <button name="action_reject" string="Reject" type="object"
+                            invisible="state in ('hired','rejected','withdrawn')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="position_id"/>
+                            <field name="referrer_id"/>
+                            <field name="reward_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="cv_attachment_id"/>
+                            <field name="hired_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Notes"/>
+                    <field name="notes"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_ref_candidate" model="ir.actions.act_window">
+        <field name="name">Candidates</field>
+        <field name="res_model">referral.candidate</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

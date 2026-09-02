@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_expenses_in_custom"
+              name="Expenses (AI / Approval)"
+              parent="hr_expense.menu_hr_expense_root"
+              action="action_hr_expense_custom"
+              sequence="45"
+              groups="custom_expenses.group_user"/>
+
+    <menuitem id="menu_expense_reports"
+              name="Expense Reports"
+              parent="hr_expense.menu_hr_expense_root"
+              action="action_custom_expense_report"
+              sequence="46"
+              groups="custom_expenses.group_user"/>
+
+    <menuitem id="menu_corporate_cards"
+              name="Corporate Cards"
+              parent="hr_expense.menu_hr_expense_root"
+              action="action_custom_expense_corporate_card"
+              sequence="47"
+              groups="custom_expenses.group_manager"/>
+
+</odoo>

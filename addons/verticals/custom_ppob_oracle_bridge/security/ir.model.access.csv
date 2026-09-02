@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ppob_oracle_connection_user,ppob oracle connection user,model_custom_ppob_oracle_connection,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_oracle_connection_ops,ppob oracle connection ops,model_custom_ppob_oracle_connection,custom_ppob_core.group_ppob_ops,1,0,0,0
+access_ppob_oracle_connection_manager,ppob oracle connection manager,model_custom_ppob_oracle_connection,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_oracle_member_map_user,ppob oracle member map user,model_custom_ppob_oracle_member_map,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_oracle_member_map_ops,ppob oracle member map ops,model_custom_ppob_oracle_member_map,custom_ppob_core.group_ppob_ops,1,0,0,0
+access_ppob_oracle_member_map_manager,ppob oracle member map manager,model_custom_ppob_oracle_member_map,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_oracle_ingest_skipped_user,ppob oracle ingest skipped user,model_custom_ppob_oracle_ingest_skipped,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_oracle_ingest_skipped_ops,ppob oracle ingest skipped ops,model_custom_ppob_oracle_ingest_skipped,custom_ppob_core.group_ppob_ops,1,1,0,0
+access_ppob_oracle_ingest_skipped_manager,ppob oracle ingest skipped manager,model_custom_ppob_oracle_ingest_skipped,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_oracle_backfill_wizard,ppob oracle backfill wizard,model_custom_ppob_oracle_backfill_wizard,custom_ppob_core.group_ppob_manager,1,1,1,1

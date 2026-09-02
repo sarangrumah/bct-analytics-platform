@@ -1,0 +1,71 @@
+# Paths Semgrep does not scan. Owner: Security agent.
+#
+# READ THIS BEFORE ADDING A LINE
+# Every entry here removes a path from EVERY rule at once, including rules written years
+# from now by people who will never read this file. That makes it the bluntest instrument
+# in the security toolchain, so it is reserved for code this repository does not author:
+# vendored dependencies, build output, and binary assets.
+#
+# It is NOT the place for:
+#   * a false positive          -> fix the rule, or suppress the line with `# nosemgrep: <rule-id> - <reason>`
+#   * a rule that is too noisy  -> scope it with `paths.exclude` inside the rule itself
+#   * test files                -> tests get scanned. A vulnerability in a test fixture is
+#                                  still a vulnerability, and test code is where hardcoded
+#                                  credentials go to be forgotten. Where a rule genuinely
+#                                  cannot apply to tests (the masking-salt KAT vectors),
+#                                  the carve-out lives in .semgrep/contracts.yml, scoped to
+#                                  that one rule.
+
+# ---- Version control and tooling state -------------------------------------------
+.git/
+.pre-commit-cache/
+.semgrep_logs/
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# ---- Dependencies we did not write (scanned as dependencies by sca-node/sca-python,
+#      which is the correct tool for them - SAST over vendored code produces thousands
+#      of findings nobody can action) -----------------------------------------------
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.egg-info/
+vendor/
+
+# ---- Build output ------------------------------------------------------------------
+dist/
+build/
+.next/
+out/
+*.min.js
+*.min.css
+*.bundle.js
+*.map
+
+# ---- dbt artefacts: generated SQL, compiled from models that ARE scanned -----------
+analytics/dbt/target/
+analytics/dbt/dbt_packages/
+analytics/dbt/logs/
+
+# ---- Binary and data ----------------------------------------------------------------
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.pdf
+*.woff
+*.woff2
+*.zip
+*.gz
+*.tar
+
+# NOT excluded, on purpose, so nobody has to wonder:
+#   addons/**            - the PDP masking and Operating Unit record rules live there
+#   analytics/cdc/**     - the extraction path contract 01 governs
+#   login-gateway/**     - holds the RS256 signing key
+#   insight-portal/**    - the only service a browser talks to
+#   scripts/**           - runs with database credentials
+#   tests/**             - see the header

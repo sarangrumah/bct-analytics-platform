@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_knowledge_article_list" model="ir.ui.view">
+        <field name="name">knowledge.article.list</field>
+        <field name="model">knowledge.article</field>
+        <field name="arch" type="xml">
+            <list string="Articles" decoration-muted="not is_published">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="parent_id"/>
+                <field name="owner_id"/>
+                <field name="tag_ids" widget="many2many_tags"
+                       options="{'color_field': 'color'}"/>
+                <field name="is_favorite" widget="boolean_favorite"/>
+                <field name="is_published" widget="boolean_toggle"/>
+                <field name="is_shared_externally" widget="boolean_toggle" optional="hide"/>
+                <field name="version_count" optional="hide"/>
+                <field name="write_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_knowledge_article_form" model="ir.ui.view">
+        <field name="name">knowledge.article.form</field>
+        <field name="model">knowledge.article</field>
+        <field name="arch" type="xml">
+            <form string="Article">
+                <header>
+                    <button name="action_toggle_favorite" type="object"
+                            string="Toggle Favorite" icon="fa-star"/>
+                    <button name="action_generate_share_link" type="object"
+                            string="Generate Share Link" icon="fa-link"
+                            groups="custom_knowledge.group_user"/>
+                    <button name="action_revoke_share_link" type="object"
+                            string="Revoke Share" icon="fa-unlink"
+                            invisible="not is_shared_externally"
+                            groups="custom_knowledge.group_user"/>
+                    <field name="is_published" widget="boolean_toggle"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_versions" type="object"
+                                class="oe_stat_button" icon="fa-history">
+                            <field name="version_count" widget="statinfo"
+                                   string="Versions"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Shared"
+                            invisible="not is_shared_externally"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Article title..."/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="parent_id"/>
+                            <field name="owner_id"/>
+                            <field name="sequence"/>
+                            <field name="is_favorite" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="tag_ids" widget="many2many_tags"
+                                   options="{'color_field': 'color'}"/>
+                            <field name="read_group_ids" widget="many2many_tags"/>
+                            <field name="color" widget="color_picker"/>
+                            <field name="is_shared_externally"/>
+                            <field name="share_token" readonly="1"
+                                   invisible="not is_shared_externally"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Content">
+                            <field name="body"/>
+                        </page>
+                        <page string="Properties">
+                            <field name="properties"/>
+                            <separator string="Definitions (inherited by children)"/>
+                            <field name="property_definitions"/>
+                        </page>
+                        <page string="Sub-articles">
+                            <field name="child_ids">
+                                <list>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="owner_id"/>
+                                    <field name="is_published"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Version History">
+                            <field name="version_ids" readonly="1">
+                                <list>
+                                    <field name="version_no"/>
+                                    <field name="saved_by"/>
+                                    <field name="saved_at"/>
+                                    <button name="action_restore_version"
+                                            type="object" string="Restore"
+                                            icon="fa-undo"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_knowledge_article_kanban" model="ir.ui.view">
+        <field name="name">knowledge.article.kanban</field>
+        <field name="model">knowledge.article</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="parent_id" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="owner_id"/>
+                <field name="tag_ids"/>
+                <field name="is_published"/>
+                <field name="is_favorite"/>
+                <field name="is_shared_externally"/>
+                <field name="color"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_global_click oe_kanban_color_#{record.color.raw_value}">
+                            <strong><field name="name"/></strong>
+                            <div>
+                                <field name="tag_ids" widget="many2many_tags"
+                                       options="{'color_field': 'color'}"/>
+                            </div>
+                            <div>
+                                <field name="owner_id" widget="many2one_avatar_user"/>
+                                <field name="is_published" widget="boolean_toggle"/>
+                                <field name="is_favorite" widget="boolean_favorite"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_knowledge_article_search" model="ir.ui.view">
+        <field name="name">knowledge.article.search</field>
+        <field name="model">knowledge.article</field>
+        <field name="arch" type="xml">
+            <search string="Articles">
+                <field name="name"/>
+                <field name="parent_id"/>
+                <field name="owner_id"/>
+                <field name="tag_ids"/>
+                <field name="search_vector" string="Full Text"
+                       filter_domain="[('search_vector','ilike',self)]"/>
+                <filter name="my_favorites" string="My Favorites"
+                        domain="[('is_favorite','=',True)]"/>
+                <filter name="published" string="Published"
+                        domain="[('is_published','=',True)]"/>
+                <filter name="shared_externally" string="Shared Externally"
+                        domain="[('is_shared_externally','=',True)]"/>
+                <filter name="my_articles" string="My Articles"
+                        domain="[('owner_id','=',uid)]"/>
+                <filter name="root_only" string="Top-level Only"
+                        domain="[('parent_id','=',False)]"/>
+                <separator/>
+                <filter name="group_parent" string="Parent"
+                        context="{'group_by':'parent_id'}"/>
+                <filter name="group_owner" string="Owner"
+                        context="{'group_by':'owner_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_knowledge_article" model="ir.actions.act_window">
+        <field name="name">Articles</field>
+        <field name="res_model">knowledge.article</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_knowledge_article_search"/>
+    </record>
+
+    <record id="action_knowledge_article_favorites" model="ir.actions.act_window">
+        <field name="name">My Favorites</field>
+        <field name="res_model">knowledge.article</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_knowledge_article_search"/>
+        <field name="context">{'search_default_my_favorites': 1}</field>
+    </record>
+
+    <record id="action_knowledge_article_shared" model="ir.actions.act_window">
+        <field name="name">Shared Articles</field>
+        <field name="res_model">knowledge.article</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_knowledge_article_search"/>
+        <field name="context">{'search_default_shared_externally': 1}</field>
+    </record>
+</odoo>

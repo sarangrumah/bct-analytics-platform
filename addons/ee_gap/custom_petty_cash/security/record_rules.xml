@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Requests: an employee sees only their own; Finance sees all. -->
+        <record id="rule_request_own" model="ir.rule">
+            <field name="name">Petty Cash Request: own only</field>
+            <field name="model_id" ref="model_petty_cash_request"/>
+            <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[Command.link(ref('group_petty_cash_user'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+        <record id="rule_request_finance" model="ir.rule">
+            <field name="name">Petty Cash Request: Finance all</field>
+            <field name="model_id" ref="model_petty_cash_request"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[Command.link(ref('group_petty_cash_finance'))]"/>
+        </record>
+
+        <!-- Realizations: same own-vs-all split. -->
+        <record id="rule_realization_own" model="ir.rule">
+            <field name="name">Petty Cash Realization: own only</field>
+            <field name="model_id" ref="model_petty_cash_realization"/>
+            <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[Command.link(ref('group_petty_cash_user'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+        <record id="rule_realization_finance" model="ir.rule">
+            <field name="name">Petty Cash Realization: Finance all</field>
+            <field name="model_id" ref="model_petty_cash_realization"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[Command.link(ref('group_petty_cash_finance'))]"/>
+        </record>
+    </data>
+</odoo>

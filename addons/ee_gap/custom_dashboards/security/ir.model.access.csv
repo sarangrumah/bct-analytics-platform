@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_dashboard_user,custom.dashboard user,model_custom_dashboard,custom_dashboards.group_user,1,1,1,0
+access_custom_dashboard_manager,custom.dashboard manager,model_custom_dashboard,custom_dashboards.group_manager,1,1,1,1
+access_custom_dashboard_tile_user,custom.dashboard.tile user,model_custom_dashboard_tile,custom_dashboards.group_user,1,1,1,0
+access_custom_dashboard_tile_manager,custom.dashboard.tile manager,model_custom_dashboard_tile,custom_dashboards.group_manager,1,1,1,1
+access_custom_dashboard_tile_wizard_user,custom.dashboard.tile.wizard user,model_custom_dashboard_tile_wizard,custom_dashboards.group_user,1,1,1,1

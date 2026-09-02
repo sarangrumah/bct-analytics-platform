@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_quality_alert_list" model="ir.ui.view">
+        <field name="name">quality.alert.list</field>
+        <field name="model">quality.alert</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'closed'"
+                  decoration-info="state in ('investigating','corrective_action')"
+                  decoration-danger="severity == 'critical'"
+                  decoration-warning="severity == 'major' and state == 'open'">
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="severity" widget="badge"/>
+                <field name="state" widget="badge"/>
+                <field name="owner_id"/>
+                <field name="resolved_at"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_quality_alert_form" model="ir.ui.view">
+        <field name="name">quality.alert.form</field>
+        <field name="model">quality.alert</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_investigate" string="Investigate" type="object"
+                            invisible="state != 'open'"/>
+                    <button name="action_corrective" string="Corrective Action" type="object"
+                            invisible="state != 'investigating'"/>
+                    <button name="action_resolve" string="Resolved" type="object" class="btn-success"
+                            invisible="state not in ('investigating','corrective_action')"/>
+                    <button name="action_close" string="Close" type="object"
+                            invisible="state != 'resolved'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="check_id"/>
+                            <field name="product_id"/>
+                            <field name="owner_id"/>
+                        </group>
+                        <group>
+                            <field name="severity"/>
+                            <field name="resolved_at" readonly="1"/>
+                            <field name="closed_at" readonly="1"/>
+                            <field name="capa_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description"><field name="description"/></page>
+                        <page string="Root Cause"><field name="root_cause"/></page>
+                        <page string="Corrective Action"><field name="corrective_action"/></page>
+                        <page string="CAPA Tracker">
+                            <field name="capa_ids" context="{'default_alert_id': id}">
+                                <list editable="bottom">
+                                    <field name="name" readonly="1"/>
+                                    <field name="action_type"/>
+                                    <field name="description"/>
+                                    <field name="responsible_id"/>
+                                    <field name="deadline"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_quality_alert" model="ir.actions.act_window">
+        <field name="name">Alerts / NCR</field>
+        <field name="res_model">quality.alert</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top-level Barcode app menu -->
+    <menuitem id="menu_barcode_root"
+              name="Barcode"
+              sequence="70"
+              web_icon="custom_barcode,static/description/icon.png"
+              groups="custom_barcode.group_user"/>
+
+    <menuitem id="menu_barcode_scan_sessions"
+              name="Scan Sessions"
+              parent="menu_barcode_root"
+              action="action_custom_barcode_scan_session"
+              sequence="10"/>
+
+    <menuitem id="menu_barcode_batch_sessions"
+              name="Batch Sessions"
+              parent="menu_barcode_root"
+              action="action_custom_barcode_batch_session"
+              sequence="20"/>
+
+    <menuitem id="menu_barcode_cluster_runs"
+              name="Cluster Picking"
+              parent="menu_barcode_root"
+              action="action_custom_barcode_cluster_run"
+              sequence="30"/>
+
+    <menuitem id="menu_barcode_config"
+              name="Configuration"
+              parent="menu_barcode_root"
+              sequence="90"
+              groups="custom_barcode.group_manager"/>
+
+    <menuitem id="menu_barcode_scan_lines"
+              name="Scan Lines"
+              parent="menu_barcode_config"
+              action="action_custom_barcode_scan_line"
+              sequence="10"/>
+
+    <menuitem id="menu_barcode_formats"
+              name="Barcode Formats"
+              parent="menu_barcode_config"
+              action="action_custom_barcode_format"
+              sequence="20"/>
+    <menuitem id="menu_barcode_label_templates"
+              name="Label Templates"
+              parent="menu_barcode_config"
+              action="action_custom_label_template"
+              sequence="30"/>
+    <menuitem id="menu_barcode_printers"
+              name="Printers"
+              parent="menu_barcode_config"
+              action="action_custom_printer_config"
+              sequence="40"/>
+    <menuitem id="menu_barcode_print_queue"
+              name="Print Queue"
+              parent="menu_barcode_root"
+              action="action_custom_print_queue"
+              sequence="40"/>
+</odoo>

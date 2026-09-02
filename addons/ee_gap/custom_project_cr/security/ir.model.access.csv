@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_cr_user,pmo cr user,model_custom_change_request,custom_project_portfolio.group_pmo_user,1,0,0,0
+access_cr_pic,pmo cr brand pic,model_custom_change_request,custom_project_portfolio.group_pmo_vertical_pic,1,0,1,0
+access_cr_ba,pmo cr ba,model_custom_change_request,custom_project_portfolio.group_pmo_ba,1,1,1,0
+access_cr_po,pmo cr po,model_custom_change_request,custom_project_portfolio.group_pmo_po,1,1,1,0
+access_cr_admin,pmo cr admin,model_custom_change_request,custom_project_portfolio.group_pmo_admin,1,1,1,1
+access_cr_appr_user,pmo cr approval user,model_custom_change_request_approval,custom_project_portfolio.group_pmo_user,1,0,0,0
+access_cr_appr_ba,pmo cr approval ba,model_custom_change_request_approval,custom_project_portfolio.group_pmo_ba,1,1,1,0
+access_cr_appr_admin,pmo cr approval admin,model_custom_change_request_approval,custom_project_portfolio.group_pmo_admin,1,1,1,1

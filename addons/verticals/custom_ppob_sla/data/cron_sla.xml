@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Runs hourly and samples the PREVIOUS complete hour. On an idle
+             instance (no transactions yet, Oracle not migrated) it finds nothing
+             and writes nothing, so installing this before go-live is free. -->
+        <record id="cron_ppob_throughput_sample" model="ir.cron">
+            <field name="name">PPOB: Sample hourly throughput</field>
+            <field name="model_id" ref="model_custom_ppob_throughput_sample"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_sample_throughput()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

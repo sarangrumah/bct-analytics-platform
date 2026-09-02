@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="module_category_voip" model="ir.module.category">
+            <field name="name">VoIP</field>
+            <field name="sequence">103</field>
+        </record>
+        <record id="group_voip_user" model="res.groups">
+            <field name="name">VoIP User</field>
+        </record>
+        <record id="group_voip_admin" model="res.groups">
+            <field name="name">VoIP Admin</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_voip_user'))]"/>
+        </record>
+    </data>
+</odoo>

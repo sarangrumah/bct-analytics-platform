@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_slide_channel_form_inherit_custom" model="ir.ui.view">
+        <field name="name">slide.channel.form.inherit.custom_elearning</field>
+        <field name="model">slide.channel</field>
+        <field name="inherit_id" ref="website_slides.view_slide_channel_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Catalog (Custom)">
+                    <group>
+                        <field name="x_level"/>
+                        <field name="x_id_category"/>
+                        <field name="x_duration_hours"/>
+                    </group>
+                    <group>
+                        <field name="x_certificate_validity_months"/>
+                        <field name="x_id_language"/>
+                        <field name="x_certificate_generated_count" readonly="1"/>
+                    </group>
+                </group>
+                <group string="Certificate &amp; Skills">
+                    <field name="x_certificate_template_id"/>
+                    <field name="x_completion_appraisal_skill_code"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_slide_channel_search_inherit_custom" model="ir.ui.view">
+        <field name="name">slide.channel.search.inherit.custom_elearning</field>
+        <field name="model">slide.channel</field>
+        <field name="inherit_id" ref="website_slides.slide_channel_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="x_level"/>
+                <field name="x_id_category"/>
+                <separator/>
+                <filter name="group_x_level" string="Level"
+                        context="{'group_by':'x_level'}"/>
+                <filter name="group_x_category" string="Category"
+                        context="{'group_by':'x_id_category'}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

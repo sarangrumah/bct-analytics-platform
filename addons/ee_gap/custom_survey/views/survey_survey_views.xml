@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_survey_survey_form_custom" model="ir.ui.view">
+        <field name="name">survey.survey.form.custom</field>
+        <field name="model">survey.survey</field>
+        <field name="inherit_id" ref="survey.survey_survey_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Classification &amp; Anonymity" name="custom_survey_classification">
+                    <group>
+                        <field name="x_survey_kind"/>
+                        <field name="x_anonymity"/>
+                        <field name="x_target_appraisal_id"/>
+                    </group>
+                    <group>
+                        <field name="x_nps_question_id"/>
+                    </group>
+                </group>
+                <group string="Certification" name="custom_survey_certification">
+                    <group>
+                        <field name="x_is_certification"/>
+                        <field name="x_certification_passing_score"
+                               invisible="not x_is_certification"/>
+                        <field name="x_certificate_validity_months"
+                               invisible="not x_is_certification"/>
+                    </group>
+                    <group>
+                        <field name="x_certificate_template"
+                               invisible="not x_is_certification"
+                               nolabel="1"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

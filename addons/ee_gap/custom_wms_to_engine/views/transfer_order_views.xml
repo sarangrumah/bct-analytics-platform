@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_transfer_order_list" model="ir.ui.view">
+        <field name="name">custom.transfer.order.list</field>
+        <field name="model">custom.transfer.order</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="rule_id"/>
+                <field name="product_id"/>
+                <field name="source_location_id"/>
+                <field name="target_location_id"/>
+                <field name="planned_qty"/>
+                <field name="actual_qty"/>
+                <field name="picker_id"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_transfer_order_form" model="ir.ui.view">
+        <field name="name">custom.transfer.order.form</field>
+        <field name="model">custom.transfer.order</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_propose" type="object" string="Propose"
+                            invisible="state != 'draft'"/>
+                    <button name="action_materialize" type="object" string="Materialize"
+                            invisible="state not in ('draft','proposed') or stock_move_id"/>
+                    <button name="action_start" type="object" string="Start" class="btn-primary"
+                            invisible="state not in ('draft','proposed')"/>
+                    <button name="action_done" type="object" string="Done"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('done','canceled')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_materialize" type="object" class="oe_stat_button"
+                                icon="fa-truck" string="Stock Move"
+                                invisible="not stock_move_id"/>
+                    </div>
+                    <group>
+                        <field name="name"/>
+                        <field name="rule_id"/>
+                        <field name="product_id"/>
+                        <field name="lot_id"/>
+                        <field name="source_location_id"/>
+                        <field name="target_location_id"/>
+                        <field name="planned_qty"/>
+                        <field name="actual_qty"/>
+                    </group>
+                    <group>
+                        <field name="picker_id"/>
+                        <field name="picked_at"/>
+                        <field name="dropped_at"/>
+                        <field name="stock_move_id"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_transfer_order_kanban" model="ir.ui.view">
+        <field name="name">custom.transfer.order.kanban</field>
+        <field name="model">custom.transfer.order</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name"/>
+                <field name="planned_qty"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card">
+                            <strong><field name="name"/></strong>
+                            <div><field name="product_id"/></div>
+                            <div>Qty: <field name="planned_qty"/></div>
+                            <div><field name="source_location_id"/> → <field name="target_location_id"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_transfer_order" model="ir.actions.act_window">
+        <field name="name">Transfer Orders</field>
+        <field name="res_model">custom.transfer.order</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+</odoo>

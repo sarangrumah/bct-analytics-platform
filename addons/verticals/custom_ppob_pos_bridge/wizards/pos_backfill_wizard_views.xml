@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_pos_backfill_wizard_form" model="ir.ui.view">
+        <field name="name">custom.ppob.pos.backfill.wizard.form</field>
+        <field name="model">custom.ppob.pos.backfill.wizard</field>
+        <field name="arch" type="xml">
+            <form string="POS Backfill / Replay">
+                <p class="text-muted">
+                    Re-process skipped POS events after mappings are completed.
+                    The bridge is push-only, so this replays the skipped queue rather
+                    than pulling from upstream.
+                </p>
+                <group>
+                    <field name="feed"/>
+                    <field name="skip_reason"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                </group>
+                <footer>
+                    <button name="action_replay" type="object" string="Replay" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pos_backfill_wizard" model="ir.actions.act_window">
+        <field name="name">POS Backfill / Replay</field>
+        <field name="res_model">custom.ppob.pos.backfill.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

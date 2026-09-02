@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Top-level ESG app menu -->
+    <menuitem id="menu_custom_esg_root"
+              name="ESG"
+              sequence="85"
+              web_icon="custom_esg,static/description/icon.png"
+              groups="group_esg_user"/>
+
+    <menuitem id="menu_custom_esg_metric"
+              name="Metrics"
+              parent="menu_custom_esg_root"
+              action="action_custom_esg_metric"
+              sequence="10"
+              groups="group_esg_user"/>
+
+    <menuitem id="menu_custom_esg_measurement"
+              name="Measurements"
+              parent="menu_custom_esg_root"
+              action="action_custom_esg_measurement"
+              sequence="20"
+              groups="group_esg_user"/>
+
+    <menuitem id="menu_custom_esg_report"
+              name="Reports"
+              parent="menu_custom_esg_root"
+              action="action_custom_esg_report"
+              sequence="30"
+              groups="group_esg_user"/>
+
+</odoo>

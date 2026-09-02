@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_expense_corporate_card_user,custom.expense.corporate.card user,model_custom_expense_corporate_card,custom_expenses.group_user,1,0,0,0
+access_custom_expense_corporate_card_manager,custom.expense.corporate.card manager,model_custom_expense_corporate_card,custom_expenses.group_manager,1,1,1,1
+access_custom_expense_report_user,custom.expense.report user,model_custom_expense_report,custom_expenses.group_user,1,1,1,0
+access_custom_expense_report_manager,custom.expense.report manager,model_custom_expense_report,custom_expenses.group_manager,1,1,1,1

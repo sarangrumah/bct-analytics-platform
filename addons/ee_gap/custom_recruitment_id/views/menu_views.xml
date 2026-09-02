@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Submenus under Recruitment app root -->
+    <menuitem id="menu_recruitment_id_webhook_logs"
+              name="Webhook Logs"
+              parent="hr_recruitment.menu_hr_recruitment_root"
+              action="action_recruitment_webhook_log"
+              sequence="80"
+              groups="custom_recruitment_id.group_user"/>
+
+    <menuitem id="menu_recruitment_id_pdp_expiring"
+              name="PDP-Expiring Applicants"
+              parent="hr_recruitment.menu_hr_recruitment_root"
+              action="action_hr_applicant_pdp_expiring"
+              sequence="85"
+              groups="custom_recruitment_id.group_manager"/>
+</odoo>

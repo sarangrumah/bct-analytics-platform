@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- Own privilege: groups sharing one are rendered as a single pick-one
+             dropdown on the user form, so sharing it across modules makes saving
+             a user silently drop every other module's group. -->
+        <record id="res_groups_privilege_retail_categ_approval" model="res.groups.privilege">
+            <field name="name">the apparel brand Category Change Approval</field>
+            <field name="sequence">195</field>
+            <field name="category_id" ref="custom_core.module_category_custom_platform"/>
+        </record>
+
+        <!--
+            Second approval tier. Odoo ships no Finance Manager group distinct
+            from Accounting Manager, and tier 2 has to be somebody else or the
+            two tiers collapse into one signature. Created empty on purpose —
+            an administrator adds the people who sign off after Accounting.
+        -->
+        <record id="group_categ_reclass_finance_manager" model="res.groups">
+            <field name="name">the apparel brand Category Change / Finance Manager</field>
+            <field name="privilege_id" ref="res_groups_privilege_retail_categ_approval"/>
+            <field name="implied_ids" eval="[Command.link(ref('custom_approval_engine.group_approval_user'))]"/>
+            <field name="comment">Second and final approver of a product category reclassification, after the Accounting Manager. Members must be set per database; the group ships empty.</field>
+        </record>
+
+        <!--
+            Tier 1 approvers are the Accounting Managers. Acting on an
+            approval.request needs custom_approval_engine.group_approval_user
+            (its ACL and record rule are both keyed on that group), which
+            Accounting Managers do not get from anywhere else — without this
+            they would receive the request and then be told they may not
+            modify it.
+        -->
+        <record id="account.group_account_manager" model="res.groups">
+            <field name="implied_ids" eval="[Command.link(ref('custom_approval_engine.group_approval_user'))]"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_quality_root" name="Quality" sequence="73"
+              groups="custom_quality_full.group_quality_user"/>
+    <menuitem id="menu_quality_checks" name="Checks" parent="menu_quality_root"
+              action="action_quality_check" sequence="10"/>
+    <menuitem id="menu_quality_alerts" name="Alerts (NCR)" parent="menu_quality_root"
+              action="action_quality_alert" sequence="20"/>
+    <menuitem id="menu_quality_config" name="Configuration" parent="menu_quality_root"
+              sequence="100" groups="custom_quality_full.group_quality_manager"/>
+    <menuitem id="menu_quality_points" name="Control Points" parent="menu_quality_config"
+              action="action_quality_point" sequence="10"/>
+    <menuitem id="menu_quality_capa" name="CAPA" parent="menu_quality_root"
+              action="action_custom_quality_capa" sequence="30"/>
+    <menuitem id="menu_quality_templates" name="Templates" parent="menu_quality_root"
+              sequence="40" groups="custom_quality_full.group_quality_manager"/>
+    <menuitem id="menu_quality_test_templates" name="Test Templates" parent="menu_quality_templates"
+              action="action_custom_quality_test" sequence="10"/>
+</odoo>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Hourly: nudge the brand twice, then auto-close silence. Reminder counters
+             live on the task, so nothing gets re-nudged every hour. -->
+        <record id="cron_verification" model="ir.cron">
+            <field name="name">VAS PMO: verification reminders &amp; auto-close</field>
+            <field name="model_id" ref="project.model_project_task"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_pmo_verification()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Daily: a hold that outlived its own estimate is the most common way work
+             goes quiet. Flag it once. -->
+        <record id="cron_hold_watch" model="ir.cron">
+            <field name="name">VAS PMO: expired holds</field>
+            <field name="model_id" ref="project.model_project_task"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_pmo_hold_watch()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Hourly: H-3 / H-1 / overdue / escalation, but only while the clock runs. -->
+        <record id="cron_sla" model="ir.cron">
+            <field name="name">VAS PMO: SLA warnings</field>
+            <field name="model_id" ref="project.model_project_task"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_pmo_sla()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Friday 18:00: close the sprint, open the next, carry work forward. -->
+        <record id="cron_sprint_roll" model="ir.cron">
+            <field name="name">VAS PMO: weekly sprint roll-over</field>
+            <field name="model_id" ref="model_custom_project_sprint"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_roll_sprint()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="nextcall" eval="(DateTime.now().replace(hour=11, minute=0, second=0) + timedelta(days=(4 - DateTime.now().weekday()) % 7)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Friday 15:00 local (08:00 UTC): draft the weekly reports, pre-filled, then
+             nudge whoever has written nothing. -->
+        <record id="cron_weekly_draft" model="ir.cron">
+            <field name="name">VAS PMO: draft weekly progress</field>
+            <field name="model_id" ref="model_custom_weekly_progress"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_draft_weekly()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="nextcall" eval="(DateTime.now().replace(hour=8, minute=0, second=0) + timedelta(days=(4 - DateTime.now().weekday()) % 7)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Monday 08:00 local (01:00 UTC): send the recap of the week that closed. -->
+        <record id="cron_weekly_digest" model="ir.cron">
+            <field name="name">VAS PMO: weekly digest</field>
+            <field name="model_id" ref="model_custom_weekly_progress"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_weekly_digest()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="nextcall" eval="(DateTime.now().replace(hour=1, minute=0, second=0) + timedelta(days=(7 - DateTime.now().weekday()) % 7)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="active" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

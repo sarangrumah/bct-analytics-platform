@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Indonesian long date, e.g. "9 Juni 2026" (accepts date or datetime in `d`). -->
+    <template id="id_date">
+        <t t-set="_bulan" t-value="['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']"/>
+        <t t-if="d"><t t-out="d.day"/> <t t-out="_bulan[d.month]"/> <t t-out="d.year"/></t>
+    </template>
+
+    <!-- QWeb template for a single Bukti Potong PPh Unifikasi -->
+    <template id="report_bupot_line_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <h2 class="text-center">Bukti Potong PPh Unifikasi</h2>
+                <h4 class="text-center"><span t-field="doc.bupot_id.name"/></h4>
+                <table class="table table-sm" style="margin-top: 1em;">
+                    <tr>
+                        <th style="width: 30%;">No. Bukti Potong</th>
+                        <td><span t-field="doc.bupot_number"/></td>
+                    </tr>
+                    <tr>
+                        <th>Internal Ref</th>
+                        <td><span t-field="doc.internal_ref"/></td>
+                    </tr>
+                    <tr>
+                        <th>Jenis PPh</th>
+                        <td>PPh Pasal <span t-esc="dict(doc._fields['pph_type'].selection).get(doc.pph_type, doc.pph_type)"/></td>
+                    </tr>
+                    <tr>
+                        <th>Tanggal Transaksi</th>
+                        <td><t t-call="custom_coretax_bupot.id_date"><t t-set="d" t-value="doc.transaction_date"/></t></td>
+                    </tr>
+                    <tr>
+                        <th>NPWP Pihak Dipotong</th>
+                        <td><span t-field="doc.cuttee_npwp"/></td>
+                    </tr>
+                    <tr>
+                        <th>NITKU Pihak Dipotong</th>
+                        <td><span t-field="doc.cuttee_nitku"/></td>
+                    </tr>
+                    <tr>
+                        <th>Nama Pihak Dipotong</th>
+                        <td><span t-field="doc.cuttee_name"/></td>
+                    </tr>
+                    <tr>
+                        <th>Source Document</th>
+                        <td><span t-field="doc.doc_ref"/></td>
+                    </tr>
+                </table>
+
+                <h5 style="margin-top: 1.5em;">Perhitungan</h5>
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <th>Bruto</th>
+                            <th>DPP</th>
+                            <th>Tarif (%)</th>
+                            <th>PPh Dipotong</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span t-field="doc.gross_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                            <td><span t-field="doc.dpp_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                            <td><span t-field="doc.rate"/></td>
+                            <td><span t-field="doc.withheld_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table style="width: 100%; border-collapse: collapse; margin-top: 4em;">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <p>Pihak Dipotong</p>
+                            <br/><br/><br/>
+                            <p>______________________</p>
+                            <span t-field="doc.cuttee_name"/>
+                        </td>
+                        <td style="width: 50%; vertical-align: top; text-align: right;">
+                            <p>Pemotong</p>
+                            <br/><br/><br/>
+                            <p>______________________</p>
+                            <span t-field="doc.company_id.name"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_bupot_line">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="custom_coretax_bupot.report_bupot_line_document"/>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_bupot_line" model="ir.actions.report">
+        <field name="name">Bukti Potong PPh Unifikasi</field>
+        <field name="model">custom.bupot.unifikasi.line</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_coretax_bupot.report_bupot_line</field>
+        <field name="report_file">custom_coretax_bupot.report_bupot_line</field>
+        <field name="binding_model_id" ref="model_custom_bupot_unifikasi_line"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

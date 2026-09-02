@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_witholding_root"
+              name="Witholding"
+              parent="account.menu_finance"
+              sequence="51"
+              groups="group_witholding_user"/>
+
+    <menuitem id="menu_witholding_rates"
+              name="Rates"
+              parent="menu_witholding_root"
+              action="action_witholding_rate"
+              sequence="10"/>
+
+    <menuitem id="menu_witholding_applications"
+              name="Applications"
+              parent="menu_witholding_root"
+              action="action_witholding_application"
+              sequence="20"/>
+
+</odoo>

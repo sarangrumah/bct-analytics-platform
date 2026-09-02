@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_pos_bridge_root"
+              name="POS Bridge"
+              parent="custom_ppob_core.menu_ppob_configuration"
+              sequence="85"/>
+
+    <menuitem id="menu_pos_txn"
+              name="Transactions (Join)"
+              parent="menu_pos_bridge_root"
+              action="action_pos_txn"
+              sequence="10"/>
+
+    <menuitem id="menu_pos_settlement"
+              name="Settlements / Snapshots"
+              parent="menu_pos_bridge_root"
+              action="action_pos_settlement"
+              sequence="20"/>
+
+    <menuitem id="menu_pos_ingest_skipped"
+              name="Skipped Events"
+              parent="menu_pos_bridge_root"
+              action="action_pos_ingest_skipped"
+              sequence="30"/>
+
+    <menuitem id="menu_pos_connection"
+              name="Feed Connections"
+              parent="menu_pos_bridge_root"
+              action="action_pos_connection"
+              sequence="40"/>
+
+    <menuitem id="menu_pos_backfill_wizard"
+              name="Backfill / Replay"
+              parent="menu_pos_bridge_root"
+              action="action_pos_backfill_wizard"
+              sequence="50"/>
+
+</odoo>

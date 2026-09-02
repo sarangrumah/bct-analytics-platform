@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_tax_id_root"
+              name="Pajak Indonesia"
+              parent="account.menu_finance"
+              sequence="55"
+              groups="custom_tax_id.group_tax_id_user"/>
+
+    <menuitem id="menu_tax_id_rules"
+              name="Withholding Rules"
+              parent="menu_tax_id_root"
+              action="action_wh_rule"
+              sequence="10"/>
+
+    <menuitem id="menu_tax_id_categories"
+              name="PPh Categories"
+              parent="menu_tax_id_root"
+              action="action_wh_category"
+              sequence="20"/>
+
+    <menuitem id="menu_tax_id_lines"
+              name="Withholding Lines"
+              parent="menu_tax_id_root"
+              action="action_wh_line"
+              sequence="30"/>
+
+    <menuitem id="menu_tax_id_pengganti"
+              name="Issue Faktur Pengganti"
+              parent="menu_tax_id_root"
+              action="action_faktur_pengganti_wizard"
+              sequence="40"
+              groups="custom_tax_id.group_tax_id_admin"/>
+
+    <menuitem id="menu_tax_id_bulk_validate"
+              name="Pre-Export Validation"
+              parent="menu_tax_id_root"
+              action="action_bulk_validation_wizard"
+              sequence="50"/>
+
+</odoo>

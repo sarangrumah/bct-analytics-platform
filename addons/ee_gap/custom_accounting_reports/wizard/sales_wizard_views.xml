@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sales_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.sales.wizard.form</field>
+        <field name="model">custom.report.sales.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sales Report">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="basis"/>
+                        <field name="group_by"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group>
+                        <field name="company_ids" widget="many2many_tags"/>
+                        <field name="partner_ids" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print"
+                            type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx"
+                            type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sales_wizard" model="ir.actions.act_window">
+        <field name="name">Sales Report</field>
+        <field name="res_model">custom.report.sales.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

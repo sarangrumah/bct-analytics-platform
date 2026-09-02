@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="module_category_onboarding" model="ir.module.category">
+            <field name="name">Onboarding</field>
+            <field name="description">Tenant onboarding lifecycle</field>
+            <field name="sequence">110</field>
+        </record>
+
+        <record id="group_onboarding_ba" model="res.groups">
+            <field name="name">Onboarding BA</field>
+            <field name="comment">Business Analyst: drive journeys, BRDs, recommendations.</field>
+        </record>
+
+        <record id="group_onboarding_manager" model="res.groups">
+            <field name="name">Onboarding Manager</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_onboarding_ba'))]"/>
+            <field name="comment">Approve Go/No-Go, archive journeys, manage public inbox.</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Journal Billing on account.move.
+
+      Renders a posted vendor bill as a GL voucher in the tenant's attached
+      format: a centered company title, a two-column meta header (Reference /
+      Invoice AP / dates / amount-in-words on the left; Vendor / PO / Tax on the
+      right), then a GL table (GL account, description, operating unit, line
+      description, debit, credit) with a TOTAL row and Posted/Approved signature.
+
+      wkhtmltopdf-safe: inline styles + <table> layout only; money via the
+      shared NBSP-free `custom_retail_localization.lv_money` macro. No company
+      logo band (external_layout) — the attached format leads with the centered
+      company name only.
+    -->
+    <template id="report_journal_billing_document">
+        <t t-set="lines" t-value="o._edo_gl_lines()"/>
+        <t t-set="ccur" t-value="o.company_id.currency_id"/>
+        <t t-set="total_debit" t-value="sum(lines.mapped('debit'))"/>
+        <t t-set="total_credit" t-value="sum(lines.mapped('credit'))"/>
+
+        <div class="page" style="font-size: 11px;">
+            <!-- Centered company title -->
+            <div style="text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 18px;" t-out="o.company_id.name"/>
+
+            <!-- Meta: left block / right block -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+                <tr>
+                    <td style="width: 50%; vertical-align: top; padding-right: 20px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="width: 30%; padding: 1px 4px; vertical-align: top;">Reference</td>
+                                <td style="padding: 1px 4px; vertical-align: top;">: <t t-out="o.ref or ''"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 4px; vertical-align: top;">Invoice AP</td>
+                                <td style="padding: 1px 4px; vertical-align: top;">: <t t-out="o.name or ''"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 4px;">Document Date</td>
+                                <td style="padding: 1px 4px;">: <t t-call="custom_retail_localization.lv_id_date"><t t-set="d" t-value="o.invoice_date"/></t></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 4px;">Due Date</td>
+                                <td style="padding: 1px 4px;">: <t t-call="custom_retail_localization.lv_id_date"><t t-set="d" t-value="o.invoice_date_due"/></t></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 4px;">TOP</td>
+                                <td style="padding: 1px 4px;">: <t t-out="o.invoice_payment_term_id.name or ''"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 4px;">Currency</td>
+                                <td style="padding: 1px 4px;">: <t t-out="o.currency_id.name or ''"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 4px;">Amount</td>
+                                <td style="padding: 1px 4px;">: <t t-call="custom_retail_localization.lv_money"><t t-set="amount" t-value="o.amount_total"/><t t-set="currency" t-value="o.currency_id"/></t></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 4px;">Rate</td>
+                                <td style="padding: 1px 4px;">: <t t-out="'{:.3f}'.format(o._edo_exchange_rate())"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 4px; vertical-align: top;">In Words</td>
+                                <td style="padding: 1px 4px; vertical-align: top; font-style: italic;">: <t t-out="o._edo_amount_in_words().upper()"/></td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="width: 50%; vertical-align: top;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="width: 30%; padding: 1px 4px; vertical-align: top;">Vendor Name</td>
+                                <td style="padding: 1px 4px; vertical-align: top;">: <t t-out="o.partner_id.name or ''"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 4px;">PO Number</td>
+                                <td style="padding: 1px 4px;">: <t t-out="o._edo_po_number()"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 4px;">Tax Number</td>
+                                <td style="padding: 1px 4px;">: <t t-out="o._edo_tax_number()"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 4px;">Accounting Date</td>
+                                <td style="padding: 1px 4px;">: <t t-call="custom_retail_localization.lv_id_date"><t t-set="d" t-value="o.date"/></t></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 4px;">Tax Date</td>
+                                <td style="padding: 1px 4px;">: <t t-call="custom_retail_localization.lv_id_date"><t t-set="d" t-value="o._edo_tax_date()"/></t></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 4px;">Tax Period</td>
+                                <td style="padding: 1px 4px;">: <t t-call="custom_retail_localization.lv_id_period"><t t-set="d" t-value="o._edo_tax_date()"/></t></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- GL table -->
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 14px;">
+                <thead>
+                    <tr style="background-color: #f3f3f3;">
+                        <th rowspan="2" style="width: 12%; border: 1px solid #000; padding: 4px; text-align: left; vertical-align: middle;">GL Account</th>
+                        <th rowspan="2" style="width: 20%; border: 1px solid #000; padding: 4px; text-align: left; vertical-align: middle;">GL Description</th>
+                        <th rowspan="2" style="width: 13%; border: 1px solid #000; padding: 4px; text-align: left; vertical-align: middle;">Operating Unit</th>
+                        <th rowspan="2" style="width: 31%; border: 1px solid #000; padding: 4px; text-align: left; vertical-align: middle;">Line Item Description</th>
+                        <th colspan="2" style="border: 1px solid #000; padding: 4px; text-align: center;">Amount in Local Currency</th>
+                    </tr>
+                    <tr style="background-color: #f3f3f3;">
+                        <th style="width: 12%; border: 1px solid #000; padding: 4px; text-align: right;">Debit</th>
+                        <th style="width: 12%; border: 1px solid #000; padding: 4px; text-align: right;">Credit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="lines" t-as="line">
+                        <td style="border: 1px solid #000; padding: 4px; vertical-align: top;" t-out="line.account_id.code or ''"/>
+                        <td style="border: 1px solid #000; padding: 4px; vertical-align: top;" t-out="line.account_id.name or ''"/>
+                        <td style="border: 1px solid #000; padding: 4px; vertical-align: top;" t-out="o._edo_operating_unit(line)"/>
+                        <td style="border: 1px solid #000; padding: 4px; vertical-align: top; white-space: pre-line;" t-out="line.name or ''"/>
+                        <td style="border: 1px solid #000; padding: 4px; text-align: right; vertical-align: top;"><t t-call="custom_retail_localization.lv_money"><t t-set="amount" t-value="line.debit"/><t t-set="currency" t-value="ccur"/></t></td>
+                        <td style="border: 1px solid #000; padding: 4px; text-align: right; vertical-align: top;"><t t-call="custom_retail_localization.lv_money"><t t-set="amount" t-value="line.credit"/><t t-set="currency" t-value="ccur"/></t></td>
+                    </tr>
+                    <tr style="font-weight: bold; background-color: #f3f3f3;">
+                        <td colspan="4" style="border: 1px solid #000; padding: 4px; text-align: right;">TOTAL</td>
+                        <td style="border: 1px solid #000; padding: 4px; text-align: right;"><t t-call="custom_retail_localization.lv_money"><t t-set="amount" t-value="total_debit"/><t t-set="currency" t-value="ccur"/></t></td>
+                        <td style="border: 1px solid #000; padding: 4px; text-align: right;"><t t-call="custom_retail_localization.lv_money"><t t-set="amount" t-value="total_credit"/><t t-set="currency" t-value="ccur"/></t></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Posted / Approved signatures -->
+            <table style="width: 100%; border-collapse: collapse; text-align: center; margin-top: 20px;">
+                <tr>
+                    <td style="width: 50%; padding: 4px;">Posted by</td>
+                    <td style="width: 50%; padding: 4px;">Approved by</td>
+                </tr>
+                <tr style="height: 55px;"><td/><td/></tr>
+                <tr>
+                    <td style="padding: 4px 4px 0; border-top: 1px solid #000;" t-out="o.create_uid.name or ''"/>
+                    <td style="padding: 4px 4px 0; border-top: 1px solid #000;">(________________)</td>
+                </tr>
+                <!-- the apparel brand has no approval engine: leave the approver name blank
+                     with a fillable signature line instead of a designation. -->
+                <tr style="font-size: 9px; color: #555;">
+                    <td style="padding: 0 4px 4px;"/>
+                    <td style="padding: 0 4px 4px;"/>
+                </tr>
+            </table>
+        </div>
+    </template>
+
+    <!-- Self-contained wrapper: no web.html_container → no external asset (report.url)
+         callback that stalls wkhtmltopdf. <main> required by _prepare_html. -->
+    <template id="report_journal_billing">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <style>
+                    @page { margin: 12mm; }
+                    * { box-sizing: border-box; }
+                    body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; margin: 0; padding: 0; }
+                </style>
+            </head>
+            <body>
+                <main>
+                    <t t-foreach="docs" t-as="o">
+                        <div t-if="not o_first" style="page-break-before: always;"></div>
+                        <t t-call="custom_retail_localization.report_journal_billing_document"/>
+                    </t>
+                </main>
+            </body>
+        </html>
+    </template>
+
+    <record id="action_report_journal_billing" model="ir.actions.report">
+        <field name="name">Journal Billing</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_retail_localization.report_journal_billing</field>
+        <field name="report_file">custom_retail_localization.report_journal_billing</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_retail_voucher_portrait"/>
+        <field name="print_report_name">'Journal Billing - %s' % (object.name or '').replace('/', '-')</field>
+    </record>
+</odoo>

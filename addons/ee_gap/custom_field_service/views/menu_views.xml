@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_fsm_root" name="Field Service" sequence="45"
+              groups="custom_field_service.group_fsm_technician"/>
+    <menuitem id="menu_fsm_wo" name="Work Orders" parent="menu_fsm_root"
+              action="action_fsm_wo" sequence="10"/>
+    <menuitem id="menu_fsm_sites" name="Sites" parent="menu_fsm_root"
+              action="action_fsm_site" sequence="20"/>
+    <menuitem id="menu_fsm_techs" name="Technicians" parent="menu_fsm_root"
+              action="action_fsm_technician" sequence="30"
+              groups="custom_field_service.group_fsm_dispatcher"/>
+    <menuitem id="menu_fsm_config" name="Configuration" parent="menu_fsm_root" sequence="100"
+              groups="custom_field_service.group_fsm_dispatcher"/>
+    <menuitem id="menu_fsm_skills" name="Skills" parent="menu_fsm_config"
+              action="action_fsm_skill" sequence="10"/>
+</odoo>

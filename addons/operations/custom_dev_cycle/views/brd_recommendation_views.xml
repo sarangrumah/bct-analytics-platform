@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_brd_recommendation_form_dev_cycle" model="ir.ui.view">
+            <field name="name">brd.recommendation.form.dev_cycle</field>
+            <field name="model">brd.recommendation</field>
+            <field name="inherit_id" ref="custom_brd_analyzer.view_brd_recommendation_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button name="action_create_dev_cycle" type="object"
+                            string="Create Dev Cycle" class="btn-secondary"/>
+                </xpath>
+                <xpath expr="//sheet" position="before">
+                    <div class="oe_button_box" name="dev_cycle_button_box">
+                        <button name="action_open_dev_cycles" type="object"
+                                class="oe_stat_button" icon="fa-tasks">
+                            <field name="dev_cycle_count" widget="statinfo" string="Dev Cycles"/>
+                        </button>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

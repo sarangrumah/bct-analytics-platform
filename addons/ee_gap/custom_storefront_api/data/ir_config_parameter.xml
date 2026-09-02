@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Allowed CORS origin for the storefront. Override per tenant. -->
+        <record id="icp_storefront_cors_origin" model="ir.config_parameter">
+            <field name="key">custom_storefront_api.cors_origin</field>
+            <field name="value">https://shop.gentle-woman.platform.localhost</field>
+        </record>
+        <!-- Storefront payments: master switch + default provider code. -->
+        <record id="icp_storefront_payments_enabled" model="ir.config_parameter">
+            <field name="key">custom_storefront_api.payments_enabled</field>
+            <field name="value">True</field>
+        </record>
+        <record id="icp_storefront_default_provider" model="ir.config_parameter">
+            <field name="key">custom_storefront_api.default_provider</field>
+            <field name="value">custom</field>
+        </record>
+    </data>
+</odoo>

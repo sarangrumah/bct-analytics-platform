@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="custom_studio_lite.StudioOverlay">
+        <t t-if="isActive">
+            <div class="o_studio_overlay_sidebar">
+                <div class="o_studio_overlay_header">
+                    <div class="o_studio_overlay_title">
+                        <i class="fa fa-paint-brush"/>
+                        <strong>Studio Mode</strong>
+                    </div>
+                    <button class="btn btn-sm btn-link"
+                            t-on-click="close"
+                            title="Exit Studio mode">
+                        <i class="fa fa-times"/>
+                    </button>
+                </div>
+
+                <div class="o_studio_overlay_context">
+                    <small>Model:</small>
+                    <code><t t-esc="state.currentModel || '—'"/></code>
+                    <small t-if="state.currentViewName"><t t-esc="state.currentViewName"/></small>
+                    <small>View id:</small>
+                    <code t-att-class="state.currentViewId ? '' : 'o_studio_overlay_warning'">
+                        <t t-esc="state.currentViewId || '(not detected)'"/>
+                    </code>
+                </div>
+
+                <!-- Tab bar -->
+                <div class="o_studio_overlay_tabs">
+                    <button class="o_studio_overlay_tab"
+                            t-att-class="state.tab === 'add' ? 'o_active' : ''"
+                            t-on-click="() => (state.tab = 'add')">
+                        <i class="fa fa-plus"/> Add
+                    </button>
+                    <button class="o_studio_overlay_tab"
+                            t-att-class="state.tab === 'properties' ? 'o_active' : ''"
+                            t-att-disabled="!state.selectedField"
+                            t-on-click="() => (state.tab = 'properties')">
+                        <i class="fa fa-sliders"/> Properties
+                    </button>
+                    <button class="o_studio_overlay_tab"
+                            t-att-class="state.tab === 'ops' ? 'o_active' : ''"
+                            t-on-click="() => (state.tab = 'ops')">
+                        <i class="fa fa-list"/> Ops
+                        <small> (<t t-esc="state.operations.length"/>)</small>
+                    </button>
+                </div>
+
+                <!-- ADD TAB -->
+                <div t-if="state.tab === 'add'" class="o_studio_overlay_panel">
+                    <h4>Create new field</h4>
+                    <p class="o_studio_hint">
+                        Will be placed after <code><t t-esc="plannedAnchor || '(no anchor)'"/></code>
+                        <small t-if="!state.selectedField"> — click a field first to override.</small>
+                    </p>
+                    <div class="o_studio_overlay_newfield">
+                        <input type="text"
+                               placeholder="Label (e.g. Account Manager)"
+                               t-att-value="state.newFieldLabel"
+                               t-on-input="(ev) => (state.newFieldLabel = ev.target.value)"/>
+                        <select t-on-change="(ev) => (state.newFieldType = ev.target.value)">
+                            <option value="char">Char</option>
+                            <option value="text">Text</option>
+                            <option value="integer">Integer</option>
+                            <option value="float">Float</option>
+                            <option value="boolean">Boolean</option>
+                            <option value="date">Date</option>
+                            <option value="datetime">Datetime</option>
+                            <option value="selection">Selection</option>
+                        </select>
+                        <button class="btn btn-sm btn-primary"
+                                t-on-click="createNewField"
+                                t-att-disabled="state.saving || !state.newFieldLabel">
+                            <i class="fa fa-plus"/> Create
+                        </button>
+                    </div>
+
+                    <h4 class="mt-3">Existing fields</h4>
+                    <p class="o_studio_hint">Drag onto a visible field in the form to insert after it.</p>
+                    <input type="text"
+                           placeholder="Filter…"
+                           t-att-value="state.filter"
+                           t-on-input="(ev) => state.filter = ev.target.value"/>
+                    <ul class="o_studio_overlay_field_list">
+                        <li t-foreach="filteredFields" t-as="f" t-key="f.id"
+                            class="o_studio_overlay_drag_source"
+                            draggable="true"
+                            t-on-dragstart="(ev) => this.onDragStart(f.name, ev)">
+                            <i class="fa fa-bars o_studio_drag_handle"/>
+                            <div class="o_studio_overlay_field_meta">
+                                <span><t t-esc="f.field_description"/></span>
+                                <code><t t-esc="f.name"/></code>
+                            </div>
+                            <span class="o_studio_field_type">[<t t-esc="f.ttype"/>]</span>
+                        </li>
+                        <li t-if="!filteredFields.length" class="o_studio_overlay_empty">
+                            All model fields are already on this view.
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- PROPERTIES TAB -->
+                <div t-if="state.tab === 'properties' and state.selectedField"
+                     class="o_studio_overlay_panel">
+                    <h4>Properties
+                        <small t-if="state.isStudioField" class="o_studio_badge">CUSTOM</small>
+                        <small t-if="!state.isStudioField and !state.selectedFieldIsWidgetOnly"
+                               class="o_studio_badge o_studio_badge_native">NATIVE</small>
+                        <small t-if="state.selectedFieldIsWidgetOnly"
+                               class="o_studio_badge o_studio_badge_widget">WIDGET</small>
+                    </h4>
+                    <div class="o_studio_overlay_props">
+                        <label>Technical name</label>
+                        <code><t t-esc="state.selectedField"/></code>
+
+                        <t t-if="!state.selectedFieldIsWidgetOnly">
+                            <label>Label</label>
+                            <input type="text"
+                                   t-att-value="state.fieldProps.label"
+                                   t-on-input="(ev) => (state.fieldProps.label = ev.target.value)"/>
+
+                            <label>Widget</label>
+                            <input type="text"
+                                   placeholder="(default)"
+                                   t-att-value="state.fieldProps.widget"
+                                   t-on-input="(ev) => (state.fieldProps.widget = ev.target.value)"/>
+
+                            <div class="o_studio_overlay_checks">
+                                <label>
+                                    <input type="checkbox"
+                                           t-att-checked="state.fieldProps.invisible"
+                                           t-on-change="(ev) => (state.fieldProps.invisible = ev.target.checked)"/>
+                                    Invisible
+                                </label>
+                                <label>
+                                    <input type="checkbox"
+                                           t-att-checked="state.fieldProps.readonly"
+                                           t-on-change="(ev) => (state.fieldProps.readonly = ev.target.checked)"/>
+                                    Readonly
+                                </label>
+                                <label>
+                                    <input type="checkbox"
+                                           t-att-checked="state.fieldProps.required"
+                                           t-on-change="(ev) => (state.fieldProps.required = ev.target.checked)"/>
+                                    Required
+                                </label>
+                            </div>
+                        </t>
+                        <p t-if="state.selectedFieldIsWidgetOnly" class="o_studio_hint">
+                            This element is rendered by a widget (e.g. ribbon, button, badge) — only Hide is available.
+                        </p>
+                    </div>
+
+                    <div t-if="!state.selectedFieldIsWidgetOnly" class="o_studio_overlay_actions">
+                        <button class="btn btn-primary"
+                                t-on-click="applyFieldProperties"
+                                t-att-disabled="state.saving">
+                            <i class="fa fa-check"/> Apply changes
+                        </button>
+                    </div>
+
+                    <h4 t-if="!state.selectedFieldIsWidgetOnly" class="mt-3">Position</h4>
+                    <div t-if="!state.selectedFieldIsWidgetOnly" class="o_studio_overlay_actions">
+                        <button class="btn btn-sm btn-secondary"
+                                t-on-click="() => this.moveSelectedField('up')"
+                                t-att-disabled="state.saving">
+                            <i class="fa fa-arrow-up"/> Move up
+                        </button>
+                        <button class="btn btn-sm btn-secondary"
+                                t-on-click="() => this.moveSelectedField('down')"
+                                t-att-disabled="state.saving">
+                            <i class="fa fa-arrow-down"/> Move down
+                        </button>
+                    </div>
+
+                    <h4 class="mt-3">Danger zone</h4>
+                    <div class="o_studio_overlay_actions">
+                        <button class="btn btn-sm btn-warning"
+                                t-on-click="hideSelectedField"
+                                t-att-disabled="state.saving">
+                            <i class="fa fa-eye-slash"/> Hide
+                        </button>
+                        <button t-if="state.isStudioField"
+                                class="btn btn-sm btn-danger"
+                                t-on-click="deleteStudioField"
+                                t-att-disabled="state.saving">
+                            <i class="fa fa-trash"/> Delete
+                        </button>
+                        <p t-if="!state.isStudioField and !state.selectedFieldIsWidgetOnly"
+                           class="o_studio_hint">
+                            Only studio-created custom fields can be deleted. Native fields can only be hidden.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- OPS TAB -->
+                <div t-if="state.tab === 'ops'" class="o_studio_overlay_panel">
+                    <h4>Persisted operations</h4>
+                    <p class="o_studio_hint">
+                        Every drop / property change / move on this view adds an entry here.
+                        Delete any row to undo it, or use Reset to drop everything.
+                    </p>
+                    <div class="o_studio_overlay_actions" style="margin-bottom: 8px;">
+                        <button class="btn btn-sm btn-danger"
+                                t-on-click="resetView"
+                                t-att-disabled="state.saving">
+                            <i class="fa fa-undo"/> Reset all edits on this view
+                        </button>
+                    </div>
+                    <ul class="o_studio_overlay_field_list">
+                        <li t-foreach="state.operations" t-as="op" t-key="op.id"
+                            class="o_studio_overlay_op_row">
+                            <div class="o_studio_overlay_field_meta">
+                                <span><strong><t t-esc="op.op_type"/></strong>
+                                    <t t-esc="op.field_name || op.attr_name"/>
+                                </span>
+                                <code t-if="op.anchor_field">→ <t t-esc="op.position"/> <t t-esc="op.anchor_field"/></code>
+                                <code t-if="op.attr_value">= <t t-esc="op.attr_value"/></code>
+                            </div>
+                            <button class="btn btn-xs btn-danger"
+                                    t-on-click="() => this.deleteOp(op.id)"
+                                    t-att-disabled="state.saving">
+                                <i class="fa fa-times"/>
+                            </button>
+                        </li>
+                        <li t-if="!state.operations.length" class="o_studio_overlay_empty">
+                            No operations on this view yet.
+                        </li>
+                    </ul>
+                </div>
+
+                <div t-if="state.saving" class="o_studio_overlay_saving">
+                    <i class="fa fa-circle-o-notch fa-spin"/> Applying…
+                </div>
+            </div>
+        </t>
+    </t>
+</templates>

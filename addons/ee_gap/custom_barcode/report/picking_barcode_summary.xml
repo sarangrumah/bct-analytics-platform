@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Per-picking summary of scanned vs expected lines.
+
+         Datasource: stock.picking.  We aggregate scan lines from every related
+         custom.barcode.scan.session that targets this picking. -->
+
+    <template id="report_picking_barcode_summary_doc"
+              name="Picking Barcode Summary (Doc)">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="picking">
+                    <div class="page">
+                        <h2>Barcode Scan Summary</h2>
+                        <h3>
+                            Transfer:
+                            <span t-out="picking.name"/>
+                        </h3>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td><b>Partner</b></td>
+                                    <td t-out="picking.partner_id.display_name or ''"/>
+                                    <td><b>State</b></td>
+                                    <td t-out="picking.state"/>
+                                </tr>
+                                <tr>
+                                    <td><b>Scheduled</b></td>
+                                    <td t-out="picking.scheduled_date"/>
+                                    <td><b>Source / Dest</b></td>
+                                    <td>
+                                        <span t-out="picking.location_id.display_name"/>
+                                        →
+                                        <span t-out="picking.location_dest_id.display_name"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <t t-set="rows" t-value="picking._barcode_summary_rows()"/>
+
+                        <h4>Scanned vs Expected</h4>
+                        <table class="table table-sm" style="font-size: 11px;">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-end">Expected</th>
+                                    <th class="text-end">Scanned</th>
+                                    <th class="text-end">Deviation</th>
+                                    <th class="text-end">Deviation %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="rows" t-as="r">
+                                    <td t-out="r['product'].display_name"/>
+                                    <td class="text-end">
+                                        <span t-out="'%.3f' % r['expected']"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-out="'%.3f' % r['scanned']"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-out="'%.3f' % (r['scanned'] - r['expected'])"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <b>
+                                            <span t-out="'%.2f%%' % r['deviation_pct']"/>
+                                        </b>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p class="text-muted" style="margin-top:1em;">
+                            Sessions considered:
+                            <t t-foreach="picking._barcode_summary_sessions()" t-as="s">
+                                <span t-out="s.name"/>
+                                <t t-if="not s_last"> , </t>
+                            </t>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_picking_barcode_summary"
+              name="Picking Barcode Summary">
+        <t t-call="custom_barcode.report_picking_barcode_summary_doc"/>
+    </template>
+
+    <record id="action_report_picking_barcode_summary" model="ir.actions.report">
+        <field name="name">Barcode Scan Summary</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_barcode.report_picking_barcode_summary</field>
+        <field name="report_file">custom_barcode.report_picking_barcode_summary</field>
+        <field name="binding_model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

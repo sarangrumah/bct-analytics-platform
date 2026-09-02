@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_forum_trending_topic_user,custom.forum.trending.topic user,model_custom_forum_trending_topic,base.group_user,1,0,0,0
+access_custom_forum_trending_topic_admin,custom.forum.trending.topic admin,model_custom_forum_trending_topic,base.group_system,1,1,1,1

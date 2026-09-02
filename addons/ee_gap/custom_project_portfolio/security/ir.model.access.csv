@@ -1,0 +1,14 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_vertical_user,pmo vertical user,model_custom_project_vertical,custom_project_portfolio.group_pmo_user,1,0,0,0
+access_vertical_pic,pmo vertical brand pic,model_custom_project_vertical,custom_project_portfolio.group_pmo_vertical_pic,1,0,0,0
+access_vertical_admin,pmo vertical admin,model_custom_project_vertical,custom_project_portfolio.group_pmo_admin,1,1,1,1
+access_portfolio_user,pmo portfolio user,model_custom_project_portfolio,custom_project_portfolio.group_pmo_user,1,0,0,0
+access_portfolio_po,pmo portfolio po,model_custom_project_portfolio,custom_project_portfolio.group_pmo_po,1,1,0,0
+access_portfolio_admin,pmo portfolio admin,model_custom_project_portfolio,custom_project_portfolio.group_pmo_admin,1,1,1,1
+access_sprint_user,pmo sprint user,model_custom_project_sprint,custom_project_portfolio.group_pmo_user,1,0,0,0
+access_sprint_ba,pmo sprint ba,model_custom_project_sprint,custom_project_portfolio.group_pmo_ba,1,1,1,0
+access_sprint_admin,pmo sprint admin,model_custom_project_sprint,custom_project_portfolio.group_pmo_admin,1,1,1,1
+access_weekly_user,pmo weekly user,model_custom_weekly_progress,custom_project_portfolio.group_pmo_user,1,0,0,0
+access_weekly_ba,pmo weekly ba,model_custom_weekly_progress,custom_project_portfolio.group_pmo_ba,1,1,1,0
+access_weekly_lead,pmo weekly lead,model_custom_weekly_progress,custom_project_portfolio.group_pmo_lead,1,1,1,0
+access_weekly_admin,pmo weekly admin,model_custom_weekly_progress,custom_project_portfolio.group_pmo_admin,1,1,1,1

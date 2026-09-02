@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Real cron record (NOT a placeholder). Seeded ACTIVE but harmless: with no
+         active WMS adapter config the drain returns immediately after logging.
+         Interval is short on purpose — the outbox is the only thing standing
+         between a warehouse transaction and the host. -->
+    <record id="cron_drain_wms_outbox" model="ir.cron">
+        <field name="name">WMS Integration: drain outbound event outbox</field>
+        <field name="model_id" ref="model_wms_integration_event"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_drain_outbox()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

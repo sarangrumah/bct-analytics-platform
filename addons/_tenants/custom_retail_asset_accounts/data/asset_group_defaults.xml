@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Seeds the 6 EBR fixed-asset categories as custom.fixed.asset.group records.
+      Runs BEFORE revaluation_account_defaults.xml so the revaluation wiring finds
+      the 6 groups and applies its IAS 16 defaults to them (instead of creating a
+      lone "General" fallback group). The method is idempotent and non-destructive.
+    -->
+    <function model="custom.fixed.asset.group"
+              name="_seed_id_coa_10d_asset_groups"/>
+</odoo>

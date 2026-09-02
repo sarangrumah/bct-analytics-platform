@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_retail_sales_report_viewer,retail.sales.report viewer,model_retail_sales_report,group_retail_sales_viewer,1,0,0,0
+access_retail_sales_target_viewer,retail.sales.target viewer,model_retail_sales_target,group_retail_sales_viewer,1,0,0,0
+access_retail_sales_target_manager,retail.sales.target manager,model_retail_sales_target,group_retail_sales_manager,1,1,1,1

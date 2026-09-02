@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_crm_lead_mining_request_list" model="ir.ui.view">
+        <field name="name">custom.crm.lead.mining.request.list</field>
+        <field name="model">custom.crm.lead.mining.request</field>
+        <field name="arch" type="xml">
+            <list string="Lead Mining Requests">
+                <field name="name"/>
+                <field name="industry"/>
+                <field name="country_id"/>
+                <field name="employees_range"/>
+                <field name="lead_number"/>
+                <field name="credits_used"/>
+                <field name="generated_lead_count" string="# Generated"/>
+                <field name="state"/>
+                <button name="action_get_leads"
+                        type="object"
+                        string="Generate Leads"
+                        icon="fa-bolt"
+                        invisible="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_crm_lead_mining_request_form" model="ir.ui.view">
+        <field name="name">custom.crm.lead.mining.request.form</field>
+        <field name="model">custom.crm.lead.mining.request</field>
+        <field name="arch" type="xml">
+            <form string="Lead Mining Request">
+                <header>
+                    <button name="action_get_lead_count"
+                            type="object"
+                            string="Estimate"
+                            class="btn-secondary"
+                            invisible="state == 'done'"/>
+                    <button name="action_get_leads"
+                            type="object"
+                            string="Generate Leads"
+                            class="btn-primary"
+                            invisible="state == 'done'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Criteria">
+                            <field name="industry"/>
+                            <field name="country_id"/>
+                            <field name="employees_range"/>
+                            <field name="lead_number"/>
+                        </group>
+                        <group string="Usage">
+                            <field name="credits_used"/>
+                            <field name="generated_lead_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Generated Leads" name="leads">
+                            <field name="generated_lead_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="partner_name"/>
+                                    <field name="email_from"/>
+                                    <field name="phone"/>
+                                    <field name="country_id"/>
+                                    <field name="x_predictive_score"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_crm_lead_mining_request_search" model="ir.ui.view">
+        <field name="name">custom.crm.lead.mining.request.search</field>
+        <field name="model">custom.crm.lead.mining.request</field>
+        <field name="arch" type="xml">
+            <search string="Lead Mining">
+                <field name="name"/>
+                <field name="industry"/>
+                <field name="country_id"/>
+                <separator/>
+                <filter name="filter_draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="filter_done" string="Done" domain="[('state','=','done')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_crm_lead_mining_request" model="ir.actions.act_window">
+        <field name="name">Lead Mining</field>
+        <field name="res_model">custom.crm.lead.mining.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

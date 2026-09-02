@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!--
+          Odoo 19 note: res.groups has NO category_id. Groups are grouped by a
+          res.groups.privilege record, which itself points at an ir.module.category.
+        -->
+        <record id="module_category_pdp" model="ir.module.category">
+            <field name="name">Perlindungan Data Pribadi</field>
+            <field name="description">Access to personal data under UU 27/2022 (PDP).</field>
+            <field name="sequence">90</field>
+        </record>
+
+        <record id="res_groups_privilege_pdp" model="res.groups.privilege">
+            <field name="name">Personal Data (PDP)</field>
+            <field name="category_id" ref="module_category_pdp"/>
+            <field name="sequence">10</field>
+            <field name="description">Who may see personal data unmasked, and who may curate the
+                PDP field classification registry.</field>
+        </record>
+
+        <!--
+          Data Viewer: sees personal/sensitive columns unmasked in the Odoo UI.
+          Deliberately NOT implied by base.group_system: under UU 27/2022 being a technical
+          administrator is not by itself a lawful basis to read personal data. A fresh install
+          therefore masks for everyone, including the admin user, until this group is granted.
+        -->
+        <record id="group_pdp_data_viewer" model="res.groups">
+            <field name="name">Data Viewer</field>
+            <field name="sequence">10</field>
+            <field name="privilege_id" ref="res_groups_privilege_pdp"/>
+            <field name="comment">May read personal and sensitive data unmasked in the Odoo UI.</field>
+        </record>
+
+        <!--
+          Officer: curates the classification registry. Implies Data Viewer, because you cannot
+          responsibly classify a column you are not allowed to look at.
+        -->
+        <record id="group_pdp_officer" model="res.groups">
+            <field name="name">Officer</field>
+            <field name="sequence">20</field>
+            <field name="privilege_id" ref="res_groups_privilege_pdp"/>
+            <field name="implied_ids" eval="[(4, ref('group_pdp_data_viewer'))]"/>
+            <field name="comment">May create and edit PDP field classifications.</field>
+        </record>
+
+    </data>
+</odoo>

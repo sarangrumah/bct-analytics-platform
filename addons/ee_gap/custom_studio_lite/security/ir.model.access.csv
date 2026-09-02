@@ -1,0 +1,17 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_studio_field_designer,studio.custom.field designer,model_studio_custom_field,group_designer,1,1,1,1
+access_studio_field_admin,studio.custom.field admin,model_studio_custom_field,group_studio_admin,1,1,1,1
+access_studio_view_customization_designer,studio.view.customization designer,model_studio_view_customization,group_designer,1,1,1,1
+access_studio_view_customization_admin,studio.view.customization admin,model_studio_view_customization,group_studio_admin,1,1,1,1
+access_studio_view_operation_designer,studio.view.operation designer,model_studio_view_operation,group_designer,1,1,1,1
+access_studio_view_operation_admin,studio.view.operation admin,model_studio_view_operation,group_studio_admin,1,1,1,1
+access_studio_field_impact_wizard_designer,studio.field.impact.wizard designer,model_studio_field_impact_wizard,group_designer,1,1,1,1
+access_studio_field_impact_wizard_admin,studio.field.impact.wizard admin,model_studio_field_impact_wizard,group_studio_admin,1,1,1,1
+access_studio_automation_rule_designer,studio.automation.rule designer,model_studio_automation_rule,group_designer,1,1,1,1
+access_studio_automation_rule_admin,studio.automation.rule admin,model_studio_automation_rule,group_studio_admin,1,1,1,1
+access_studio_automation_action_designer,studio.automation.action designer,model_studio_automation_action,group_designer,1,1,1,1
+access_studio_automation_action_admin,studio.automation.action admin,model_studio_automation_action,group_studio_admin,1,1,1,1
+access_studio_report_customization_designer,studio.report.customization designer,model_studio_report_customization,group_designer,1,1,1,1
+access_studio_report_customization_admin,studio.report.customization admin,model_studio_report_customization,group_studio_admin,1,1,1,1
+access_studio_report_xpath_designer,studio.report.xpath designer,model_studio_report_xpath,group_designer,1,1,1,1
+access_studio_report_xpath_admin,studio.report.xpath admin,model_studio_report_xpath,group_studio_admin,1,1,1,1

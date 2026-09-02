@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_fleet_bbm_log_list" model="ir.ui.view">
+        <field name="name">custom.fleet.bbm.log.list</field>
+        <field name="model">custom.fleet.bbm.log</field>
+        <field name="arch" type="xml">
+            <list string="BBM Logs">
+                <field name="date"/>
+                <field name="vehicle_id"/>
+                <field name="odometer_km"/>
+                <field name="liter"/>
+                <field name="price_per_liter"/>
+                <field name="total" sum="Total"/>
+                <field name="consumption_km_per_l" optional="show"/>
+                <field name="gas_station" optional="hide"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_fleet_bbm_log_form" model="ir.ui.view">
+        <field name="name">custom.fleet.bbm.log.form</field>
+        <field name="model">custom.fleet.bbm.log</field>
+        <field name="arch" type="xml">
+            <form string="BBM Log">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="vehicle_id"/>
+                            <field name="date"/>
+                            <field name="odometer_km"/>
+                            <field name="gas_station"/>
+                        </group>
+                        <group>
+                            <field name="liter"/>
+                            <field name="price_per_liter"/>
+                            <field name="total"/>
+                            <field name="consumption_km_per_l"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Receipt">
+                        <field name="receipt_attachment" filename="receipt_filename"/>
+                        <field name="receipt_filename" invisible="1"/>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_fleet_bbm_log_search" model="ir.ui.view">
+        <field name="name">custom.fleet.bbm.log.search</field>
+        <field name="model">custom.fleet.bbm.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="vehicle_id"/>
+                <field name="gas_station"/>
+                <field name="date"/>
+                <filter name="this_month" string="This Month"
+                        domain="[('date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="group_vehicle" string="Vehicle"
+                        context="{'group_by': 'vehicle_id'}"/>
+                <filter name="group_date" string="Date"
+                        context="{'group_by': 'date'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_fleet_bbm_log" model="ir.actions.act_window">
+        <field name="name">BBM Logs</field>
+        <field name="res_model">custom.fleet.bbm.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_fleet_bbm_log_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Record fuel refills to track cost and consumption.
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+/*
+ * Palette. The categorical slots are the first three of the validated default order
+ * (blue, orange, aqua) and were checked with the data-viz validator rather than by eye:
+ *
+ *   light  (surface #fcfcfb):  CVD worst all-pairs dE 9.2 (deutan), normal-vision worst 24.0,
+ *                              contrast WARN on aqua (2.74:1) -> relief taken as the table view
+ *                              that ships under every chart.
+ *   dark   (surface #1a1a19):  CVD worst all-pairs dE 9.4, normal-vision worst 20.9,
+ *                              all three >= 3:1.
+ *
+ * No chart in this application uses more than two series, and every series carries a second
+ * encoding (dash pattern plus a legend marker), so hue is never the only channel.
+ *
+ * Status colours are the reserved four and are never used for a series. Freshness always ships
+ * icon + text as well as colour.
+ */
+:root {
+  color-scheme: light;
+  --surface-0: #f4f4f1;
+  --surface-1: #fcfcfb;
+  --surface-2: #ffffff;
+  --border: #e2e1dc;
+  --border-strong: #cbcac3;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #767569;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --grid: #e8e7e3;
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-critical: #d03b3b;
+  --accent-soft: #eaf2fd;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface-0: #121211;
+    --surface-1: #1a1a19;
+    --surface-2: #222220;
+    --border: #35352f;
+    --border-strong: #4a4a43;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #9b9a8f;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --grid: #2c2c28;
+    --status-good: #0ca30c;
+    --status-warning: #fab219;
+    --status-critical: #d03b3b;
+    --accent-soft: #1d2a3a;
+  }
+}
+
+@theme inline {
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-ink: var(--text-primary);
+  --color-ink-2: var(--text-secondary);
+  --color-ink-3: var(--text-muted);
+  --color-series-1: var(--series-1);
+  --color-series-2: var(--series-2);
+  --color-series-3: var(--series-3);
+  --color-good: var(--status-good);
+  --color-warn: var(--status-warning);
+  --color-critical: var(--status-critical);
+  --color-accent-soft: var(--accent-soft);
+}
+
+html,
+body {
+  background: var(--surface-0);
+  color: var(--text-primary);
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Numbers line up in tables and stat tiles. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* A visible focus ring everywhere, because every chart control is reachable by keyboard. */
+:where(a, button, input, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--series-1);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Recharts puts its keyboard focus on the surface element; make that visible too. */
+.recharts-surface:focus-visible {
+  outline: 2px solid var(--series-1);
+  outline-offset: 2px;
+}
+
+/* Skip link, visible on focus only. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 50;
+}
+.skip-link:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

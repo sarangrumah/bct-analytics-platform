@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Both configs are seeded DISABLED and pointing at localhost. Per tenant:
+           1. set base_url,
+           2. store the shared secret under the credential_ref key in
+              ir.config_parameter,
+           3. pin which one to use via ir.config_parameter
+              wms_integration.adapter_config = <config name>,
+           4. flip status to "active".
+         Leaving both disabled is safe: the outbox keeps queueing and the cron
+         logs "No active WMS adapter config" without losing events. -->
+
+    <record id="adapter_wms_host" model="custom.adapter.config">
+        <field name="name">wms_host</field>
+        <field name="adapter_type">wms_host</field>
+        <field name="base_url">http://localhost:8099</field>
+        <field name="auth_method">hmac</field>
+        <field name="credential_ref">wms_integration.host_secret</field>
+        <field name="timeout_s">20</field>
+        <field name="retry_count">3</field>
+        <field name="status">disabled</field>
+        <field name="notes">Generic REST WMS host. Endpoints: wms/goods-receipt, wms/putaway, wms/pick, wms/pack, wms/goods-issue, wms/stock-adjustment.</field>
+    </record>
+
+    <record id="adapter_wms_sap_host" model="custom.adapter.config">
+        <field name="name">wms_sap_host</field>
+        <field name="adapter_type">wms_sap_host</field>
+        <field name="base_url">http://localhost:8099</field>
+        <field name="auth_method">hmac</field>
+        <field name="credential_ref">wms_integration.sap_secret</field>
+        <field name="timeout_s">30</field>
+        <field name="retry_count">3</field>
+        <field name="status">disabled</field>
+        <field name="notes">SAP edge (PI/CPI or REST facade in front of the WMMBID / DELVRY IDoc families).</field>
+    </record>
+
+    <!-- Deliberately NOT seeded (ir.config_parameter.value is required=True, so an
+         empty placeholder row would fail to install). Set these per tenant:
+
+           wms_integration.adapter_config
+               name of the custom.adapter.config the outbox pushes through.
+               Unset = first active WMS-typed config.
+
+           custom_core.secure_endpoint.wms.secret
+               REQUIRED for the inbound /api/wms/* routes. Until it exists every
+               call is rejected with NO_SECRET_CONFIGURED — fail-closed by design.
+
+           custom_core.secure_endpoint.wms.allowed_cidrs
+               optional comma-separated CIDR/IP allowlist for the inbound routes.
+
+           wms_integration.host_secret / wms_integration.sap_secret
+               outbound HMAC secrets referenced by credential_ref above. -->
+</odoo>

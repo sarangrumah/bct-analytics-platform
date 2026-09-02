@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Standalone root menu -->
+    <menuitem id="menu_data_cleaning_root"
+              name="Data Cleaning"
+              sequence="95"
+              groups="custom_data_cleaning.group_user"/>
+
+    <menuitem id="menu_data_cleaning_dedup_rules"
+              name="Dedup Rules"
+              parent="menu_data_cleaning_root"
+              action="action_dedup_rule"
+              sequence="10"/>
+
+    <menuitem id="menu_data_cleaning_candidates"
+              name="Candidates"
+              parent="menu_data_cleaning_root"
+              action="action_dedup_candidate"
+              sequence="20"/>
+
+    <menuitem id="menu_data_cleaning_normalize"
+              name="Normalize Tools"
+              parent="menu_data_cleaning_root"
+              action="action_dedup_normalize_wizard"
+              sequence="30"/>
+
+</odoo>

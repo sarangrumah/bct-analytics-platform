@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_wms_reports_root"
+              name="WMS Reports"
+              parent="stock.menu_warehouse_report"
+              sequence="120"
+              groups="stock.group_stock_user"/>
+
+    <menuitem id="menu_purchase_return_report"
+              name="Purchase Returns"
+              parent="menu_wms_reports_root"
+              action="action_purchase_return_report"
+              sequence="10"/>
+
+    <menuitem id="menu_stock_summary_report"
+              name="Stock Summary (Qty + Value)"
+              parent="menu_wms_reports_root"
+              action="action_stock_summary_report"
+              sequence="20"/>
+
+    <menuitem id="menu_stock_take_report"
+              name="Stock Take"
+              parent="menu_wms_reports_root"
+              action="action_stock_take_report"
+              sequence="30"/>
+
+    <menuitem id="menu_spot_check_report"
+              name="Spot Check"
+              parent="menu_wms_reports_root"
+              action="action_spot_check_report"
+              sequence="40"/>
+
+    <menuitem id="menu_transfer_report"
+              name="Transfers"
+              parent="menu_wms_reports_root"
+              action="action_transfer_report"
+              sequence="50"/>
+
+    <menuitem id="menu_scrap_report"
+              name="Scrap"
+              parent="menu_wms_reports_root"
+              action="action_scrap_report"
+              sequence="60"/>
+
+</odoo>

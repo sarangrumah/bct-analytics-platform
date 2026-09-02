@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_partner_form_tax_id" model="ir.ui.view">
+        <field name="name">res.partner.form.tax_id</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']" position="after">
+                <page string="Pajak (Indonesia)">
+                    <group>
+                        <group>
+                            <field name="x_custom_npwp" placeholder="15 atau 16 digit"/>
+                            <field name="x_custom_npwp_status" readonly="1" widget="badge"/>
+                            <field name="x_custom_pkp"/>
+                        </group>
+                        <group>
+                            <field name="x_custom_nik" placeholder="16 digit (orang pribadi)"/>
+                            <field name="x_custom_foreign_counterparty" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Identitas Coretax">
+                        <group>
+                            <field name="x_custom_nitku" placeholder="22 digit (kosongkan = NPWP + 000000)"/>
+                            <field name="x_custom_nitku_display" readonly="1"/>
+                            <field name="x_custom_ptkp"/>
+                        </group>
+                        <group invisible="not x_custom_foreign_counterparty">
+                            <field name="x_custom_tin" placeholder="Tax Identity Number"/>
+                            <field name="x_custom_passport"/>
+                            <field name="x_custom_kitas"/>
+                            <field name="x_custom_birth_place"/>
+                            <field name="x_custom_birth_date"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

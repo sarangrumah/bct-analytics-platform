@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!--
+          Service products used by the Provider DP 100% + Pelunasan topup
+          wizard. Account / tax assignment is done per-line by the wizard
+          based on provider config, so these records carry no fixed account.
+          purchase_ok=True so they appear in vendor bill product lookups.
+        -->
+
+        <record id="product_provider_dp_100" model="product.product">
+            <field name="name">Provider Deposit DP 100% (PPOB)</field>
+            <field name="default_code">PPOB-PROV-DP-100</field>
+            <field name="type">service</field>
+            <field name="purchase_ok" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="active" eval="True"/>
+            <field name="description">DP 100% line on a vendor bill for provider deposit topup. Carries the gross deposit amount with PPN Masukan inclusive tax. Posts to Bucket Inventory (or Vendor Advance, depending on provider topup_dp_timing).</field>
+        </record>
+
+        <record id="product_provider_pelunasan" model="product.product">
+            <field name="name">Pelunasan Provider Deposit (PPOB)</field>
+            <field name="default_code">PPOB-PROV-PELUNASAN</field>
+            <field name="type">service</field>
+            <field name="purchase_ok" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="active" eval="True"/>
+            <field name="description">Offset line on the Pelunasan vendor bill, used to balance the DP and either reverse it (dp_post mode) or transfer Vendor Advance into Bucket Inventory (pelunasan_post mode). Net invoice total is Rp 0.</field>
+        </record>
+
+    </data>
+</odoo>

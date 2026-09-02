@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_pmo_notify_root" name="Notifications"
+              parent="custom_project_portfolio.menu_pmo_root" sequence="60"
+              groups="custom_project_portfolio.group_pmo_lead"/>
+
+    <menuitem id="menu_pmo_notify_log" name="Delivery Log" parent="menu_pmo_notify_root"
+              action="action_notify_log" sequence="10"/>
+    <menuitem id="menu_pmo_notify_outbox" name="Outbox" parent="menu_pmo_notify_root"
+              action="action_notify_outbox" sequence="20"/>
+    <menuitem id="menu_pmo_notify_rules" name="Rules" parent="menu_pmo_notify_root"
+              action="action_notify_rule" sequence="30"
+              groups="custom_project_portfolio.group_pmo_admin"/>
+
+</odoo>

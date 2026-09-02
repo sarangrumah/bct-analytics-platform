@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_frontdesk_visitor_list" model="ir.ui.view">
+        <field name="name">custom.frontdesk.visitor.list</field>
+        <field name="model">custom.frontdesk.visitor</field>
+        <field name="arch" type="xml">
+            <list string="Visitors"
+                  decoration-info="state == 'expected'"
+                  decoration-success="state == 'checked_in'"
+                  decoration-muted="state in ('checked_out','cancelled')">
+                <field name="name"/>
+                <field name="visitor_company"/>
+                <field name="host_employee_id"/>
+                <field name="station_id"/>
+                <field name="purpose"/>
+                <field name="check_in_time"/>
+                <field name="check_out_time"/>
+                <field name="state" widget="badge"/>
+                <field name="whatsapp_notified"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_frontdesk_visitor_form" model="ir.ui.view">
+        <field name="name">custom.frontdesk.visitor.form</field>
+        <field name="model">custom.frontdesk.visitor</field>
+        <field name="arch" type="xml">
+            <form string="Visitor">
+                <header>
+                    <button name="action_check_in" type="object" string="Check In"
+                            class="oe_highlight" invisible="state != 'expected'"/>
+                    <button name="action_check_out" type="object" string="Check Out"
+                            class="oe_highlight" invisible="state != 'checked_in'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('checked_out','cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="expected,checked_in,checked_out"/>
+                </header>
+                <sheet>
+                    <field name="photo" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Visitor name"/></h1>
+                        <h3><field name="visitor_company" placeholder="Visitor company"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="host_employee_id"/>
+                            <field name="station_id"/>
+                            <field name="purpose"/>
+                            <field name="badge_number"/>
+                        </group>
+                        <group>
+                            <field name="phone"/>
+                            <field name="email"/>
+                            <field name="id_number" groups="custom_frontdesk.group_manager"/>
+                            <field name="check_in_time"/>
+                            <field name="check_out_time"/>
+                            <field name="whatsapp_notified"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_frontdesk_visitor_kanban" model="ir.ui.view">
+        <field name="name">custom.frontdesk.visitor.kanban</field>
+        <field name="model">custom.frontdesk.visitor</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="visitor_company"/>
+                <field name="host_employee_id"/>
+                <field name="station_id"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="name"/></strong>
+                            <div><field name="visitor_company"/></div>
+                            <div>Host: <field name="host_employee_id"/></div>
+                            <div>Station: <field name="station_id"/></div>
+                            <div><field name="state" widget="badge"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_frontdesk_visitor_search" model="ir.ui.view">
+        <field name="name">custom.frontdesk.visitor.search</field>
+        <field name="model">custom.frontdesk.visitor</field>
+        <field name="arch" type="xml">
+            <search string="Visitors">
+                <field name="name"/>
+                <field name="visitor_company"/>
+                <field name="host_employee_id"/>
+                <field name="station_id"/>
+                <filter name="today" string="Today"
+                        domain="[('check_in_time','&gt;=', (context_today()).strftime('%Y-%m-%d 00:00:00')),
+                                 ('check_in_time','&lt;=', (context_today()).strftime('%Y-%m-%d 23:59:59'))]"/>
+                <filter name="checked_in" string="Checked In"
+                        domain="[('state','=','checked_in')]"/>
+                <filter name="expected" string="Expected"
+                        domain="[('state','=','expected')]"/>
+                <separator/>
+                <filter name="group_state" string="State" context="{'group_by':'state'}"/>
+                <filter name="group_host" string="Host" context="{'group_by':'host_employee_id'}"/>
+                <filter name="group_station" string="Station" context="{'group_by':'station_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_frontdesk_visitor" model="ir.actions.act_window">
+        <field name="name">Visitors</field>
+        <field name="res_model">custom.frontdesk.visitor</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_frontdesk_visitor_search"/>
+    </record>
+</odoo>

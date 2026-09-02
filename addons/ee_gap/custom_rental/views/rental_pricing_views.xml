@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_rental_pricing_list" model="ir.ui.view">
+        <field name="name">custom.rental.pricing.list</field>
+        <field name="model">custom.rental.pricing</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="product_template_id"/>
+                <field name="duration"/>
+                <field name="unit"/>
+                <field name="price"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_custom_rental_pricing_form" model="ir.ui.view">
+        <field name="name">custom.rental.pricing.form</field>
+        <field name="model">custom.rental.pricing</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="product_template_id"/>
+                        <field name="duration"/>
+                        <field name="unit"/>
+                        <field name="price"/>
+                        <field name="currency_id"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_custom_rental_pricing" model="ir.actions.act_window">
+        <field name="name">Rental Pricing</field>
+        <field name="res_model">custom.rental.pricing</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_product_template_rental_form" model="ir.ui.view">
+        <field name="name">product.template.rental.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='list_price']" position="after">
+                <field name="is_rentable"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Rental Pricing" invisible="not is_rentable">
+                    <field name="rental_pricing_ids">
+                        <list editable="bottom">
+                            <field name="duration"/>
+                            <field name="unit"/>
+                            <field name="price"/>
+                            <field name="currency_id" column_invisible="True"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

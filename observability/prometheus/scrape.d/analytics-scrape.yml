@@ -1,0 +1,71 @@
+# ---------------------------------------------------------------------------
+# Analytics scrape targets. Owner: Data Warehouse agent.
+#
+# FORMAT NOTE, and it contradicts the README next to this file. That README says
+# a drop-in is "a bare list of scrape configs - no `global:`, no
+# `scrape_configs:` key". Prometheus 2.55 rejects that:
+#
+#   FAILED: error loading scrape configs:
+#     "/etc/prometheus/scrape.d/analytics-scrape.yml": yaml: unmarshal errors:
+#     line 28: cannot unmarshal !!seq into config.ScrapeConfigs
+#
+# A file loaded through `scrape_config_files` must carry a top-level
+# `scrape_configs:` key, as below. Verified with
+# `promtool check config /etc/prometheus/prometheus.yml`. The README is
+# Platform-Infra's file, so this is recorded here and raised with the Lead
+# rather than edited across an ownership boundary.
+#
+# Two jobs, and they are deliberately separate identities:
+#
+#   warehouse-exporter  postgres_exporter over the WAREHOUSE database, running
+#                       ONLY the custom queries in
+#                       analytics/warehouse/exporter/queries.yml. Everything it
+#                       emits is namespaced bct_warehouse_*. It connects as
+#                       warehouse_rls, which is SELECT-only and RLS-constrained,
+#                       and every series it produces is a timestamp, a row count
+#                       or a test outcome - not one monetary or personal value.
+#
+#   analytics-cdc       Backend's CDC consumer, emitting bct_cdc_*. Listed here
+#                       rather than in a Backend-owned file because THIS agent
+#                       owns the alert rules that read those series, and a
+#                       scrape target and the alert that depends on it going out
+#                       of sync is a silent monitoring gap. `honor_labels` is
+#                       off so the `job` label is ours.
+#
+# Applying a change without a restart (--web.enable-lifecycle is on):
+#   curl -XPOST http://127.0.0.1:39090/-/reload
+# ---------------------------------------------------------------------------
+
+scrape_configs:
+
+  - job_name: warehouse-exporter
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    static_configs:
+      - targets: ["warehouse-exporter:9187"]
+        labels:
+          service: warehouse
+          component: analytics
+
+# The CDC consumer publishes on 9108 (analytics/cdc/Dockerfile EXPOSE 9108).
+#
+# Targeted by CONTAINER NAME, not by compose service name. Backend currently
+# runs the consumer outside this compose project, so a bare `cdc` does not
+# resolve on the network and the target sat permanently DOWN - which would have
+# fired CdcConsumerMetricsAbsentWhileSlotExists as a false page, since a
+# bct_slot_* replication slot genuinely does exist. Verified reachable at this
+# name from inside the Prometheus container before changing it. If Backend
+# later declares it as a compose service, `container_name` and the service
+# alias both resolve, so this keeps working either way.
+# A DOWN target here is itself the signal: the alert rules treat an absent
+# bct_cdc_up as actionable, because the failure mode the 2 GB slot cap exists
+# to bound is precisely the consumer being dead - at which point its metrics go
+# absent rather than high.
+  - job_name: analytics-cdc
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    static_configs:
+      - targets: ["odoo19-bct-cdc:9108"]
+        labels:
+          service: cdc
+          component: analytics

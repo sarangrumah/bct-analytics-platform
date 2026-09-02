@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_retail_import_log_list" model="ir.ui.view">
+        <field name="name">retail.import.log.list</field>
+        <field name="model">retail.import.log</field>
+        <field name="arch" type="xml">
+            <list string="Import Logs" decoration-success="state=='imported'" decoration-warning="state=='partial'" decoration-danger="state=='failed'" decoration-muted="state in ('queued','cancelled')" decoration-info="state=='running'">
+                <field name="name"/>
+                <field name="profile_id"/>
+                <field name="file_type"/>
+                <field name="filename"/>
+                <field name="line_count"/>
+                <field name="records_created"/>
+                <field name="records_matched"/>
+                <field name="records_skipped"/>
+                <field name="error_count"/>
+                <field name="state" widget="badge"/>
+                <field name="imported_at"/>
+                <field name="started_at" optional="show"/>
+                <field name="finished_at" optional="show"/>
+                <field name="duration" string="Minutes" digits="[6,1]" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_retail_import_log_form" model="ir.ui.view">
+        <field name="name">retail.import.log.form</field>
+        <field name="model">retail.import.log</field>
+        <field name="arch" type="xml">
+            <form string="Import Log">
+                <header>
+                    <button name="action_cancel" type="object" string="Cancel Import"
+                            invisible="state != 'queued'"
+                            confirm="Cancel this queued import? The file stays attached and can be resubmitted."/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="queued,running,imported"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="profile_id"/>
+                            <field name="file_type"/>
+                            <field name="filename"/>
+                            <field name="attachment_id"/>
+                            <field name="file_hash"/>
+                            <field name="job_uuid"/>
+                        </group>
+                        <group>
+                            <field name="state" widget="badge"/>
+                            <field name="line_count"/>
+                            <field name="records_created"/>
+                            <field name="records_matched"/>
+                            <field name="records_skipped"/>
+                            <field name="error_count"/>
+                            <field name="imported_at"/>
+                            <field name="started_at"/>
+                            <field name="finished_at"/>
+                            <field name="duration" string="Minutes" digits="[6,1]"/>
+                            <field name="imported_by_id"/>
+                        </group>
+                    </group>
+                    <group string="Result" invisible="state == 'queued'">
+                        <field name="result_summary" nolabel="1" readonly="1"/>
+                    </group>
+                    <group string="Error message" invisible="not error_message">
+                        <field name="error_message" nolabel="1"/>
+                    </group>
+                    <group string="Row errors" invisible="not raw_payload">
+                        <field name="raw_payload" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Source Rows" name="source_rows">
+                            <field name="line_ids" nolabel="1" mode="list">
+                                <list string="Source Rows" decoration-success="state=='ok'" decoration-warning="state=='skipped'" decoration-danger="state=='error'">
+                                    <field name="row_number"/>
+                                    <field name="aggregate_key"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="target_model"/>
+                                    <field name="target_res_id"/>
+                                    <field name="error_message" optional="show"/>
+                                    <field name="raw_data_json" optional="hide"/>
+                                </list>
+                                <form string="Source Row">
+                                    <group>
+                                        <group>
+                                            <field name="row_number"/>
+                                            <field name="aggregate_key"/>
+                                            <field name="state"/>
+                                        </group>
+                                        <group>
+                                            <field name="target_model"/>
+                                            <field name="target_res_id"/>
+                                        </group>
+                                    </group>
+                                    <group string="Error message" invisible="not error_message">
+                                        <field name="error_message" nolabel="1"/>
+                                    </group>
+                                    <separator string="Parsed Row" invisible="not raw_data_html"/>
+                                    <field name="raw_data_html" nolabel="1" readonly="1" invisible="not raw_data_html"/>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_server_sync_feeds" model="ir.actions.server">
+        <field name="name">Sync from FTP</field>
+        <field name="model_id" ref="model_retail_import_log"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_sync_feeds()</field>
+    </record>
+
+    <record id="action_retail_import_log" model="ir.actions.act_window">
+        <field name="name">Imports</field>
+        <field name="res_model">retail.import.log</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

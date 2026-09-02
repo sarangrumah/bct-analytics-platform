@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_fixed_asset_list" model="ir.ui.view">
+        <field name="name">custom.fixed.asset.list</field>
+        <field name="model">custom.fixed.asset</field>
+        <field name="arch" type="xml">
+            <list string="Fixed Assets" decoration-info="state == 'draft'"
+                  decoration-success="state == 'running'"
+                  decoration-muted="state in ('disposed','cancelled')">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="group_id"/>
+                <field name="location_id"/>
+                <field name="acquisition_date"/>
+                <field name="acquisition_value"/>
+                <field name="accumulated_depreciation"/>
+                <field name="net_book_value"/>
+                <field name="state"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fixed_asset_form" model="ir.ui.view">
+        <field name="name">custom.fixed.asset.form</field>
+        <field name="model">custom.fixed.asset</field>
+        <field name="arch" type="xml">
+            <form string="Fixed Asset">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_open_revaluation_wizard" type="object"
+                            string="Revalue"
+                            invisible="state != 'running'"/>
+                    <button name="action_open_dispose_wizard" type="object"
+                            string="Dispose"
+                            invisible="state != 'running'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state not in ('draft','running')"/>
+                    <button name="action_reset_draft" type="object"
+                            string="Reset to Draft"
+                            invisible="state not in ('cancelled','running')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,running,disposed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_revaluations" type="object"
+                                class="oe_stat_button" icon="fa-line-chart"
+                                invisible="revaluation_count == 0">
+                            <field name="revaluation_count" widget="statinfo"
+                                   string="Revaluations"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="code"/>
+                        <h1><field name="code" readonly="state != 'draft'"/></h1>
+                        <label for="name"/>
+                        <h2><field name="name"/></h2>
+                    </div>
+                    <group>
+                        <group string="Acquisition">
+                            <field name="acquisition_date"
+                                   readonly="state != 'draft'"/>
+                            <field name="posting_date"
+                                   readonly="state != 'draft'"/>
+                            <field name="depreciation_date_mode"
+                                   readonly="state != 'draft'"/>
+                            <field name="acquisition_value"
+                                   readonly="state != 'draft'"/>
+                            <field name="salvage_value"
+                                   readonly="state != 'draft'"/>
+                            <field name="useful_life_months"
+                                   readonly="state != 'draft'"/>
+                            <field name="depreciation_method"
+                                   readonly="state != 'draft'"/>
+                            <field name="declining_factor"
+                                   invisible="depreciation_method != 'declining'"
+                                   readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Assignment">
+                            <field name="group_id"/>
+                            <field name="location_id"/>
+                            <field name="custodian_id"/>
+                            <field name="company_id"
+                                   groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Accounting">
+                        <group>
+                            <field name="asset_account_id"/>
+                            <field name="depreciation_account_id"/>
+                        </group>
+                        <group>
+                            <field name="expense_account_id"/>
+                            <field name="journal_id"/>
+                        </group>
+                    </group>
+                    <group string="Totals">
+                        <field name="accumulated_depreciation"/>
+                        <field name="revaluation_value"
+                               invisible="revaluation_value == 0"/>
+                        <field name="revaluation_surplus_balance"
+                               invisible="revaluation_surplus_balance == 0"/>
+                        <field name="revaluation_loss_recognized"
+                               invisible="revaluation_loss_recognized == 0"/>
+                        <field name="net_book_value"/>
+                    </group>
+                    <group string="Disposal" invisible="state != 'disposed'">
+                        <field name="disposal_date"/>
+                        <field name="disposal_value"/>
+                        <field name="disposal_gain_loss"/>
+                        <field name="disposal_move_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Depreciation Schedule">
+                            <field name="depreciation_line_ids">
+                                <list decoration-success="posted" decoration-muted="reversed">
+                                    <field name="sequence"/>
+                                    <field name="date"/>
+                                    <field name="amount"/>
+                                    <field name="posted"/>
+                                    <field name="reversed"/>
+                                    <field name="move_id"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <button name="action_post_now"
+                                            type="object" string="Post"
+                                            invisible="posted or reversed"/>
+                                    <button name="action_reverse"
+                                            type="object" string="Reverse"
+                                            invisible="not posted"
+                                            confirm="Reverse this posted depreciation? A reversing journal entry will be booked and the asset NBV will be restored."/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fixed_asset_kanban" model="ir.ui.view">
+        <field name="name">custom.fixed.asset.kanban</field>
+        <field name="model">custom.fixed.asset</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="acquisition_value"/>
+                <field name="net_book_value"/>
+                <field name="state"/>
+                <field name="currency_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="code"/></strong>
+                            <div><field name="name"/></div>
+                            <div>
+                                NBV: <field name="net_book_value"
+                                            widget="monetary"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_fixed_asset_search" model="ir.ui.view">
+        <field name="name">custom.fixed.asset.search</field>
+        <field name="model">custom.fixed.asset</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="group_id"/>
+                <field name="location_id"/>
+                <field name="custodian_id"/>
+                <filter name="state_draft" string="Draft"
+                        domain="[('state','=','draft')]"/>
+                <filter name="state_running" string="Running"
+                        domain="[('state','=','running')]"/>
+                <filter name="state_disposed" string="Disposed"
+                        domain="[('state','=','disposed')]"/>
+
+                    <filter name="group_group" string="Group"
+                            context="{'group_by':'group_id'}"/>
+                    <filter name="group_location" string="Location"
+                            context="{'group_by':'location_id'}"/>
+                    <filter name="group_state" string="State"
+                            context="{'group_by':'state'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fixed_asset" model="ir.actions.act_window">
+        <field name="name">Fixed Assets</field>
+        <field name="res_model">custom.fixed.asset</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_fixed_asset_search"/>
+    </record>
+
+</odoo>

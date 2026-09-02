@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ai_features_root" name="AI" sequence="2"
+              web_icon="custom_ai_features,static/description/icon.png"
+              groups="custom_ai_features.group_ai_user"/>
+
+    <menuitem id="menu_ai_anomaly_inbox" name="Anomaly Inbox"
+              parent="menu_ai_features_root"
+              action="action_anomaly_finding" sequence="10"/>
+
+    <menuitem id="menu_ai_nlq_sessions" name="NLQ Sessions"
+              parent="menu_ai_features_root"
+              action="action_nlq_session" sequence="20"/>
+
+    <menuitem id="menu_ai_config" name="Configuration"
+              parent="menu_ai_features_root"
+              sequence="100" groups="custom_ai_features.group_ai_admin"/>
+    <menuitem id="menu_ai_anomaly_scans" name="Scan History"
+              parent="menu_ai_config"
+              action="action_anomaly_scan" sequence="10"/>
+</odoo>

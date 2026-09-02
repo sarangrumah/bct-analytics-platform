@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ppob_transaction_user,ppob transaction user,model_custom_ppob_transaction,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_transaction_ops,ppob transaction ops,model_custom_ppob_transaction,custom_ppob_core.group_ppob_ops,1,1,1,0
+access_ppob_transaction_api,ppob transaction api,model_custom_ppob_transaction,custom_ppob_core.group_ppob_api,1,1,1,0
+access_ppob_transaction_manager,ppob transaction manager,model_custom_ppob_transaction,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_manual_sale_wizard,ppob manual sale wizard,model_custom_ppob_manual_sale_wizard,custom_ppob_core.group_ppob_ops,1,1,1,1

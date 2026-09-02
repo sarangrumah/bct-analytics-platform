@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_product_class_list" model="ir.ui.view">
+        <field name="name">custom.ppob.product.class.list</field>
+        <field name="model">custom.ppob.product.class</field>
+        <field name="arch" type="xml">
+            <list string="Product Classes">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="vat_mode"/>
+                <field name="default_wallet_account_id"/>
+                <field name="default_revenue_account_id"/>
+                <field name="default_cogs_account_id"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ppob_product_class_form" model="ir.ui.view">
+        <field name="name">custom.ppob.product.class.form</field>
+        <field name="model">custom.ppob.product.class</field>
+        <field name="arch" type="xml">
+            <form string="Product Class">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Telko"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="vat_mode"/>
+                        </group>
+                    </group>
+                    <group string="Default GL Accounts">
+                        <field name="default_wallet_account_id"/>
+                        <field name="default_revenue_account_id"/>
+                        <field name="default_cogs_account_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ppob_product_class" model="ir.actions.act_window">
+        <field name="name">Product Classes</field>
+        <field name="res_model">custom.ppob.product.class</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

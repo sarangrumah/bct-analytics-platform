@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="module_category_tax_id" model="ir.module.category">
+            <field name="name">Tax Indonesia (PPh + DPP NL)</field>
+            <field name="sequence">81</field>
+        </record>
+
+        <record id="group_tax_id_user" model="res.groups">
+            <field name="name">PPh User</field>
+            <field name="comment">Read withholding rules, view auto-generated withholding lines + Bupot drafts.</field>
+        </record>
+
+        <record id="group_tax_id_admin" model="res.groups">
+            <field name="name">PPh / DPP Admin</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_tax_id_user'))]"/>
+            <field name="comment">Configure withholding rules, edit account.tax DPP Nilai Lain, issue Faktur Pengganti.</field>
+        </record>
+
+    </data>
+</odoo>

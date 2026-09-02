@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="module_category_rental" model="ir.module.category">
+            <field name="name">Rental</field>
+            <field name="sequence">99</field>
+        </record>
+        <record id="group_rental_user" model="res.groups">
+            <field name="name">Rental User</field>
+        </record>
+        <record id="group_rental_manager" model="res.groups">
+            <field name="name">Rental Manager</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_rental_user'))]"/>
+        </record>
+    </data>
+</odoo>

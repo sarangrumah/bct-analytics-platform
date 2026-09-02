@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Drop `name` from the Product Variants list ordering.
+
+        `name` is an _inherits field living on product_template, so ordering by
+        it forces a LEFT JOIN plus a top-N sort across the whole catalogue
+        (347k variants x 32k templates) just to render 80 rows. `default_code`
+        is near-unique, so `name` only ever broke ties between rows sharing a
+        code; the remaining order is served straight from an index.
+
+        Variants with no default_code sort last (ASC -> NULLS LAST), which is
+        where the codeless Size x Inseam surplus belongs anyway.
+    -->
+    <record id="product_product_tree_view_retail_order" model="ir.ui.view">
+        <field name="name">product.product.list.retail.order</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_product_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="default_order">is_favorite desc, default_code, id</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

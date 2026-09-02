@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_asset_conversion_wizard_form" model="ir.ui.view">
+        <field name="name">custom.asset.conversion.wizard.form</field>
+        <field name="model">custom.asset.conversion.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Convert to Fixed Assets">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="picking_id" readonly="1"/>
+                            <field name="acquisition_date"/>
+                        </group>
+                        <group>
+                            <field name="asset_group_id"/>
+                        </group>
+                    </group>
+                    <div class="o_horizontal_separator">Lines</div>
+                    <group>
+                        <button name="action_select_all"
+                                type="object"
+                                string="Select All"
+                                class="btn-secondary"/>
+                        <button name="action_deselect_all"
+                                type="object"
+                                string="Deselect All"
+                                class="btn-secondary"/>
+                    </group>
+                    <field name="line_ids">
+                        <list editable="bottom"
+                              decoration-muted="existing_asset_id">
+                            <field name="selected"
+                                   widget="boolean_toggle"
+                                   readonly="existing_asset_id"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="serial_number" readonly="1"/>
+                            <field name="unit_cost"/>
+                            <field name="create_rental_asset"
+                                   readonly="existing_asset_id"/>
+                            <field name="status" readonly="1"/>
+                            <field name="existing_asset_id" column_invisible="True"/>
+                            <field name="currency_id" column_invisible="True"/>
+                        </list>
+                    </field>
+                </sheet>
+                <footer>
+                    <button name="action_confirm"
+                            type="object"
+                            string="Confirm Conversion"
+                            class="btn-primary"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

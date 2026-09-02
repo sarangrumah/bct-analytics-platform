@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_helpdesk_ticket_list" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.list</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <list string="Tickets" decoration-danger="sla_status == 'breach'"
+                  decoration-warning="sla_status == 'warn'"
+                  decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="subject"/>
+                <field name="team_id"/>
+                <field name="partner_id"/>
+                <field name="assignee_id"/>
+                <field name="priority" widget="priority"/>
+                <field name="state" widget="badge"/>
+                <field name="sla_deadline"/>
+                <field name="sla_status"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_helpdesk_ticket_form" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <form string="Ticket">
+                <header>
+                    <button name="action_set_open" type="object" string="Open"
+                            class="oe_highlight" invisible="state != 'new'"/>
+                    <button name="action_set_pending" type="object" string="Pending"
+                            invisible="state not in ('new','open')"/>
+                    <button name="action_set_resolved" type="object" string="Resolve"
+                            class="oe_highlight" invisible="state in ('resolved','closed')"/>
+                    <button name="action_set_closed" type="object" string="Close"
+                            invisible="state == 'closed'"/>
+                    <button name="action_ai_suggest_response" type="object" string="AI Suggest"
+                            icon="fa-magic"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="new,open,pending,resolved,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h2><field name="subject" placeholder="Short summary..."/></h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="team_id"/>
+                            <field name="partner_id"/>
+                            <field name="partner_email"/>
+                            <field name="assignee_id"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="tag_ids" widget="many2many_tags"
+                                   options="{'color_field': 'color'}"/>
+                        </group>
+                        <group>
+                            <field name="sla_id"/>
+                            <field name="sla_deadline"/>
+                            <field name="sla_status" widget="badge"/>
+                            <field name="resolved_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                        <page string="AI Suggested Response">
+                            <field name="ai_suggested_text" widget="text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_helpdesk_ticket_kanban" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.kanban</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="subject"/>
+                <field name="priority"/>
+                <field name="sla_status"/>
+                <field name="assignee_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="name"/></strong>
+                            <div><field name="subject"/></div>
+                            <div>
+                                <field name="priority" widget="priority"/>
+                                <field name="sla_status" widget="badge"/>
+                            </div>
+                            <div><field name="assignee_id"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_helpdesk_ticket_search" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.search</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <search string="Tickets">
+                <field name="name"/>
+                <field name="subject"/>
+                <field name="partner_id"/>
+                <field name="team_id"/>
+                <field name="tag_ids"/>
+                <filter name="open_state" string="Open"
+                        domain="[('state','in',('new','open','pending'))]"/>
+                <filter name="urgent" string="Urgent"
+                        domain="[('priority','=','3')]"/>
+                <filter name="sla_breach" string="SLA Breached"
+                        domain="[('sla_status','=','breach')]"/>
+                <filter name="my_tickets" string="My Tickets"
+                        domain="[('assignee_id','=',uid)]"/>
+                <separator/>
+                <filter name="group_team" string="Team" context="{'group_by':'team_id'}"/>
+                <filter name="group_priority" string="Priority" context="{'group_by':'priority'}"/>
+                <filter name="group_state" string="State" context="{'group_by':'state'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_helpdesk_ticket" model="ir.actions.act_window">
+        <field name="name">Tickets</field>
+        <field name="res_model">helpdesk.ticket</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_helpdesk_ticket_search"/>
+    </record>
+</odoo>

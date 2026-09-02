@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="module_category_iot" model="ir.module.category">
+            <field name="name">IoT</field>
+            <field name="sequence">110</field>
+        </record>
+        <record id="group_iot_user" model="res.groups">
+            <field name="name">IoT User</field>
+        </record>
+        <record id="group_iot_admin" model="res.groups">
+            <field name="name">IoT Admin</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_iot_user'))]"/>
+        </record>
+    </data>
+</odoo>

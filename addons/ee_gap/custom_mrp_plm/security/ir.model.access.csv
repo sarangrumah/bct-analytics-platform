@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_eco_stage_user,stage user,model_mrp_eco_stage,group_plm_user,1,0,0,0
+access_eco_stage_mgr,stage mgr,model_mrp_eco_stage,group_plm_manager,1,1,1,1
+access_eco_user,eco user,model_mrp_eco,group_plm_user,1,1,1,0
+access_eco_mgr,eco mgr,model_mrp_eco,group_plm_manager,1,1,1,1

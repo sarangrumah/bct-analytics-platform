@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_custom_expense_report_list" model="ir.ui.view">
+        <field name="name">custom.expense.report.list</field>
+        <field name="model">custom.expense.report</field>
+        <field name="arch" type="xml">
+            <list string="Expense Reports" decoration-info="state=='submitted'" decoration-success="state in ('approved','paid')" decoration-muted="state=='cancelled'">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="expense_count"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_expense_report_form" model="ir.ui.view">
+        <field name="name">custom.expense.report.form</field>
+        <field name="model">custom.expense.report</field>
+        <field name="arch" type="xml">
+            <form string="Expense Report">
+                <header>
+                    <button name="action_submit_for_approval"
+                            type="object"
+                            string="Submit for Approval"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"
+                            groups="custom_expenses.group_user"/>
+                    <button name="action_approve"
+                            type="object"
+                            string="Approve"
+                            class="oe_highlight"
+                            invisible="state != 'submitted'"
+                            groups="custom_expenses.group_manager"/>
+                    <button name="action_register_payment"
+                            type="object"
+                            string="Register Payment"
+                            class="oe_highlight"
+                            invisible="state != 'approved'"
+                            groups="custom_expenses.group_manager"/>
+                    <button name="action_open_approval_request"
+                            type="object"
+                            string="View Approval"
+                            invisible="not x_custom_approval_request_id"/>
+                    <button name="action_reset_to_draft"
+                            type="object"
+                            string="Reset to Draft"
+                            invisible="state not in ('submitted','cancelled')"
+                            groups="custom_expenses.group_manager"/>
+                    <button name="action_cancel"
+                            type="object"
+                            string="Cancel"
+                            invisible="state in ('paid','cancelled')"
+                            groups="custom_expenses.group_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="total_amount"/>
+                            <field name="x_custom_approval_request_id" readonly="1"/>
+                            <field name="x_custom_approval_state" widget="badge" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Expenses" name="expenses">
+                            <field name="expense_ids" readonly="state != 'draft'">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="product_id"/>
+                                    <field name="total_amount" sum="Total"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="x_corporate_card_id"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Payments" name="payments" invisible="not payment_ids">
+                            <field name="payment_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="amount"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_expense_report_search" model="ir.ui.view">
+        <field name="name">custom.expense.report.search</field>
+        <field name="model">custom.expense.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <separator/>
+                <filter name="filter_draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="filter_submitted" string="Submitted" domain="[('state','=','submitted')]"/>
+                <filter name="filter_approved" string="Approved" domain="[('state','=','approved')]"/>
+                <filter name="filter_paid" string="Paid" domain="[('state','=','paid')]"/>
+                <separator/>
+                <filter name="filter_my" string="My Reports" domain="[('employee_id.user_id','=',uid)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_expense_report" model="ir.actions.act_window">
+        <field name="name">Expense Reports</field>
+        <field name="res_model">custom.expense.report</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

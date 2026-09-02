@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top-level Forum Moderation app menu -->
+    <menuitem id="menu_custom_forum_root"
+              name="Forum Moderation"
+              sequence="50"
+              web_icon="custom_forum,static/description/icon.png"
+              groups="custom_forum.group_user"/>
+
+    <menuitem id="menu_custom_forum_posts"
+              name="Posts"
+              parent="menu_custom_forum_root"
+              action="website_forum.forum_post_action"
+              sequence="10"
+              groups="custom_forum.group_user"/>
+
+    <menuitem id="menu_custom_forum_post_reasons"
+              name="Closing Reasons"
+              parent="menu_custom_forum_root"
+              action="website_forum.forum_post_reason_action"
+              sequence="20"
+              groups="custom_forum.group_manager"/>
+</odoo>

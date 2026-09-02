@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_strategy_user,strategy.user,model_custom_wms_putaway_strategy,group_putaway_user,1,0,0,0
+access_strategy_admin,strategy.admin,model_custom_wms_putaway_strategy,group_putaway_admin,1,1,1,1
+access_rule_user,rule.user,model_custom_wms_putaway_rule,group_putaway_user,1,0,0,0
+access_rule_admin,rule.admin,model_custom_wms_putaway_rule,group_putaway_admin,1,1,1,1
+access_suggestion_user,suggestion.user,model_custom_wms_putaway_suggestion,group_putaway_user,1,1,1,0
+access_suggestion_admin,suggestion.admin,model_custom_wms_putaway_suggestion,group_putaway_admin,1,1,1,1
+access_hd_pallet_user,hd.pallet.user,model_custom_wms_hd_pallet,group_putaway_user,1,1,1,0
+access_hd_pallet_admin,hd.pallet.admin,model_custom_wms_hd_pallet,group_putaway_admin,1,1,1,1

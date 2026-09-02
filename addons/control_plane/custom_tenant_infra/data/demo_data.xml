@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!--
+        Minimal UAT demo seed for the tenant_infra module.
+
+        Creates one VPS + one dev environment so the VPS list / environment
+        list pages are not empty when an operator opens them on a fresh
+        landing_demo DB. Records are noupdate=1 so editing in the UI is
+        safe across reinstalls.
+
+        SSH credential ref uses file:// scheme; the orchestrator's
+        resolve_ssh_key() will return SSHCredentialError if the file is
+        absent which the friendly handler converts to a 200 "skipped"
+        response.
+    -->
+
+    <record id="demo_tenant_registry" model="tenant.registry">
+        <field name="slug">dev-sandbox</field>
+        <field name="display_name">Dev Sandbox (Demo)</field>
+        <field name="db_name">dev_sandbox</field>
+        <field name="state">active</field>
+        <field name="plan_tier">starter</field>
+        <field name="contact_email">demo@example.com</field>
+    </record>
+
+    <record id="demo_vps_dev01" model="tenant.vps">
+        <field name="name">Dev VPS 01</field>
+        <field name="hostname">dev-vps-01.demo.local</field>
+        <field name="public_ip">10.0.0.10</field>
+        <field name="ssh_port">22</field>
+        <field name="ssh_user">ubuntu</field>
+        <field name="ssh_credential_ref">file:///etc/platform-secrets/dev01.key</field>
+        <field name="provider">digitalocean</field>
+        <field name="region">sgp1</field>
+        <field name="cpu_cores">2</field>
+        <field name="ram_mb">2048</field>
+        <field name="disk_gb">40</field>
+        <field name="state">active</field>
+        <field name="prometheus_target_url">http://prometheus:9090</field>
+        <field name="grafana_dashboard_uid">vps-overview-001</field>
+    </record>
+
+    <record id="demo_env_dev01_dev" model="tenant.environment">
+        <field name="vps_id" ref="demo_vps_dev01"/>
+        <field name="tenant_registry_id" ref="demo_tenant_registry"/>
+        <field name="env_type">dev</field>
+        <field name="db_name">dev_sandbox</field>
+        <field name="odoo_url">http://dev-vps-01.demo.local:8069</field>
+    </record>
+
+</odoo>

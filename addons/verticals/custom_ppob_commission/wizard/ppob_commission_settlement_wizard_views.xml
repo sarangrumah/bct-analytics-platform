@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_commission_settlement_wizard_form" model="ir.ui.view">
+        <field name="name">custom.ppob.commission.settlement.wizard.form</field>
+        <field name="model">custom.ppob.commission.settlement.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Commission Settlement">
+                <group>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="scope"/>
+                    <field name="partner_id"/>
+                    <field name="pph_rate" invisible="scope != 'us_to_mitra'"/>
+                </group>
+                <footer>
+                    <button name="action_run" type="object" string="Run" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ppob_commission_settlement_wizard" model="ir.actions.act_window">
+        <field name="name">Settle Commissions</field>
+        <field name="res_model">custom.ppob.commission.settlement.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- License: LGPL-3 -->
+<odoo>
+
+    <record id="view_hht_device_list" model="ir.ui.view">
+        <field name="name">hht.device.list</field>
+        <field name="model">hht.device</field>
+        <field name="arch" type="xml">
+            <list string="HHT Devices" decoration-muted="not enabled" decoration-success="status == 'active'" decoration-danger="status == 'quarantined'">
+                <field name="name"/>
+                <field name="device_id"/>
+                <field name="model"/>
+                <field name="tenant_id"/>
+                <field name="user_id"/>
+                <field name="status"/>
+                <field name="scan_count_today"/>
+                <field name="last_seen_at"/>
+                <field name="enabled"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hht_device_form" model="ir.ui.view">
+        <field name="name">hht.device.form</field>
+        <field name="model">hht.device</field>
+        <field name="arch" type="xml">
+            <form string="HHT Device">
+                <header>
+                    <button name="action_regenerate_secret"
+                            type="object"
+                            string="Regenerate Secret"
+                            class="btn-warning"
+                            confirm="This will invalidate the current device secret. Continue?"
+                            groups="custom_hht_bridge.group_hht_admin"/>
+                    <field name="status" widget="badge" decoration-success="status == 'active'" decoration-danger="status == 'quarantined'" decoration-muted="status == 'disabled'"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_scan_logs"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-list">
+                            <field name="scan_log_count" widget="statinfo" string="Scans"/>
+                        </button>
+                        <button name="action_view_sync_queue"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-clock-o">
+                            <field name="sync_queue_count" widget="statinfo" string="Queued"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Device name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Identity">
+                            <field name="device_id"/>
+                            <field name="model"/>
+                            <field name="tenant_id"/>
+                            <field name="user_id"/>
+                            <field name="enabled"/>
+                        </group>
+                        <group string="Security">
+                            <field name="api_key" readonly="1"/>
+                            <field name="api_secret" readonly="1"
+                                   invisible="id"
+                                   help="Shown once at creation; rotate via Regenerate Secret."/>
+                            <field name="allowed_cidrs"
+                                   placeholder="10.0.0.0/8, 192.168.1.0/24"/>
+                        </group>
+                        <group string="Activity">
+                            <field name="last_seen_at"/>
+                            <field name="last_action_at"/>
+                            <field name="last_action_summary"/>
+                            <field name="scan_count_today"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hht_device_kanban" model="ir.ui.view">
+        <field name="name">hht.device.kanban</field>
+        <field name="model">hht.device</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="status"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card">
+                            <strong><field name="name"/></strong>
+                            <div><field name="device_id"/></div>
+                            <div><field name="model"/></div>
+                            <div>Today: <field name="scan_count_today"/></div>
+                            <div><field name="last_seen_at"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_hht_device_search" model="ir.ui.view">
+        <field name="name">hht.device.search</field>
+        <field name="model">hht.device</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="device_id"/>
+                <field name="tenant_id"/>
+                <field name="user_id"/>
+                <filter string="Active" name="filter_active"
+                        domain="[('enabled', '=', True)]"/>
+                <filter string="Disabled" name="filter_disabled"
+                        domain="[('enabled', '=', False)]"/>
+
+                    <filter string="Tenant" name="g_tenant"
+                            context="{'group_by': 'tenant_id'}"/>
+                    <filter string="Model" name="g_model"
+                            context="{'group_by': 'model'}"/>
+                    <filter string="Status" name="g_status"
+                            context="{'group_by': 'status'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hht_device" model="ir.actions.act_window">
+        <field name="name">Devices</field>
+        <field name="res_model">hht.device</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_hht_device_search"/>
+    </record>
+
+</odoo>

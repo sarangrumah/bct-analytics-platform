@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Dedicated channel: ESB pushes must not queue behind bulk imports, and
+         ESB tolerates only modest concurrency. -->
+    <record id="channel_esb" model="queue.job.channel">
+        <field name="name">esb</field>
+        <field name="parent_id" ref="queue_job.channel_root"/>
+    </record>
+
+    <record id="job_function_esb_push" model="queue.job.function">
+        <field name="model_id" ref="model_custom_esb_outbox"/>
+        <field name="method">_job_push</field>
+        <field name="channel_id" ref="channel_esb"/>
+    </record>
+</odoo>

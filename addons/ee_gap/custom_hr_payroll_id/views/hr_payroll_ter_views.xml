@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_hr_payroll_ter_bracket_list" model="ir.ui.view">
+        <field name="name">hr.payroll.ter.bracket.list</field>
+        <field name="model">hr.payroll.ter.bracket</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" decoration-muted="not active">
+                <field name="category"/>
+                <field name="lower_bound"/>
+                <field name="upper_bound" help="0 = open-ended (highest bracket)"/>
+                <field name="rate"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hr_payroll_ter_bracket_search" model="ir.ui.view">
+        <field name="name">hr.payroll.ter.bracket.search</field>
+        <field name="model">hr.payroll.ter.bracket</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="category"/>
+                <filter name="cat_a" string="Kategori A" domain="[('category','=','A')]"/>
+                <filter name="cat_b" string="Kategori B" domain="[('category','=','B')]"/>
+                <filter name="cat_c" string="Kategori C" domain="[('category','=','C')]"/>
+                <group>
+                    <filter name="by_cat" string="Category" domain="[]" context="{'group_by': 'category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_payroll_ter_bracket" model="ir.actions.act_window">
+        <field name="name">TER Brackets (PP 58/2023)</field>
+        <field name="res_model">hr.payroll.ter.bracket</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_hr_payroll_ter_bracket_search"/>
+        <field name="context">{"search_default_by_cat": 1}</field>
+    </record>
+
+</odoo>

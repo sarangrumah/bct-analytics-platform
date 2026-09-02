@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_planning_root" name="Planning" sequence="62"
+              groups="custom_planning.group_planning_user"/>
+    <menuitem id="menu_planning_slots" name="Shifts" parent="menu_planning_root"
+              action="action_planning_slot" sequence="10"/>
+    <menuitem id="menu_planning_config" name="Configuration" parent="menu_planning_root"
+              sequence="100" groups="custom_planning.group_planning_manager"/>
+    <menuitem id="menu_planning_roles" name="Roles" parent="menu_planning_config"
+              action="action_planning_role" sequence="10"/>
+</odoo>

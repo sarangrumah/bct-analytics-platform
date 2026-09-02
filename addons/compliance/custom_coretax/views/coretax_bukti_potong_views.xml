@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_coretax_bupot_list" model="ir.ui.view">
+        <field name="name">custom.coretax.bukti.potong.list</field>
+        <field name="model">custom.coretax.bukti.potong</field>
+        <field name="arch" type="xml">
+            <list string="Bukti Potong" export_xlsx="1">
+                <field name="no_bupot"/>
+                <field name="tanggal_bupot"/>
+                <field name="period_year"/>
+                <field name="period_month"/>
+                <field name="partner_id"/>
+                <field name="jenis_pph"/>
+                <field name="tarif"/>
+                <field name="dpp" sum="Total DPP"/>
+                <field name="pph_terpotong" sum="Total PPh"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="source"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state in ('approved','submitted')"
+                       decoration-warning="state == 'exported'"
+                       decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_coretax_bupot_form" model="ir.ui.view">
+        <field name="name">custom.coretax.bukti.potong.form</field>
+        <field name="model">custom.coretax.bukti.potong</field>
+        <field name="arch" type="xml">
+            <form string="Bukti Potong">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_draft" string="Reset to Draft" type="object"
+                            invisible="state == 'draft'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('cancelled','approved')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,exported,submitted,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="no_bupot"/>
+                        <h1><field name="no_bupot"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="jenis_pph"/>
+                            <field name="source"/>
+                            <field name="tanggal_bupot"/>
+                            <field name="period_year"/>
+                            <field name="period_month"/>
+                        </group>
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="tarif"/>
+                            <field name="dpp"/>
+                            <field name="pph_terpotong"/>
+                            <field name="account_move_id"/>
+                            <field name="attachment_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coretax_bupot_search" model="ir.ui.view">
+        <field name="name">custom.coretax.bukti.potong.search</field>
+        <field name="model">custom.coretax.bukti.potong</field>
+        <field name="arch" type="xml">
+            <search string="Bukti Potong">
+                <field name="no_bupot"/>
+                <field name="partner_id"/>
+                <filter string="Draft" name="f_draft" domain="[('state','=','draft')]"/>
+                <filter string="Confirmed" name="f_confirmed" domain="[('state','=','confirmed')]"/>
+                <filter string="Approved" name="f_approved" domain="[('state','=','approved')]"/>
+                <separator/>
+                <filter string="PPh 21" name="f_pph21" domain="[('jenis_pph','=','21')]"/>
+                <filter string="PPh 23" name="f_pph23" domain="[('jenis_pph','=','23')]"/>
+                <filter string="PPh 26" name="f_pph26" domain="[('jenis_pph','=','26')]"/>
+                <filter string="PPh 4(2)" name="f_pph42" domain="[('jenis_pph','=','4_2')]"/>
+                <separator/>
+                <filter string="Issued" name="f_issued" domain="[('source','=','issued')]"/>
+                <filter string="Received" name="f_received" domain="[('source','=','received')]"/>
+                <separator/>
+                    <filter string="Period Year" name="g_year" context="{'group_by':'period_year'}"/>
+                    <filter string="Period Month" name="g_month" context="{'group_by':'period_month'}"/>
+                    <filter string="Jenis PPh" name="g_jenis" context="{'group_by':'jenis_pph'}"/>
+                    <filter string="Source" name="g_source" context="{'group_by':'source'}"/>
+                    <filter string="State" name="g_state" context="{'group_by':'state'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_coretax_bupot" model="ir.actions.act_window">
+        <field name="name">Bukti Potong</field>
+        <field name="res_model">custom.coretax.bukti.potong</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_coretax_bupot_search"/>
+    </record>
+
+</odoo>

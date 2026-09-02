@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_stock_summary_report_list" model="ir.ui.view">
+        <field name="name">custom.wms.stock.summary.report.list</field>
+        <field name="model">custom.wms.stock.summary.report</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <header>
+                    <button name="action_export_xlsx" type="object" string="Export XLSX (with barcode)"
+                            class="btn-primary"/>
+                </header>
+                <field name="warehouse_id"/>
+                <field name="location_id"/>
+                <field name="default_code" optional="show"/>
+                <field name="product_id"/>
+                <field name="categ_id" optional="hide"/>
+                <field name="lot_id" optional="hide"/>
+                <field name="quantity" sum="Total On Hand"/>
+                <field name="reserved_quantity" sum="Total Reserved" optional="show"/>
+                <field name="available_quantity" sum="Total Available" optional="show"/>
+                <field name="unit_cost"/>
+                <field name="value" sum="Total Value"/>
+                <field name="in_date" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_stock_summary_report_pivot" model="ir.ui.view">
+        <field name="name">custom.wms.stock.summary.report.pivot</field>
+        <field name="model">custom.wms.stock.summary.report</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="product_id" type="row"/>
+                <field name="warehouse_id" type="col"/>
+                <field name="quantity" type="measure"/>
+                <field name="value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_stock_summary_report_search" model="ir.ui.view">
+        <field name="name">custom.wms.stock.summary.report.search</field>
+        <field name="model">custom.wms.stock.summary.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+                <field name="default_code"/>
+                <field name="location_id"/>
+                <field name="warehouse_id"/>
+                <filter name="filter_nonzero" string="Non-zero On Hand" domain="[('quantity', '!=', 0)]"/>
+                <filter name="filter_negative" string="Negative Stock" domain="[('quantity', '&lt;', 0)]"/>
+                <group>
+                    <filter name="group_warehouse" string="Warehouse" context="{'group_by': 'warehouse_id'}"/>
+                    <filter name="group_location" string="Location" context="{'group_by': 'location_id'}"/>
+                    <filter name="group_product" string="Product (SKU)" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_category" string="Category" context="{'group_by': 'categ_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_stock_summary_report" model="ir.actions.act_window">
+        <field name="name">Stock Summary (Qty + Value)</field>
+        <field name="res_model">custom.wms.stock.summary.report</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="view_stock_summary_report_search"/>
+        <field name="context">{'search_default_group_warehouse': 1, 'search_default_filter_nonzero': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">No stock on hand</p>
+            <p>On-hand quantity and value per SKU / warehouse / bin.
+               Value uses the product cost of the quant's company.</p>
+        </field>
+    </record>
+
+</odoo>

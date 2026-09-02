@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_document">
+        <t t-set="company" t-value="o.company_id"/>
+        <t t-set="accent" t-value="company.brand_accent_color or '#714B67'"/>
+        <t t-set="currency" t-value="o.currency_id"/>
+        <t t-set="is_quote" t-value="o.state in ('draft', 'sent')"/>
+        <div t-attf-class="page o_company_#{company.id}_layout" style="font-size: 12px;">
+
+            <!-- Header -->
+            <t t-call="custom_report_templates.brand_header">
+                <t t-set="doc_title" t-value="'SALES QUOTE' if is_quote else 'SALES ORDER'"/>
+                <tr>
+                    <td style="width: 45%; font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">DATE</td>
+                    <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;">
+                        <t t-call="custom_report_templates.id_date"><t t-set="d" t-value="o.date_order"/></t>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">
+                        <t t-out="'QUOTE #' if is_quote else 'ORDER #'"/>
+                    </td>
+                    <td style="text-align: right; border: 1px solid #b0b0b0; padding: 3px 5px;" t-out="o.name"/>
+                </tr>
+                <tr t-if="is_quote and o.validity_date">
+                    <td style="font-weight: bold; background-color: #f3f3f3; border: 1px solid #b0b0b0; padding: 3px 5px;">EXPIRED DATE</td>
+                    <td style="text-align: right; background-color: #e8edf5; border: 1px solid #b0b0b0; padding: 3px 5px;">
+                        <t t-call="custom_report_templates.id_date"><t t-set="d" t-value="o.validity_date"/></t>
+                    </td>
+                </tr>
+            </t>
+
+            <!-- Bill to -->
+            <t t-call="custom_report_templates.party_band">
+                <t t-set="band_label">BILL TO</t>
+                <t t-set="partner" t-value="o.partner_id"/>
+            </t>
+
+            <!-- Items -->
+            <t t-call="custom_report_templates.items_table">
+                <t t-set="lines" t-value="o.order_line"/>
+                <t t-set="qty_field" t-value="'product_uom_qty'"/>
+            </t>
+
+            <!-- Comments + totals (side-by-side via table, not Bootstrap grid) -->
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 55%; vertical-align: top; padding-right: 10px;">
+                        <t t-call="custom_report_templates.comments_box">
+                            <span t-if="o.note" t-out="o.note"/>
+                        </t>
+                    </td>
+                    <td style="width: 45%; vertical-align: top;">
+                        <t t-call="custom_report_templates.totals_block">
+                            <t t-set="show_balance" t-value="False"/>
+                        </t>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Signature + footer -->
+            <t t-call="custom_report_templates.signature_block">
+                <t t-set="signer" t-value="o.user_id.name"/>
+                <t t-set="doc_noun" t-value="'quotation' if is_quote else 'order'"/>
+                <t t-set="show_customer_sig" t-value="is_quote"/>
+                <t t-set="customer_name" t-value="o.partner_id.name"/>
+                <t t-set="customer_company" t-value="o.partner_id.commercial_partner_id.name"/>
+            </t>
+        </div>
+    </template>
+
+    <!-- Minimal self-contained wrapper: no external HTTP requests → fast wkhtmltopdf -->
+    <template id="report_saleorder">
+        <html>
+            <body>
+                <!-- <main> is required by ir_actions_report._prepare_html (root.xpath('//main')[0]) -->
+                <main>
+                    <!-- _prepare_html keeps only the children of <main>: anything left in
+                         <head> never reaches wkhtmltopdf, which then falls back to latin-1
+                         and prints "Â¥" for ¥. Charset and CSS therefore live in here. -->
+                    <meta charset="utf-8"/>
+                    <style>
+                        @page { margin: 15mm; }
+                        * { box-sizing: border-box; }
+                        body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; margin: 0; padding: 0; }
+                    </style>
+                    <t t-foreach="docs" t-as="o">
+                        <div t-if="not o_first" style="page-break-before: always;"></div>
+                        <t t-call="custom_report_templates.report_saleorder_document" t-lang="o.partner_id.lang"/>
+                    </t>
+                </main>
+            </body>
+        </html>
+    </template>
+</odoo>

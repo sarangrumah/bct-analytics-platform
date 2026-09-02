@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rule_user,pmo notify rule user,model_custom_project_notify_rule,custom_project_portfolio.group_pmo_user,1,0,0,0
+access_rule_lead,pmo notify rule lead,model_custom_project_notify_rule,custom_project_portfolio.group_pmo_lead,1,1,0,0
+access_rule_admin,pmo notify rule admin,model_custom_project_notify_rule,custom_project_portfolio.group_pmo_admin,1,1,1,1
+access_outbox_lead,pmo notify outbox lead,model_custom_project_notify_outbox,custom_project_portfolio.group_pmo_lead,1,1,0,0
+access_outbox_admin,pmo notify outbox admin,model_custom_project_notify_outbox,custom_project_portfolio.group_pmo_admin,1,1,1,1
+access_log_user,pmo notify log user,model_custom_project_notify_log,custom_project_portfolio.group_pmo_user,1,0,0,0
+access_log_admin,pmo notify log admin,model_custom_project_notify_log,custom_project_portfolio.group_pmo_admin,1,1,1,1

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_notify_rule_list" model="ir.ui.view">
+        <field name="name">custom.project.notify.rule.list</field>
+        <field name="model">custom.project.notify.rule</field>
+        <field name="arch" type="xml">
+            <list string="Notification Rules" editable="bottom">
+                <field name="event"/>
+                <field name="recipient_kind"/>
+                <field name="role_group_id"
+                       column_invisible="False"
+                       readonly="recipient_kind != 'group'"/>
+                <field name="channel_wa" widget="boolean_toggle"/>
+                <field name="channel_email" widget="boolean_toggle"/>
+                <field name="channel_odoo" widget="boolean_toggle"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_notify_rule_search" model="ir.ui.view">
+        <field name="name">custom.project.notify.rule.search</field>
+        <field name="model">custom.project.notify.rule</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="event"/>
+                <field name="recipient_kind"/>
+                <filter name="f_wa" string="WhatsApp on" domain="[('channel_wa','=',True)]"/>
+                <filter name="f_inactive" string="Archived" domain="[('active','=',False)]"/>
+                <group>
+                    <filter name="g_event" string="Event" context="{'group_by':'event'}"/>
+                    <filter name="g_kind" string="Recipient"
+                            context="{'group_by':'recipient_kind'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_notify_rule" model="ir.actions.act_window">
+        <field name="name">Notification Rules</field>
+        <field name="res_model">custom.project.notify.rule</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_notify_rule_search"/>
+        <field name="context">{'search_default_g_event': 1, 'active_test': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No rules yet</p>
+            <p>A rule says who hears about an event, and on which channel.
+               Changing a rule takes effect immediately — no deploy.</p>
+        </field>
+    </record>
+
+</odoo>

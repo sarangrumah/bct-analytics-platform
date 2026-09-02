@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_tenant_vps_user,tenant.vps user RO,model_tenant_vps,group_tenant_infra_user,1,0,0,0
+access_tenant_vps_manager,tenant.vps manager RW,model_tenant_vps,group_tenant_infra_manager,1,1,1,1
+access_tenant_environment_user,tenant.environment user RO,model_tenant_environment,group_tenant_infra_user,1,0,0,0
+access_tenant_environment_manager,tenant.environment manager RW,model_tenant_environment,group_tenant_infra_manager,1,1,1,1
+access_tenant_vps_bootstrap_template_user,tenant.vps.bootstrap.template user RO,model_tenant_vps_bootstrap_template,group_tenant_infra_user,1,0,0,0
+access_tenant_vps_bootstrap_template_manager,tenant.vps.bootstrap.template manager RW,model_tenant_vps_bootstrap_template,group_tenant_infra_manager,1,1,1,1
+access_tenant_vps_deployer_manager,tenant.vps.deployer manager,model_tenant_vps_deployer,group_tenant_infra_manager,1,1,1,1

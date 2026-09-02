@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="custom_hht_bridge.ReceivePage">
+        <div class="hht-page-receive hht-form">
+            <h2>Receive</h2>
+            <div class="hht-form-row">
+                <label>Destination Location</label>
+                <input type="text" class="hht-input" t-model="state.location_id"/>
+            </div>
+            <div class="hht-form-row">
+                <label>Quantity</label>
+                <input type="number" min="0" step="any" class="hht-input hht-num" t-model.number="state.qty"/>
+            </div>
+            <div class="hht-form-row">
+                <label>Lot/Serial</label>
+                <input type="text" class="hht-input" t-model="state.lot"/>
+            </div>
+            <button class="hht-submit" t-on-click="() => this.submit()">Confirm Receipt</button>
+        </div>
+    </t>
+
+    <t t-name="custom_hht_bridge.IssuePage">
+        <div class="hht-page-issue hht-form">
+            <h2>Issue</h2>
+            <div class="hht-form-row">
+                <label>Source Location</label>
+                <input type="text" class="hht-input" t-model="state.location_id"/>
+            </div>
+            <div class="hht-form-row">
+                <label>Quantity</label>
+                <input type="number" min="0" step="any" class="hht-input hht-num" t-model.number="state.qty"/>
+            </div>
+            <div class="hht-form-row">
+                <label>Lot/Serial</label>
+                <input type="text" class="hht-input" t-model="state.lot"/>
+            </div>
+            <button class="hht-submit" t-on-click="() => this.submit()">Confirm Issue</button>
+        </div>
+    </t>
+
+    <t t-name="custom_hht_bridge.TransferPage">
+        <div class="hht-page-transfer hht-form">
+            <h2>Transfer</h2>
+            <div class="hht-form-row">
+                <label>From Location</label>
+                <input type="text" class="hht-input" t-model="state.location_id"/>
+            </div>
+            <div class="hht-form-row">
+                <label>To Location</label>
+                <input type="text" class="hht-input" t-model="state.location_dest_id"/>
+            </div>
+            <div class="hht-form-row">
+                <label>Quantity</label>
+                <input type="number" min="0" step="any" class="hht-input hht-num" t-model.number="state.qty"/>
+            </div>
+            <div class="hht-form-row">
+                <label>Lot/Serial</label>
+                <input type="text" class="hht-input" t-model="state.lot"/>
+            </div>
+            <button class="hht-submit" t-on-click="() => this.submit()">Confirm Transfer</button>
+        </div>
+    </t>
+
+    <t t-name="custom_hht_bridge.CountPage">
+        <div class="hht-page-count hht-form">
+            <h2>Cycle Count</h2>
+            <div class="hht-form-row">
+                <label>Location</label>
+                <input type="text" class="hht-input" t-model="state.location_id"/>
+            </div>
+            <div class="hht-form-row">
+                <label>Counted Qty</label>
+                <input type="number" min="0" step="any" class="hht-input hht-num" t-model.number="state.qty"/>
+            </div>
+            <div class="hht-form-row">
+                <label>Lot/Serial</label>
+                <input type="text" class="hht-input" t-model="state.lot"/>
+            </div>
+            <button class="hht-submit" t-on-click="() => this.submit()">Record Count</button>
+        </div>
+    </t>
+
+    <t t-name="custom_hht_bridge.HandoverPage">
+        <div class="hht-page-handover hht-form">
+            <h2>BAST Handover</h2>
+            <div class="hht-form-row">
+                <label>BAST Reference</label>
+                <input type="text" class="hht-input" t-model="state.bast_ref"/>
+            </div>
+            <div class="hht-form-row">
+                <label>Party</label>
+                <select class="hht-input" t-model="state.party">
+                    <option value="from">From</option>
+                    <option value="to">To</option>
+                </select>
+            </div>
+            <button class="hht-submit" t-on-click="() => this.submit()">Sign &amp; Submit</button>
+        </div>
+    </t>
+</templates>

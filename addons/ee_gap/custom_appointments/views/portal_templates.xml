@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="booking_page" name="Booking Page">
+        <t t-call="website.layout">
+            <div class="container py-4">
+                <h2 t-out="atype.name"/>
+                <p class="text-muted">
+                    Duration: <span t-out="atype.duration_minutes"/> minutes
+                </p>
+                <div t-field="atype.description"/>
+                <hr/>
+                <h4>Pick a time</h4>
+                <form t-attf-action="/book/#{atype.slug}/submit" method="POST">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="resource_id" t-att-value="resource and resource.id or ''"/>
+                    <div class="mb-3">
+                        <label>Slot</label>
+                        <select name="start_dt" class="form-select" required="required">
+                            <option t-foreach="slots" t-as="s" t-att-value="s" t-out="s"/>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Name</label>
+                            <input name="customer_name" class="form-control" required="required"/>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Email</label>
+                            <input name="customer_email" type="email" class="form-control" required="required"/>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Phone</label>
+                            <input name="customer_phone" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label>Notes</label>
+                        <textarea name="notes" class="form-control" rows="3"/>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Book</button>
+                </form>
+            </div>
+        </t>
+    </template>
+
+    <template id="booking_confirm" name="Booking Confirmed">
+        <t t-call="website.layout">
+            <div class="container py-4 text-center">
+                <h2>✅ Booking confirmed</h2>
+                <p>Reference: <b t-out="booking.name"/></p>
+                <p><span t-out="atype.name"/> at <span t-out="booking.start_dt"/></p>
+                <p>We sent a confirmation to <span t-out="booking.customer_email"/>.</p>
+            </div>
+        </t>
+    </template>
+</odoo>

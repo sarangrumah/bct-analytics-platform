@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Daily late-fee accrual: for every picked_up order past its expected
+         return, accrue days_overdue * (rate/100) * subtotal. Idempotent —
+         _cron_accrue_late_fees skips orders already accrued today. -->
+    <record id="cron_accrue_late_fees" model="ir.cron">
+        <field name="name">Rental: accrue late fees</field>
+        <field name="model_id" ref="model_rental_order"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_accrue_late_fees()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

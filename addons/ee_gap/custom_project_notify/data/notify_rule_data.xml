@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Default rule set. This is the e-Telekomunikasi DOC_NEXT_REVIEWER map, promoted
+             from a Python constant to editable data. noupdate="1" so a module upgrade never
+             silently rewrites what the PO Lead has tuned. -->
+
+        <record id="rule_task_created_assignee" model="custom.project.notify.rule">
+            <field name="event">task_created</field>
+            <field name="recipient_kind">assignee</field>
+        </record>
+        <record id="rule_task_created_po" model="custom.project.notify.rule">
+            <field name="event">task_created</field>
+            <field name="recipient_kind">po</field>
+        </record>
+
+        <record id="rule_assigned_assignee" model="custom.project.notify.rule">
+            <field name="event">assigned</field>
+            <field name="recipient_kind">assignee</field>
+            <field name="channel_email" eval="False"/>
+        </record>
+
+        <record id="rule_stage_assignee" model="custom.project.notify.rule">
+            <field name="event">stage_changed</field>
+            <field name="recipient_kind">assignee</field>
+        </record>
+        <record id="rule_stage_reporter" model="custom.project.notify.rule">
+            <field name="event">stage_changed</field>
+            <field name="recipient_kind">reporter</field>
+        </record>
+        <record id="rule_stage_po" model="custom.project.notify.rule">
+            <field name="event">stage_changed</field>
+            <field name="recipient_kind">po</field>
+        </record>
+
+        <!-- Hold: the PO and the vertical owner, because a hold is someone else's problem
+             to unblock. -->
+        <record id="rule_hold_po" model="custom.project.notify.rule">
+            <field name="event">on_hold</field>
+            <field name="recipient_kind">po</field>
+        </record>
+        <record id="rule_hold_vertical" model="custom.project.notify.rule">
+            <field name="event">on_hold</field>
+            <field name="recipient_kind">vertical_owner</field>
+        </record>
+        <record id="rule_hold_expired_po" model="custom.project.notify.rule">
+            <field name="event">hold_expired</field>
+            <field name="recipient_kind">po</field>
+        </record>
+        <record id="rule_hold_expired_owner" model="custom.project.notify.rule">
+            <field name="event">hold_expired</field>
+            <field name="recipient_kind">portfolio_owner</field>
+        </record>
+
+        <!-- Verification: the brand PIC, on WhatsApp. No Odoo inbox — this person does not
+             live in Odoo. -->
+        <record id="rule_verify_request_pic" model="custom.project.notify.rule">
+            <field name="event">verify_request</field>
+            <field name="recipient_kind">brand_pic</field>
+            <field name="channel_odoo" eval="False"/>
+        </record>
+        <record id="rule_verify_h2_pic" model="custom.project.notify.rule">
+            <field name="event">verify_reminder_h2</field>
+            <field name="recipient_kind">brand_pic</field>
+            <field name="channel_email" eval="False"/>
+            <field name="channel_odoo" eval="False"/>
+        </record>
+        <record id="rule_verify_h5_pic" model="custom.project.notify.rule">
+            <field name="event">verify_reminder_h5</field>
+            <field name="recipient_kind">brand_pic</field>
+            <field name="channel_odoo" eval="False"/>
+        </record>
+        <record id="rule_autoclose_pic" model="custom.project.notify.rule">
+            <field name="event">verify_auto_close</field>
+            <field name="recipient_kind">brand_pic</field>
+            <field name="channel_odoo" eval="False"/>
+        </record>
+        <record id="rule_autoclose_assignee" model="custom.project.notify.rule">
+            <field name="event">verify_auto_close</field>
+            <field name="recipient_kind">assignee</field>
+        </record>
+        <record id="rule_autoclose_po" model="custom.project.notify.rule">
+            <field name="event">verify_auto_close</field>
+            <field name="recipient_kind">po</field>
+        </record>
+
+        <!-- Deadlines -->
+        <record id="rule_h3_assignee" model="custom.project.notify.rule">
+            <field name="event">due_h3</field>
+            <field name="recipient_kind">assignee</field>
+            <field name="channel_email" eval="False"/>
+        </record>
+        <record id="rule_h1_assignee" model="custom.project.notify.rule">
+            <field name="event">due_h1</field>
+            <field name="recipient_kind">assignee</field>
+        </record>
+        <record id="rule_overdue_assignee" model="custom.project.notify.rule">
+            <field name="event">overdue</field>
+            <field name="recipient_kind">assignee</field>
+        </record>
+        <record id="rule_overdue_po" model="custom.project.notify.rule">
+            <field name="event">overdue</field>
+            <field name="recipient_kind">po</field>
+        </record>
+        <record id="rule_escalation_assignee" model="custom.project.notify.rule">
+            <field name="event">escalation</field>
+            <field name="recipient_kind">assignee</field>
+        </record>
+        <record id="rule_escalation_po" model="custom.project.notify.rule">
+            <field name="event">escalation</field>
+            <field name="recipient_kind">po</field>
+        </record>
+        <record id="rule_escalation_owner" model="custom.project.notify.rule">
+            <field name="event">escalation</field>
+            <field name="recipient_kind">portfolio_owner</field>
+        </record>
+
+        <record id="rule_health_po" model="custom.project.notify.rule">
+            <field name="event">health_degraded</field>
+            <field name="recipient_kind">po</field>
+        </record>
+        <record id="rule_health_owner" model="custom.project.notify.rule">
+            <field name="event">health_degraded</field>
+            <field name="recipient_kind">portfolio_owner</field>
+        </record>
+
+        <!-- Change requests -->
+        <record id="rule_cr_created_ba" model="custom.project.notify.rule">
+            <field name="event">cr_created</field>
+            <field name="recipient_kind">ba</field>
+        </record>
+        <record id="rule_cr_created_po" model="custom.project.notify.rule">
+            <field name="event">cr_created</field>
+            <field name="recipient_kind">po</field>
+        </record>
+        <record id="rule_cr_submit_po" model="custom.project.notify.rule">
+            <field name="event">cr_submit</field>
+            <field name="recipient_kind">assignee</field>
+        </record>
+        <record id="rule_cr_approve_ba" model="custom.project.notify.rule">
+            <field name="event">cr_approve</field>
+            <field name="recipient_kind">ba</field>
+        </record>
+        <record id="rule_cr_approve_reporter" model="custom.project.notify.rule">
+            <field name="event">cr_approve</field>
+            <field name="recipient_kind">reporter</field>
+            <field name="channel_odoo" eval="False"/>
+        </record>
+        <record id="rule_cr_reject_reporter" model="custom.project.notify.rule">
+            <field name="event">cr_reject</field>
+            <field name="recipient_kind">reporter</field>
+            <field name="channel_odoo" eval="False"/>
+        </record>
+        <record id="rule_cr_reject_ba" model="custom.project.notify.rule">
+            <field name="event">cr_reject</field>
+            <field name="recipient_kind">ba</field>
+        </record>
+        <record id="rule_cr_intake_overdue_po" model="custom.project.notify.rule">
+            <field name="event">cr_intake_overdue</field>
+            <field name="recipient_kind">po</field>
+        </record>
+        <record id="rule_cr_intake_overdue_ba" model="custom.project.notify.rule">
+            <field name="event">cr_intake_overdue</field>
+            <field name="recipient_kind">ba</field>
+        </record>
+
+        <!-- Weekly -->
+        <record id="rule_weekly_reminder_ba" model="custom.project.notify.rule">
+            <field name="event">weekly_reminder</field>
+            <field name="recipient_kind">ba</field>
+            <field name="channel_email" eval="False"/>
+        </record>
+        <record id="rule_weekly_digest_po" model="custom.project.notify.rule">
+            <field name="event">weekly_digest</field>
+            <field name="recipient_kind">po</field>
+        </record>
+        <record id="rule_weekly_digest_owner" model="custom.project.notify.rule">
+            <field name="event">weekly_digest</field>
+            <field name="recipient_kind">portfolio_owner</field>
+        </record>
+
+        <!-- Config defaults. The BFF URL is intentionally the in-cluster address: the
+             Odoo -> BFF hop never leaves the docker network. -->
+        <record id="param_bff_url" model="ir.config_parameter">
+            <field name="key">custom_project_notify.bff_url</field>
+            <field name="value">http://vas-pmo:8080</field>
+        </record>
+        <record id="param_dispatch_enabled" model="ir.config_parameter">
+            <field name="key">custom_project_notify.dispatch_enabled</field>
+            <field name="value">1</field>
+        </record>
+
+    </data>
+</odoo>

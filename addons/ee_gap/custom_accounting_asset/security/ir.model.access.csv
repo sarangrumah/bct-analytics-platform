@@ -1,0 +1,24 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_fixed_asset_group_internal,fixed asset group internal read,model_custom_fixed_asset_group,base.group_user,1,0,0,0
+access_fixed_asset_group_user,fixed asset group user,model_custom_fixed_asset_group,group_asset_user,1,0,0,0
+access_fixed_asset_group_mgr,fixed asset group manager,model_custom_fixed_asset_group,group_asset_manager,1,1,1,1
+access_fixed_asset_location_internal,fixed asset location internal read,model_custom_fixed_asset_location,base.group_user,1,0,0,0
+access_fixed_asset_location_user,fixed asset location user,model_custom_fixed_asset_location,group_asset_user,1,0,0,0
+access_fixed_asset_location_mgr,fixed asset location manager,model_custom_fixed_asset_location,group_asset_manager,1,1,1,1
+access_fixed_asset_internal,fixed asset internal read,model_custom_fixed_asset,base.group_user,1,0,0,0
+access_fixed_asset_user,fixed asset user,model_custom_fixed_asset,group_asset_user,1,1,1,0
+access_fixed_asset_mgr,fixed asset manager,model_custom_fixed_asset,group_asset_manager,1,1,1,1
+access_fixed_asset_depr_line_internal,fixed asset depreciation line internal read,model_custom_fixed_asset_depreciation_line,base.group_user,1,0,0,0
+access_fixed_asset_depr_line_user,fixed asset depreciation line user,model_custom_fixed_asset_depreciation_line,group_asset_user,1,0,0,0
+access_fixed_asset_depr_line_mgr,fixed asset depreciation line manager,model_custom_fixed_asset_depreciation_line,group_asset_manager,1,1,1,1
+access_fixed_asset_disposal_wizard_user,fixed asset disposal wizard user,model_custom_fixed_asset_disposal_wizard,group_asset_user,1,1,1,1
+access_fixed_asset_disposal_wizard_mgr,fixed asset disposal wizard manager,model_custom_fixed_asset_disposal_wizard,group_asset_manager,1,1,1,1
+access_asset_register_wizard_user,asset register wizard user,model_custom_report_asset_register_wizard,group_asset_user,1,1,1,1
+access_asset_register_wizard_mgr,asset register wizard manager,model_custom_report_asset_register_wizard,group_asset_manager,1,1,1,1
+access_fixed_asset_revaluation_internal,fixed asset revaluation internal read,model_custom_fixed_asset_revaluation,base.group_user,1,0,0,0
+access_fixed_asset_revaluation_user,fixed asset revaluation user,model_custom_fixed_asset_revaluation,group_asset_user,1,1,1,0
+access_fixed_asset_revaluation_mgr,fixed asset revaluation manager,model_custom_fixed_asset_revaluation,group_asset_manager,1,1,1,1
+access_fixed_asset_revaluation_wizard_user,fixed asset revaluation wizard user,model_custom_fixed_asset_revaluation_wizard,group_asset_user,1,1,1,1
+access_fixed_asset_revaluation_wizard_mgr,fixed asset revaluation wizard manager,model_custom_fixed_asset_revaluation_wizard,group_asset_manager,1,1,1,1
+access_fixed_asset_post_wizard_user,fixed asset post wizard user,model_custom_fixed_asset_post_wizard,group_asset_user,1,1,1,1
+access_fixed_asset_post_wizard_mgr,fixed asset post wizard manager,model_custom_fixed_asset_post_wizard,group_asset_manager,1,1,1,1

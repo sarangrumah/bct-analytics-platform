@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_my_home_consent" name="Portal: My Consents Entry"
+              inherit_id="portal.portal_my_home" customize_show="True" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">My Consents</t>
+                <t t-set="url" t-value="'/my/consents'"/>
+                <t t-set="placeholder_count" t-value="'consent_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="portal_my_consents" name="My Consents">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Consents</t>
+            </t>
+            <div class="o_portal_my_doc_table">
+                <h3>Active &amp; Past Consents</h3>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Purpose</th>
+                            <th>Given At</th>
+                            <th>Expires</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="consents" t-as="c">
+                            <td><span t-field="c.purpose_id.name"/></td>
+                            <td><span t-field="c.given_at"/></td>
+                            <td><span t-field="c.expires_at"/></td>
+                            <td>
+                                <span t-if="c.state == 'active'" class="badge text-bg-success">Active</span>
+                                <span t-if="c.state == 'expired'" class="badge text-bg-warning">Expired</span>
+                                <span t-if="c.state == 'withdrawn'" class="badge text-bg-secondary">Withdrawn</span>
+                            </td>
+                            <td>
+                                <form t-if="c.state == 'active'" t-attf-action="/my/consents/#{c.id}/withdraw" method="post">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="text" name="reason" placeholder="Reason (optional)" class="form-control form-control-sm d-inline w-50"/>
+                                    <button type="submit" class="btn btn-sm btn-warning">Withdraw</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr t-if="not consents">
+                            <td colspan="5" class="text-muted">No consent records.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+</odoo>

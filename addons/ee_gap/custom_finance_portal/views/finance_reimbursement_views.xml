@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_finance_reimbursement_list" model="ir.ui.view">
+        <field name="name">finance.reimbursement.list</field>
+        <field name="model">finance.reimbursement</field>
+        <field name="arch" type="xml">
+            <list string="Reimbursement &amp; Expenses"
+                  decoration-info="state=='submitted'"
+                  decoration-success="state in ('approved','posted','paid')"
+                  decoration-danger="state=='rejected'"
+                  decoration-muted="state=='cancelled'">
+                <field name="name"/>
+                <field name="requester_id"/>
+                <field name="division_id"/>
+                <field name="expense_date"/>
+                <field name="amount" sum="Total"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="sap_payment_status" optional="show"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_finance_reimbursement_form" model="ir.ui.view">
+        <field name="name">finance.reimbursement.form</field>
+        <field name="model">finance.reimbursement</field>
+        <field name="arch" type="xml">
+            <form string="Reimbursement &amp; Expenses">
+                <header>
+                    <button name="action_submit_for_approval" type="object"
+                            string="Submit for Approval" class="oe_highlight"
+                            invisible="state != 'draft'"
+                            groups="custom_finance_portal.group_finance_user"/>
+                    <button name="action_approve" type="object" string="Approve" class="oe_highlight"
+                            invisible="state != 'submitted'"
+                            groups="custom_finance_portal.group_finance_officer"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="state != 'submitted'"
+                            groups="custom_finance_portal.group_finance_officer"/>
+                    <button name="action_open_approval_request" type="object" string="View Approval"
+                            invisible="not x_custom_approval_request_id"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state not in ('submitted','rejected','cancelled')"
+                            groups="custom_finance_portal.group_finance_manager"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('paid','posted','cancelled')"
+                            groups="custom_finance_portal.group_finance_user"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,pushed,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="requester_id" readonly="state != 'draft'"/>
+                            <field name="division_id" readonly="state != 'draft'"/>
+                            <field name="submission_type_id" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="pr_number" readonly="state != 'draft'"/>
+                            <field name="expense_date" readonly="state != 'draft'"/>
+                            <field name="payment_method" readonly="state != 'draft'"/>
+                            <field name="amount"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                        </group>
+                    </group>
+                    <group string="Payment To" col="4">
+                        <field name="bank_name" readonly="state != 'draft'"/>
+                        <field name="account_number" readonly="state != 'draft'"/>
+                    </group>
+                    <notebook>
+                        <page string="Detail" name="lines">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="item_id"/>
+                                    <field name="account_code"/>
+                                    <field name="cost_center_code"/>
+                                    <field name="subtotal" sum="Total"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="receipt" widget="binary" filename="receipt_filename"/>
+                                    <field name="receipt_filename" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="SAP / Approval" name="sap">
+                            <group>
+                                <group string="Approval">
+                                    <field name="x_custom_approval_state" widget="badge" readonly="1"/>
+                                </group>
+                                <group string="SAP Mirror">
+                                    <field name="sap_sync_state"/>
+                                    <field name="sap_document_no"/>
+                                    <field name="sap_payment_plan_date"/>
+                                    <field name="sap_payment_status"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                    <field name="description" placeholder="Description..."/>
+                    <field name="note" placeholder="Notes..."/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_finance_reimbursement" model="ir.actions.act_window">
+        <field name="name">Reimbursement &amp; Expenses</field>
+        <field name="res_model">finance.reimbursement</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

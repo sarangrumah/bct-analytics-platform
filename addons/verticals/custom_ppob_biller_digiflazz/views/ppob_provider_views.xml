@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_provider_form_digiflazz" model="ir.ui.view">
+        <field name="name">custom.ppob.provider.form.digiflazz</field>
+        <field name="model">custom.ppob.provider</field>
+        <field name="inherit_id" ref="custom_ppob_provider.view_ppob_provider_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='connection']" position="after">
+                <page string="Digiflazz" name="digiflazz"
+                      invisible="adapter_class != 'ppob_digiflazz'">
+                    <div class="alert alert-warning" role="alert">
+                        This adapter has <b>never been run against a live Digiflazz
+                        server</b>. It is written to the published spec and tested
+                        against a mocked HTTP layer. Verify against a sandbox before
+                        go-live, and expect the response-code mapping to need work.
+                    </div>
+                    <group>
+                        <group string="Credentials">
+                            <field name="digiflazz_username"/>
+                            <field name="digiflazz_testing"/>
+                            <div class="text-muted" colspan="2">
+                                The API key is never stored here. Point
+                                <b>credential_ref</b> (Connection tab) at the
+                                <i>ir.config_parameter</i> holding it.
+                            </div>
+                        </group>
+                        <group string="Status Check Guards">
+                            <field name="digiflazz_status_min_age_s"/>
+                            <field name="digiflazz_status_max_age_days"/>
+                        </group>
+                    </group>
+                    <group>
+                        <div class="text-muted" colspan="2">
+                            A prepaid status check at Digiflazz is <b>a re-sent
+                            topup with the same ref_id</b>, not a read. That is safe
+                            only while the ref_id is still recognised: too soon and
+                            it can duplicate, too old and it books a brand-new
+                            charged sale. Both guards exist to stop that.
+                        </div>
+                    </group>
+                    <group>
+                        <button name="action_digiflazz_check_balance"
+                                type="object"
+                                string="Check Digiflazz Balance"
+                                class="btn-secondary"
+                                icon="fa-refresh"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="module_category_approval" model="ir.module.category">
+            <field name="name">Workflow / Approvals</field>
+            <field name="description">Generic multi-tier approval engine.</field>
+            <field name="sequence">90</field>
+        </record>
+
+        <!-- User: can submit approval requests, sees own pending approvals -->
+        <record id="group_approval_user" model="res.groups">
+            <field name="name">Approval User</field>
+            <field name="comment">May submit approval requests against records they own.</field>
+        </record>
+
+        <!-- Manager: can approve / reject / cancel, manage own delegations -->
+        <record id="group_approval_manager" model="res.groups">
+            <field name="name">Approval Manager</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_approval_user'))]"/>
+        </record>
+
+        <!-- Admin: design matrices, see all delegations + OOO -->
+        <record id="group_approval_admin" model="res.groups">
+            <field name="name">Approval Admin</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_approval_manager'))]"/>
+        </record>
+
+    </data>
+</odoo>

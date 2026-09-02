@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_lead_mining_user,custom.crm.lead.mining.request user,model_custom_crm_lead_mining_request,group_user,1,1,1,0
+access_lead_mining_manager,custom.crm.lead.mining.request manager,model_custom_crm_lead_mining_request,group_manager,1,1,1,1
+access_web_form_token_manager,custom.crm.web.form.token manager,model_custom_crm_web_form_token,group_manager,1,1,1,1
+access_web_form_token_user_ro,custom.crm.web.form.token user read,model_custom_crm_web_form_token,group_user,1,0,0,0

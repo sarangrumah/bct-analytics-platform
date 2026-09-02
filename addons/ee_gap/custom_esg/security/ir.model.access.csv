@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_esg_metric_user,custom.esg.metric user,model_custom_esg_metric,group_esg_user,1,0,0,0
+access_custom_esg_metric_manager,custom.esg.metric manager,model_custom_esg_metric,group_esg_manager,1,1,1,1
+access_custom_esg_measurement_user,custom.esg.measurement user,model_custom_esg_measurement,group_esg_user,1,0,0,0
+access_custom_esg_measurement_manager,custom.esg.measurement manager,model_custom_esg_measurement,group_esg_manager,1,1,1,1
+access_custom_esg_report_user,custom.esg.report user,model_custom_esg_report,group_esg_user,1,0,0,0
+access_custom_esg_report_manager,custom.esg.report manager,model_custom_esg_report,group_esg_manager,1,1,1,1
+access_custom_esg_emission_factor_user,custom.esg.emission.factor user,model_custom_esg_emission_factor,group_esg_user,1,0,0,0
+access_custom_esg_emission_factor_manager,custom.esg.emission.factor manager,model_custom_esg_emission_factor,group_esg_manager,1,1,1,1
+access_custom_esg_materiality_user,custom.esg.materiality user,model_custom_esg_materiality,group_esg_user,1,0,0,0
+access_custom_esg_materiality_manager,custom.esg.materiality manager,model_custom_esg_materiality,group_esg_manager,1,1,1,1
+access_custom_esg_account_mapping_user,custom.esg.account.mapping user,model_custom_esg_account_mapping,group_esg_user,1,0,0,0
+access_custom_esg_account_mapping_manager,custom.esg.account.mapping manager,model_custom_esg_account_mapping,group_esg_manager,1,1,1,1

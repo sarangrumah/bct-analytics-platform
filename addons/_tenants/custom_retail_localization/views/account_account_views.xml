@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Let Accounting flag an account as usable payment Destination Account
+         directly from the Chart of Accounts form. -->
+    <record id="view_account_form_retail_payment_destination" model="ir.ui.view">
+        <field name="name">account.account.form.retail.payment.destination</field>
+        <field name="model">account.account</field>
+        <field name="inherit_id" ref="account.view_account_form"/>
+        <field name="arch" type="xml">
+            <field name="account_type" position="after">
+                <field name="l10n_allow_payment_destination"/>
+            </field>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_reconcile_rule_list" model="ir.ui.view">
+        <field name="name">custom.reconcile.rule.list</field>
+        <field name="model">custom.reconcile.rule</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="match_partner"/>
+                <field name="match_amount"/>
+                <field name="amount_tolerance"/>
+                <field name="auto_validate"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_reconcile_rule_form" model="ir.ui.view">
+        <field name="name">custom.reconcile.rule.form</field>
+        <field name="model">custom.reconcile.rule</field>
+        <field name="arch" type="xml">
+            <form string="Reconcile Rule">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="journal_ids" widget="many2many_tags"/>
+                            <field name="active"/>
+                            <field name="auto_validate"/>
+                        </group>
+                        <group string="Matching">
+                            <field name="match_partner"/>
+                            <field name="match_amount"/>
+                            <field name="amount_tolerance"/>
+                            <field name="match_reference_regex"/>
+                            <field name="target_account_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_reconcile_rule_search" model="ir.ui.view">
+        <field name="name">custom.reconcile.rule.search</field>
+        <field name="model">custom.reconcile.rule</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                <filter name="auto_validate" string="Auto-validate"
+                        domain="[('auto_validate', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_reconcile_rule" model="ir.actions.act_window">
+        <field name="name">Reconcile Rules</field>
+        <field name="res_model">custom.reconcile.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

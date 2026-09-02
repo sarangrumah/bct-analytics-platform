@@ -1,0 +1,280 @@
+# ===========================================================================
+# odoo19-bct — observability overlay.
+#
+#   make up-obs      (adds these on top of the base + dev stack)
+#   make down-obs    (removes only these; the base stack keeps running)
+#
+# Kept OUT of compose/odoo.dev.yml on purpose. The brief's footprint budget
+# ("base stack must idle under 4 GiB") is about postgres + redis + odoo, and
+# folding six more services into the default `up` would make that number
+# unmeasurable and the dev loop slower for no benefit.
+#
+# WHAT THIS OVERLAY OWNS vs WHAT THE DWH AGENT OWNS
+# -------------------------------------------------
+# Platform-Infra owns the MECHANISM: the services, the provisioning wiring and
+# the drop-in directories. The Data Warehouse agent owns the CONTENT it drops
+# in, namely observability/grafana/dashboards/analytics-*.json and
+# observability/prometheus/scrape.d/analytics-*.yml. Neither has to edit the
+# other's files:
+#   * Prometheus loads every scrape.d/*.yml via `scrape_config_files`;
+#   * Grafana loads every dashboards/**.json via a file provider with
+#     foldersFromFilesStructure.
+# Adding an analytics dashboard is `git add` plus a container restart.
+#
+# Images are pinned by digest, like the base stack.
+# ===========================================================================
+
+x-restart-policy: &restart-policy
+  restart: unless-stopped
+
+x-default-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-hardening: &hardening
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+services:
+
+  # =========================================================================
+  # Prometheus — metrics store and alert evaluator.
+  # =========================================================================
+  prometheus:
+    image: prom/prometheus:v2.55.1@sha256:2659f4c2ebb718e7695cb9b25ffa7d6be64db013daba13e05c875451cf51b0d3
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-prometheus
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    user: "65534:65534"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      # Both bounds, not just time. On a single VPS a retention policy with no
+      # size cap is how the metrics volume eats the disk that Odoo needs.
+      - --storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME:-15d}
+      - --storage.tsdb.retention.size=${PROMETHEUS_RETENTION_SIZE:-2GB}
+      - --web.enable-lifecycle
+      - --web.external-url=http://127.0.0.1:${PROMETHEUS_HOST_PORT:-39090}/
+    volumes:
+      - ../observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../observability/prometheus/rules:/etc/prometheus/rules:ro
+      # Drop-in scrape configs. The DWH agent's analytics-*.yml land here.
+      - ../observability/prometheus/scrape.d:/etc/prometheus/scrape.d:ro
+      - promdata:/prometheus
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${PROMETHEUS_HOST_PORT:-39090}:9090"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:9090/-/healthy"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks: [bct]
+
+  # =========================================================================
+  # Alertmanager — routes what Prometheus fires.
+  #
+  # Load-bearing here, not decorative: docs/adr/0001 makes replication-slot lag
+  # alerting a hard requirement, because max_slot_wal_keep_size=2GB means a
+  # lagging slot gets dropped and the warehouse needs a resync. The rules warn
+  # at 512 MiB and page at 1 GiB, i.e. with half the cap still in hand.
+  # =========================================================================
+  alertmanager:
+    image: prom/alertmanager:v0.28.0@sha256:d5155cfac40a6d9250ffc97c19db2c5e190c7bc57c6b67125c94903358f8c7d8
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-alertmanager
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    user: "65534:65534"
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+      - --web.external-url=http://127.0.0.1:${ALERTMANAGER_HOST_PORT:-39093}/
+    volumes:
+      - ../observability/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanagerdata:/alertmanager
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${ALERTMANAGER_HOST_PORT:-39093}:9093"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:9093/-/healthy"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks: [bct]
+
+  # =========================================================================
+  # Loki — log store.
+  # =========================================================================
+  loki:
+    image: grafana/loki:3.3.2@sha256:8af2de1abbdd7aa92b27c9bcc96f0f4140c9096b507c77921ffddf1c6ad6c48f
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-loki
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    user: "10001:10001"
+    command: ["-config.file=/etc/loki/loki-config.yml"]
+    volumes:
+      - ../observability/loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - lokidata:/loki
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${LOKI_HOST_PORT:-33100}:3100"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3100/ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    networks: [bct]
+
+  # =========================================================================
+  # Promtail — ships container logs into Loki.
+  #
+  # Included because a Loki with no producer is a service that looks healthy
+  # and holds nothing. It reads the Docker socket READ-ONLY to discover
+  # containers and label them by compose project.
+  #
+  # The socket mount is the one genuine privilege in this overlay. It is
+  # read-only and promtail is the only service that gets it; note that
+  # read-only access to the Docker socket is still a substantial grant on a
+  # host running other projects, so promtail is filtered to this project's
+  # containers in its own config.
+  # =========================================================================
+  promtail:
+    image: grafana/promtail:3.3.2@sha256:cb4990801ec58975c5e231057c2bcf204c85fac428eec65ad66e0016c64b9608
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-promtail
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    command: ["-config.file=/etc/promtail/promtail-config.yml"]
+    volumes:
+      - ../observability/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - promtaildata:/tmp/promtail
+    depends_on:
+      loki:
+        condition: service_healthy
+    networks: [bct]
+
+  # =========================================================================
+  # Grafana.
+  # =========================================================================
+  grafana:
+    image: grafana/grafana:11.4.0@sha256:d8ea37798ccc41061a62ab080f2676dda6bf7815558499f901bdb0f533a456fb
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-grafana
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    user: "472:472"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      # `:?` makes compose refuse to render when the variable is unset, rather
+      # than starting Grafana with whatever default the image picks. The message
+      # is the point of the form - it tells the reader how to fix it at the
+      # moment it breaks.
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required - run make dev-bootstrap}
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://127.0.0.1:33001/}
+      # No anonymous access and no sign-up: this dashboard will eventually show
+      # tenant-scoped business data.
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SECURITY_COOKIE_SECURE: "false"
+      GF_SECURITY_COOKIE_SAMESITE: "strict"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      # Datasource passwords come from the environment, not from the
+      # provisioning YAML, so no credential is ever written to a tracked file.
+      POSTGRES_EXPORTER_PASSWORD: ${POSTGRES_EXPORTER_PASSWORD:-}
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ../observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      # Dashboard drop-in. The DWH agent's analytics-*.json land here and are
+      # picked up by the file provider with no config change.
+      - ../observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafanadata:/var/lib/grafana
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${GRAFANA_HOST_PORT:-33001}:3000"
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks: [bct]
+
+  # =========================================================================
+  # postgres_exporter.
+  #
+  # Connects as metrics_exporter (pg_monitor only). It is how replication-slot
+  # lag reaches Prometheus, which is the metric the whole
+  # max_slot_wal_keep_size design depends on.
+  # =========================================================================
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.16.0@sha256:6999a7657e2f2fb0ca6ebf417213eebf6dc7d21b30708c622f6fcb11183a2bb0
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-postgres-exporter
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    user: "65534:65534"
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_EXPORTER_USER:-metrics_exporter}:${POSTGRES_EXPORTER_PASSWORD:?POSTGRES_EXPORTER_PASSWORD is required}@postgres:5432/${POSTGRES_DB:-postgres}?sslmode=disable"
+      PG_EXPORTER_EXCLUDE_DATABASES: "template0,template1"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:9187/metrics || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks: [bct]
+
+  # =========================================================================
+  # node_exporter — host CPU, memory, disk.
+  #
+  # Disk headroom is not a nice-to-have here: max_slot_wal_keep_size protects
+  # against WAL growth, but nothing protects against the filestore or the
+  # Prometheus TSDB filling the same disk.
+  # =========================================================================
+  node-exporter:
+    image: prom/node-exporter:v1.8.2@sha256:4032c6d5bfd752342c3e631c2f1de93ba6b86c41db6b167b9a35372c139e7706
+    container_name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}-node-exporter
+    <<: [*restart-policy, *hardening]
+    logging: *default-logging
+    user: "65534:65534"
+    command:
+      - --path.rootfs=/host
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
+    pid: host
+    volumes:
+      # `:ro` and NOT `:ro,rslave`. rslave is the upstream recommendation on a
+      # native Linux host, but Docker Desktop's VM refuses it outright:
+      #   "path / is mounted on / but it is not a shared or slave mount"
+      # Plain read-only works on both. The cost is that a filesystem mounted on
+      # the host after this container started is not visible to it, which for a
+      # long-lived VPS is not a real limitation.
+      - /:/host:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:9100/metrics || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks: [bct]
+
+volumes:
+  promdata:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_promdata
+  grafanadata:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_grafanadata
+  lokidata:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_lokidata
+  alertmanagerdata:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_alertmanagerdata
+  promtaildata:
+    name: ${COMPOSE_PROJECT_NAME:-odoo19-bct}_promtaildata

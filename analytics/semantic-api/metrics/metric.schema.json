@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bct.local/schemas/metric.schema.json",
+  "title": "BCT metric definition",
+  "description": "Frozen contract 03. A metric that fails this schema fails the build. Two rules the schema cannot express are enforced in app/registry.py instead: tenant_id must appear in grain (contract 03 rule 1), and pdp_class may never be 'secret'.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "label",
+    "grain",
+    "dimensions",
+    "filters",
+    "type",
+    "aggregation",
+    "source_model",
+    "refresh_sla_seconds",
+    "pdp_class"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,62}$",
+      "description": "snake_case, unique, stable. Renaming is a breaking change (contract 03 rule 5)."
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "grain": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{1,62}$"
+      },
+      "description": "The lowest level the metric may be requested at. tenant_id is always present."
+    },
+    "dimensions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{1,62}$"
+      },
+      "description": "Legal group-by keys. The compiler allow-lists against exactly this."
+    },
+    "filters": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_]{1,62}$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "daterange",
+              "int",
+              "int[]",
+              "string",
+              "string[]"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "column": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,62}$",
+            "description": "Column the filter applies to, when it differs from the filter key."
+          }
+        }
+      }
+    },
+    "type": {
+      "enum": [
+        "decimal",
+        "integer",
+        "percent",
+        "duration_seconds",
+        "count"
+      ]
+    },
+    "unit": {
+      "type": "string",
+      "maxLength": 32
+    },
+    "aggregation": {
+      "enum": [
+        "sum",
+        "avg",
+        "count",
+        "count_distinct",
+        "ratio",
+        "period_growth"
+      ]
+    },
+    "source_model": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,62}$",
+      "description": "The dbt model in schema marts that answers this metric."
+    },
+    "measure": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,62}$",
+      "description": "The column the aggregation is applied to. Not used by 'ratio' metrics, which declare numerator and denominator instead."
+    },
+    "refresh_sla_seconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 86400
+    },
+    "pdp_class": {
+      "enum": [
+        "public",
+        "internal",
+        "personal",
+        "sensitive"
+      ]
+    },
+    "derived_dimensions": {
+      "type": "object",
+      "description": "Dimensions computed from a base column rather than selected directly, e.g. date_month from date_day. Deliberately NOT free-form SQL: only a base column and an enumerated date grain, so 'the API never accepts raw SQL' holds without qualification.",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_]{1,62}$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "from",
+          "grain"
+        ],
+        "properties": {
+          "from": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,62}$"
+          },
+          "grain": {
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "quarter",
+              "year"
+            ]
+          }
+        }
+      }
+    },
+    "channel_note": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "Required when source_model unions channels: states explicitly that summing across the channel column is intended. mart_revenue_daily UNIONs invoice/pos/ppob_commission, and summing across them must be a declared decision rather than an accident of a missing GROUP BY."
+    },
+    "numerator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "measure",
+        "agg"
+      ],
+      "properties": {
+        "measure": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{1,62}$"
+        },
+        "agg": {
+          "enum": [
+            "sum",
+            "count",
+            "count_true"
+          ]
+        }
+      },
+      "description": "Ratio numerator. Required when aggregation is 'ratio'. 'count_true' is COUNT(*) FILTER (WHERE col) - SUM(boolean) is invalid in Postgres and SUM(col::int) silently truncates a numeric column."
+    },
+    "denominator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "measure",
+        "agg"
+      ],
+      "properties": {
+        "measure": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{1,62}$"
+        },
+        "agg": {
+          "enum": [
+            "sum",
+            "count",
+            "count_true"
+          ]
+        }
+      },
+      "description": "Ratio denominator. Required when aggregation is 'ratio'. Division is guarded by NULLIF, so an empty denominator yields NULL rather than 0."
+    },
+    "growth_over": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,62}$",
+      "description": "The time dimension a 'period_growth' metric lags across. Must also appear in dimensions, and the caller must request it."
+    }
+  }
+}

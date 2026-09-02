@@ -19,6 +19,7 @@ never holds signing material.
   "odoo_uid": 7,
   "roles": ["analytics.viewer"],
   "allowed_ou": [1, 4, 9],
+  "all_ou": false,
   "company_ids": [1],
   "iat": 1756600000,
   "exp": 1756603600
@@ -28,7 +29,11 @@ never holds signing material.
 - `tenant_id` — the Odoo database this session belongs to. **Never** taken from a request header,
   query string, cookie or request body. Only from the verified token.
 - `roles` — one of `analytics.viewer`, `analytics.analyst`, `analytics.admin`.
-- `allowed_ou` — Operating Unit ids the user may see. Empty array means *all OUs in the tenant*.
+- `allowed_ou` — Operating Unit ids the user may see. **An empty array means the user sees only
+  documents carrying no Operating Unit** — it does NOT mean "all". This mirrors
+  `custom_operating_unit`'s record rules exactly, which fail closed.
+- `all_ou` — boolean, the explicit bypass. `true` only for members of
+  `custom_operating_unit.group_operating_unit_all`. **Absent or `false` means no bypass.**
 - `exp` — 3600 s. Refresh via an httpOnly, `Secure`, `SameSite=Strict` refresh cookie.
 
 ## Verification, server-side only
@@ -53,3 +58,44 @@ A session for tenant A requesting tenant B returns **HTTP 403** with exactly:
 
 No leak of whether tenant B exists. The event is written to the audit log with the subject, the
 requested tenant and the timestamp. Proven by test (§6: "Cross-tenant access returns 403").
+
+## Amendment at GATE 3 — `allowed_ou: []` no longer means "all"
+
+**This corrects a defect in the contract as originally frozen, found by the Backend agent.**
+
+The contract said an empty `allowed_ou` meant *all OUs in the tenant*. The producer says the
+opposite — `addons/custom_operating_unit/models/res_users.py:21-22`:
+
+> "Empty means the user sees only documents that carry no Operating Unit — the rules fail closed,
+> not open."
+
+The same `[]` therefore meant "everything" to the gateway and "almost nothing" to Odoo. A user with
+no OU entitlement would receive a token whose `allowed_ou` is `[]`, the semantic API would read that
+as all-OUs, and **that user would see more in the dashboard than in Odoo**. A privilege escalation
+manufactured purely by two documents disagreeing — and nothing would report it, because the token is
+valid, the tenant check passes, and every row returned is genuinely in the right tenant.
+
+### Ruling: the empty value is the restrictive one; "all" is explicit
+
+`allowed_ou: []` now means *no Operating Units*, matching Odoo. The bypass is a separate boolean
+`all_ou`, issued only to members of `group_operating_unit_all`.
+
+Backend proposed keeping `[]` = all and guarding it by refusing to issue a token to anyone not in the
+bypass group. That is sound and it closes today's hole. It was not taken because it leaves
+"empty means everything" latent in the verifier forever: any future code path that forgets to
+populate the claim, or populates it from a failed lookup, grants **everything**. With this ruling,
+forgetting grants **nothing**.
+
+That is the same principle this project already committed to with `warehouse_reader` — read-only *by
+construction*, not by policy. A guard that must be remembered is weaker than a default that is safe.
+
+**The wire format change is free right now and will not be later:** `insight-portal/` does not yet
+exist, so no consumer has bound to the old shape. Deferring this would have made it expensive
+exactly when it became load-bearing.
+
+### Consequences
+- The gateway may now safely issue a token to a user with no OU entitlement; it simply sees what that
+  user sees in Odoo. Backend may still refuse instead, but that is now a UX choice, not a safety
+  requirement — the ambiguity it was defending against is gone.
+- Every verifier must treat **absent `all_ou` as `false`**. Never infer the bypass from emptiness.
+- Contract 03's `allowed_ou` filtering and any RLS predicate must be updated to match.

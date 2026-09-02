@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_asset_opname_wizard_user,asset opname wizard user,model_custom_report_asset_opname_wizard,custom_accounting_reports.group_report_user,1,1,1,1
+access_event_movement_wizard_user,event movement wizard user,model_custom_report_event_movement_wizard,custom_accounting_reports.group_report_user,1,1,1,1
+access_spareparts_wizard_user,spareparts wizard user,model_custom_report_spareparts_wizard,custom_accounting_reports.group_report_user,1,1,1,1
+access_maintenance_health_wizard_user,maintenance health wizard user,model_custom_report_maintenance_health_wizard,custom_accounting_reports.group_report_user,1,1,1,1
+access_repair_history_wizard_user,repair history wizard user,model_custom_report_repair_history_wizard,custom_accounting_reports.group_report_user,1,1,1,1

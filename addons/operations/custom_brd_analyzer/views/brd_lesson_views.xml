@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_brd_lesson_list" model="ir.ui.view">
+            <field name="name">brd.lesson.list</field>
+            <field name="model">brd.lesson</field>
+            <field name="arch" type="xml">
+                <list decoration-danger="severity == 'blocker'" decoration-muted="not active">
+                    <field name="name"/>
+                    <field name="severity"/>
+                    <field name="correct_modules" widget="many2many_tags"/>
+                    <field name="inject_count"/>
+                    <field name="active" optional="show"/>
+                    <field name="created_by_lesson" optional="hide"/>
+                    <field name="create_date" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_brd_lesson_form" model="ir.ui.view">
+            <field name="name">brd.lesson.form</field>
+            <field name="model">brd.lesson</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" string="Lesson"/>
+                            <h1><field name="name"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="severity"/>
+                                <field name="active"/>
+                                <field name="created_by_lesson" readonly="1"/>
+                                <field name="source_recommendation_id" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="inject_count" readonly="1"/>
+                                <field name="correct_modules" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Section Pattern">
+                                <field name="section_pattern" nolabel="1" placeholder="Keywords from BRD content the lesson applies to..."/>
+                            </page>
+                            <page string="Rejected Proposals">
+                                <field name="rejected_proposals" widget="json" nolabel="1"/>
+                            </page>
+                            <page string="Reason">
+                                <field name="reason" nolabel="1"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_brd_lesson_search" model="ir.ui.view">
+            <field name="name">brd.lesson.search</field>
+            <field name="model">brd.lesson</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="section_pattern"/>
+                    <field name="correct_modules"/>
+                    <filter name="filter_blocker" string="Blocker" domain="[('severity','=','blocker')]"/>
+                    <filter name="filter_hint" string="Hint" domain="[('severity','=','hint')]"/>
+                    <separator/>
+                    <filter name="filter_active" string="Active" domain="[('active','=',True)]"/>
+                    <filter name="filter_archived" string="Archived" domain="[('active','=',False)]"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_brd_lesson" model="ir.actions.act_window">
+            <field name="name">Lessons Learned</field>
+            <field name="res_model">brd.lesson</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_brd_lesson_search"/>
+            <field name="context">{'search_default_filter_active': 1}</field>
+        </record>
+
+    </data>
+</odoo>

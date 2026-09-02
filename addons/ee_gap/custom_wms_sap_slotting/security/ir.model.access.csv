@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_storage_type_user,storage.type.user,model_custom_wms_storage_type,custom_wms_putaway.group_putaway_user,1,0,0,0
+access_storage_type_admin,storage.type.admin,model_custom_wms_storage_type,custom_wms_putaway.group_putaway_admin,1,1,1,1
+access_storage_type_line_user,storage.type.line.user,model_custom_wms_storage_type_search_line,custom_wms_putaway.group_putaway_user,1,0,0,0
+access_storage_type_line_admin,storage.type.line.admin,model_custom_wms_storage_type_search_line,custom_wms_putaway.group_putaway_admin,1,1,1,1
+access_storage_section_user,storage.section.user,model_custom_wms_storage_section,custom_wms_putaway.group_putaway_user,1,0,0,0
+access_storage_section_admin,storage.section.admin,model_custom_wms_storage_section,custom_wms_putaway.group_putaway_admin,1,1,1,1
+access_storage_section_line_user,storage.section.line.user,model_custom_wms_storage_section_search_line,custom_wms_putaway.group_putaway_user,1,0,0,0
+access_storage_section_line_admin,storage.section.line.admin,model_custom_wms_storage_section_search_line,custom_wms_putaway.group_putaway_admin,1,1,1,1

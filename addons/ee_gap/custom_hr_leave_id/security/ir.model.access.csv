@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_id_public_holiday_user,id.public.holiday user,model_id_public_holiday,custom_hr_leave_id.group_user,1,0,0,0
+access_id_public_holiday_manager,id.public.holiday manager,model_id_public_holiday,custom_hr_leave_id.group_manager,1,1,1,1
+access_custom_leave_carryover_policy_user,custom.leave.carryover.policy user,model_custom_leave_carryover_policy,custom_hr_leave_id.group_user,1,0,0,0
+access_custom_leave_carryover_policy_manager,custom.leave.carryover.policy manager,model_custom_leave_carryover_policy,custom_hr_leave_id.group_manager,1,1,1,1
+access_custom_leave_balance_report_user,custom.leave.balance.report user,model_custom_leave_balance_report,custom_hr_leave_id.group_user,1,0,0,0
+access_custom_leave_balance_report_manager,custom.leave.balance.report manager,model_custom_leave_balance_report,custom_hr_leave_id.group_manager,1,0,0,0

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_custom_scrap_batch" model="ir.sequence">
+            <field name="name">Scrap Batch</field>
+            <field name="code">custom.scrap.batch</field>
+            <field name="prefix">SCRAP/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

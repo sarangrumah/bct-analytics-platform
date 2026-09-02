@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_retail_categ_reclass_stock_user,retail.categ.reclass raise request,custom_retail_localization.model_retail_categ_reclass,stock.group_stock_user,1,1,1,0
+access_retail_categ_reclass_line_stock_user,retail.categ.reclass.line raise request,custom_retail_localization.model_retail_categ_reclass_line,stock.group_stock_user,1,1,1,0
+access_retail_categ_reclass_product_stock_user,retail.categ.reclass.product raise request,custom_retail_localization.model_retail_categ_reclass_product,stock.group_stock_user,1,1,1,0

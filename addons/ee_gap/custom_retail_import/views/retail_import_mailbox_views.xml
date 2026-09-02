@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_retail_import_mailbox_list" model="ir.ui.view">
+        <field name="name">retail.import.mailbox.list</field>
+        <field name="model">retail.import.mailbox</field>
+        <field name="arch" type="xml">
+            <list string="Mailboxes" decoration-success="last_status=='ok'" decoration-danger="last_status=='error'">
+                <field name="name"/>
+                <field name="host"/>
+                <field name="username"/>
+                <field name="msg_count"/>
+                <field name="mailbox_bytes"/>
+                <field name="last_run"/>
+                <field name="last_status"/>
+                <field name="purge_enabled" widget="boolean_toggle"/>
+                <field name="dry_run" widget="boolean_toggle"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_retail_import_mailbox_form" model="ir.ui.view">
+        <field name="name">retail.import.mailbox.form</field>
+        <field name="model">retail.import.mailbox</field>
+        <field name="arch" type="xml">
+            <form string="Mailbox">
+                <header>
+                    <button name="action_test_connection" type="object" string="Test Connection"/>
+                    <button name="action_fetch_now" type="object" string="Fetch Now" class="btn-primary"/>
+                    <button name="action_purge_now" type="object" string="Purge Now"
+                            invisible="not purge_enabled"
+                            confirm="Delete every backed-up message past the retention window from the mail server. Backups on the SFTP share are kept. Continue?"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not active or dry_run or not purge_enabled">
+                        Live purge is armed: messages past the retention window are deleted from
+                        the mail server on every cron run.
+                    </div>
+                    <group>
+                        <group string="Connection">
+                            <field name="name"/>
+                            <field name="host"/>
+                            <field name="port"/>
+                            <field name="use_ssl"/>
+                            <field name="username"/>
+                            <field name="folder"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Credentials">
+                            <field name="password_env"/>
+                            <field name="password_param" placeholder="fallback only — stored in clear text"/>
+                        </group>
+                        <group string="What to take">
+                            <field name="sender_filter"/>
+                            <field name="attachment_glob"/>
+                            <field name="ingest_glob" placeholder="X24*.xlsx,X70D*.xlsx"/>
+                        </group>
+                        <group string="Destinations">
+                            <field name="backup_dir" placeholder="/mnt/data_retail/mailbox"/>
+                            <field name="drop_dir" placeholder="/mnt/data_retail/data"/>
+                        </group>
+                        <group string="Retention">
+                            <field name="purge_enabled"/>
+                            <field name="dry_run" invisible="not purge_enabled"/>
+                            <field name="retention_days" invisible="not purge_enabled"/>
+                            <field name="max_messages" invisible="not purge_enabled"/>
+                            <field name="max_bytes_mb" invisible="not purge_enabled"/>
+                        </group>
+                        <group string="Last run">
+                            <field name="last_run"/>
+                            <field name="last_status"/>
+                            <field name="msg_count"/>
+                            <field name="mailbox_bytes"/>
+                            <field name="uidvalidity"/>
+                            <field name="last_message"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Fetched Attachments">
+                            <field name="fetched_ids" readonly="1">
+                                <list decoration-danger="state=='error'" decoration-muted="state=='purged'">
+                                    <field name="email_date"/>
+                                    <field name="uid"/>
+                                    <field name="subject"/>
+                                    <field name="filename"/>
+                                    <field name="size"/>
+                                    <field name="state"/>
+                                    <field name="backup_path" optional="hide"/>
+                                    <field name="staged_path" optional="hide"/>
+                                    <field name="sha256" optional="hide"/>
+                                    <field name="error" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_retail_import_mailbox" model="ir.actions.act_window">
+        <field name="name">Mailboxes</field>
+        <field name="res_model">retail.import.mailbox</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'active_test': False}</field>
+    </record>
+</odoo>

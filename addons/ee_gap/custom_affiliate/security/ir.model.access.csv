@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_affiliate_user,custom.affiliate user,model_custom_affiliate,base.group_user,1,0,0,0
+access_affiliate_mgr,custom.affiliate manager,model_custom_affiliate,sales_team.group_sale_manager,1,1,1,1
+access_affiliate_link_user,custom.affiliate.link user,model_custom_affiliate_link,base.group_user,1,0,0,0
+access_affiliate_link_mgr,custom.affiliate.link manager,model_custom_affiliate_link,sales_team.group_sale_manager,1,1,1,1
+access_affiliate_click_mgr,custom.affiliate.click manager,model_custom_affiliate_click,sales_team.group_sale_manager,1,1,1,1
+access_affiliate_click_sys,custom.affiliate.click system,model_custom_affiliate_click,base.group_system,1,1,1,1
+access_affiliate_conv_user,custom.affiliate.conversion user,model_custom_affiliate_conversion,base.group_user,1,0,0,0
+access_affiliate_conv_mgr,custom.affiliate.conversion manager,model_custom_affiliate_conversion,sales_team.group_sale_manager,1,1,1,1
+access_affiliate_payout_mgr,custom.affiliate.payout manager,model_custom_affiliate_payout,sales_team.group_sale_manager,1,1,1,1

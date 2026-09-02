@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_cr_list" model="ir.ui.view">
+        <field name="name">custom.change.request.list</field>
+        <field name="model">custom.change.request</field>
+        <field name="arch" type="xml">
+            <list string="Change Requests" decoration-danger="approval_state == 'rejected'">
+                <field name="code"/>
+                <field name="vertical_id"/>
+                <field name="name"/>
+                <field name="cr_type"/>
+                <field name="impact" widget="badge"
+                       decoration-danger="impact == 'critical'"
+                       decoration-warning="impact == 'high'"/>
+                <field name="priority" optional="show"/>
+                <field name="ba_id" optional="show"/>
+                <field name="approval_state" widget="badge"
+                       decoration-success="approval_state == 'approved'"
+                       decoration-warning="approval_state == 'waiting_approval'"
+                       decoration-danger="approval_state == 'rejected'"/>
+                <field name="approval_progress" string="Tiers"/>
+                <field name="stage_id"/>
+                <field name="task_count" string="Tasks"/>
+                <field name="sla_response_due" optional="show"/>
+                <field name="sla_response_met" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cr_form" model="ir.ui.view">
+        <field name="name">custom.change.request.form</field>
+        <field name="model">custom.change.request</field>
+        <field name="arch" type="xml">
+            <form string="Change Request">
+                <header>
+                    <button name="action_start_analysis" type="object" string="Take into analysis"
+                            class="btn-primary" invisible="approval_state != 'draft'"/>
+                    <button name="action_submit_for_approval" type="object"
+                            string="Submit for approval" class="btn-primary"
+                            invisible="approval_state != 'analysis'"/>
+                    <button name="action_approve" type="object" string="Approve my tier"
+                            class="btn-primary" invisible="approval_state != 'waiting_approval'"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="approval_state in ['approved','rejected']"/>
+                    <button name="action_spawn_tasks" type="object" string="Create task"
+                            invisible="approval_state != 'approved'"/>
+                    <button name="action_request_verification" type="object"
+                            string="Request user verification"
+                            invisible="approval_state != 'approved'"/>
+                    <field name="approval_state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h2><field name="code" readonly="1"/></h2>
+                        <h1><field name="name" placeholder="What the brand is asking for"/></h1>
+                    </div>
+                    <group>
+                        <group string="Origin">
+                            <field name="vertical_id"/>
+                            <field name="requester_partner_id"/>
+                            <field name="request_date"/>
+                            <field name="project_id"/>
+                            <field name="stage_id"/>
+                        </group>
+                        <group string="Classification">
+                            <field name="cr_type"/>
+                            <field name="priority"/>
+                            <field name="impact"/>
+                            <field name="ba_id"/>
+                            <field name="po_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Response SLA">
+                            <field name="sla_response_due"/>
+                            <field name="first_response_at"/>
+                            <field name="sla_response_met"/>
+                        </group>
+                        <group string="Delivery">
+                            <field name="task_count"/>
+                            <field name="task_done_count"/>
+                            <field name="closed_at"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Request" name="request">
+                            <field name="description" widget="html"
+                                   placeholder="In the requester's own words"/>
+                        </page>
+                        <page string="Impact analysis" name="impact">
+                            <field name="impact_analysis" widget="html"
+                                   placeholder="Required before approval"/>
+                            <group>
+                                <group>
+                                    <field name="affected_modules"
+                                           placeholder="custom_retail_import_pos, custom_asset_ops_reports"/>
+                                    <field name="effort_estimate_days"/>
+                                    <field name="need_downtime"/>
+                                </group>
+                                <group>
+                                    <field name="risk_note"/>
+                                    <field name="rollback_plan"
+                                           placeholder="How this is undone if it goes wrong"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Approvals" name="approvals">
+                            <field name="approval_ids" readonly="1">
+                                <list>
+                                    <field name="tier"/>
+                                    <field name="role"/>
+                                    <field name="user_id"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'approved'"
+                                           decoration-danger="state == 'rejected'"/>
+                                    <field name="decided_at"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                            <group string="Rejection reason"
+                                   invisible="approval_state != 'rejected'">
+                                <field name="reject_reason" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page string="Tasks" name="tasks">
+                            <field name="task_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="stage_id"/>
+                                    <field name="user_ids" widget="many2many_avatar_user"/>
+                                    <field name="custom_cycle_time_team"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cr_search" model="ir.ui.view">
+        <field name="name">custom.change.request.search</field>
+        <field name="model">custom.change.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="vertical_id"/>
+                <field name="ba_id"/>
+                <filter name="f_intake" string="Intake (needs triage)"
+                        domain="[('approval_state','=','draft')]"/>
+                <filter name="f_waiting" string="Waiting approval"
+                        domain="[('approval_state','=','waiting_approval')]"/>
+                <filter name="f_approved" string="Approved"
+                        domain="[('approval_state','=','approved')]"/>
+                <separator/>
+                <filter name="f_sla_missed" string="Response SLA missed"
+                        domain="[('sla_response_met','=',False),('first_response_at','!=',False)]"/>
+                <filter name="f_high_impact" string="High / critical impact"
+                        domain="[('impact','in',['high','critical'])]"/>
+                <group>
+                    <filter name="g_vertical" string="Vertical" context="{'group_by':'vertical_id'}"/>
+                    <filter name="g_state" string="Approval state"
+                            context="{'group_by':'approval_state'}"/>
+                    <filter name="g_ba" string="Business Analyst" context="{'group_by':'ba_id'}"/>
+                    <filter name="g_type" string="Type" context="{'group_by':'cr_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cr" model="ir.actions.act_window">
+        <field name="name">Change Requests</field>
+        <field name="res_model">custom.change.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_cr_search"/>
+    </record>
+
+    <record id="action_cr_intake" model="ir.actions.act_window">
+        <field name="name">Intake</field>
+        <field name="res_model">custom.change.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_cr_search"/>
+        <field name="context">{'search_default_f_intake': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Intake is empty</p>
+            <p>New brand requests land here for triage. One queue, one decision:
+               take it into analysis, or reject it with a reason.</p>
+        </field>
+    </record>
+
+</odoo>

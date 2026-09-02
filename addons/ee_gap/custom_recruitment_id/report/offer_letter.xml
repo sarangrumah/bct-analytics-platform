@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_offer_letter_document" name="Offer Letter Document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page" style="page-break-after: always; font-family: serif;">
+                        <div class="text-center mb-4">
+                            <h2>SURAT PENAWARAN KERJA</h2>
+                            <h4>Offer Letter</h4>
+                            <p>
+                                <span t-out="user.env.company.name"/><br/>
+                                <span t-out="user.env.company.partner_id.contact_address or ''"/>
+                            </p>
+                        </div>
+
+                        <p>
+                            Kepada Yth.<br/>
+                            <b><span t-out="doc.partner_name or '—'"/></b><br/>
+                            <span t-out="doc.email_from or ''"/>
+                        </p>
+
+                        <p>
+                            Dengan hormat,<br/>
+                            Berdasarkan hasil proses seleksi yang telah Saudara/i ikuti,
+                            dengan ini kami menawarkan posisi sebagai berikut:
+                        </p>
+
+                        <table class="table table-bordered" style="font-size: 12px;">
+                            <tr>
+                                <td style="width: 35%;"><b>Jabatan</b></td>
+                                <td>
+                                    <span t-out="doc.job_id.name or '—'"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Departemen</b></td>
+                                <td>
+                                    <span t-out="doc.department_id.name or '—'"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Tanggal Mulai Kerja</b></td>
+                                <td>
+                                    <span t-out="doc.x_offer_start_date or '—'"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Masa Percobaan</b></td>
+                                <td>
+                                    <span t-out="doc.x_offer_probation_months or 0"/> bulan
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Gaji Pokok (Bruto / bulan)</b></td>
+                                <td>
+                                    <span t-out="doc.x_offer_currency_id.symbol or ''"/>
+                                    <span t-out="'{:,.0f}'.format(doc.x_offer_salary or 0)"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Estimasi PPh 21 / bulan</b></td>
+                                <td>
+                                    <span t-out="doc.x_offer_currency_id.symbol or ''"/>
+                                    <span t-out="'{:,.0f}'.format(doc.x_offer_pph21_estimated or 0)"/>
+                                    <br/>
+                                    <small class="text-muted">
+                                        Estimasi indikatif berdasarkan tarif TER PP 58/2023.
+                                        Perhitungan final mengikuti payslip resmi.
+                                    </small>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p>
+                            Selama masa percobaan, baik perusahaan maupun karyawan
+                            dapat mengakhiri hubungan kerja dengan pemberitahuan
+                            minimal 7 (tujuh) hari kerja sebelumnya, sesuai
+                            ketentuan UU Cipta Kerja dan peraturan turunannya.
+                        </p>
+
+                        <p>
+                            Penawaran ini berlaku selama 7 hari sejak tanggal
+                            surat ini diterbitkan. Konfirmasi penerimaan dilakukan
+                            dengan menandatangani surat ini.
+                        </p>
+
+                        <br/>
+                        <table style="width: 100%; font-size: 12px;">
+                            <tr>
+                                <td style="width: 50%; vertical-align: top;">
+                                    Menyetujui,<br/>
+                                    Calon Karyawan<br/><br/><br/><br/>
+                                    (<b><span t-out="doc.partner_name or '—'"/></b>)
+                                </td>
+                                <td style="width: 50%; vertical-align: top;">
+                                    Hormat kami,<br/>
+                                    <span t-out="user.env.company.name"/><br/><br/><br/><br/>
+                                    (<b>HR Department</b>)
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p class="text-muted" style="font-size: 9px; margin-top: 1em;">
+                            Dokumen ini diterbitkan secara elektronik dan sah tanpa
+                            tanda tangan basah, sesuai UU ITE 11/2008 jo. 19/2016.
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_offer_letter" model="ir.actions.report">
+        <field name="name">Offer Letter (ID)</field>
+        <field name="model">hr.applicant</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_recruitment_id.report_offer_letter_document</field>
+        <field name="report_file">custom_recruitment_id.report_offer_letter_document</field>
+        <field name="binding_model_id" ref="hr_recruitment.model_hr_applicant"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+</odoo>

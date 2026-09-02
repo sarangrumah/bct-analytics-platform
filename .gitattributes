@@ -1,0 +1,64 @@
+# ---------------------------------------------------------------------------
+# Line endings. NOT optional.
+#
+# The primary development host for this repo is Windows and `core.autocrlf` is
+# `true` there. Any shell script, SQL file or config that reaches a Linux
+# container with CRLF endings fails at exec time with:
+#     /entrypoint.sh: bad interpreter: /bin/sh^M
+# ...or, worse, silently mis-parses (a trailing \r becomes part of a password).
+#
+# `* text=auto eol=lf` normalises everything to LF in the index AND checks it
+# out as LF regardless of core.autocrlf. The explicit rules below are redundant
+# by design: they survive someone "simplifying" the first line.
+# ---------------------------------------------------------------------------
+* text=auto eol=lf
+
+*.sh            text eol=lf
+*.bash          text eol=lf
+*.py            text eol=lf
+*.sql           text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.conf          text eol=lf
+*.cfg           text eol=lf
+*.ini           text eol=lf
+*.toml          text eol=lf
+*.json          text eol=lf
+*.md            text eol=lf
+*.env           text eol=lf
+*.xml           text eol=lf
+*.csv           text eol=lf
+*.po            text eol=lf
+*.pot           text eol=lf
+
+Dockerfile      text eol=lf
+Dockerfile.*    text eol=lf
+*.Dockerfile    text eol=lf
+Makefile        text eol=lf
+makefile        text eol=lf
+*.mk            text eol=lf
+.env.example    text eol=lf
+.editorconfig   text eol=lf
+.gitattributes  text eol=lf
+.gitignore      text eol=lf
+.dockerignore   text eol=lf
+
+# Never touched by normalisation.
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.svgz   binary
+*.pdf    binary
+*.gz     binary
+*.bz2    binary
+*.xz     binary
+*.zip    binary
+*.7z     binary
+*.woff   binary
+*.woff2  binary
+*.ttf    binary
+*.eot    binary
+*.dump   binary
+*.tar    binary

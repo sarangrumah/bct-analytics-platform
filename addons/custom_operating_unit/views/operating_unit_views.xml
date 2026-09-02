@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_operating_unit_list" model="ir.ui.view">
+        <field name="name">operating.unit.list</field>
+        <field name="model">operating.unit</field>
+        <field name="arch" type="xml">
+            <list string="Operating Units">
+                <field name="complete_name" string="Operating Unit"/>
+                <field name="code"/>
+                <field name="parent_id" optional="show"/>
+                <field name="manager_id" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_operating_unit_form" model="ir.ui.view">
+        <field name="name">operating.unit.form</field>
+        <field name="model">operating.unit</field>
+        <field name="arch" type="xml">
+            <form string="Operating Unit">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Cabang Bandung"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="OU-BDG"/>
+                            <field name="parent_id"/>
+                            <field name="manager_id"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" widget="boolean_toggle"/>
+                            <field name="complete_name" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_operating_unit_search" model="ir.ui.view">
+        <field name="name">operating.unit.search</field>
+        <field name="model">operating.unit</field>
+        <field name="arch" type="xml">
+            <search string="Operating Units">
+                <field name="complete_name" string="Operating Unit"/>
+                <field name="code"/>
+                <field name="manager_id"/>
+                <filter name="filter_root" string="Top level"
+                        domain="[('parent_id', '=', False)]"/>
+                <separator/>
+                <filter name="filter_inactive" string="Archived"
+                        domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="group_by_parent" string="Parent Unit" domain="[]"
+                            context="{'group_by': 'parent_id'}"/>
+                    <filter name="group_by_company" string="Company" domain="[]"
+                            context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_operating_unit" model="ir.actions.act_window">
+        <field name="name">Operating Units</field>
+        <field name="res_model">operating.unit</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define an Operating Unit</p>
+            <p>A branch, depot or POS cluster inside one company. Documents are stamped with it and
+               the analytics warehouse groups by it.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_operating_unit_root"
+              name="Operating Units"
+              parent="base.menu_administration"
+              action="action_operating_unit"
+              sequence="80"
+              groups="custom_operating_unit.group_operating_unit_manager"/>
+
+</odoo>

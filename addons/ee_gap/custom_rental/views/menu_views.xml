@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_rental_root" name="Rental" sequence="56"
+              groups="custom_rental.group_rental_user"/>
+    <menuitem id="menu_rental_orders" name="Orders" parent="menu_rental_root"
+              action="action_rental_order" sequence="10"/>
+    <menuitem id="menu_rental_assets" name="Assets" parent="menu_rental_root"
+              action="action_rental_asset" sequence="20"
+              groups="custom_rental.group_rental_manager"/>
+    <menuitem id="menu_rental_schedule" name="Schedule" parent="menu_rental_root"
+              action="action_custom_rental_schedule" sequence="15"/>
+    <menuitem id="menu_rental_config" name="Configuration" parent="menu_rental_root"
+              sequence="90" groups="custom_rental.group_rental_manager"/>
+    <menuitem id="menu_rental_pricing" name="Pricing Tiers" parent="menu_rental_config"
+              action="action_custom_rental_pricing" sequence="10"/>
+    <menuitem id="menu_rental_settings" name="Settings" parent="menu_rental_config"
+              action="action_rental_config_settings" sequence="90"/>
+</odoo>

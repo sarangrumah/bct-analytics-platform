@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="res_groups_privilege_hr_leave_id" model="res.groups.privilege">
+            <field name="name">Indonesia Leave</field>
+            <field name="sequence">120</field>
+        </record>
+
+        <record id="group_user" model="res.groups">
+            <field name="name">Indonesia Leave / User</field>
+            <field name="privilege_id" ref="res_groups_privilege_hr_leave_id"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="group_manager" model="res.groups">
+            <field name="name">Indonesia Leave / Manager</field>
+            <field name="privilege_id" ref="res_groups_privilege_hr_leave_id"/>
+            <field name="implied_ids" eval="[(4, ref('group_user'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+    </data>
+</odoo>

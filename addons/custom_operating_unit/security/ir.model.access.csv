@@ -1,0 +1,3 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+access_operating_unit_user,operating.unit.user,model_operating_unit,base.group_user,1,0,0,0
+access_operating_unit_manager,operating.unit.manager,model_operating_unit,custom_operating_unit.group_operating_unit_manager,1,1,1,1

@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_fleet_bbm_log_user,custom.fleet.bbm.log user,model_custom_fleet_bbm_log,custom_fleet_id.group_user,1,1,1,0
+access_custom_fleet_bbm_log_manager,custom.fleet.bbm.log manager,model_custom_fleet_bbm_log,custom_fleet_id.group_manager,1,1,1,1
+access_custom_fleet_driver_assignment_user,custom.fleet.driver.assignment user,model_custom_fleet_driver_assignment,custom_fleet_id.group_user,1,1,1,0
+access_custom_fleet_driver_assignment_manager,custom.fleet.driver.assignment manager,model_custom_fleet_driver_assignment,custom_fleet_id.group_manager,1,1,1,1

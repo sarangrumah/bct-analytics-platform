@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ppob_va_account_user,ppob va account user,model_custom_ppob_va_account,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_va_account_ops,ppob va account ops,model_custom_ppob_va_account,custom_ppob_core.group_ppob_ops,1,1,1,0
+access_ppob_va_account_manager,ppob va account manager,model_custom_ppob_va_account,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_va_topup_user,ppob va topup user,model_custom_ppob_va_topup,custom_ppob_core.group_ppob_user,1,0,0,0
+access_ppob_va_topup_ops,ppob va topup ops,model_custom_ppob_va_topup,custom_ppob_core.group_ppob_ops,1,1,1,0
+access_ppob_va_topup_api,ppob va topup api,model_custom_ppob_va_topup,custom_ppob_core.group_ppob_api,1,1,1,0
+access_ppob_va_topup_manager,ppob va topup manager,model_custom_ppob_va_topup,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_va_bank_connection_manager,ppob va bank connection manager,model_custom_ppob_va_bank_connection,custom_ppob_core.group_ppob_manager,1,1,1,1
+access_ppob_va_bank_connection_api,ppob va bank connection api,model_custom_ppob_va_bank_connection,custom_ppob_core.group_ppob_api,1,0,0,0

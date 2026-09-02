@@ -1,0 +1,9 @@
+{
+  "path": "https://stg7.esb.co.id/core-stg/report/stock-movement",
+  "timestamp": "2024-11-28 11:58:20",
+  "status": "fail",
+  "code": "EC03100001",
+  "message": "Invalid Token",
+  "result": null,
+  "errors": null
+}

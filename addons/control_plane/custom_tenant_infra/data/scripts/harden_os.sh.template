@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# harden_os.sh — idempotent OS hardening for {{ vps_hostname }}
+# Tenant: {{ tenant_slug | default("n/a") }}
+# Rendered by orchestrator from tenant.vps.bootstrap.template.
+set -euo pipefail
+
+LOG_PREFIX="[harden_os]"
+log() { echo "${LOG_PREFIX} $*"; }
+
+# Detect OS (only Debian/Ubuntu supported for MVP).
+. /etc/os-release
+if [[ "${ID:-}" != "debian" && "${ID:-}" != "ubuntu" ]]; then
+  log "WARN unsupported OS ${ID:-unknown}, continuing best-effort"
+fi
+
+export DEBIAN_FRONTEND=noninteractive
+
+log "apt update + base packages"
+apt-get -qq update
+apt-get -qq install -y --no-install-recommends \
+  ufw fail2ban unattended-upgrades ca-certificates curl gnupg \
+  openssh-server jq htop chrony
+
+# --- SSH hardening (idempotent) ---
+SSHD=/etc/ssh/sshd_config
+log "hardening sshd"
+sed -i \
+  -e 's/^#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' \
+  -e 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' \
+  -e 's/^#\?ChallengeResponseAuthentication.*/ChallengeResponseAuthentication no/' \
+  -e 's/^#\?X11Forwarding.*/X11Forwarding no/' \
+  "$SSHD"
+systemctl reload ssh || systemctl reload sshd || true
+
+# --- UFW (allow ssh + http/https) ---
+log "configuring UFW"
+ufw --force reset >/dev/null
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow {{ ssh_port | default(22) }}/tcp comment 'ssh'
+ufw allow 80/tcp  comment 'http'
+ufw allow 443/tcp comment 'https'
+ufw --force enable
+
+# --- fail2ban (default sshd jail is fine) ---
+log "enabling fail2ban"
+systemctl enable --now fail2ban
+
+# --- unattended upgrades ---
+log "enabling unattended-upgrades"
+dpkg-reconfigure -fnoninteractive unattended-upgrades || true
+
+# --- time sync ---
+log "enabling chrony"
+systemctl enable --now chrony
+
+# --- sysctl tweaks ---
+cat > /etc/sysctl.d/99-platform-hardening.conf <<'EOF'
+net.ipv4.tcp_syncookies=1
+net.ipv4.conf.all.rp_filter=1
+net.ipv4.conf.all.accept_redirects=0
+net.ipv6.conf.all.accept_redirects=0
+kernel.kptr_restrict=2
+EOF
+sysctl -p /etc/sysctl.d/99-platform-hardening.conf >/dev/null
+
+log "DONE"

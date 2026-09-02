@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============ GL Open Items ============ -->
+    <record id="view_gl_open_items_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.gl.open.items.wizard.form</field>
+        <field name="model">custom.report.gl.open.items.wizard</field>
+        <field name="arch" type="xml">
+            <form string="GL Open Items / Outstanding Balance">
+                <group>
+                    <group>
+                        <field name="date_to"/>
+                        <field name="date_from"/>
+                        <field name="account_type_filter"/>
+                    </group>
+                    <group>
+                        <field name="company_ids" widget="many2many_tags"/>
+                        <field name="partner_ids" widget="many2many_tags"/>
+                        <field name="account_ids" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print"
+                            type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx"
+                            type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gl_open_items_wizard" model="ir.actions.act_window">
+        <field name="name">GL Open Items / Outstanding</field>
+        <field name="res_model">custom.report.gl.open.items.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- ============ Bill vs Payment ============ -->
+    <record id="view_bill_payment_wizard_form" model="ir.ui.view">
+        <field name="name">custom.report.bill.payment.wizard.form</field>
+        <field name="model">custom.report.bill.payment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Mapping Vendor Bill vs Payment">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="posted_only"/>
+                    </group>
+                    <group>
+                        <field name="company_ids" widget="many2many_tags"/>
+                        <field name="partner_ids" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="View" name="action_view"
+                            type="object" class="btn-primary"/>
+                    <button string="Print PDF" name="action_print"
+                            type="object" class="btn-secondary"/>
+                    <button string="Export Excel" name="action_export_xlsx"
+                            type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bill_payment_wizard" model="ir.actions.act_window">
+        <field name="name">Mapping Bill vs Payment</field>
+        <field name="res_model">custom.report.bill.payment.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

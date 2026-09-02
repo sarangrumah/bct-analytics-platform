@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--
+        Coretax module data.
+        The Coretax configuration (NPWP, sertel, KPP code) must be entered
+        per-tenant via the Settings UI — no default record is seeded because
+        NPWP is unique and tenant-specific.
+
+        ir.sequence records for NSFP / Bupot numbering are created on-demand
+        by the wizards when the first export is generated.
+    -->
+</odoo>

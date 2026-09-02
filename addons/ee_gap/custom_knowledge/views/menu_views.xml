@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top-level app menu -->
+    <menuitem id="menu_knowledge_root"
+              name="Knowledge"
+              sequence="60"
+              web_icon="custom_knowledge,static/description/icon.png"
+              groups="custom_knowledge.group_user"/>
+
+    <menuitem id="menu_knowledge_articles"
+              name="Articles"
+              parent="menu_knowledge_root"
+              action="action_knowledge_article"
+              sequence="10"/>
+
+    <menuitem id="menu_knowledge_favorites"
+              name="My Favorites"
+              parent="menu_knowledge_root"
+              action="action_knowledge_article_favorites"
+              sequence="20"/>
+
+    <menuitem id="menu_knowledge_shared"
+              name="Shared"
+              parent="menu_knowledge_root"
+              action="action_knowledge_article_shared"
+              sequence="30"/>
+
+    <menuitem id="menu_knowledge_config"
+              name="Configuration"
+              parent="menu_knowledge_root"
+              sequence="90"
+              groups="custom_knowledge.group_manager"/>
+
+    <menuitem id="menu_knowledge_tags"
+              name="Tags"
+              parent="menu_knowledge_config"
+              action="action_knowledge_tag"
+              sequence="10"/>
+
+    <menuitem id="menu_knowledge_templates"
+              name="Templates"
+              parent="menu_knowledge_config"
+              action="action_knowledge_article_template"
+              sequence="20"/>
+
+    <menuitem id="menu_knowledge_versions"
+              name="Versions"
+              parent="menu_knowledge_config"
+              action="action_knowledge_article_version"
+              sequence="30"/>
+</odoo>

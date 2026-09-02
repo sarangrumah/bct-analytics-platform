@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_ppob_configuration_sla_targets"
+              name="SLA Targets"
+              parent="custom_ppob_core.menu_ppob_configuration"
+              action="action_ppob_sla_target"
+              sequence="30"/>
+
+    <menuitem id="menu_ppob_operations_throughput"
+              name="Throughput Samples"
+              parent="custom_ppob_core.menu_ppob_operations"
+              action="action_ppob_throughput_sample"
+              sequence="30"/>
+
+</odoo>

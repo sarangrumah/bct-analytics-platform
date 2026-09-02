@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_appraisal_tpl_user,template user,model_appraisal_template,group_appraisal_user,1,0,0,0
+access_appraisal_tpl_mgr,template mgr,model_appraisal_template,group_appraisal_manager,1,1,1,1
+access_appraisal_tpl_item_user,template item user,model_appraisal_template_item,group_appraisal_user,1,0,0,0
+access_appraisal_tpl_item_mgr,template item mgr,model_appraisal_template_item,group_appraisal_manager,1,1,1,1
+access_appraisal_cycle_user,cycle user,model_appraisal_cycle,group_appraisal_user,1,0,0,0
+access_appraisal_cycle_mgr,cycle mgr,model_appraisal_cycle,group_appraisal_manager,1,1,1,1
+access_appraisal_user,appraisal user,model_appraisal_appraisal,group_appraisal_user,1,1,1,0
+access_appraisal_mgr,appraisal mgr,model_appraisal_appraisal,group_appraisal_manager,1,1,1,1
+access_appraisal_line_user,line user,model_appraisal_line,group_appraisal_user,1,1,1,0
+access_appraisal_line_mgr,line mgr,model_appraisal_line,group_appraisal_manager,1,1,1,1

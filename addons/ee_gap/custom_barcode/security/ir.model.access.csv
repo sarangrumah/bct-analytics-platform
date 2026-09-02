@@ -1,0 +1,19 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_barcode_scan_session_user,custom.barcode.scan.session user,model_custom_barcode_scan_session,custom_barcode.group_user,1,1,1,0
+access_barcode_scan_session_manager,custom.barcode.scan.session manager,model_custom_barcode_scan_session,custom_barcode.group_manager,1,1,1,1
+access_barcode_scan_line_user,custom.barcode.scan.line user,model_custom_barcode_scan_line,custom_barcode.group_user,1,1,1,0
+access_barcode_scan_line_manager,custom.barcode.scan.line manager,model_custom_barcode_scan_line,custom_barcode.group_manager,1,1,1,1
+access_barcode_batch_session_user,custom.barcode.batch.session user,model_custom_barcode_batch_session,custom_barcode.group_user,1,1,1,0
+access_barcode_batch_session_manager,custom.barcode.batch.session manager,model_custom_barcode_batch_session,custom_barcode.group_manager,1,1,1,1
+access_barcode_cluster_run_user,custom.barcode.cluster.run user,model_custom_barcode_cluster_run,custom_barcode.group_user,1,1,1,0
+access_barcode_cluster_run_manager,custom.barcode.cluster.run manager,model_custom_barcode_cluster_run,custom_barcode.group_manager,1,1,1,1
+access_barcode_cluster_assignment_user,custom.barcode.cluster.assignment user,model_custom_barcode_cluster_assignment,custom_barcode.group_user,1,1,1,1
+access_barcode_cluster_assignment_manager,custom.barcode.cluster.assignment manager,model_custom_barcode_cluster_assignment,custom_barcode.group_manager,1,1,1,1
+access_custom_barcode_format_user,custom.barcode.format user,model_custom_barcode_format,custom_barcode.group_user,1,0,0,0
+access_custom_barcode_format_mgr,custom.barcode.format mgr,model_custom_barcode_format,custom_barcode.group_manager,1,1,1,1
+access_custom_label_template_user,custom.label.template user,model_custom_label_template,custom_barcode.group_user,1,0,0,0
+access_custom_label_template_mgr,custom.label.template mgr,model_custom_label_template,custom_barcode.group_manager,1,1,1,1
+access_custom_printer_config_user,custom.printer.config user,model_custom_printer_config,custom_barcode.group_user,1,0,0,0
+access_custom_printer_config_mgr,custom.printer.config mgr,model_custom_printer_config,custom_barcode.group_manager,1,1,1,1
+access_custom_print_queue_user,custom.print.queue user,model_custom_print_queue,custom_barcode.group_user,1,1,1,0
+access_custom_print_queue_mgr,custom.print.queue mgr,model_custom_print_queue,custom_barcode.group_manager,1,1,1,1

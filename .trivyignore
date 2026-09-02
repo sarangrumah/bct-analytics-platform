@@ -1,0 +1,38 @@
+# Trivy suppressions - vulnerability, secret, misconfiguration and licence findings.
+# Owner: Security agent. Consumed by the `container-scan` and `fs-scan` CI jobs.
+#
+# ------------------------------------------------------------------------------------
+# THERE ARE NO ACTIVE SUPPRESSIONS. This is a statement of fact, not an oversight:
+# at Phase 1 the repository builds exactly one image (odoo/Dockerfile) and no scan has
+# yet produced a finding that anyone has triaged. Shipping a pre-populated list of CVE
+# ids nobody has looked at would be worse than an empty file - it would look like
+# diligence while silencing findings that were never read.
+# ------------------------------------------------------------------------------------
+#
+# FORMAT AND POLICY - enforced by security/check_ignore_policy.py, which runs as a
+# pre-commit hook and as a CI step. A suppression that does not satisfy all four rules
+# below fails the build; it does not warn.
+#
+#   1. Every entry sits under a contiguous comment block containing a `reason:` line.
+#      "False positive" is not a reason. Say why the code path is unreachable, or why
+#      the fixed version cannot be adopted yet, and name what would change that.
+#   2. Every entry carries `expires: YYYY-MM-DD`. Past the date, CI fails until the
+#      entry is either removed or consciously re-dated by a human. Suppressions rot in
+#      exactly the way that base-image CVEs do not.
+#   3. Every entry names an `owner:` - the agent or person accountable for closing it.
+#   4. Maximum horizon is one year. A suppression you cannot justify revisiting inside a
+#      year is a design problem escalated to the Lead, not a line in this file.
+#
+# WORKED EXAMPLE - copy this shape. It is commented out and therefore inert.
+#
+#   # reason: CVE-2025-XXXXX is in libfoo's TLS server path. This image runs libfoo only
+#   #   as a client behind the reverse proxy, so the vulnerable listener is never bound.
+#   #   Fixed in libfoo 2.4, which Debian bookworm does not carry; unblocked by the
+#   #   trixie base-image bump tracked for GATE 5.
+#   # expires: 2026-11-30
+#   # owner: Platform-Infra
+#   # CVE-2025-XXXXX
+#
+# A finding you intend to fix does not belong here. Fix it, or raise it to the Lead.
+# Suppressing a finding to make a gate green is the specific behaviour the gate exists
+# to prevent (master prompt 5.2).

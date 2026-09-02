@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- The whole point of the brand-PIC group: a brand contact can open the work
+             waiting on their verification, and nothing else. This is what makes it safe
+             to hand a login to someone outside the VAS team. -->
+
+        <record id="task_vertical_pic_rule" model="ir.rule">
+            <field name="name">Task: brand PIC sees only their own vertical</field>
+            <field name="model_id" ref="project.model_project_task"/>
+            <field name="domain_force">[('custom_vertical_id.pic_partner_ids','in',[user.partner_id.id])]</field>
+            <field name="groups" eval="[Command.link(ref('group_pmo_vertical_pic'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="project_vertical_pic_rule" model="ir.rule">
+            <field name="name">Project: brand PIC sees only their own vertical</field>
+            <field name="model_id" ref="project.model_project_project"/>
+            <field name="domain_force">[('custom_vertical_id.pic_partner_ids','in',[user.partner_id.id])]</field>
+            <field name="groups" eval="[Command.link(ref('group_pmo_vertical_pic'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- The VAS team itself is not partitioned: monitoring only works if everyone
+             can see the whole board. -->
+        <record id="task_pmo_team_rule" model="ir.rule">
+            <field name="name">Task: VAS team sees all</field>
+            <field name="model_id" ref="project.model_project_task"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[Command.link(ref('group_pmo_user'))]"/>
+        </record>
+
+        <record id="weekly_ba_own_rule" model="ir.rule">
+            <field name="name">Weekly: BA writes their own, reads all</field>
+            <field name="model_id" ref="model_custom_weekly_progress"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[Command.link(ref('group_pmo_ba'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+    </data>
+</odoo>

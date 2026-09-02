@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_dashboard_list" model="ir.ui.view">
+        <field name="name">custom.dashboard.list</field>
+        <field name="model">custom.dashboard</field>
+        <field name="arch" type="xml">
+            <list string="Dashboards" decoration-muted="not is_published">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="owner_id"/>
+                <field name="tile_count"/>
+                <field name="is_published" widget="boolean_toggle"/>
+                <field name="is_public" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_dashboard_form" model="ir.ui.view">
+        <field name="name">custom.dashboard.form</field>
+        <field name="model">custom.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard">
+                <header>
+                    <button name="action_publish" type="object" string="Publish"
+                            class="oe_highlight" invisible="is_published"/>
+                    <button name="action_unpublish" type="object" string="Unpublish"
+                            invisible="not is_published"/>
+                    <button name="action_refresh_all_tiles" type="object"
+                            string="Refresh All Tiles" icon="fa-refresh"/>
+                    <button name="action_ask_ai" type="object" string="Ask AI"
+                            icon="fa-magic"/>
+                    <button name="action_generate_share_link" type="object"
+                            string="Generate Share Link" invisible="share_token"/>
+                    <button name="action_revoke_share_link" type="object"
+                            string="Revoke Share Link" invisible="not share_token"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Dashboard name..."/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="owner_id"/>
+                            <field name="is_published"/>
+                            <field name="is_public"/>
+                            <field name="color" widget="color_picker"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="allowed_group_ids" widget="many2many_tags"/>
+                            <field name="tile_count"/>
+                            <field name="share_token" readonly="1"
+                                   invisible="not share_token"/>
+                            <field name="share_url" widget="url" readonly="1"
+                                   invisible="not share_token"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Tiles">
+                            <field name="tile_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="tile_type"/>
+                                    <field name="model_name"/>
+                                    <field name="domain"/>
+                                    <field name="measure_field"/>
+                                    <field name="groupby_field"/>
+                                    <field name="refresh_interval_seconds"/>
+                                    <field name="cached_display"/>
+                                    <field name="cached_at"/>
+                                    <field name="last_error" optional="hide"/>
+                                    <button name="action_refresh" type="object"
+                                            string="Refresh" icon="fa-refresh"/>
+                                    <button name="action_open_tile_records" type="object"
+                                            string="Open" icon="fa-external-link"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Ask AI">
+                            <group>
+                                <field name="last_ai_question"
+                                       placeholder="Type a question and press Ask AI in the header..."/>
+                                <field name="last_ai_at" readonly="1"/>
+                                <field name="last_ai_answer" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_dashboard_kanban" model="ir.ui.view">
+        <field name="name">custom.dashboard.kanban</field>
+        <field name="model">custom.dashboard</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_dashboard">
+                <field name="name"/>
+                <field name="owner_id"/>
+                <field name="tile_count"/>
+                <field name="is_published"/>
+                <field name="is_public"/>
+                <field name="color"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="name"/></strong>
+                            <div>
+                                <span>Owner: <field name="owner_id"/></span>
+                            </div>
+                            <div>
+                                <span>Tiles: <field name="tile_count"/></span>
+                            </div>
+                            <div>
+                                <field name="is_published" widget="badge"/>
+                                <field name="is_public" widget="badge"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_custom_dashboard_search" model="ir.ui.view">
+        <field name="name">custom.dashboard.search</field>
+        <field name="model">custom.dashboard</field>
+        <field name="arch" type="xml">
+            <search string="Dashboards">
+                <field name="name"/>
+                <field name="owner_id"/>
+                <filter name="published" string="Published"
+                        domain="[('is_published','=',True)]"/>
+                <filter name="draft" string="Draft"
+                        domain="[('is_published','=',False)]"/>
+                <filter name="public" string="Public"
+                        domain="[('is_public','=',True)]"/>
+                <filter name="mine" string="My Dashboards"
+                        domain="[('owner_id','=',uid)]"/>
+                <separator/>
+                <filter name="group_owner" string="Owner"
+                        context="{'group_by':'owner_id'}"/>
+                <filter name="group_published" string="Status"
+                        context="{'group_by':'is_published'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboards</field>
+        <field name="res_model">custom.dashboard</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_custom_dashboard_search"/>
+    </record>
+</odoo>

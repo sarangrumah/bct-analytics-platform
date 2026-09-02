@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_leave_balance_report_list" model="ir.ui.view">
+        <field name="name">custom.leave.balance.report.list</field>
+        <field name="model">custom.leave.balance.report</field>
+        <field name="arch" type="xml">
+            <list string="Leave Balance" create="false" edit="false" delete="false">
+                <field name="employee_id"/>
+                <field name="leave_type_id"/>
+                <field name="year"/>
+                <field name="allocated" sum="Allocated"/>
+                <field name="used" sum="Used"/>
+                <field name="remaining" sum="Remaining"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_leave_balance_report_search" model="ir.ui.view">
+        <field name="name">custom.leave.balance.report.search</field>
+        <field name="model">custom.leave.balance.report</field>
+        <field name="arch" type="xml">
+            <search string="Leave Balance">
+                <field name="employee_id"/>
+                <field name="leave_type_id"/>
+                <field name="year"/>
+                <separator/>
+                <filter name="group_employee" string="Employee" context="{'group_by':'employee_id'}"/>
+                <filter name="group_type" string="Leave Type" context="{'group_by':'leave_type_id'}"/>
+                <filter name="group_year" string="Year" context="{'group_by':'year'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_leave_balance_report" model="ir.actions.act_window">
+        <field name="name">Leave Balance Report</field>
+        <field name="res_model">custom.leave.balance.report</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_custom_leave_balance_report_search"/>
+    </record>
+</odoo>

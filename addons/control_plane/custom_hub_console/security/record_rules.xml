@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Hub CSMs see only tenants where they are the responsible CSM. -->
+    <record id="rule_tenant_registry_csm" model="ir.rule">
+        <field name="name">Hub CSM: own tenants only</field>
+        <field name="model_id" ref="custom_super_admin.model_tenant_registry"/>
+        <field name="domain_force">[('csm_user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_hub_csm'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- Hub admins / global access bypass: see everything -->
+    <record id="rule_tenant_registry_admin" model="ir.rule">
+        <field name="name">Hub Admin: all tenants</field>
+        <field name="model_id" ref="custom_super_admin.model_tenant_registry"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_hub_admin'))]"/>
+    </record>
+
+    <!-- Deployment rows: CSMs see only deployments for their tenants -->
+    <record id="rule_deployment_csm" model="ir.rule">
+        <field name="name">Hub CSM: deployments for own tenants</field>
+        <field name="model_id" ref="model_custom_hub_module_deployment"/>
+        <field name="domain_force">[('tenant_id.csm_user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_hub_csm'))]"/>
+    </record>
+
+    <record id="rule_deployment_admin" model="ir.rule">
+        <field name="name">Hub Admin: all deployments</field>
+        <field name="model_id" ref="model_custom_hub_module_deployment"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_hub_admin'))]"/>
+    </record>
+
+    <!-- Audit log: viewers read all; only admins (and create-only for csm) -->
+    <record id="rule_audit_all_viewers" model="ir.rule">
+        <field name="name">Audit: viewers read all</field>
+        <field name="model_id" ref="model_custom_hub_audit_event"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_hub_viewer'))]"/>
+    </record>
+</odoo>

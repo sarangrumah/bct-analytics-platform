@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_dev_cycle_list" model="ir.ui.view">
+            <field name="name">dev.cycle.list</field>
+            <field name="model">dev.cycle</field>
+            <field name="arch" type="xml">
+                <list decoration-success="state == 'done'"
+                      decoration-info="state == 'deployed'"
+                      decoration-warning="state in ('code_review','qa','uat')"
+                      decoration-muted="state == 'backlog'">
+                    <field name="name"/>
+                    <field name="brd_recommendation_id"/>
+                    <field name="module_target_id"/>
+                    <field name="branch_name"/>
+                    <field name="assignee_id"/>
+                    <field name="estimate_md"/>
+                    <field name="actual_md"/>
+                    <field name="env_progress"/>
+                    <field name="state" widget="badge"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_dev_cycle_kanban" model="ir.ui.view">
+            <field name="name">dev.cycle.kanban</field>
+            <field name="model">dev.cycle</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="state" class="o_kanban_small_column">
+                    <field name="state"/>
+                    <field name="name"/>
+                    <field name="assignee_id"/>
+                    <field name="branch_name"/>
+                    <field name="brd_recommendation_id"/>
+                    <templates>
+                        <t t-name="card">
+                            <div class="o_kanban_record_top">
+                                <strong><field name="name"/></strong>
+                            </div>
+                            <div>
+                                <field name="brd_recommendation_id"/>
+                            </div>
+                            <div t-if="record.branch_name.raw_value">
+                                <small><field name="branch_name"/></small>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <field name="assignee_id" widget="many2one_avatar_user"/>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="view_dev_cycle_form" model="ir.ui.view">
+            <field name="name">dev.cycle.form</field>
+            <field name="model">dev.cycle</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_start" type="object" string="Start Dev"
+                                class="btn-primary" invisible="state != 'backlog'"/>
+                        <button name="action_to_review" type="object" string="To Code Review"
+                                invisible="state != 'in_dev'"/>
+                        <button name="action_to_qa" type="object" string="To QA"
+                                invisible="state != 'code_review'"/>
+                        <button name="action_to_uat" type="object" string="To UAT"
+                                invisible="state != 'qa'"/>
+                        <button name="action_deploy" type="object" string="Mark Deployed"
+                                class="btn-primary" invisible="state not in ('uat','code_review','qa')"/>
+                        <button name="action_done" type="object" string="Mark Done"
+                                invisible="state != 'deployed'"/>
+                        <button name="action_create_project_task" type="object"
+                                string="Create Project Task" invisible="project_task_id"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_open_pr_list" type="object"
+                                    class="oe_stat_button" icon="fa-code-fork">
+                                <field name="pr_count" widget="statinfo" string="PRs"/>
+                            </button>
+                            <button name="action_open_deployment_list" type="object"
+                                    class="oe_stat_button" icon="fa-rocket">
+                                <field name="deployment_count" widget="statinfo" string="Deployments"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1><field name="name"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="brd_recommendation_id"/>
+                                <field name="journey_id"/>
+                                <field name="module_target_id"/>
+                                <field name="project_task_id"/>
+                                <field name="assignee_id"/>
+                            </group>
+                            <group>
+                                <field name="branch_name"/>
+                                <field name="repo_url"/>
+                                <field name="env_progress"/>
+                                <field name="estimate_md"/>
+                                <field name="actual_md"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Pull Requests">
+                                <field name="pr_ids">
+                                    <list>
+                                        <field name="provider"/>
+                                        <field name="pr_number"/>
+                                        <field name="pr_url" widget="url"/>
+                                        <field name="state"/>
+                                        <field name="ci_status"/>
+                                        <field name="merged_at"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Deployments">
+                                <field name="deployment_ids">
+                                    <list>
+                                        <field name="environment_id"/>
+                                        <field name="module_deployment_id"/>
+                                        <field name="deployed_at"/>
+                                        <field name="outcome"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Timeline">
+                                <group>
+                                    <field name="created_at"/>
+                                    <field name="started_at"/>
+                                    <field name="completed_at"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_dev_cycle" model="ir.actions.act_window">
+            <field name="name">Dev Cycles</field>
+            <field name="res_model">dev.cycle</field>
+            <field name="view_mode">kanban,list,form</field>
+        </record>
+
+    </data>
+</odoo>

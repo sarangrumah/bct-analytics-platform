@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_tenant_registry_list" model="ir.ui.view">
+        <field name="name">tenant.registry.list</field>
+        <field name="model">tenant.registry</field>
+        <field name="arch" type="xml">
+            <list string="Tenants" decoration-success="state == 'active'"
+                  decoration-warning="state == 'suspended'"
+                  decoration-muted="state == 'archived'"
+                  decoration-danger="state == 'failed'"
+                  decoration-info="state == 'provisioning'">
+                <field name="slug"/>
+                <field name="display_name"/>
+                <field name="state" widget="badge"/>
+                <field name="plan_tier"/>
+                <field name="contact_email"/>
+                <field name="csm_user_id"/>
+                <field name="last_backup_at"/>
+                <field name="activated_at"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_tenant_registry_kanban" model="ir.ui.view">
+        <field name="name">tenant.registry.kanban</field>
+        <field name="model">tenant.registry</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_dashboard">
+                <field name="slug"/>
+                <field name="display_name"/>
+                <field name="state"/>
+                <field name="plan_tier"/>
+                <field name="last_backup_at"/>
+                <field name="contact_email"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="o_kanban_record_top">
+                            <div class="o_kanban_record_headings">
+                                <strong><field name="display_name"/></strong>
+                                <small class="text-muted">
+                                    <field name="slug"/>
+                                </small>
+                            </div>
+                            <div>
+                                <span class="badge text-bg-info">
+                                    <field name="plan_tier"/>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="o_kanban_record_body">
+                            <div>📧 <field name="contact_email"/></div>
+                            <div>💾 Last backup: <field name="last_backup_at"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_tenant_registry_form" model="ir.ui.view">
+        <field name="name">tenant.registry.form</field>
+        <field name="model">tenant.registry</field>
+        <field name="arch" type="xml">
+            <form string="Tenant">
+                <header>
+                    <button name="action_suspend"
+                            string="Suspend"
+                            type="object"
+                            class="btn-warning"
+                            confirm="Suspend this tenant? Access will be revoked."
+                            invisible="state != 'active'"/>
+                    <button name="action_resume"
+                            string="Resume"
+                            type="object"
+                            class="btn-success"
+                            invisible="state != 'suspended'"/>
+                    <button name="action_archive"
+                            string="Archive"
+                            type="object"
+                            class="btn-danger"
+                            confirm="Archive (soft-delete) this tenant? DB will be renamed and purged after 30 days."
+                            invisible="state not in ('active', 'suspended', 'failed')"/>
+                    <button name="action_trigger_backup"
+                            string="Backup Now"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state not in ('active', 'suspended')"/>
+                    <button name="action_open_restore_wizard"
+                            string="Restore..."
+                            type="object"
+                            invisible="state == 'archived'"/>
+                    <button name="action_open_replicate_wizard"
+                            string="Replicate to Staging"
+                            type="object"
+                            invisible="state not in ('active', 'suspended')"/>
+                    <button name="action_open_grafana"
+                            string="Grafana ↗"
+                            type="object"
+                            invisible="state == 'archived'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="provisioning,active,suspended,archived"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_backups"
+                                type="object" class="oe_stat_button" icon="fa-database">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Backups</span>
+                            </div>
+                        </button>
+                        <button name="action_view_action_log"
+                                type="object" class="oe_stat_button" icon="fa-list">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Action Log</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="display_name" class="oe_edit_only"/>
+                        <h1><field name="display_name" placeholder="Acme Corporation"/></h1>
+                        <label for="slug" class="oe_edit_only"/>
+                        <h3><field name="slug" placeholder="acme"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="db_name"/>
+                            <field name="plan_tier"/>
+                            <field name="csm_user_id"/>
+                            <field name="features" widget="json"/>
+                        </group>
+                        <group>
+                            <field name="contact_email"/>
+                            <field name="contact_phone"/>
+                            <field name="activated_at"/>
+                            <field name="last_backup_at"/>
+                            <field name="suspended_at" invisible="not suspended_at"/>
+                            <field name="archived_at" invisible="not archived_at"/>
+                            <field name="purge_after" invisible="not purge_after"/>
+                            <field name="last_seen_at"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Backup &amp; Replication">
+                            <group>
+                                <group string="Schedule">
+                                    <field name="backup_schedule"
+                                           placeholder="0 2 * * *"
+                                           help="5-field cron expression (UTC)."/>
+                                    <field name="backup_retention_days"/>
+                                    <field name="pitr_enabled"/>
+                                </group>
+                                <group string="Status">
+                                    <field name="last_backup_at" readonly="1"/>
+                                    <field name="last_scheduled_backup_at" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes" placeholder="Operational notes about this tenant..."/>
+                        </page>
+                        <page string="Sync Error" invisible="not sync_error">
+                            <field name="sync_error" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tenant_registry_search" model="ir.ui.view">
+        <field name="name">tenant.registry.search</field>
+        <field name="model">tenant.registry</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="slug"/>
+                <field name="display_name"/>
+                <field name="contact_email"/>
+                <field name="csm_user_id"/>
+                <filter name="active" string="Active" domain="[('state','=','active')]"/>
+                <filter name="suspended" string="Suspended" domain="[('state','=','suspended')]"/>
+                <filter name="archived" string="Archived" domain="[('state','=','archived')]"/>
+                <filter name="failed" string="Failed" domain="[('state','=','failed')]"/>
+                <group>
+                    <filter name="by_state" string="State" context="{'group_by': 'state'}"/>
+                    <filter name="by_plan" string="Plan" context="{'group_by': 'plan_tier'}"/>
+                    <filter name="by_csm" string="CSM" context="{'group_by': 'csm_user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_tenant_registry" model="ir.actions.act_window">
+        <field name="name">Tenants</field>
+        <field name="res_model">tenant.registry</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_tenant_registry_search"/>
+        <field name="context">{"search_default_active": 1}</field>
+    </record>
+
+</odoo>

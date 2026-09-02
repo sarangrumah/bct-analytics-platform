@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_barcode_scan_session_list" model="ir.ui.view">
+        <field name="name">custom.barcode.scan.session.list</field>
+        <field name="model">custom.barcode.scan.session</field>
+        <field name="arch" type="xml">
+            <list string="Scan Sessions"
+                  decoration-info="state == 'scanning'"
+                  decoration-success="state == 'completed'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="picking_id"/>
+                <field name="operator_id"/>
+                <field name="total_scanned"/>
+                <field name="state" widget="badge"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_barcode_scan_session_form" model="ir.ui.view">
+        <field name="name">custom.barcode.scan.session.form</field>
+        <field name="model">custom.barcode.scan.session</field>
+        <field name="arch" type="xml">
+            <form string="Barcode Scan Session">
+                <header>
+                    <button name="action_start_scanning" type="object"
+                            string="Start Scanning" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_complete" type="object"
+                            string="Complete" class="oe_highlight"
+                            invisible="state != 'scanning'"/>
+                    <button name="action_apply_to_picking" type="object"
+                            string="Apply to Transfer" icon="fa-check"
+                            invisible="state not in ('scanning','completed')"/>
+                    <button name="action_open_kiosk" type="object"
+                            string="Open Kiosk" icon="fa-tablet"
+                            invisible="state in ('completed','cancelled')"/>
+                    <button name="action_cancel" type="object"
+                            string="Cancel"
+                            invisible="state in ('completed','cancelled')"/>
+                    <button name="action_reset_draft" type="object"
+                            string="Reset to Draft"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,scanning,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="picking_id"/>
+                            <field name="operator_id"/>
+                        </group>
+                        <group>
+                            <field name="total_scanned"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Scan Lines">
+                            <field name="line_ids">
+                                <list editable="bottom"
+                                      decoration-danger="status == 'not_found'"
+                                      decoration-warning="status == 'duplicate'"
+                                      decoration-muted="status == 'wrong_location'">
+                                    <field name="scanned_at"/>
+                                    <field name="raw_barcode"/>
+                                    <field name="product_id"/>
+                                    <field name="lot_id"/>
+                                    <field name="quantity"/>
+                                    <field name="status" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_barcode_scan_session_search" model="ir.ui.view">
+        <field name="name">custom.barcode.scan.session.search</field>
+        <field name="model">custom.barcode.scan.session</field>
+        <field name="arch" type="xml">
+            <search string="Scan Sessions">
+                <field name="name"/>
+                <field name="picking_id"/>
+                <field name="operator_id"/>
+                <filter name="draft" string="Draft"
+                        domain="[('state','=','draft')]"/>
+                <filter name="scanning" string="Scanning"
+                        domain="[('state','=','scanning')]"/>
+                <filter name="completed" string="Completed"
+                        domain="[('state','=','completed')]"/>
+                <filter name="my_sessions" string="My Sessions"
+                        domain="[('operator_id','=',uid)]"/>
+                <separator/>
+                <filter name="group_state" string="State"
+                        context="{'group_by':'state'}"/>
+                <filter name="group_operator" string="Operator"
+                        context="{'group_by':'operator_id'}"/>
+                <filter name="group_picking" string="Transfer"
+                        context="{'group_by':'picking_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Mobile / kiosk form: big inputs, big buttons, no clutter. -->
+    <record id="view_custom_barcode_scan_session_kiosk_form" model="ir.ui.view">
+        <field name="name">custom.barcode.scan.session.kiosk.form</field>
+        <field name="model">custom.barcode.scan.session</field>
+        <field name="arch" type="xml">
+            <form string="Kiosk Scan" js_class="barcode_form" create="false">
+                <header>
+                    <button name="action_complete" type="object"
+                            string="DONE" class="btn-primary btn-lg"
+                            invisible="state != 'scanning'"/>
+                    <button name="action_apply_to_picking" type="object"
+                            string="APPLY" class="btn-success btn-lg"
+                            invisible="state not in ('scanning','completed')"/>
+                    <button name="action_cancel" type="object"
+                            string="CANCEL" class="btn-secondary btn-lg"
+                            invisible="state in ('completed','cancelled')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1 style="font-size: 2rem;">
+                            <field name="name" readonly="1"/>
+                        </h1>
+                        <h2 style="font-size: 1.5rem; color:#666;">
+                            <field name="picking_id" readonly="1"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <field name="total_scanned" readonly="1"
+                               class="o_field_big" style="font-size: 2.5rem;"/>
+                    </group>
+                    <separator string="Last Scans"/>
+                    <field name="line_ids" nolabel="1">
+                        <list create="false" delete="false" edit="false"
+                              limit="10"
+                              decoration-danger="status == 'not_found'"
+                              decoration-warning="status == 'duplicate'"
+                              decoration-success="status == 'ok'">
+                            <field name="scanned_at"/>
+                            <field name="product_id"/>
+                            <field name="lot_id"/>
+                            <field name="quantity"/>
+                            <field name="status" widget="badge"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_custom_barcode_scan_session" model="ir.actions.act_window">
+        <field name="name">Scan Sessions</field>
+        <field name="res_model">custom.barcode.scan.session</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_custom_barcode_scan_session_search"/>
+    </record>
+</odoo>

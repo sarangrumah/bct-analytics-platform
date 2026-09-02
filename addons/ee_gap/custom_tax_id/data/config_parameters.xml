@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Whether posting a vendor bill also books the PPh withholding to the GL
+      (Dr Utang Usaha / Cr Hutang PPh) as a separate posted journal entry.
+
+        "1" (default) -> enabled: the withholding hits the GL, so the Hutang PPh
+                         liability is real and the "Rekonsiliasi PPh Terutang vs
+                         Disetor" report (TAX-REC-03) has data.
+        "0"           -> disabled: only the withholding lines + Bupot drafts are
+                         created (legacy behaviour, no GL impact).
+
+      noupdate="1" so a value changed by an administrator survives upgrades.
+      Editable at Settings > Technical > System Parameters.
+    -->
+    <data noupdate="1">
+        <record id="param_withholding_gl_posting" model="ir.config_parameter">
+            <field name="key">custom_tax_id.withholding_gl_posting</field>
+            <field name="value">1</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===== Editorial content blocks (CMS) ===== -->
+    <record id="view_storefront_content_list" model="ir.ui.view">
+        <field name="name">custom.storefront.content.list</field>
+        <field name="model">custom.storefront.content</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="headline"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_storefront_content_form" model="ir.ui.view">
+        <field name="name">custom.storefront.content.form</field>
+        <field name="model">custom.storefront.content</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Hero banner"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="hero / editorial / featured"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="image" widget="image" class="oe_avatar"/>
+                        </group>
+                    </group>
+                    <group string="Copy (translatable ID/EN)">
+                        <field name="eyebrow" placeholder="Autumn / Winter"/>
+                        <field name="headline" placeholder="The quiet confidence of fewer, better things."/>
+                        <field name="body"/>
+                        <field name="cta_label" placeholder="Explore the collection"/>
+                        <field name="cta_url" placeholder="/products"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_storefront_content" model="ir.actions.act_window">
+        <field name="name">Site Content</field>
+        <field name="res_model">custom.storefront.content</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Newsletter subscribers -->
+    <record id="view_storefront_subscriber_list" model="ir.ui.view">
+        <field name="name">custom.storefront.subscriber.list</field>
+        <field name="model">custom.storefront.subscriber</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="email"/>
+                <field name="source"/>
+                <field name="create_date"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_storefront_subscriber" model="ir.actions.act_window">
+        <field name="name">Newsletter Subscribers</field>
+        <field name="res_model">custom.storefront.subscriber</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- ===== Stores (physical store locator, projection of stock.warehouse) ===== -->
+    <record id="view_storefront_store_list" model="ir.ui.view">
+        <field name="name">stock.warehouse.list.storefront</field>
+        <field name="model">stock.warehouse</field>
+        <field name="arch" type="xml">
+            <list string="Stores" editable="bottom">
+                <field name="custom_storefront_published" widget="boolean_toggle" string="Published"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="partner_id" string="Address"/>
+                <field name="custom_store_hours" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_storefront_store_search" model="ir.ui.view">
+        <field name="name">stock.warehouse.search.storefront</field>
+        <field name="model">stock.warehouse</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="published" string="Published in Storefront"
+                        domain="[('custom_storefront_published', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_storefront_stores" model="ir.actions.act_window">
+        <field name="name">Stores</field>
+        <field name="res_model">stock.warehouse</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_storefront_store_list"/>
+        <field name="search_view_id" ref="view_storefront_store_search"/>
+        <field name="context">{'search_default_published': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Publish a warehouse as a storefront store</p>
+            <p>Stores shown on the headless storefront's store locator and in-store
+               availability are warehouses with <b>Show in Storefront</b> enabled.
+               Toggle <b>Published</b> here, then open a store to set its address,
+               geo-coordinates, opening hours and photo.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_storefront_root" name="Storefront" sequence="96"/>
+    <menuitem id="menu_storefront_stores" name="Stores"
+              parent="menu_storefront_root" action="action_storefront_stores" sequence="5"/>
+    <menuitem id="menu_storefront_content" name="Site Content"
+              parent="menu_storefront_root" action="action_storefront_content" sequence="10"/>
+    <menuitem id="menu_storefront_subscriber" name="Newsletter Subscribers"
+              parent="menu_storefront_root" action="action_storefront_subscriber" sequence="20"/>
+
+    <!-- Store-locator fields on the Warehouse form -->
+    <record id="view_warehouse_storefront_form" model="ir.ui.view">
+        <field name="name">stock.warehouse.form.storefront</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.view_warehouse"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Storefront / Store Locator" name="storefront_locator">
+                    <group>
+                        <field name="custom_storefront_published"/>
+                        <field name="custom_store_latitude"
+                               invisible="not custom_storefront_published"/>
+                        <field name="custom_store_longitude"
+                               invisible="not custom_storefront_published"/>
+                    </group>
+                    <group>
+                        <field name="custom_store_image" widget="image"
+                               invisible="not custom_storefront_published"/>
+                    </group>
+                    <field name="custom_store_hours"
+                           invisible="not custom_storefront_published"
+                           placeholder="Mon–Fri 10:00–22:00&#10;Sat–Sun 10:00–22:00"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Material & composition on the Product template form -->
+    <record id="view_product_template_storefront_form" model="ir.ui.view">
+        <field name="name">product.template.form.storefront</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='description_sale']" position="after">
+                <field name="custom_material_composition"
+                       string="Material &amp; Composition"
+                       placeholder="e.g. 80% Cotton, 20% Linen"/>
+                <label for="custom_drop_date"/>
+                <div class="o_row">
+                    <field name="custom_drop_date"/>
+                    <field name="custom_is_new" readonly="1"/>
+                </div>
+                <!-- Storefront merchandising: surface the eCommerce category &
+                     tag fields directly on the Sales product form. On a headless
+                     tenant the Website app/editor is hidden, so the native
+                     website_sale "eCommerce" tab that normally hosts these is out
+                     of reach — these drive the storefront PLP facets, category
+                     breadcrumbs and the product-detail tag chips. -->
+                <field name="public_categ_ids" widget="many2many_tags"
+                       string="Storefront Categories"
+                       options="{'no_quick_create': False}"
+                       placeholder="Ready to Wear, Accessories…"/>
+                <field name="product_tag_ids" widget="many2many_tags"
+                       string="Storefront Tags"
+                       options="{'color_field': 'color', 'no_quick_create': False}"
+                       placeholder="New Arrival, Bestseller, Sustainable…"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

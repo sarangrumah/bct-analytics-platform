@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_coretax_config_pajakku_form" model="ir.ui.view">
+        <field name="name">custom.coretax.config.form.pajakku</field>
+        <field name="model">custom.coretax.config</field>
+        <field name="inherit_id" ref="custom_coretax.view_coretax_config_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Pajakku ASPP" name="pajakku">
+                        <group>
+                            <group string="Activation">
+                                <field name="pajakku_enabled"/>
+                                <field name="pajakku_sandbox_mode"/>
+                                <field name="pajakku_api_url" placeholder="leave empty for default"/>
+                            </group>
+                            <group string="Credentials">
+                                <field name="pajakku_client_id"/>
+                                <field name="pajakku_client_secret_set" readonly="1"/>
+                                <button name="action_pajakku_set_secret"
+                                        type="object"
+                                        string="Set / Rotate Secret..."
+                                        class="btn-link"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Pending / Errors">
+                                <field name="pajakku_pending_tx" readonly="1"/>
+                                <field name="pajakku_error_tx" readonly="1"/>
+                            </group>
+                            <group string="Last Test">
+                                <field name="pajakku_last_test" readonly="1"/>
+                                <field name="pajakku_last_test_ok" readonly="1"/>
+                                <field name="pajakku_last_test_message" readonly="1"/>
+                                <button name="action_pajakku_test_connection"
+                                        type="object"
+                                        string="Test Connection"
+                                        class="btn-primary"
+                                        invisible="not pajakku_enabled"/>
+                            </group>
+                        </group>
+                        <div class="alert alert-info" role="alert">
+                            Pajakku adapter is a host-to-host ASPP integration. Until live sandbox
+                            credentials are configured, attempts to submit will raise an error pointing
+                            the operator to the manual portal flow. Use the "Test Connection" button
+                            after entering credentials to verify OAuth2 reachability.
+                        </div>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_pajakku_secret_wizard_form" model="ir.ui.view">
+        <field name="name">custom.coretax.pajakku.secret.wizard.form</field>
+        <field name="model">custom.coretax.pajakku.secret.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Set Pajakku Secret">
+                <sheet>
+                    <p>Paste the Pajakku client secret below. It will be encrypted at rest
+                       via the master KMS wrapping key and never stored in plaintext on the
+                       config record.</p>
+                    <group>
+                        <field name="config_id" readonly="1"/>
+                        <field name="client_secret" password="True"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_save" string="Save (encrypted)" type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===================== Cash Advance ===================== -->
+    <record id="view_finance_cash_advance_list" model="ir.ui.view">
+        <field name="name">finance.cash.advance.list</field>
+        <field name="model">finance.cash.advance</field>
+        <field name="arch" type="xml">
+            <list string="Cash Advance"
+                  decoration-info="state=='submitted'"
+                  decoration-success="state in ('approved','posted','paid')"
+                  decoration-warning="state=='pushed'"
+                  decoration-danger="state=='rejected'"
+                  decoration-muted="state=='cancelled'">
+                <field name="name"/>
+                <field name="requester_id"/>
+                <field name="division_id"/>
+                <field name="ca_type"/>
+                <field name="amount" sum="Total"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="pr_number" optional="show"/>
+                <field name="sap_payment_status" optional="show"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_finance_cash_advance_form" model="ir.ui.view">
+        <field name="name">finance.cash.advance.form</field>
+        <field name="model">finance.cash.advance</field>
+        <field name="arch" type="xml">
+            <form string="Cash Advance">
+                <header>
+                    <button name="action_submit_for_approval" type="object"
+                            string="Submit for Approval" class="oe_highlight"
+                            invisible="state != 'draft'"
+                            groups="custom_finance_portal.group_finance_user"/>
+                    <button name="action_approve" type="object"
+                            string="Approve" class="oe_highlight"
+                            invisible="state != 'submitted'"
+                            groups="custom_finance_portal.group_finance_officer"/>
+                    <button name="action_reject" type="object"
+                            string="Reject"
+                            invisible="state != 'submitted'"
+                            groups="custom_finance_portal.group_finance_officer"/>
+                    <button name="action_open_approval_request" type="object"
+                            string="View Approval"
+                            invisible="not x_custom_approval_request_id"/>
+                    <button name="action_reset_to_draft" type="object"
+                            string="Reset to Draft"
+                            invisible="state not in ('submitted','rejected','cancelled')"
+                            groups="custom_finance_portal.group_finance_manager"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('paid','posted','cancelled')"
+                            groups="custom_finance_portal.group_finance_user"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,pushed,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_realizations" type="object"
+                                class="oe_stat_button" icon="fa-list-ul">
+                            <field name="realization_count" widget="statinfo" string="Realizations"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="requester_id" readonly="state != 'draft'"/>
+                            <field name="nik" readonly="1"/>
+                            <field name="division_id" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="submission_type_id" readonly="state != 'draft'"/>
+                            <field name="ca_type" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="pr_number" readonly="state != 'draft'"/>
+                            <field name="po_number" readonly="state != 'draft'"/>
+                            <field name="payment_date" readonly="state != 'draft'"/>
+                            <field name="payment_method" readonly="state != 'draft'"/>
+                            <field name="amount"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                        </group>
+                    </group>
+                    <group string="Payment To" col="4">
+                        <field name="bank_name" readonly="state != 'draft'"/>
+                        <field name="account_number" readonly="state != 'draft'"/>
+                        <field name="recipient" readonly="state != 'draft'"/>
+                    </group>
+                    <notebook>
+                        <page string="Detail" name="lines">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="item_id"/>
+                                    <field name="account_code"/>
+                                    <field name="cost_center_code"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_amount"/>
+                                    <field name="subtotal" sum="Total"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Purpose / Notes" name="notes">
+                            <group>
+                                <field name="purpose"/>
+                                <field name="description"/>
+                                <field name="note"/>
+                            </group>
+                        </page>
+                        <page string="SAP / Approval" name="sap">
+                            <group>
+                                <group string="Approval">
+                                    <field name="x_custom_approval_request_id" readonly="1"/>
+                                    <field name="x_custom_approval_state" widget="badge" readonly="1"/>
+                                </group>
+                                <group string="SAP Mirror">
+                                    <field name="sap_sync_state"/>
+                                    <field name="sap_document_no"/>
+                                    <field name="sap_pushed_at"/>
+                                    <field name="sap_payment_plan_date"/>
+                                    <field name="sap_payment_status"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_finance_cash_advance_search" model="ir.ui.view">
+        <field name="name">finance.cash.advance.search</field>
+        <field name="model">finance.cash.advance</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="requester_id"/>
+                <field name="pr_number"/>
+                <field name="division_id"/>
+                <separator/>
+                <filter name="f_draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="f_submitted" string="On Process" domain="[('state','=','submitted')]"/>
+                <filter name="f_approved" string="Approved" domain="[('state','in',('approved','pushed','posted'))]"/>
+                <filter name="f_paid" string="Paid" domain="[('state','=','paid')]"/>
+                <filter name="f_rejected" string="Rejected" domain="[('state','=','rejected')]"/>
+                <separator/>
+                <filter name="f_mine" string="My Requests" domain="[('requester_id.user_id','=',uid)]"/>
+                <group>
+                    <filter name="g_state" string="Status" context="{'group_by':'state'}"/>
+                    <filter name="g_division" string="Division" context="{'group_by':'division_id'}"/>
+                    <filter name="g_requester" string="Requester" context="{'group_by':'requester_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_finance_cash_advance" model="ir.actions.act_window">
+        <field name="name">Cash Advance</field>
+        <field name="res_model">finance.cash.advance</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_finance_cash_advance_search"/>
+    </record>
+
+    <!-- ===================== Cash Advance Realization ===================== -->
+    <record id="view_finance_ca_realization_list" model="ir.ui.view">
+        <field name="name">finance.cash.advance.realization.list</field>
+        <field name="model">finance.cash.advance.realization</field>
+        <field name="arch" type="xml">
+            <list string="CA Realization"
+                  decoration-info="state=='submitted'"
+                  decoration-success="state in ('approved','posted','paid')"
+                  decoration-muted="state=='cancelled'">
+                <field name="name"/>
+                <field name="advance_id"/>
+                <field name="requester_id"/>
+                <field name="realization_date"/>
+                <field name="advance_amount"/>
+                <field name="amount" string="Realized" sum="Realized"/>
+                <field name="difference" sum="Difference"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_finance_ca_realization_form" model="ir.ui.view">
+        <field name="name">finance.cash.advance.realization.form</field>
+        <field name="model">finance.cash.advance.realization</field>
+        <field name="arch" type="xml">
+            <form string="CA Realization">
+                <header>
+                    <button name="action_submit_for_approval" type="object"
+                            string="Submit for Approval" class="oe_highlight"
+                            invisible="state != 'draft'"
+                            groups="custom_finance_portal.group_finance_user"/>
+                    <button name="action_approve" type="object"
+                            string="Approve" class="oe_highlight"
+                            invisible="state != 'submitted'"
+                            groups="custom_finance_portal.group_finance_officer"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="state != 'submitted'"
+                            groups="custom_finance_portal.group_finance_officer"/>
+                    <button name="action_open_approval_request" type="object"
+                            string="View Approval"
+                            invisible="not x_custom_approval_request_id"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state not in ('submitted','rejected','cancelled')"
+                            groups="custom_finance_portal.group_finance_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,pushed,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="advance_id" readonly="state != 'draft'"
+                                   context="{'default_requester_id': requester_id}"/>
+                            <field name="requester_id" readonly="state != 'draft'"/>
+                            <field name="realization_date" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="advance_amount"/>
+                            <field name="amount"/>
+                            <field name="difference"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Detail" name="lines">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="item_id"/>
+                                    <field name="account_code"/>
+                                    <field name="cost_center_code"/>
+                                    <field name="subtotal" sum="Total"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="SAP / Approval" name="sap">
+                            <group>
+                                <group string="Approval">
+                                    <field name="x_custom_approval_state" widget="badge" readonly="1"/>
+                                </group>
+                                <group string="SAP Mirror">
+                                    <field name="sap_sync_state"/>
+                                    <field name="sap_payment_status"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                    <field name="note" placeholder="Notes..."/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_finance_ca_realization" model="ir.actions.act_window">
+        <field name="name">CA Realization</field>
+        <field name="res_model">finance.cash.advance.realization</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

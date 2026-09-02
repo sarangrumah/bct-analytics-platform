@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sale_order_form_ecommerce_id" model="ir.ui.view">
+        <field name="name">sale.order.form.ecommerce.id</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='client_order_ref']" position="after">
+                <field name="x_id_courier_id" readonly="1"/>
+                <field name="x_awb_number"/>
+                <field name="x_awb_tracking_url" widget="url" readonly="1"
+                       invisible="not x_awb_tracking_url"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top-level eCommerce ID app menu -->
+    <menuitem id="menu_ecommerce_id_root"
+              name="eCommerce ID"
+              sequence="60"
+              groups="custom_ecommerce.group_user"/>
+
+    <menuitem id="menu_ecommerce_id_couriers"
+              name="Couriers ID"
+              parent="menu_ecommerce_id_root"
+              action="action_custom_ecommerce_courier"
+              sequence="10"/>
+</odoo>

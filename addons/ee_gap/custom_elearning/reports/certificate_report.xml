@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_elearning_certificate_document" name="eLearning Certificate Document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.basic_layout">
+                    <div class="page" style="page-break-after: always; font-family: serif; padding: 40px; border: 8px double #1a3a72; min-height: 90vh;">
+                        <div class="text-center" style="margin-top: 40px;">
+                            <h1 style="font-size: 32px; color: #1a3a72; letter-spacing: 4px;">SERTIFIKAT</h1>
+                            <h2 style="font-size: 24px; color: #1a3a72;">Keikutsertaan</h2>
+                            <hr style="width: 40%; margin: 20px auto; border-top: 2px solid #1a3a72;"/>
+                        </div>
+
+                        <p class="text-center" style="margin-top: 40px; font-size: 14px;">
+                            Diberikan kepada:
+                        </p>
+                        <h2 class="text-center" style="font-size: 28px; color: #000; font-style: italic; margin-top: 10px;">
+                            <span t-out="doc.partner_id.name or '—'"/>
+                        </h2>
+                        <hr style="width: 60%; margin: 10px auto;"/>
+
+                        <p class="text-center" style="margin-top: 30px; font-size: 14px;">
+                            Atas keikutsertaan dan penyelesaian kursus:
+                        </p>
+                        <h3 class="text-center" style="font-size: 22px; color: #1a3a72; margin-top: 10px;">
+                            <span t-out="doc.channel_id.name or '—'"/>
+                        </h3>
+
+                        <table style="width: 80%; margin: 30px auto; font-size: 12px;">
+                            <tr>
+                                <td style="width: 33%;"><b>Level</b></td>
+                                <td style="width: 33%;"><b>Durasi</b></td>
+                                <td style="width: 33%;"><b>Berlaku Sampai</b></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span t-out="dict(doc.channel_id._fields['x_level'].selection).get(doc.channel_id.x_level) or '—'"/>
+                                </td>
+                                <td>
+                                    <span t-out="doc.channel_id.x_duration_hours or 0"/> jam
+                                </td>
+                                <td>
+                                    <span t-out="doc.x_certificate_expiry_date or '—'"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p class="text-center" style="margin-top: 30px; font-size: 12px;">
+                            Diterbitkan di
+                            <b><span t-out="user.env.company.city or user.env.company.name"/></b>
+                            pada tanggal
+                            <b><span t-out="doc.x_certificate_issue_date or ''"/></b>
+                        </p>
+
+                        <table style="width: 100%; margin-top: 60px; font-size: 12px;">
+                            <tr>
+                                <td style="width: 50%; text-align: center;">
+                                    <br/><br/><br/>
+                                    ___________________________<br/>
+                                    Instruktur<br/>
+                                    <b>
+                                        <span t-out="(doc.channel_id.user_id.name if doc.channel_id.user_id else '—') or '—'"/>
+                                    </b>
+                                </td>
+                                <td style="width: 50%; text-align: center;">
+                                    <br/><br/><br/>
+                                    ___________________________<br/>
+                                    Penyelenggara<br/>
+                                    <b><span t-out="user.env.company.name"/></b>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p class="text-center text-muted" style="font-size: 9px; margin-top: 40px;">
+                            Sertifikat ini diterbitkan secara elektronik dan sah tanpa tanda tangan basah,
+                            sesuai UU ITE 11/2008 jo. 19/2016.
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_elearning_certificate" model="ir.actions.report">
+        <field name="name">Sertifikat Keikutsertaan</field>
+        <field name="model">slide.channel.partner</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_elearning.report_elearning_certificate_document</field>
+        <field name="report_file">custom_elearning.report_elearning_certificate_document</field>
+        <field name="binding_model_id" ref="website_slides.model_slide_channel_partner"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+</odoo>

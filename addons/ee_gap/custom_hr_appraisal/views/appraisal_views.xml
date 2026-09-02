@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_appraisal_list" model="ir.ui.view">
+        <field name="name">appraisal.list</field>
+        <field name="model">appraisal.appraisal</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="cycle_id"/>
+                <field name="employee_id"/>
+                <field name="manager_id"/>
+                <field name="overall_score"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_appraisal_form" model="ir.ui.view">
+        <field name="name">appraisal.form</field>
+        <field name="model">appraisal.appraisal</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start_self_review" string="Start Self Review" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_submit_self" string="Submit Self Review" type="object"
+                            invisible="state != 'self_review'"/>
+                    <button name="action_submit_manager" string="Submit Manager Review" type="object"
+                            class="btn-primary" invisible="state != 'manager_review'"/>
+                    <button name="action_close" string="Close" type="object"
+                            invisible="state != 'calibration'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h2><field name="employee_id"/></h2>
+                        <h4 class="text-muted"><field name="cycle_id"/></h4>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="template_id"/>
+                            <field name="manager_id"/>
+                        </group>
+                        <group>
+                            <field name="overall_score" readonly="1"/>
+                            <field name="closed_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Items"/>
+                    <field name="line_ids">
+                        <list editable="bottom">
+                            <field name="name"/>
+                            <field name="competency"/>
+                            <field name="weight"/>
+                            <field name="score_employee"/>
+                            <field name="comment_employee"/>
+                            <field name="score_manager"/>
+                            <field name="comment_manager"/>
+                        </list>
+                    </field>
+                    <separator string="Overall Comments"/>
+                    <group>
+                        <field name="overall_comment_employee" placeholder="Self comment"/>
+                        <field name="overall_comment_manager" placeholder="Manager comment"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_appraisal" model="ir.actions.act_window">
+        <field name="name">Appraisals</field>
+        <field name="res_model">appraisal.appraisal</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ppob_wallet_adjust_wizard_form" model="ir.ui.view">
+        <field name="name">custom.ppob.wallet.adjust.wizard.form</field>
+        <field name="model">custom.ppob.wallet.adjust.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Adjust Wallet">
+                <group>
+                    <field name="wallet_id" readonly="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="direction"/>
+                    <field name="amount"/>
+                    <field name="counterpart_account_id"/>
+                    <field name="reason"/>
+                </group>
+                <footer>
+                    <button name="action_apply" type="object" string="Apply" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ppob_wallet_adjust_wizard" model="ir.actions.act_window">
+        <field name="name">Adjust Wallet</field>
+        <field name="res_model">custom.ppob.wallet.adjust.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

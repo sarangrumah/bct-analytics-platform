@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fsm_site_list" model="ir.ui.view">
+        <field name="name">fsm.site.list</field>
+        <field name="model">fsm.site</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="city"/>
+                <field name="country_id"/>
+                <field name="work_order_count"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fsm_site_form" model="ir.ui.view">
+        <field name="name">fsm.site.form</field>
+        <field name="model">fsm.site</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. HQ Jakarta"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="street"/>
+                            <field name="city"/>
+                            <field name="state_id"/>
+                            <field name="zip"/>
+                            <field name="country_id"/>
+                        </group>
+                        <group>
+                            <field name="latitude"/>
+                            <field name="longitude"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <separator string="Access Notes"/>
+                    <field name="access_notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fsm_site" model="ir.actions.act_window">
+        <field name="name">Sites</field>
+        <field name="res_model">fsm.site</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

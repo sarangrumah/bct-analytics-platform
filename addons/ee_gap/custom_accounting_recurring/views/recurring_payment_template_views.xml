@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_recurring_payment_template_list" model="ir.ui.view">
+        <field name="name">custom.recurring.payment.template.list</field>
+        <field name="model">custom.recurring.payment.template</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="payment_type"/>
+                <field name="journal_id"/>
+                <field name="amount" sum="Total"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="period"/>
+                <field name="next_date"/>
+                <field name="end_date"/>
+                <field name="auto_post"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_recurring_payment_template_form" model="ir.ui.view">
+        <field name="name">custom.recurring.payment.template.form</field>
+        <field name="model">custom.recurring.payment.template</field>
+        <field name="arch" type="xml">
+            <form string="Recurring Payment Template">
+                <header>
+                    <button name="action_run_now" type="object" string="Run Now"
+                            class="btn-primary"
+                            groups="custom_accounting_recurring.group_recurring_admin"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Monthly Office Rent"/></h1>
+                        <field name="code" readonly="1"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id"/>
+                            <field name="partner_id"/>
+                            <field name="payment_type"/>
+                            <field name="journal_id"/>
+                            <field name="amount"/>
+                            <field name="auto_post"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="period"/>
+                            <field name="next_date"/>
+                            <field name="end_date"/>
+                            <field name="last_generated_at"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_recurring_payment_template" model="ir.actions.act_window">
+        <field name="name">Recurring Payment Templates</field>
+        <field name="res_model">custom.recurring.payment.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

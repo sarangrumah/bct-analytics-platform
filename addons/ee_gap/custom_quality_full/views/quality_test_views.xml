@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_quality_test_list" model="ir.ui.view">
+        <field name="name">custom.quality.test.list</field>
+        <field name="model">custom.quality.test</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="test_type"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_custom_quality_test_form" model="ir.ui.view">
+        <field name="name">custom.quality.test.form</field>
+        <field name="model">custom.quality.test</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="test_type"/>
+                            <field name="company_id"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <separator string="Questions"/>
+                    <field name="line_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                            <field name="response_type"/>
+                            <field name="is_required"/>
+                            <field name="expected_min"/>
+                            <field name="expected_max"/>
+                            <field name="expected_set" optional="hide"/>
+                        </list>
+                    </field>
+                    <separator string="Description"/>
+                    <field name="description"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_custom_quality_test" model="ir.actions.act_window">
+        <field name="name">Test Templates</field>
+        <field name="res_model">custom.quality.test</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

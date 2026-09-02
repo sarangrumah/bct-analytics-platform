@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Append Indonesia-gateway credential fields to the standard
+         payment.provider form. Visibility is gated by the new
+         provider codes so existing providers are not cluttered. -->
+    <record id="view_payment_provider_form_id" model="ir.ui.view">
+        <field name="name">payment.provider.form.indonesia</field>
+        <field name="model">payment.provider</field>
+        <field name="inherit_id" ref="payment.payment_provider_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Indonesia Gateway"
+                      invisible="code not in ('midtrans', 'xendit', 'doku', 'pos')">
+                    <group>
+                        <group string="Credentials">
+                            <field name="x_id_server_key" password="True"/>
+                            <field name="x_id_client_key"/>
+                            <field name="x_id_merchant_id"
+                                   invisible="code != 'doku'"/>
+                            <field name="x_id_webhook_secret" password="True"/>
+                        </group>
+                        <group string="Mode">
+                            <field name="x_id_sandbox"/>
+                        </group>
+                        <group string="Headless Storefront">
+                            <field name="is_published"
+                                   help="When enabled, this gateway is offered at the Next.js storefront checkout."/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

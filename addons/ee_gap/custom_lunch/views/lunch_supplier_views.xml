@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="lunch_supplier_view_form_inherit_id" model="ir.ui.view">
+        <field name="name">lunch.supplier.form.inherit.custom_lunch</field>
+        <field name="model">lunch.supplier</field>
+        <field name="inherit_id" ref="lunch.lunch_supplier_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Indonesia">
+                    <group>
+                        <field name="x_id_vendor_type"/>
+                        <field name="x_id_currency_id"/>
+                        <field name="x_id_min_order"/>
+                    </group>
+                    <group>
+                        <field name="x_id_halal_certified"/>
+                        <field name="x_id_gofood_id"/>
+                        <field name="x_id_grabfood_id"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="lunch_supplier_view_tree_inherit_id" model="ir.ui.view">
+        <field name="name">lunch.supplier.list.inherit.custom_lunch</field>
+        <field name="model">lunch.supplier</field>
+        <field name="inherit_id" ref="lunch.lunch_supplier_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_id_vendor_type" optional="show"/>
+                <field name="x_id_halal_certified" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="lunch_supplier_view_search_inherit_id" model="ir.ui.view">
+        <field name="name">lunch.supplier.search.inherit.custom_lunch</field>
+        <field name="model">lunch.supplier</field>
+        <field name="inherit_id" ref="lunch.lunch_supplier_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter name="filter_halal_vendor"
+                        string="Halal Certified"
+                        domain="[('x_id_halal_certified', '=', True)]"/>
+                <filter name="filter_vendor_gofood"
+                        string="GoFood"
+                        domain="[('x_id_vendor_type', '=', 'gofood')]"/>
+                <filter name="filter_vendor_grabfood"
+                        string="GrabFood"
+                        domain="[('x_id_vendor_type', '=', 'grabfood')]"/>
+                <filter name="filter_vendor_shopeefood"
+                        string="ShopeeFood"
+                        domain="[('x_id_vendor_type', '=', 'shopeefood')]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

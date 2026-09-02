@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_finance_sync_log_list" model="ir.ui.view">
+        <field name="name">finance.sync.log.list</field>
+        <field name="model">finance.sync.log</field>
+        <field name="arch" type="xml">
+            <list string="Sync Log" create="false"
+                  decoration-danger="status=='error'"
+                  decoration-muted="status=='skipped'">
+                <field name="create_date"/>
+                <field name="direction"/>
+                <field name="operation"/>
+                <field name="res_model" optional="show"/>
+                <field name="res_id" optional="hide"/>
+                <field name="record_count"/>
+                <field name="status" widget="badge"/>
+                <field name="message"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_finance_sync_log_form" model="ir.ui.view">
+        <field name="name">finance.sync.log.form</field>
+        <field name="model">finance.sync.log</field>
+        <field name="arch" type="xml">
+            <form string="Sync Log" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="create_date"/>
+                            <field name="direction"/>
+                            <field name="operation"/>
+                            <field name="status"/>
+                        </group>
+                        <group>
+                            <field name="res_model"/>
+                            <field name="res_id"/>
+                            <field name="record_count"/>
+                            <field name="message"/>
+                        </group>
+                    </group>
+                    <field name="payload" widget="ace" options="{'mode': 'json'}"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_finance_sync_log_search" model="ir.ui.view">
+        <field name="name">finance.sync.log.search</field>
+        <field name="model">finance.sync.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="operation"/>
+                <field name="res_model"/>
+                <filter name="f_error" string="Errors" domain="[('status','=','error')]"/>
+                <filter name="f_push" string="Push" domain="[('direction','=','push')]"/>
+                <filter name="f_pull" string="Pull" domain="[('direction','=','pull')]"/>
+                <group>
+                    <filter name="g_dir" string="Direction" context="{'group_by':'direction'}"/>
+                    <filter name="g_op" string="Operation" context="{'group_by':'operation'}"/>
+                    <filter name="g_status" string="Status" context="{'group_by':'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_finance_sync_log" model="ir.actions.act_window">
+        <field name="name">Sync Log</field>
+        <field name="res_model">finance.sync.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_finance_sync_log_search"/>
+    </record>
+
+    <!-- Manual sync triggers (server actions) -->
+    <record id="action_sync_sap_masters_now" model="ir.actions.server">
+        <field name="name">Sync SAP Master Data Now</field>
+        <field name="model_id" ref="model_finance_sync_log"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_sync_sap_masters()</field>
+    </record>
+
+    <record id="action_sync_hris_travel_now" model="ir.actions.server">
+        <field name="name">Sync HRIS Travel Now</field>
+        <field name="model_id" ref="model_finance_sync_log"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_sync_hris_travel()</field>
+    </record>
+
+    <!-- Adapter config shortcut (reuse the framework's own views via action) -->
+    <record id="action_finance_adapter_config" model="ir.actions.act_window">
+        <field name="name">Bridge Adapters</field>
+        <field name="res_model">custom.adapter.config</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('adapter_type','in',('finance_sap_bridge','finance_hris_bridge'))]</field>
+    </record>
+
+    <!-- ===== Sync menu under Finance Portal ===== -->
+    <menuitem id="menu_finance_sync_root"
+              name="Sync (SAP / HRIS)"
+              parent="custom_finance_portal.menu_finance_portal_root"
+              sequence="30"
+              groups="custom_finance_portal.group_finance_manager"/>
+
+    <menuitem id="menu_finance_sync_log"
+              name="Sync Log"
+              parent="menu_finance_sync_root"
+              action="action_finance_sync_log"
+              sequence="10"/>
+    <menuitem id="menu_finance_adapter_config"
+              name="Bridge Adapters"
+              parent="menu_finance_sync_root"
+              action="action_finance_adapter_config"
+              sequence="20"/>
+    <menuitem id="menu_finance_sync_masters_now"
+              name="Sync SAP Masters Now"
+              parent="menu_finance_sync_root"
+              action="action_sync_sap_masters_now"
+              sequence="30"/>
+    <menuitem id="menu_finance_sync_travel_now"
+              name="Sync HRIS Travel Now"
+              parent="menu_finance_sync_root"
+              action="action_sync_hris_travel_now"
+              sequence="40"/>
+
+</odoo>

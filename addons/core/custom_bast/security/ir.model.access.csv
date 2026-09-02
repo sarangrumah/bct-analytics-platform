@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bast_document_user,bast.document.user,model_custom_bast_document,group_bast_user,1,1,1,0
+access_bast_document_manager,bast.document.manager,model_custom_bast_document,group_bast_manager,1,1,1,1
+access_bast_line_user,bast.line.user,model_custom_bast_line,group_bast_user,1,1,1,1
+access_bast_line_manager,bast.line.manager,model_custom_bast_line,group_bast_manager,1,1,1,1
+access_bast_sign_wizard_user,bast.sign.wizard.user,model_custom_bast_sign_wizard,group_bast_user,1,1,1,1

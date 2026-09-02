@@ -1,0 +1,131 @@
+# Semgrep - TypeScript/JavaScript rules for login-gateway (Backend) and insight-portal
+# (Frontend). Owner: Security agent.
+#
+# Neither service exists yet - they arrive in waves 3 and 4. The rules land now so that
+# the first commit of each is measured against them, rather than the ruleset being written
+# afterwards to fit whatever got built.
+
+rules:
+  - id: bct-ts-eval
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: "eval()/Function() on a runtime value executes attacker-controlled input."
+    metadata:
+      category: security
+      cwe: "CWE-95: Eval Injection"
+      owner: Security
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+
+  - id: bct-ts-dangerously-set-inner-html
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      dangerouslySetInnerHTML renders unescaped HTML. Insight-portal displays warehouse
+      values that originate in Odoo free-text fields - partner names, PPOB failure
+      reasons - which are user-controlled by definition. Render as text, or sanitise with
+      an allowlist first.
+    metadata:
+      category: security
+      cwe: "CWE-79: Cross-site Scripting"
+      owner: Security
+    pattern: dangerouslySetInnerHTML={...}
+
+  - id: bct-ts-child-process-interpolation
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: "Shell command built from a template literal. Use execFile with an argument array."
+    metadata:
+      category: security
+      cwe: "CWE-78: OS Command Injection"
+      owner: Security
+    pattern-either:
+      - pattern: child_process.exec(`...${...}...`, ...)
+      - pattern: exec(`...${...}...`, ...)
+      - pattern: execSync(`...${...}...`, ...)
+
+  - id: bct-ts-sql-template-literal
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      SQL assembled from a template literal. Warehouse queries must bind parameters -
+      contract 02 requires tenant_id to arrive as a bound parameter AND as the Postgres
+      session variable that RLS reads. String interpolation defeats both.
+    metadata:
+      category: security
+      cwe: "CWE-89: SQL Injection"
+      contract: docs/agents/contracts/02-session.md
+      owner: Security
+    pattern-either:
+      - pattern: $CLIENT.query(`...${...}...`, ...)
+      - pattern: $CLIENT.raw(`...${...}...`, ...)
+      - pattern: $DB.unsafe(`...${...}...`, ...)
+
+  - id: bct-ts-cookie-missing-httponly
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      Session or refresh cookie set without httpOnly. Contract 02 requires the refresh
+      cookie to be httpOnly, Secure and SameSite=Strict; a cookie readable from JavaScript
+      is a token the browser has been handed, which the contract forbids.
+    metadata:
+      category: security
+      cwe: "CWE-1004: Sensitive Cookie Without HttpOnly Flag"
+      contract: docs/agents/contracts/02-session.md
+      owner: Security
+    patterns:
+      - pattern-either:
+          - pattern: $RES.cookie($NAME, $VALUE, {...})
+          - pattern: "cookies().set({...})"
+          - pattern: $C.set($NAME, $VALUE, {...})
+      - pattern-not: "$RES.cookie($NAME, $VALUE, {..., httpOnly: true, ...})"
+      - pattern-not: "cookies().set({..., httpOnly: true, ...})"
+      - pattern-not: "$C.set($NAME, $VALUE, {..., httpOnly: true, ...})"
+      - metavariable-regex:
+          metavariable: $NAME
+          regex: (?i).*(session|refresh|token|auth|jwt|sid).*
+
+  - id: bct-ts-tls-verification-disabled
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: "TLS verification disabled process-wide. This also disables it for the JWKS fetch."
+    metadata:
+      category: security
+      cwe: "CWE-295: Improper Certificate Validation"
+      owner: Security
+    pattern-either:
+      - pattern: 'process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"'
+      - pattern: "rejectUnauthorized: false"
+
+  - id: bct-ts-next-server-secret-to-client
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      A secret-looking value is exposed through NEXT_PUBLIC_*, which Next.js inlines into
+      the client bundle. Master prompt section 4: the browser never receives a token, a
+      connection string, or database credentials.
+    metadata:
+      category: security
+      cwe: "CWE-200: Exposure of Sensitive Information"
+      owner: Security
+    patterns:
+      - pattern-regex: NEXT_PUBLIC_[A-Z0-9_]*(SECRET|TOKEN|KEY|PASSWORD|PASSWD|DSN|CONNECTION_STRING|PRIVATE)[A-Z0-9_]*
+
+  - id: bct-ts-console-log-token
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >-
+      Logging something token-shaped. Container logs go to Loki, which is not access-
+      controlled to the same standard as the token itself.
+    metadata:
+      category: security
+      cwe: "CWE-532: Insertion of Sensitive Information into Log File"
+      owner: Security
+    patterns:
+      - pattern-either:
+          - pattern: console.log(..., $X, ...)
+          - pattern: console.debug(..., $X, ...)
+      - metavariable-regex:
+          metavariable: $X
+          regex: (?i).*(token|jwt|password|secret|authorization|refresh_?cookie).*

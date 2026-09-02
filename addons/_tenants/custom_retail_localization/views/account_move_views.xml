@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      Feature #9 on the vendor bill FORM. The l10n_purchase_type + operating-unit
+      fields already exist on account.move; surface them so a MANUALLY-created
+      bill (no PO) can pick Trade / Non-Trade (driving BILL/T vs BILL/NT numbering
+      and the payable account) and an Operating Unit (Head Office / Store) for
+      per-OU P&L. Everything is scoped to vendor bills / refunds.
+    -->
+    <record id="view_move_form_retail_trade_ou" model="ir.ui.view">
+        <field name="name">account.move.form.retail.trade.ou</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- Header fields next to the partner -->
+            <field name="partner_id" position="after">
+                <field name="l10n_purchase_type"
+                       widget="radio"
+                       options="{'horizontal': True}"
+                       invisible="move_type not in ('in_invoice', 'in_refund')"/>
+                <field name="l10n_ou_analytic_id"
+                       invisible="move_type not in ('in_invoice', 'in_refund')"
+                       domain="['&amp;', ('plan_id.name', '=', 'Operating Unit'), '|', ('company_id', '=', False), ('company_id', '=', company_id)]"
+                       options="{'no_create': True}"/>
+            </field>
+
+            <!-- Operating-Unit column on the bill line grid -->
+            <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='product_id']" position="after">
+                <field name="l10n_ou_analytic_id"
+                       optional="show"
+                       domain="['&amp;', ('plan_id.name', '=', 'Operating Unit'), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
+                       options="{'no_create': True}"
+                       column_invisible="parent.move_type not in ('in_invoice', 'in_refund')"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_pajakku_root"
+              name="Pajakku"
+              parent="custom_coretax.menu_coretax_root"
+              sequence="50"
+              groups="custom_coretax_pajakku.group_pajakku_user"/>
+
+    <menuitem id="menu_pajakku_transactions"
+              name="Transactions"
+              parent="menu_pajakku_root"
+              action="action_coretax_transaction"
+              sequence="10"/>
+
+    <menuitem id="menu_pajakku_usage"
+              name="Usage / Billing"
+              parent="menu_pajakku_root"
+              action="action_pajakku_usage"
+              sequence="20"
+              groups="custom_coretax_pajakku.group_pajakku_admin"/>
+
+</odoo>

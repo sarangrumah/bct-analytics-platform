@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="module_category_appraisal" model="ir.module.category">
+            <field name="name">Appraisal</field>
+            <field name="sequence">105</field>
+        </record>
+        <record id="group_appraisal_user" model="res.groups">
+            <field name="name">Appraisal User</field>
+        </record>
+        <record id="group_appraisal_manager" model="res.groups">
+            <field name="name">Appraisal Manager (HR)</field>
+            <field name="implied_ids" eval="[Command.link(ref('group_appraisal_user'))]"/>
+        </record>
+    </data>
+</odoo>

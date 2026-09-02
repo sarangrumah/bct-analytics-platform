@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_pos_settlement_list" model="ir.ui.view">
+        <field name="name">custom.ppob.pos.settlement.list</field>
+        <field name="model">custom.ppob.pos.settlement</field>
+        <field name="arch" type="xml">
+            <list string="POS Settlements" decoration-warning="state == 'variance'">
+                <field name="snapshot_date"/>
+                <field name="feed"/>
+                <field name="mitra_id"/>
+                <field name="provider_id"/>
+                <field name="reported_balance"/>
+                <field name="odoo_balance"/>
+                <field name="variance"/>
+                <field name="state"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pos_settlement_form" model="ir.ui.view">
+        <field name="name">custom.ppob.pos.settlement.form</field>
+        <field name="model">custom.ppob.pos.settlement</field>
+        <field name="arch" type="xml">
+            <form string="POS Settlement">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="feed"/>
+                            <field name="snapshot_date"/>
+                            <field name="mitra_id"/>
+                            <field name="provider_id"/>
+                            <field name="external_ref"/>
+                        </group>
+                        <group>
+                            <field name="reported_balance"/>
+                            <field name="odoo_balance"/>
+                            <field name="variance"/>
+                            <field name="state"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="raw_payload"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pos_settlement" model="ir.actions.act_window">
+        <field name="name">POS Settlements</field>
+        <field name="res_model">custom.ppob.pos.settlement</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

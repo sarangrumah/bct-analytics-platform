@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_tenant_vps_list" model="ir.ui.view">
+        <field name="name">tenant.vps.list</field>
+        <field name="model">tenant.vps</field>
+        <field name="arch" type="xml">
+            <list string="VPS Fleet" decoration-success="state == 'active'"
+                  decoration-warning="state == 'degraded'"
+                  decoration-info="state in ('hardening','bootstrapping')"
+                  decoration-muted="state == 'decommissioned'"
+                  decoration-danger="state == 'registered'">
+                <field name="name"/>
+                <field name="hostname"/>
+                <field name="public_ip"/>
+                <field name="provider"/>
+                <field name="region"/>
+                <field name="state" widget="badge"/>
+                <field name="environment_count"/>
+                <field name="last_health_check_at"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_tenant_vps_form" model="ir.ui.view">
+        <field name="name">tenant.vps.form</field>
+        <field name="model">tenant.vps</field>
+        <field name="arch" type="xml">
+            <form string="VPS">
+                <header>
+                    <button name="action_register_with_orchestrator" type="object"
+                            string="Register"
+                            class="btn-primary"
+                            invisible="state != 'registered'"/>
+                    <button name="action_bootstrap" type="object"
+                            string="Bootstrap"
+                            class="btn-primary"
+                            invisible="state not in ('registered','hardening')"/>
+                    <button name="action_deploy_odoo_stack" type="object"
+                            string="Deploy Odoo Stack"
+                            invisible="state not in ('active','degraded')"/>
+                    <button name="action_sync_addons" type="object"
+                            string="Sync Addons"
+                            invisible="state not in ('active','degraded')"/>
+                    <button name="action_healthcheck" type="object"
+                            string="Healthcheck"
+                            invisible="state == 'decommissioned'"/>
+                    <button name="action_decommission" type="object"
+                            string="Decommission"
+                            confirm="Decommission this VPS? This is non-reversible."
+                            invisible="state == 'decommissioned'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="registered,hardening,bootstrapping,active"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Friendly name (e.g. tenant-demoretail-prod)"/></h1>
+                    </div>
+                    <notebook>
+                        <page string="Info" name="info">
+                            <group>
+                                <group string="Network">
+                                    <field name="hostname"/>
+                                    <field name="public_ip"/>
+                                    <field name="ssh_port"/>
+                                    <field name="ssh_user"/>
+                                    <field name="ssh_credential_ref"
+                                           placeholder="vault://prod/vps/{id}/ssh_key"/>
+                                </group>
+                                <group string="Provider">
+                                    <field name="provider"/>
+                                    <field name="region"/>
+                                    <field name="cpu_cores"/>
+                                    <field name="ram_mb"/>
+                                    <field name="disk_gb"/>
+                                </group>
+                                <group string="Runtime">
+                                    <field name="os_version"/>
+                                    <field name="docker_version"/>
+                                    <field name="last_health_check_at"/>
+                                </group>
+                                <group string="Observability">
+                                    <field name="prometheus_target_url"/>
+                                    <field name="grafana_dashboard_uid"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Environments" name="environments">
+                            <field name="environment_ids">
+                                <list editable="bottom">
+                                    <field name="tenant_registry_id"/>
+                                    <field name="env_type"/>
+                                    <field name="db_name"/>
+                                    <field name="odoo_url"/>
+                                    <field name="addons_revision"/>
+                                    <field name="last_deploy_at"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Bootstrap Log" name="bootstrap_log">
+                            <field name="bootstrap_log" widget="text"
+                                   options="{'no_label': true}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_tenant_vps" model="ir.actions.act_window">
+        <field name="name">VPS Fleet</field>
+        <field name="res_model">tenant.vps</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

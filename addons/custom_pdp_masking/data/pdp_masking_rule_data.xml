@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      These five rows ARE frozen contract 01's masking table. They are loaded with noupdate="0"
+      so that `-u custom_pdp_masking` restores them if someone edits them by hand: the contract,
+      not the database, is authoritative.
+    -->
+    <data noupdate="0">
+
+        <record id="rule_public" model="pdp.masking.rule">
+            <field name="sequence">10</field>
+            <field name="pdp_class">public</field>
+            <field name="transform">none</field>
+            <field name="ui_masked" eval="False"/>
+            <field name="description">Non-personal and publishable. Copied verbatim.</field>
+        </record>
+
+        <record id="rule_internal" model="pdp.masking.rule">
+            <field name="sequence">20</field>
+            <field name="pdp_class">internal</field>
+            <field name="transform">none</field>
+            <field name="ui_masked" eval="False"/>
+            <field name="description">Business data, no personal content. Copied verbatim.
+                Contract 01's own example places sale.order.amount_total here.</field>
+        </record>
+
+        <record id="rule_personal" model="pdp.masking.rule">
+            <field name="sequence">30</field>
+            <field name="pdp_class">personal</field>
+            <field name="transform">hmac_sha256</field>
+            <field name="ui_masked" eval="True"/>
+            <field name="description">UU PDP Art. 4(2). Deterministic HMAC-SHA256 under the
+                per-tenant salt: preserves joins and distinct counts, destroys readability. The
+                same partner hashes identically within a tenant and differently across tenants.</field>
+        </record>
+
+        <record id="rule_sensitive" model="pdp.masking.rule">
+            <field name="sequence">40</field>
+            <field name="pdp_class">sensitive</field>
+            <field name="transform">hmac_sha256_or_null</field>
+            <field name="ui_masked" eval="True"/>
+            <field name="description">UU PDP Art. 4(3). Same digest as `personal`, except that
+                columns flagged drop_to_null (free text, coordinates) are written as NULL. No
+                reveal of any kind: a hash of a NIK is still not a NIK.</field>
+        </record>
+
+        <record id="rule_secret" model="pdp.masking.rule">
+            <field name="sequence">50</field>
+            <field name="pdp_class">secret</field>
+            <field name="transform">drop</field>
+            <field name="ui_masked" eval="False"/>
+            <field name="description">Credentials and key material. Never named in the extraction
+                SELECT list, so the column cannot land in the warehouse even by accident.
+                Anti-pattern 7.9.</field>
+        </record>
+
+    </data>
+</odoo>

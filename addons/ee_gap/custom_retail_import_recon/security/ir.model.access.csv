@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_retail_recon_accounting,retail recon - accounting read,model_retail_import_recon,account.group_account_readonly,1,0,0,0
+access_retail_recon_retail_user,retail recon - retail import user,model_retail_import_recon,custom_retail_import.group_retail_import_user,1,0,0,0
+access_retail_recon_own_group,retail recon - own group,model_retail_import_recon,group_retail_recon_user,1,0,0,0

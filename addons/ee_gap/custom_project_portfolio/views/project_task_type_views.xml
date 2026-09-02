@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Standalone stage-configuration views. Deliberately NOT an inherit of
+         project.task_type_edit: core view xmlids are the most common reason a module
+         fails to install on a new Odoo release, and this screen has to keep working. -->
+
+    <record id="view_stage_config_list" model="ir.ui.view">
+        <field name="name">project.task.type.pmo.list</field>
+        <field name="model">project.task.type</field>
+        <field name="arch" type="xml">
+            <list string="Stages" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="custom_code"/>
+                <field name="custom_applies_to"/>
+                <field name="custom_sla_clock" widget="badge"
+                       decoration-warning="custom_sla_clock == 'user_side'"
+                       decoration-muted="custom_sla_clock == 'paused'"/>
+                <field name="custom_is_hold"/>
+                <field name="custom_is_waiting_user"/>
+                <field name="custom_is_closed_stage"/>
+                <field name="custom_auto_close_days"/>
+                <field name="custom_require_reason"/>
+                <field name="fold"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_stage_config_form" model="ir.ui.view">
+        <field name="name">project.task.type.pmo.form</field>
+        <field name="model">project.task.type</field>
+        <field name="arch" type="xml">
+            <form string="Stage">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Identity">
+                            <field name="custom_code" placeholder="waiting_user"/>
+                            <field name="sequence"/>
+                            <field name="custom_applies_to"/>
+                            <field name="fold"/>
+                        </group>
+                        <group string="SLA clock">
+                            <field name="custom_sla_clock"/>
+                            <field name="custom_is_hold"/>
+                            <field name="custom_is_waiting_user"/>
+                            <field name="custom_is_closed_stage"/>
+                            <field name="custom_auto_close_days"
+                                   invisible="not custom_is_waiting_user"/>
+                            <field name="custom_require_reason"/>
+                        </group>
+                    </group>
+                    <group string="Allowed next stages">
+                        <field name="custom_next_stage_ids" widget="many2many_tags" nolabel="1"
+                               help="Leave empty to allow any transition."/>
+                    </group>
+                    <group string="Projects using this stage">
+                        <field name="project_ids" widget="many2many_tags" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_stage_config" model="ir.actions.act_window">
+        <field name="name">Stages &amp; SLA Clock</field>
+        <field name="res_model">project.task.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_ids" eval="[
+            Command.clear(),
+            Command.create({'view_mode': 'list', 'view_id': ref('view_stage_config_list')}),
+            Command.create({'view_mode': 'form', 'view_id': ref('view_stage_config_form')}),
+        ]"/>
+    </record>
+
+</odoo>

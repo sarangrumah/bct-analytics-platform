@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="res_groups_privilege_finance_portal" model="res.groups.privilege">
+            <field name="name">Finance Portal</field>
+            <field name="sequence">130</field>
+        </record>
+
+        <!-- Requester / employee: submit own documents -->
+        <record id="group_finance_user" model="res.groups">
+            <field name="name">Finance Portal / Requester</field>
+            <field name="privilege_id" ref="res_groups_privilege_finance_portal"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- Tax reviewer (first approval tier) -->
+        <record id="group_finance_tax" model="res.groups">
+            <field name="name">Finance Portal / Tax Reviewer</field>
+            <field name="privilege_id" ref="res_groups_privilege_finance_portal"/>
+            <field name="implied_ids" eval="[(4, ref('group_finance_user'))]"/>
+        </record>
+
+        <!-- Finance officer (second approval tier) -->
+        <record id="group_finance_officer" model="res.groups">
+            <field name="name">Finance Portal / Finance Officer</field>
+            <field name="privilege_id" ref="res_groups_privilege_finance_portal"/>
+            <field name="implied_ids" eval="[(4, ref('group_finance_user'))]"/>
+        </record>
+
+        <!-- Manager: full config + master data -->
+        <record id="group_finance_manager" model="res.groups">
+            <field name="name">Finance Portal / Manager</field>
+            <field name="privilege_id" ref="res_groups_privilege_finance_portal"/>
+            <field name="implied_ids" eval="[(4, ref('group_finance_officer')), (4, ref('group_finance_tax'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- External vendor (portal) — submits vendor invoices only -->
+        <record id="group_finance_vendor" model="res.groups">
+            <field name="name">Finance Portal / Vendor</field>
+            <field name="privilege_id" ref="res_groups_privilege_finance_portal"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
+        <!-- Vendor record rule: a vendor only sees its own invoices -->
+        <record id="rule_vendor_invoice_own" model="ir.rule">
+            <field name="name">Vendor sees own invoices</field>
+            <field name="model_id" ref="model_finance_vendor_invoice"/>
+            <field name="groups" eval="[(4, ref('group_finance_vendor'))]"/>
+            <field name="domain_force">[('vendor_id.user_ids', 'in', [user.id])]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_wh_line_list" model="ir.ui.view">
+        <field name="name">account.move.withholding.line.list</field>
+        <field name="model">account.move.withholding.line</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0">
+                <field name="move_id"/>
+                <field name="category_id"/>
+                <field name="pph_kind"/>
+                <field name="base_amount"/>
+                <field name="tarif"/>
+                <field name="tax_amount"/>
+                <field name="fasilitas_insentif"/>
+                <field name="nomor_sertifikat_insentif" optional="hide"/>
+                <field name="tarif_fasilitas" optional="hide"/>
+                <field name="norma_penghasilan_neto" optional="hide"/>
+                <field name="bupot_id"/>
+                <field name="currency_id" invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_wh_line" model="ir.actions.act_window">
+        <field name="name">All Withholding Lines</field>
+        <field name="res_model">account.move.withholding.line</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,24 @@
+.o_studio_systray {
+    display: inline-flex;
+    align-items: center;
+
+    .o_studio_systray_btn {
+        color: #b3b9c4;
+        padding: 0 10px;
+        line-height: 1;
+
+        &:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        &.o_studio_systray_active {
+            color: #f0c674;
+            background: rgba(240, 198, 116, 0.12);
+        }
+
+        i {
+            font-size: 18px;
+        }
+    }
+}

@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_witholding_rate_user,custom.witholding.rate user,model_custom_witholding_rate,group_witholding_user,1,0,0,0
+access_witholding_rate_manager,custom.witholding.rate manager,model_custom_witholding_rate,group_witholding_manager,1,1,1,1
+access_witholding_application_user,custom.witholding.application user,model_custom_witholding_application,group_witholding_user,1,1,1,0
+access_witholding_application_manager,custom.witholding.application manager,model_custom_witholding_application,group_witholding_manager,1,1,1,1
+access_apply_witholding_wizard,custom.apply.witholding.wizard,model_custom_apply_witholding_wizard,group_witholding_user,1,1,1,1

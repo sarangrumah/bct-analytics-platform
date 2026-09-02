@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_putaway_rule_form_inherit_sap_slotting" model="ir.ui.view">
+        <field name="name">custom.wms.putaway.rule.form.inherit.sap.slotting</field>
+        <field name="model">custom.wms.putaway.rule</field>
+        <field name="inherit_id" ref="custom_wms_putaway.view_putaway_rule_form"/>
+        <field name="arch" type="xml">
+            <!-- Odoo 19 forbids @string as an inheritance selector, so anchor on
+                 the last field of the Targeting group and step up to the group. -->
+            <xpath expr="//field[@name='temperature_zone']/.." position="after">
+                <group string="SAP Storage Search" invisible="kind != 'sap_storage_search'">
+                    <group string="Search">
+                        <field name="sap_search_order"/>
+                        <field name="sap_default_type_id"/>
+                        <field name="sap_default_section_id"/>
+                        <field name="sap_consolidate"/>
+                    </group>
+                    <group string="Scoring &amp; Fallback">
+                        <field name="sap_type_penalty"/>
+                        <field name="sap_section_penalty"/>
+                        <field name="sap_fail_action"/>
+                        <field name="sap_overflow_location_id"
+                               invisible="sap_fail_action != 'overflow'"
+                               required="sap_fail_action == 'overflow' and kind == 'sap_storage_search'"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

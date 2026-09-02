@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--
+      Seed industry packs (metadata only). ``module_ids`` is intentionally
+      left empty here: catalog rows are created by the runtime scan, not by
+      XML, so they cannot be ``ref``'d. ``_link_seed_modules`` fills each
+      pack from ``_SEED_PACK_MODULES`` after the scan, only when empty, so
+      operator edits in the Hub UI are preserved. ``code`` mirrors the
+      hub-portal ``verticals`` values.
+    -->
+    <record id="pack_retail" model="custom.hub.industry.pack">
+        <field name="name">Retail / POS</field>
+        <field name="code">retail</field>
+        <field name="vertical">Retail / POS</field>
+        <field name="sequence">10</field>
+        <field name="icon">🛍️</field>
+        <field name="description">Point of sale, inventory, accounting and Indonesia tax for retail outlets and e-commerce.</field>
+    </record>
+
+    <record id="pack_fnb" model="custom.hub.industry.pack">
+        <field name="name">Food &amp; Beverage</field>
+        <field name="code">fnb</field>
+        <field name="vertical">Food &amp; Beverage</field>
+        <field name="sequence">20</field>
+        <field name="icon">🍽️</field>
+        <field name="description">Restaurant &amp; café operations: POS, stock, subscriptions and appointments.</field>
+    </record>
+
+    <record id="pack_drone_services" model="custom.hub.industry.pack">
+        <field name="name">Drone Show Services</field>
+        <field name="code">drone_services</field>
+        <field name="vertical">Drone Show Services (event-based)</field>
+        <field name="sequence">30</field>
+        <field name="icon">🛸</field>
+        <field name="description">Event-based drone show delivery: show management, pilot procurement, flight permissions and fleet.</field>
+    </record>
+
+    <record id="pack_drone_rental" model="custom.hub.industry.pack">
+        <field name="name">Drone Rental &amp; Sales</field>
+        <field name="code">drone_rental</field>
+        <field name="vertical">Drone Rental &amp; Sales</field>
+        <field name="sequence">40</field>
+        <field name="icon">🚁</field>
+        <field name="description">Drone rental, repair, damage claims, kit bundling and fleet tracking.</field>
+    </record>
+
+    <record id="pack_distrib" model="custom.hub.industry.pack">
+        <field name="name">Wholesale Distribution</field>
+        <field name="code">distrib</field>
+        <field name="vertical">Wholesale Distribution</field>
+        <field name="sequence">50</field>
+        <field name="icon">🚚</field>
+        <field name="description">Wholesale distribution: warehousing, 3-way match, multi-leg transfers and HHT scanning.</field>
+    </record>
+
+    <record id="pack_manufacturing" model="custom.hub.industry.pack">
+        <field name="name">Manufacturing</field>
+        <field name="code">manufacturing</field>
+        <field name="vertical">Manufacturing</field>
+        <field name="sequence">60</field>
+        <field name="icon">🏭</field>
+        <field name="description">Manufacturing: MRP, asset register, warehouse rules, planning and maintenance.</field>
+    </record>
+
+    <record id="pack_services" model="custom.hub.industry.pack">
+        <field name="name">Professional Services</field>
+        <field name="code">services</field>
+        <field name="vertical">Professional Services</field>
+        <field name="sequence">70</field>
+        <field name="icon">💼</field>
+        <field name="description">Professional services: project &amp; timesheet, recurring billing, helpdesk, documents and approvals.</field>
+    </record>
+
+    <record id="pack_ppob" model="custom.hub.industry.pack">
+        <field name="name">PPOB (Payment Point Online Bank)</field>
+        <field name="code">ppob</field>
+        <field name="vertical">PPOB (Payment Point Online Bank)</field>
+        <field name="sequence">80</field>
+        <field name="icon">📱</field>
+        <field name="description">Bill payment / top-up reseller: mitra wallets, provider deposit inventory, transaction dispatch with failover, margin VAT (PMK-63), commissions with PPh 23, daily e-Faktur rollup, and bank virtual-account top-up.</field>
+    </record>
+
+    <record id="pack_vas_pmo" model="custom.hub.industry.pack">
+        <field name="name">VAS PMO (Product Owner delivery)</field>
+        <field name="code">vas_pmo</field>
+        <field name="vertical">Internal — Product Owner / PMO</field>
+        <field name="sequence">90</field>
+        <field name="icon">📡</field>
+        <field name="description">Project, change-request and task management for a Product Owner team: brand verticals, weekly sprints and weekly progress reports, Hold and Waiting-User-Verification stages with per-stage SLA clock semantics, rule-driven WhatsApp + e-mail notifications, and a headless Next.js UI on top of the REST API.</field>
+    </record>
+</odoo>

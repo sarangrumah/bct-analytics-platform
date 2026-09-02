@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_scan_session_form_supplier_batch" model="ir.ui.view">
+        <field name="name">custom.barcode.scan.session.form.supplier.batch</field>
+        <field name="model">custom.barcode.scan.session</field>
+        <field name="inherit_id" ref="custom_barcode.view_custom_barcode_scan_session_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_ids']/list/field[@name='quantity']" position="after">
+                <field name="supplier_batch_ref" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

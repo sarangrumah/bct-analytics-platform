@@ -1,0 +1,25 @@
+# Pinned Python toolchain for .github/workflows/ci.yml and for local verification.
+# Owner: Security agent.
+#
+#   python -m pip install -r security/requirements-ci.txt
+#
+# Why pinned to exact versions
+#   A scanner that changes underneath you turns CI red without a commit, and a security
+#   gate that goes red for reasons nobody caused is a gate people learn to re-run until it
+#   passes. Every version below was the current release on 2026-08-31 and was executed on
+#   the operator host at that version. Bump deliberately, in a commit of its own, so a
+#   scanner-behaviour change is never mixed into a code change.
+#
+# These versions are themselves audited: the sca-python job runs pip-audit over this very
+# file, so the tools that check our dependencies are checked as dependencies.
+#
+# Not hash-pinned yet
+#   `--require-hashes` needs a hash for every transitive dependency, which is a lockfile
+#   this project does not yet generate. Tracked for Phase 5 alongside cosign/SLSA, where
+#   build-integrity work belongs. Stated here rather than left as an unexplained gap.
+
+pre-commit==4.6.2
+semgrep==1.175.0
+pip-audit==2.10.1
+cyclonedx-bom==7.3.1
+PyYAML==6.0.3

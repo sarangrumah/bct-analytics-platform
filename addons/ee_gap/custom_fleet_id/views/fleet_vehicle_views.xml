@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit form view: add Indonesia Fleet group + service + smart buttons -->
+    <record id="view_fleet_vehicle_form_inherit_id" model="ir.ui.view">
+        <field name="name">fleet.vehicle.form.inherit.custom_fleet_id</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Indonesia Fleet (STNK / KIR / BBM)">
+                    <group string="STNK">
+                        <field name="x_stnk_number"/>
+                        <field name="x_stnk_expiry_date"/>
+                        <field name="x_stnk_alert_days_before"/>
+                        <field name="x_stnk_status" widget="badge"
+                               decoration-success="x_stnk_status == 'valid'"
+                               decoration-warning="x_stnk_status == 'expiring'"
+                               decoration-danger="x_stnk_status == 'expired'"/>
+                    </group>
+                    <group string="KIR">
+                        <field name="x_kir_number"/>
+                        <field name="x_kir_expiry_date"/>
+                        <field name="x_kir_alert_days_before"/>
+                        <field name="x_kir_status" widget="badge"
+                               decoration-success="x_kir_status == 'valid'"
+                               decoration-warning="x_kir_status == 'expiring'"
+                               decoration-danger="x_kir_status == 'expired'"
+                               decoration-muted="x_kir_status == 'na'"/>
+                    </group>
+                    <group string="BBM &amp; Driver">
+                        <field name="x_bbm_type"/>
+                        <field name="x_driver_partner_id"/>
+                        <button name="action_add_bbm_log"
+                                type="object"
+                                string="Add BBM Log"
+                                class="btn-secondary"
+                                icon="fa-tint"/>
+                    </group>
+                    <group string="Service">
+                        <field name="x_current_odometer"/>
+                        <field name="x_next_service_km"/>
+                        <field name="x_next_service_date"/>
+                        <field name="x_service_due" widget="boolean_toggle" readonly="1"/>
+                    </group>
+                </group>
+            </xpath>
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_bbm_logs"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-tint">
+                    <field name="x_bbm_log_count" widget="statinfo" string="BBM Logs"/>
+                </button>
+                <button name="action_open_driver_assignments"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-history">
+                    <field name="x_driver_assignment_count" widget="statinfo" string="Drivers"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit list view: append status badges -->
+    <record id="view_fleet_vehicle_list_inherit_id" model="ir.ui.view">
+        <field name="name">fleet.vehicle.list.inherit.custom_fleet_id</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_stnk_expiry_date" optional="show"/>
+                <field name="x_stnk_status" widget="badge"
+                       decoration-success="x_stnk_status == 'valid'"
+                       decoration-warning="x_stnk_status == 'expiring'"
+                       decoration-danger="x_stnk_status == 'expired'"
+                       optional="show"/>
+                <field name="x_kir_status" widget="badge"
+                       decoration-success="x_kir_status == 'valid'"
+                       decoration-warning="x_kir_status == 'expiring'"
+                       decoration-danger="x_kir_status == 'expired'"
+                       decoration-muted="x_kir_status == 'na'"
+                       optional="hide"/>
+                <field name="x_bbm_type" optional="hide"/>
+                <field name="x_driver_partner_id" optional="hide"/>
+                <field name="x_service_due" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action: vehicles whose STNK is expiring or expired -->
+    <record id="action_fleet_vehicle_stnk_alert" model="ir.actions.act_window">
+        <field name="name">STNK / KIR Expiring</field>
+        <field name="res_model">fleet.vehicle</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[
+            '|',
+            ('x_stnk_status', 'in', ('expiring', 'expired')),
+            ('x_kir_status', 'in', ('expiring', 'expired'))
+        ]</field>
+        <field name="context">{'search_default_x_stnk_status': 'expired'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No vehicles with expiring or expired STNK / KIR.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action: vehicles whose service is due -->
+    <record id="action_fleet_vehicle_service_due" model="ir.actions.act_window">
+        <field name="name">Service Due</field>
+        <field name="res_model">fleet.vehicle</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('x_service_due', '=', True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No vehicles with service due.
+            </p>
+        </field>
+    </record>
+</odoo>

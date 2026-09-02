@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_spreadsheet_tag_user,custom.spreadsheet.tag user,model_custom_spreadsheet_tag,custom_spreadsheet.group_user,1,1,1,0
+access_custom_spreadsheet_tag_manager,custom.spreadsheet.tag manager,model_custom_spreadsheet_tag,custom_spreadsheet.group_manager,1,1,1,1
+access_custom_spreadsheet_workbook_user,custom.spreadsheet.workbook user,model_custom_spreadsheet_workbook,custom_spreadsheet.group_user,1,1,1,0
+access_custom_spreadsheet_workbook_manager,custom.spreadsheet.workbook manager,model_custom_spreadsheet_workbook,custom_spreadsheet.group_manager,1,1,1,1
+access_custom_spreadsheet_version_user,custom.spreadsheet.version user,model_custom_spreadsheet_version,custom_spreadsheet.group_user,1,0,0,0
+access_custom_spreadsheet_version_manager,custom.spreadsheet.version manager,model_custom_spreadsheet_version,custom_spreadsheet.group_manager,1,1,1,1
+access_custom_spreadsheet_import_wizard,custom.spreadsheet.import.wizard user,model_custom_spreadsheet_import_wizard,custom_spreadsheet.group_user,1,1,1,1
+access_custom_spreadsheet_load_wizard,custom.spreadsheet.load.wizard user,model_custom_spreadsheet_load_wizard,custom_spreadsheet.group_user,1,1,1,1

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_vertical_list" model="ir.ui.view">
+        <field name="name">custom.project.vertical.list</field>
+        <field name="model">custom.project.vertical</field>
+        <field name="arch" type="xml">
+            <list string="Verticals">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="legal_entity" optional="show"/>
+                <field name="brand_group"/>
+                <field name="vertical_po_id" optional="show"/>
+                <field name="ba_ids" widget="many2many_tags" optional="show"/>
+                <field name="pic_partner_ids" widget="many2many_tags" optional="show"/>
+                <field name="project_count" string="Projects"/>
+                <field name="task_count" string="Tasks"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vertical_form" model="ir.ui.view">
+        <field name="name">custom.project.vertical.form</field>
+        <field name="model">custom.project.vertical</field>
+        <field name="arch" type="xml">
+            <form string="Vertical">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Brand name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="RETAIL"/>
+                            <field name="legal_entity" placeholder="leave blank until confirmed"/>
+                            <field name="brand_group"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="vertical_po_id"/>
+                            <field name="ba_ids" widget="many2many_tags"/>
+                            <field name="pic_partner_ids" widget="many2many_tags"
+                                   help="Brand-side contacts notified when work waits on user verification."/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Projects" name="projects">
+                            <field name="project_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="custom_health"/>
+                                    <field name="custom_progress" widget="progressbar"/>
+                                    <field name="custom_task_overdue_count"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vertical_search" model="ir.ui.view">
+        <field name="name">custom.project.vertical.search</field>
+        <field name="model">custom.project.vertical</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="legal_entity"/>
+                <filter name="filter_confirmed_entity" string="Legal entity confirmed"
+                        domain="[('legal_entity','!=',False)]"/>
+                <filter name="filter_pending_entity" string="Legal entity pending"
+                        domain="[('legal_entity','=',False)]"/>
+                <separator/>
+                <filter name="filter_inactive" string="Archived" domain="[('active','=',False)]"/>
+                <group>
+                    <filter name="group_brand" string="Brand group" context="{'group_by':'brand_group'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_vertical" model="ir.actions.act_window">
+        <field name="name">Verticals</field>
+        <field name="res_model">custom.project.vertical</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_vertical_search"/>
+        <field name="context">{'active_test': False}</field>
+    </record>
+
+</odoo>

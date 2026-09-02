@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# install_caddy.sh — Caddy reverse proxy with auto-TLS
+# Hostname: {{ vps_hostname }}
+# Upstream Odoo: 127.0.0.1:8069
+set -euo pipefail
+
+LOG_PREFIX="[install_caddy]"
+log() { echo "${LOG_PREFIX} $*"; }
+
+if ! command -v caddy >/dev/null 2>&1; then
+  log "installing caddy"
+  apt-get -qq install -y debian-keyring debian-archive-keyring apt-transport-https curl
+  curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
+    | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+  curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' \
+    | tee /etc/apt/sources.list.d/caddy-stable.list
+  apt-get -qq update
+  apt-get -qq install -y caddy
+else
+  log "caddy already installed"
+fi
+
+log "writing Caddyfile"
+cat > /etc/caddy/Caddyfile <<EOF
+{{ vps_hostname }} {
+    encode gzip
+    reverse_proxy 127.0.0.1:8069 {
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Real-IP {remote}
+    }
+    # longpolling endpoint
+    @longpoll path /longpolling/*
+    reverse_proxy @longpoll 127.0.0.1:8072
+}
+EOF
+
+systemctl enable --now caddy
+systemctl reload caddy
+
+log "DONE"

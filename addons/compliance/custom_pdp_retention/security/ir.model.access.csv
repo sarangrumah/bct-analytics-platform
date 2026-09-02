@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pdp_retention_user,pdp.retention.policy user,model_pdp_retention_policy,custom_core.group_custom_user,1,0,0,0
+access_pdp_retention_admin,pdp.retention.policy admin,model_pdp_retention_policy,group_retention_admin,1,1,1,1
+access_pdp_retention_dpo,pdp.retention.policy dpo,model_pdp_retention_policy,custom_pdp_taxonomy.group_dpo,1,1,1,1

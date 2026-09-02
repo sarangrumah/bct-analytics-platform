@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pdp_retention_policy_list" model="ir.ui.view">
+        <field name="name">pdp.retention.policy.list</field>
+        <field name="model">pdp.retention.policy</field>
+        <field name="arch" type="xml">
+            <list string="Retention Policies">
+                <field name="model_name"/>
+                <field name="classification_id"/>
+                <field name="retention_days"/>
+                <field name="action"/>
+                <field name="date_field"/>
+                <field name="records_eligible_count" string="Eligible"/>
+                <field name="last_run"/>
+                <field name="next_run"/>
+                <field name="active"/>
+                <button name="action_run_now" type="object" string="Run Now" class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pdp_retention_policy_form" model="ir.ui.view">
+        <field name="name">pdp.retention.policy.form</field>
+        <field name="model">pdp.retention.policy</field>
+        <field name="arch" type="xml">
+            <form string="Retention Policy">
+                <header>
+                    <button name="action_run_now" type="object" string="Run Now" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="model_id"/>
+                            <field name="classification_id"/>
+                            <field name="date_field"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="retention_days"/>
+                            <field name="action"/>
+                            <field name="last_run"/>
+                            <field name="next_run"/>
+                            <field name="records_eligible_count" string="Records Eligible"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pdp_retention_policy" model="ir.actions.act_window">
+        <field name="name">Retention Dashboard</field>
+        <field name="res_model">pdp.retention.policy</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

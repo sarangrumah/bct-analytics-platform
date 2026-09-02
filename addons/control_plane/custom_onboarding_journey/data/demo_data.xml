@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!--
+        Minimal UAT demo seed for the onboarding_journey module.
+
+        Ties together the seed retail BRD, the seed tenant.registry and
+        creates a demo partner so the journey list/kanban shows a real
+        record on a fresh landing_demo DB.
+    -->
+
+    <record id="demo_partner_retail" model="res.partner">
+        <field name="name">PT Demo Retail</field>
+        <field name="company_type">company</field>
+        <field name="email">demo-retail@example.com</field>
+    </record>
+
+    <record id="demo_journey_retail" model="onboarding.journey">
+        <field name="name">Onboarding - PT Demo Retail</field>
+        <field name="stage">brd_analyzed</field>
+        <field name="partner_id" ref="demo_partner_retail"/>
+        <field name="target_go_live" eval="(DateTime.now() + relativedelta(days=60)).strftime('%Y-%m-%d')"/>
+        <field name="tenant_registry_id" ref="custom_tenant_infra.demo_tenant_registry"/>
+        <field name="tenant_vps_id" ref="custom_tenant_infra.demo_vps_dev01"/>
+        <field name="tenant_environment_id" ref="custom_tenant_infra.demo_env_dev01_dev"/>
+        <field name="company_profile_json">{"name":"PT Demo Retail","npwp":"01.234.567.8-901.000","modules_wishlist":["pos","loyalty","stock"],"narrative":"Retail chain with 12 outlets in Greater Jakarta."}</field>
+    </record>
+
+    <!-- Re-parent the seed BRD document to this journey now that the
+         journey_id Many2one (declared by custom_onboarding_journey) exists. -->
+    <record id="custom_brd_analyzer.demo_brd_retail" model="brd.document">
+        <field name="journey_id" ref="demo_journey_retail"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_aged_receivable">
+            <t t-call="custom_accounting_reports.report_header"/>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Partner</th>
+                        <th t-foreach="lines['buckets']" t-as="b"
+                            class="text-end" t-esc="b['label']"/>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="lines['rows']" t-as="row">
+                        <td t-esc="row['partner_name']"/>
+                        <td t-foreach="lines['buckets']" t-as="b"
+                            class="text-end">
+                            <span t-esc="row[b['code']]"
+                                  t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                        </td>
+                        <td class="text-end fw-bold">
+                            <span t-esc="row['total']"
+                                  t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                        </td>
+                    </tr>
+                    <tr class="table-secondary fw-bold">
+                        <td>Grand Total</td>
+                        <td t-foreach="lines['buckets']" t-as="b"
+                            class="text-end">
+                            <span t-esc="lines['grand_total'][b['code']]"
+                                  t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                        </td>
+                        <td class="text-end">
+                            <span t-esc="lines['grand_total']['total']"
+                                  t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <t t-call="custom_accounting_reports.report_footer_signature"/>
+        </template>
+    </data>
+</odoo>

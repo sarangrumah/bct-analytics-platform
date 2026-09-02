@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ref_pos_user,position user,model_referral_position,group_referral_user,1,0,0,0
+access_ref_pos_hr,position hr,model_referral_position,group_referral_hr,1,1,1,1
+access_ref_cand_user,candidate user create,model_referral_candidate,group_referral_user,1,1,1,0
+access_ref_cand_hr,candidate hr,model_referral_candidate,group_referral_hr,1,1,1,1
+access_ref_reward_user,reward user,model_referral_reward,group_referral_user,1,0,0,0
+access_ref_reward_hr,reward hr,model_referral_reward,group_referral_hr,1,1,1,1

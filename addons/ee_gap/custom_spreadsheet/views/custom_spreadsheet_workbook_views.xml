@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_custom_spreadsheet_workbook_list" model="ir.ui.view">
+        <field name="name">custom.spreadsheet.workbook.list</field>
+        <field name="model">custom.spreadsheet.workbook</field>
+        <field name="arch" type="xml">
+            <list string="Workbooks">
+                <field name="name"/>
+                <field name="owner_id"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="version_count"/>
+                <field name="is_published" widget="boolean_toggle"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_custom_spreadsheet_workbook_form" model="ir.ui.view">
+        <field name="name">custom.spreadsheet.workbook.form</field>
+        <field name="model">custom.spreadsheet.workbook</field>
+        <field name="arch" type="xml">
+            <form string="Workbook">
+                <header>
+                    <button name="action_ask_ai"
+                            type="object"
+                            string="Ask AI"
+                            class="oe_highlight"
+                            icon="fa-magic"/>
+                    <button name="action_ai_formula_suggest"
+                            type="object"
+                            string="Suggest Formula"
+                            icon="fa-calculator"/>
+                    <button name="action_ai_data_clean"
+                            type="object"
+                            string="Clean Data (AI)"
+                            icon="fa-broom"/>
+                    <button name="action_open_import_wizard"
+                            type="object"
+                            string="Import CSV"
+                            icon="fa-upload"/>
+                    <button name="action_export_csv"
+                            type="object"
+                            string="Export CSV"
+                            icon="fa-file-text-o"/>
+                    <button name="action_open_load_wizard"
+                            type="object"
+                            string="Load from Model"
+                            icon="fa-database"/>
+                    <button name="action_generate_share_token"
+                            type="object"
+                            string="Generate Share Link"
+                            icon="fa-share-alt"
+                            invisible="share_token"/>
+                    <button name="action_revoke_share_token"
+                            type="object"
+                            string="Revoke Share Link"
+                            icon="fa-ban"
+                            invisible="not share_token"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_versions"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-history">
+                            <field name="version_count" widget="statinfo" string="Versions"/>
+                        </button>
+                    </div>
+                    <field name="thumbnail" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Workbook name..."/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="owner_id"/>
+                            <field name="is_published"/>
+                            <field name="tag_ids"
+                                   widget="many2many_tags"
+                                   options="{'color_field': 'color'}"/>
+                        </group>
+                        <group>
+                            <field name="shared_user_ids"
+                                   widget="many2many_tags"/>
+                            <field name="share_token" readonly="1"/>
+                            <field name="share_url" widget="url" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description"
+                                   placeholder="What is this workbook for?"/>
+                        </page>
+                        <page string="Grid Data (JSON)">
+                            <p class="text-muted">
+                                Raw JSON grid storage. Use Import CSV or Load from Model to populate.
+                            </p>
+                            <field name="data_json" widget="text"/>
+                        </page>
+                        <page string="AI Suggestions">
+                            <group>
+                                <field name="suggested_formulas" widget="text" readonly="1"/>
+                                <field name="ai_clean_report" widget="text" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Versions">
+                            <field name="version_ids" readonly="1">
+                                <list>
+                                    <field name="version_no"/>
+                                    <field name="saved_by"/>
+                                    <field name="saved_at"/>
+                                    <field name="note"/>
+                                    <button name="action_restore"
+                                            type="object"
+                                            string="Restore"
+                                            icon="fa-undo"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_spreadsheet_workbook_kanban" model="ir.ui.view">
+        <field name="name">custom.spreadsheet.workbook.kanban</field>
+        <field name="model">custom.spreadsheet.workbook</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="owner_id"/>
+                <field name="is_published"/>
+                <field name="tag_ids"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong><field name="name"/></strong>
+                            <div>
+                                <field name="owner_id"/>
+                            </div>
+                            <div>
+                                <field name="tag_ids"
+                                       widget="many2many_tags"
+                                       options="{'color_field': 'color'}"/>
+                            </div>
+                            <div>
+                                <field name="is_published" widget="boolean_toggle"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_custom_spreadsheet_workbook_search" model="ir.ui.view">
+        <field name="name">custom.spreadsheet.workbook.search</field>
+        <field name="model">custom.spreadsheet.workbook</field>
+        <field name="arch" type="xml">
+            <search string="Workbooks">
+                <field name="name"/>
+                <field name="owner_id"/>
+                <field name="tag_ids"/>
+                <filter name="published"
+                        string="Published"
+                        domain="[('is_published','=',True)]"/>
+                <filter name="my_workbooks"
+                        string="My Workbooks"
+                        domain="[('owner_id','=',uid)]"/>
+                <filter name="shared_with_me"
+                        string="Shared With Me"
+                        domain="[('shared_user_ids','in',[uid])]"/>
+                <filter name="has_share_link"
+                        string="With Share Link"
+                        domain="[('share_token','!=',False)]"/>
+                <separator/>
+                <filter name="group_owner"
+                        string="Owner"
+                        context="{'group_by':'owner_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_custom_spreadsheet_workbook" model="ir.actions.act_window">
+        <field name="name">Workbooks</field>
+        <field name="res_model">custom.spreadsheet.workbook</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_custom_spreadsheet_workbook_search"/>
+    </record>
+</odoo>

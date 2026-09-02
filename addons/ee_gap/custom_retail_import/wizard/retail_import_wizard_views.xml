@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_retail_import_wizard_form" model="ir.ui.view">
+        <field name="name">retail.import.wizard.form</field>
+        <field name="model">retail.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import Retail Data">
+                <group>
+                    <field name="profile_id"/>
+                    <field name="file_type"/>
+                    <field name="file" filename="filename"/>
+                    <field name="filename" invisible="1"/>
+                    <field name="force"/>
+                </group>
+                <separator string="Preview" invisible="not preview_html"/>
+                <field name="preview_html" nolabel="1" readonly="1" invisible="not preview_html"/>
+                <footer>
+                    <button name="action_preview" type="object" string="Preview (dry-run)"/>
+                    <button name="action_import" type="object" string="Import" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_retail_import_wizard" model="ir.actions.act_window">
+        <field name="name">Import Retail Data</field>
+        <field name="res_model">retail.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

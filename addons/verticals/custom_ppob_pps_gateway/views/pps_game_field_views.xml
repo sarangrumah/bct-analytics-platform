@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_pps_game_field_list" model="ir.ui.view">
+        <field name="name">custom.ppob.pps.game.field.list</field>
+        <field name="model">custom.ppob.pps.game.field</field>
+        <field name="arch" type="xml">
+            <list string="Game Fields" editable="bottom">
+                <field name="product_id"/>
+                <field name="key"/>
+                <field name="label"/>
+                <field name="field_type"/>
+                <field name="required"/>
+                <field name="sequence"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_pps_game_field" model="ir.actions.act_window">
+        <field name="name">Game Fields</field>
+        <field name="res_model">custom.ppob.pps.game.field</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_dev_cycle_user,dev.cycle user RO,model_dev_cycle,group_dev_cycle_user,1,0,0,0
+access_dev_cycle_manager,dev.cycle manager RW,model_dev_cycle,group_dev_cycle_manager,1,1,1,1
+access_dev_cycle_pr_user,dev.cycle.pr user RO,model_dev_cycle_pr,group_dev_cycle_user,1,0,0,0
+access_dev_cycle_pr_manager,dev.cycle.pr manager RW,model_dev_cycle_pr,group_dev_cycle_manager,1,1,1,1
+access_dev_cycle_deployment_user,dev.cycle.deployment user RO,model_dev_cycle_deployment,group_dev_cycle_user,1,0,0,0
+access_dev_cycle_deployment_manager,dev.cycle.deployment manager RW,model_dev_cycle_deployment,group_dev_cycle_manager,1,1,1,1

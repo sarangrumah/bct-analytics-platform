@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_account_analytic_line_form_billable" model="ir.ui.view">
+        <field name="name">account.analytic.line.form.billable</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='unit_amount']" position="after">
+                <field name="x_billable"/>
+                <field name="x_billing_currency_id" groups="custom_timesheet.group_manager"/>
+                <field name="x_billing_rate" widget="monetary"
+                       options="{'currency_field': 'x_billing_currency_id'}"
+                       invisible="not x_billable"/>
+                <field name="x_overtime_hours" readonly="1"/>
+                <field name="x_validation_state" readonly="1"/>
+                <field name="x_billed_invoice_line_id" readonly="1"
+                       groups="custom_timesheet.group_manager"/>
+                <field name="x_overtime_work_entry_id" readonly="1"
+                       groups="custom_timesheet.group_manager"/>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_submit_validation" type="object"
+                            string="Submit" class="btn-primary"
+                            invisible="x_validation_state != 'draft'"/>
+                    <button name="action_validate" type="object"
+                            string="Validate" class="btn-primary"
+                            invisible="x_validation_state != 'submitted'"
+                            groups="custom_timesheet.group_manager"/>
+                    <button name="action_reset_to_draft" type="object"
+                            string="Reset to Draft"
+                            invisible="x_validation_state == 'draft'"
+                            groups="custom_timesheet.group_manager"/>
+                    <button name="action_create_overtime_work_entry" type="object"
+                            string="Create OT Work Entry"
+                            invisible="x_overtime_hours &lt;= 0 or x_validation_state != 'validated'"
+                            groups="custom_timesheet.group_manager"/>
+                    <field name="x_validation_state" widget="statusbar"
+                           statusbar_visible="draft,submitted,validated"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_analytic_line_list_billable" model="ir.ui.view">
+        <field name="name">account.analytic.line.list.billable</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='unit_amount']" position="after">
+                <field name="x_billable" optional="show"/>
+                <field name="x_overtime_hours" optional="hide"/>
+                <field name="x_validation_state" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Pivot view: employee x date -->
+    <record id="view_account_analytic_line_pivot_timesheet" model="ir.ui.view">
+        <field name="name">account.analytic.line.view_pivot.timesheet</field>
+        <field name="model">account.analytic.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Timesheet Pivot" sample="1">
+                <field name="employee_id" type="row"/>
+                <field name="date" interval="day" type="col"/>
+                <field name="unit_amount" type="measure"/>
+                <field name="x_overtime_hours" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Search view: current week filter + flat filters -->
+    <record id="view_account_analytic_line_search_timesheet" model="ir.ui.view">
+        <field name="name">account.analytic.line.search.timesheet</field>
+        <field name="model">account.analytic.line</field>
+        <field name="arch" type="xml">
+            <search string="Timesheets">
+                <field name="employee_id"/>
+                <field name="project_id"/>
+                <field name="name"/>
+                <separator/>
+                <filter name="filter_billable" string="Billable"
+                        domain="[('x_billable', '=', True)]"/>
+                <filter name="filter_overtime" string="Has Overtime"
+                        domain="[('x_overtime_hours', '&gt;', 0)]"/>
+                <filter name="filter_draft" string="Draft"
+                        domain="[('x_validation_state', '=', 'draft')]"/>
+                <filter name="filter_submitted" string="Submitted"
+                        domain="[('x_validation_state', '=', 'submitted')]"/>
+                <filter name="filter_validated" string="Validated"
+                        domain="[('x_validation_state', '=', 'validated')]"/>
+                <filter name="filter_not_invoiced" string="Not Invoiced"
+                        domain="[('x_billed_invoice_line_id', '=', False)]"/>
+                <separator/>
+                <filter name="filter_this_week" string="This Week"
+                        domain="[('date', '&gt;=', (context_today() + relativedelta(weeks=-1, weekday=0)).strftime('%Y-%m-%d')),
+                                 ('date', '&lt;=', (context_today() + relativedelta(weekday=6)).strftime('%Y-%m-%d'))]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Dedicated action for pivot/list -->
+    <record id="action_timesheet_pivot" model="ir.actions.act_window">
+        <field name="name">Timesheet Pivot</field>
+        <field name="res_model">account.analytic.line</field>
+        <field name="view_mode">pivot,list,form</field>
+        <field name="search_view_id" ref="view_account_analytic_line_search_timesheet"/>
+        <field name="context">{"search_default_filter_this_week": 1}</field>
+    </record>
+
+</odoo>

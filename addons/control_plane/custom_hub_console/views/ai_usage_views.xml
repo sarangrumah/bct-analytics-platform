@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ai_usage_list" model="ir.ui.view">
+        <field name="name">custom.hub.ai.usage.list</field>
+        <field name="model">custom.hub.ai.usage</field>
+        <field name="arch" type="xml">
+            <list string="AI Usage">
+                <field name="date"/>
+                <field name="tenant_id"/>
+                <field name="model_name"/>
+                <field name="input_tokens" sum="Input"/>
+                <field name="output_tokens" sum="Output"/>
+                <field name="cache_read_tokens" sum="Cache Read"/>
+                <field name="cache_hit_rate_pct"/>
+                <field name="cost_usd" sum="Cost (USD)"/>
+                <field name="request_count" sum="Requests"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ai_usage_pivot" model="ir.ui.view">
+        <field name="name">custom.hub.ai.usage.pivot</field>
+        <field name="model">custom.hub.ai.usage</field>
+        <field name="arch" type="xml">
+            <pivot string="AI Usage">
+                <field name="tenant_id" type="row"/>
+                <field name="date" interval="month" type="col"/>
+                <field name="request_count" type="measure"/>
+                <field name="input_tokens" type="measure"/>
+                <field name="output_tokens" type="measure"/>
+                <field name="cost_usd" type="measure"/>
+                <field name="cache_hit_rate_pct" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_ai_usage_graph" model="ir.ui.view">
+        <field name="name">custom.hub.ai.usage.graph</field>
+        <field name="model">custom.hub.ai.usage</field>
+        <field name="arch" type="xml">
+            <graph string="AI Usage Over Time" type="line">
+                <field name="date" interval="day"/>
+                <field name="request_count" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_ai_usage_search" model="ir.ui.view">
+        <field name="name">custom.hub.ai.usage.search</field>
+        <field name="model">custom.hub.ai.usage</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="tenant_id"/>
+                <field name="model_name"/>
+                <filter string="Last 7 Days" name="last7"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Last 30 Days" name="last30"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+
+                    <filter string="Tenant" name="g_tenant"
+                            context="{'group_by': 'tenant_id'}"/>
+                    <filter string="Model" name="g_model"
+                            context="{'group_by': 'model_name'}"/>
+                    <filter string="Date (Month)" name="g_date"
+                            context="{'group_by': 'date:month'}"/>
+
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ai_usage" model="ir.actions.act_window">
+        <field name="name">AI Console</field>
+        <field name="res_model">custom.hub.ai.usage</field>
+        <field name="view_mode">list,pivot,graph</field>
+        <field name="context">{'search_default_last7': 1}</field>
+    </record>
+</odoo>

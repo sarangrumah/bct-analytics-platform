@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!--
+        Initial inbound-ingest cursor. '0' scans from the beginning on first run.
+        In production, set to MAX(MSG016T.ID) at install (backfill wizard or a
+        one-shot update) so pre-existing rows are not bulk-ingested.
+        -->
+        <record id="param_inbound_cursor" model="ir.config_parameter">
+            <field name="key">custom_ppob_oracle_bridge.last_seen_msg016t_id</field>
+            <field name="value">0</field>
+        </record>
+
+    </data>
+</odoo>

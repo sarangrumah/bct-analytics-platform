@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_retail_mdm_request_user,mdm request user read,model_retail_mdm_request,custom_retail_import.group_retail_import_user,1,0,0,0
+access_retail_mdm_request_manager,mdm request manager all,model_retail_mdm_request,custom_retail_import.group_retail_import_manager,1,1,1,1
+access_retail_mdm_item_user,mdm item user read,model_retail_mdm_item,custom_retail_import.group_retail_import_user,1,0,0,0
+access_retail_mdm_item_manager,mdm item manager all,model_retail_mdm_item,custom_retail_import.group_retail_import_manager,1,1,1,1
+access_retail_mdm_category_map_user,mdm category map user read,model_retail_mdm_category_map,custom_retail_import.group_retail_import_user,1,0,0,0
+access_retail_mdm_category_map_manager,mdm category map manager all,model_retail_mdm_category_map,custom_retail_import.group_retail_import_manager,1,1,1,1

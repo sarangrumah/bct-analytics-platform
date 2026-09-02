@@ -1,0 +1,25 @@
+{
+  "name": "athera-hub-portal",
+  "version": "1.0.0",
+  "private": true,
+  "engines": { "node": ">=22 <25" },
+  "scripts": {
+    "dev": "next dev -H 127.0.0.1 -p 33003",
+    "build": "next build",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "next": "15.5.21",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "jose": "6.2.10",
+    "pg": "8.13.1",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "@types/pg": "8.11.10",
+    "@types/react": "19.0.2",
+    "typescript": "5.9.3"
+  }
+}
