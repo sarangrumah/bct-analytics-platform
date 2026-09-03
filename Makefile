@@ -492,3 +492,7 @@ cdc-status: ## Show the CDC loader, its replication slot and its last success
 # Adding a target with one of those names silently overrides theirs, because
 # make takes the LAST definition. Check this list before naming a new target.
 # ===========================================================================
+
+.PHONY: scan-local
+scan-local: ## Run CI's static scanners locally via digest-pinned Docker images (S-2). ARGS=semgrep|hadolint|sqlfluff|gitleaks|trivy|all
+	@bash scripts/scan-local.sh $(or $(ARGS),all)

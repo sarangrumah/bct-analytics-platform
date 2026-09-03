@@ -22,5 +22,9 @@
     "@types/react": "19.0.2",
     "typescript": "5.9.3",
     "@types/pg": "8.11.10"
+  },
+  "overrides": {
+    "postcss": "^8.5.18",
+    "sharp": "^0.35.0"
   }
 }

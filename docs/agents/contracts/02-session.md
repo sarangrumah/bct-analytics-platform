@@ -3,6 +3,13 @@
 Status: **FROZEN at GATE 0.** Producer: `login-gateway`. Consumers: `insight-portal` (server side
 only), `semantic-api`.
 
+> **AMANDEMEN LOKAL 2026-09-03 — dicatat oleh operator, bukan oleh pemilik repo.**
+> Daftar klaim di bawah **tidak lengkap** terhadap kode yang berjalan. `login-gateway` juga
+> mencetak `is_super_admin`, `subscription_active`, dan `products`. Ketiganya dibekukan di
+> `07-entitlement.md`; bentuk token yang sah adalah gabungan contract 02 dan 07.
+> Aturan absen yang sama berlaku untuk ketiganya: absen berarti `false` / kosong, tidak pernah
+> "semua". Jangan menghapus klaim ini agar cocok dengan dokumen — dokumen ini yang tertinggal.
+
 ## Shape
 
 `login-gateway` authenticates the user against Odoo over JSON-RPC (`common.authenticate`), reads the

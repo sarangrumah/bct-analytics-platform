@@ -87,7 +87,7 @@ class DigiflazzAdapter(PPOBProviderAdapter):
         # Digiflazz specifies md5(username + api_key + suffix) as its request
         # signature; a stronger digest here produces a signature their API rejects.
         # The weakness is in their protocol and cannot be fixed on this side.
-        return hashlib.md5(raw.encode("utf-8")).hexdigest()  # noqa: S324  # nosec B324 - vendor-mandated digest
+        return hashlib.md5(raw.encode("utf-8")).hexdigest()  # noqa: S324  # nosec B324 - vendor-mandated digest # nosemgrep: bct-python-weak-hash-for-security
 
     def _timeout(self):
         cfg = self.provider.adapter_config_id

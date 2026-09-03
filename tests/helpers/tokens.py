@@ -54,7 +54,20 @@ def public_key_pem() -> str:
 
 
 def claims(tenant="bct", uid=2, roles=None, allowed_ou=None, all_ou=False, ttl=3600, **overrides):
-    """A contract-02 claim set. `allowed_ou` defaults to `[]`, which now means NO operating units."""
+    """A contract-02 + contract-07 claim set.
+
+    `allowed_ou` defaults to `[]`, which now means NO operating units.
+
+    `subscription_active` and `products` default to an ENTITLED tenant, because that is what a real
+    token from `login-gateway` carries: the gateway asks the control plane on every issue, so a
+    token that reached a verifier always has both claims. A helper that omitted them would mint a
+    shape the platform never produces, and — since contract 07 reads absent as false — every test
+    that merely wanted a valid session would have started failing with 402 for a reason that had
+    nothing to do with what it was testing.
+
+    Tests that want the refusal pass the claims explicitly:
+    `claims(subscription_active=False)` or `claims(products=["odoo"])`.
+    """
     now = int(time.time())
     payload = {
         "iss": env("LOGIN_GATEWAY_JWT_ISSUER", "https://login-gateway.local/"),
@@ -66,6 +79,9 @@ def claims(tenant="bct", uid=2, roles=None, allowed_ou=None, all_ou=False, ttl=3
         "allowed_ou": [] if allowed_ou is None else allowed_ou,
         "all_ou": all_ou,
         "company_ids": [1],
+        # Contract 07. Both halves, always — see the docstring.
+        "subscription_active": True,
+        "products": ["insight", "odoo", "agent"],
         "iat": now,
         "exp": now + ttl,
     }

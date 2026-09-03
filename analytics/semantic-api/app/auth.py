@@ -42,6 +42,21 @@ class Session:
         # Absent means false. Ruling a0fbb88: the bypass must be explicit, so a token that predates
         # the claim, or one a bug forgot to populate, grants nothing rather than everything.
         self.all_ou = bool(claims.get("all_ou", False))
+        # Contract 07. Absent means false, and absent `products` means NONE, never all — the same
+        # fail-closed rule `all_ou` follows. A token minted before these claims existed must not
+        # read as a paid subscription, and a bug that forgets to populate them must lock the door
+        # rather than open it.
+        self.subscription_active = bool(claims.get("subscription_active", False))
+        self.products = list(claims.get("products") or [])
+
+    def entitled_to(self, product: str) -> bool:
+        """Contract 07: the plan grants this product AND the subscription is live.
+
+        Both halves are needed. An active subscription on a plan that does not include the
+        product is not entitlement, and a lapsed subscription on a plan that does include it is
+        not entitlement either.
+        """
+        return self.subscription_active and product in self.products
 
     def __repr__(self) -> str:
         return "<Session tenant=%s uid=%s all_ou=%s>" % (self.tenant_id, self.odoo_uid, self.all_ou)

@@ -116,7 +116,7 @@ class OnboardingPublicSubmission(models.Model):
         partner_name = data.get("partner_name") or data.get("company_name") or _("Unknown")
         partner_email = data.get("partner_email") or data.get("contact_email")
         partner_phone = data.get("contact_phone")
-        Partner = self.env["res.partner"].sudo()
+        Partner = self.env["res.partner"].sudo()  # nosemgrep: bct-odoo-sudo-on-tenant-scoped-model  # public intake has no logged-in user; partner search/create needs sudo; tenancy is per-database (dbfilter), not per-row
         partner = False
         if partner_email:
             partner = Partner.search([("email", "=", partner_email)], limit=1)

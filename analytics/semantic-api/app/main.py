@@ -50,6 +50,11 @@ STALE_TOTAL = Counter(
 SCOPE_VIOLATIONS = Counter(
     "bct_semantic_tenant_scope_violation_total", "Cross-tenant requests refused with 403."
 )
+ENTITLEMENT_REFUSALS = Counter(
+    "bct_semantic_entitlement_refusal_total",
+    "Requests refused with 402 because the tenant's entitlement did not cover this product.",
+    ["reason"],
+)
 POOL_GUARD_TRIPS = Gauge(
     "bct_semantic_pool_guard_trips",
     "Times a pooled connection was checked out carrying a stale tenant scope (finding T-1). "
@@ -83,6 +88,26 @@ TENANT_SCOPE_VIOLATION_BODY = {
     "error": "tenant_scope_violation",
     "detail": "Session is not scoped to the requested tenant.",
 }
+
+#: Contract 07. Two distinct refusals, and the difference is not cosmetic: one says the client
+#: stopped paying, the other says they never bought this product. A single merged message sends
+#: the wrong half of the platform to fix it.
+#:
+#: 402 and NOT 403. A lapsed or absent entitlement is not an authorisation failure — the session is
+#: valid and the person is who they say they are. 403 stays reserved for contract 02's cross-tenant
+#: violation, which is why the scope check above runs FIRST and cannot be shadowed by this one.
+SUBSCRIPTION_INACTIVE_BODY = {
+    "error": "subscription_inactive",
+    "detail": "This tenant's subscription is not active.",
+}
+PRODUCT_NOT_ENTITLED_BODY = {
+    "error": "product_not_entitled",
+    "detail": "This tenant's plan does not include ATHERA Insight.",
+}
+
+#: The product this service IS. Named once so the gate cannot drift from the vocabulary frozen in
+#: contract 07 and in the plans table's CHECK constraint.
+THIS_PRODUCT = "insight"
 
 
 class QueryRequest(BaseModel):
@@ -220,6 +245,25 @@ def create_app(warehouse=None, verifier=None, registry=None, max_limit=None) -> 
             QUERY_TOTAL.labels(metric=payload.metric, status="403").inc()
             _audit("tenant_scope_violation", session, requested=requested_tenant)
             return JSONResponse(TENANT_SCOPE_VIOLATION_BODY, 403)
+
+        # Contract 07, and deliberately placed AFTER the scope check so a cross-tenant probe from
+        # an unentitled session still answers 403 rather than leaking, through a 402, that the
+        # entitlement layer was reached at all.
+        #
+        # Checked from the verified token and nowhere else. The gateway asks the control plane on
+        # every issue and every refresh, so the freshest answer this service can have is already in
+        # the claims; re-reading the registry here would add a second copy of the rule and a second
+        # thing to be down. The cost is the token's lifetime — see contract 07's revocation budget.
+        if not session.subscription_active:
+            ENTITLEMENT_REFUSALS.labels(reason="subscription_inactive").inc()
+            QUERY_TOTAL.labels(metric=payload.metric, status="402").inc()
+            _audit("subscription_inactive", session)
+            return JSONResponse(SUBSCRIPTION_INACTIVE_BODY, 402)
+        if THIS_PRODUCT not in session.products:
+            ENTITLEMENT_REFUSALS.labels(reason="product_not_entitled").inc()
+            QUERY_TOTAL.labels(metric=payload.metric, status="402").inc()
+            _audit("product_not_entitled", session)
+            return JSONResponse(PRODUCT_NOT_ENTITLED_BODY, 402)
 
         metric = registry.get(payload.metric)
         if metric is None:

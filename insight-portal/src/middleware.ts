@@ -98,17 +98,42 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
    * them back to the login screen to re-enter a correct password that cannot help, which is the
    * single most confusing thing this branch could do.
    */
-  if (!session.subscription_active && !pathname.startsWith("/subscription")) {
-    if (pathname.startsWith("/api/")) {
-      return NextResponse.json(
-        { error: "subscription_inactive", detail: "This tenant's subscription is not active." },
-        { status: 402 },
-      );
+  /**
+   * Contract 07 splits the old single question into two, because they have different answers and
+   * different people fix them.
+   *
+   *   subscription_active === false   the client stopped paying, or the clock ran out
+   *   !products.includes("insight")   the client pays, but for a plan that is not this product
+   *
+   * Merging them was the state before contract 07: `products` was minted into every token and read
+   * by nobody, so a client on the `odoo_care` plan passed this gate and used a dashboard their plan
+   * does not grant. The claim existed; the enforcement did not.
+   *
+   * Both are 402, never 403 — see the note above. `/subscription` stays exempt for both, or the
+   * page that explains the refusal would itself be refused, forever.
+   */
+  if (!pathname.startsWith("/subscription")) {
+    const refusal = !session.subscription_active
+      ? { error: "subscription_inactive", detail: "This tenant's subscription is not active." }
+      : !session.products.includes("insight")
+        ? {
+            error: "product_not_entitled",
+            detail: "This tenant's plan does not include ATHERA Insight.",
+          }
+        : null;
+
+    if (refusal !== null) {
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json(refusal, { status: 402 });
+      }
+      const info = request.nextUrl.clone();
+      info.pathname = "/subscription";
+      info.search = "";
+      // The page reads this to say which of the two happened. It is a hint for wording only: the
+      // page re-derives the truth from the session, so a forged query string changes nothing.
+      info.searchParams.set("reason", refusal.error);
+      return NextResponse.redirect(info);
     }
-    const info = request.nextUrl.clone();
-    info.pathname = "/subscription";
-    info.search = "";
-    return NextResponse.redirect(info);
   }
 
   return NextResponse.next();

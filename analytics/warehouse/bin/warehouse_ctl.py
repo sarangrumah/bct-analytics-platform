@@ -614,6 +614,7 @@ def cmd_import_policy(args) -> int:
         # sweep here would delete the Odoo tenants' policy on the first import
         # for an external client -- the two share this table, and each source
         # is only authoritative for its own tables.
+        # nosemgrep: bct-python-sql-string-interpolation  # %s and VALUES %s are bound psycopg2 params, not Python string interpolation
         cur.execute(
             "DELETE FROM warehouse.column_policy p "
             "WHERE p.source_table = ANY(%s) "
